@@ -6,8 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProviders
 import com.bluehub.fastmixer.R
-import com.bluehub.fastmixer.screens.common.ViewModelFactory
-import com.bluehub.fastmixer.screens.common.fragments.BaseFragment
+import com.bluehub.fastmixer.common.viewmodel.ViewModelFactory
+import com.bluehub.fastmixer.common.fragments.BaseFragment
 import kotlinx.android.synthetic.main.mixing_fragment.*
 import javax.inject.Inject
 

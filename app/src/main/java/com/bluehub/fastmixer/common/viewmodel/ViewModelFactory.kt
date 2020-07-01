@@ -1,4 +1,4 @@
-package com.bluehub.fastmixer.screens.common
+package com.bluehub.fastmixer.common.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider

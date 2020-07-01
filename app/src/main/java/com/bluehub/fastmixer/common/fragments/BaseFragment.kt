@@ -1,4 +1,4 @@
-package com.bluehub.fastmixer.screens.common.fragments
+package com.bluehub.fastmixer.common.fragments
 
 import androidx.annotation.UiThread
 import androidx.fragment.app.Fragment
