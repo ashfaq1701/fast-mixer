@@ -11,7 +11,11 @@ class MixerApplication: Application() {
     override fun onCreate() {
         super.onCreate()
         mApplicationComponent = DaggerApplicationComponent.builder()
-            .applicationModule(ApplicationModule(this))
+            .applicationModule(
+                ApplicationModule(
+                    this
+                )
+            )
             .build()
     }
 
