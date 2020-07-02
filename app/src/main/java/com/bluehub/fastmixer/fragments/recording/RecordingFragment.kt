@@ -1,4 +1,4 @@
-package com.bluehub.fastmixer.screens.mixing
+package com.bluehub.fastmixer.fragments.recording
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -10,29 +10,29 @@ import com.bluehub.fastmixer.common.fragments.BaseFragment
 import com.bluehub.fastmixer.common.viewmodel.ViewModelFactory
 import javax.inject.Inject
 
-class MixingFragment : BaseFragment() {
+class RecordingFragment : BaseFragment() {
+
     companion object {
-        fun newInstance() = MixingFragment()
+        fun newInstance() = RecordingFragment()
     }
 
     @Inject
     lateinit var mViewModelFactory: ViewModelFactory
 
-    private lateinit var viewModel: MixingViewModel
+    private lateinit var viewModel: RecordingViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.mixing_fragment, container, false)
+        return inflater.inflate(R.layout.recording_fragment, container, false)
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         getPresentationComponent().inject(this)
         viewModel = ViewModelProviders.of(this, mViewModelFactory)
-            .get(MixingViewModel::class.java)
-        // TODO: Use the ViewModel
+            .get(RecordingViewModel::class.java)
     }
 
 }
