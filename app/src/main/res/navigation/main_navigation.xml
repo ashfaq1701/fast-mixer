@@ -3,19 +3,23 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    app:startDestination="@id/mixingFragment">
+    app:startDestination="@id/mixingScreen">
 
     <fragment
-        android:id="@+id/mixingFragment"
+        android:id="@+id/mixingScreen"
         android:name="com.bluehub.fastmixer.screens.mixing.MixingScreen"
-        android:label="MixingFragment" >
+        android:label="MixingScreen" >
         <action
-            android:id="@+id/action_mixingFragment_to_recordingFragment"
-            app:destination="@id/recordingFragment" />
+            android:id="@+id/action_mixingScreen_to_recordingScreen"
+            app:destination="@id/recordingScreen" />
     </fragment>
     <fragment
-        android:id="@+id/recordingFragment"
-        android:name="com.bluehub.fastmixer.fragments.recording.RecordingFragment"
-        android:label="recording_fragment"
-        tools:layout="@layout/recording_fragment" />
+        android:id="@+id/recordingScreen"
+        android:name="com.bluehub.fastmixer.screens.recording.RecordingScreen"
+        android:label="RecordingScreen"
+        tools:layout="@layout/recording_screen" >
+        <action
+            android:id="@+id/action_recordingScreen_to_mixingScreen"
+            app:destination="@id/mixingScreen" />
+    </fragment>
 </navigation>

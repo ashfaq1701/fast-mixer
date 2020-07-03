@@ -10,29 +10,33 @@ import com.bluehub.fastmixer.common.fragments.BaseFragment
 import com.bluehub.fastmixer.common.viewmodel.ViewModelFactory
 import javax.inject.Inject
 
-class RecordingFragment : BaseFragment() {
+class VisualizerFragment : BaseFragment() {
 
     companion object {
-        fun newInstance() = RecordingFragment()
+        fun newInstance() = VisualizerFragment()
     }
 
     @Inject
     lateinit var mViewModelFactory: ViewModelFactory
 
-    private lateinit var viewModel: RecordingViewModel
+    private lateinit var viewModel: VisualizerViewModel
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        getPresentationComponent().inject(this)
+        viewModel = ViewModelProviders.of(this, mViewModelFactory)
+            .get(VisualizerViewModel::class.java)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.recording_fragment, container, false)
+        return inflater.inflate(R.layout.visualizer_fragment, container, false)
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        getPresentationComponent().inject(this)
-        viewModel = ViewModelProviders.of(this, mViewModelFactory)
-            .get(RecordingViewModel::class.java)
     }
 
 }
