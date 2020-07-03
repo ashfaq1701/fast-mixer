@@ -7,6 +7,15 @@
 
     <fragment
         android:id="@+id/mixingFragment"
-        android:name="com.bluehub.fastmixer.screens.mixing.MixingFragment"
-        android:label="MixingFragment" />
+        android:name="com.bluehub.fastmixer.screens.mixing.MixingScreen"
+        android:label="MixingFragment" >
+        <action
+            android:id="@+id/action_mixingFragment_to_recordingFragment"
+            app:destination="@id/recordingFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/recordingFragment"
+        android:name="com.bluehub.fastmixer.fragments.recording.RecordingFragment"
+        android:label="recording_fragment"
+        tools:layout="@layout/recording_fragment" />
 </navigation>
