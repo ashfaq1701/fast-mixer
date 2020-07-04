@@ -10,20 +10,24 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import com.bluehub.fastmixer.R
 import com.bluehub.fastmixer.common.fragments.BaseFragment
+import com.bluehub.fastmixer.common.fragments.BaseScreenFragment
 import com.bluehub.fastmixer.common.viewmodel.ViewModelFactory
 import com.bluehub.fastmixer.databinding.MixingScreenBinding
 import com.bluehub.fastmixer.screens.recording.RecordingScreenViewModel
 import javax.inject.Inject
 
-class MixingScreen : BaseFragment() {
+class MixingScreen : BaseScreenFragment() {
     companion object {
         fun newInstance() = MixingScreen()
     }
+
+    override var TAG: String = javaClass.simpleName
 
     @Inject
     lateinit var mViewModelFactory: ViewModelFactory
 
     private lateinit var viewModel: MixingScreenViewModel
+    private lateinit var dataBinding: MixingScreenBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,7 +38,7 @@ class MixingScreen : BaseFragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val dataBinding: MixingScreenBinding = DataBindingUtil
+        dataBinding = DataBindingUtil
             .inflate(inflater, R.layout.mixing_screen, container, false)
 
         viewModel = ViewModelProviders.of(this, mViewModelFactory)
@@ -59,4 +63,11 @@ class MixingScreen : BaseFragment() {
         // TODO: Use the ViewModel
     }
 
+    override fun disableControls() {
+        dataBinding.goToRecord.isEnabled = false
+    }
+
+    override fun enableControls() {
+        dataBinding.goToRecord.isEnabled = true
+    }
 }

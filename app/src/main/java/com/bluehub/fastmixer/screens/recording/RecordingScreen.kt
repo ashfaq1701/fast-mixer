@@ -10,19 +10,23 @@ import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.bluehub.fastmixer.R
 import com.bluehub.fastmixer.common.fragments.BaseFragment
+import com.bluehub.fastmixer.common.fragments.BaseScreenFragment
 import com.bluehub.fastmixer.common.viewmodel.ViewModelFactory
 import com.bluehub.fastmixer.databinding.RecordingScreenBinding
 import javax.inject.Inject
 
-class RecordingScreen : BaseFragment() {
+class RecordingScreen : BaseScreenFragment() {
 
     companion object {
         fun newInstance() = RecordingScreen()
     }
 
+    override var TAG: String = javaClass.simpleName
+
     @Inject
     lateinit var mViewModelFactory: ViewModelFactory
 
+    private lateinit var dataBinding: RecordingScreenBinding
     private lateinit var viewModel: RecordingScreenViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,7 +38,7 @@ class RecordingScreen : BaseFragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val dataBinding: RecordingScreenBinding = DataBindingUtil
+        dataBinding = DataBindingUtil
             .inflate(inflater, R.layout.recording_screen, container, false)
 
         viewModel = ViewModelProviders.of(this, mViewModelFactory)
@@ -66,4 +70,11 @@ class RecordingScreen : BaseFragment() {
         super.onActivityCreated(savedInstanceState)
     }
 
+    override fun disableControls() {
+        dataBinding.toggleRecord.isEnabled = false
+    }
+
+    override fun enableControls() {
+        dataBinding.toggleRecord.isEnabled = true
+    }
 }
