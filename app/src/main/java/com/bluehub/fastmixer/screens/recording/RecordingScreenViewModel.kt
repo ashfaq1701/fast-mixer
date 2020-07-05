@@ -1,10 +1,12 @@
 package com.bluehub.fastmixer.screens.recording
 
+import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.bluehub.fastmixer.common.viewmodel.BaseScreenViewModel
 
-class RecordingScreenViewModel : ViewModel() {
+class RecordingScreenViewModel(val context: Context?, val tag: String) : BaseScreenViewModel(context, tag) {
     private val _eventSetRecording = MutableLiveData<Boolean>(false)
     val eventSetRecording: LiveData<Boolean>
         get() = _eventSetRecording

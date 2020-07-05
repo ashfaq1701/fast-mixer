@@ -16,10 +16,9 @@ object PermissionManager {
         Manifest.permission.WRITE_EXTERNAL_STORAGE
     )
 
-    private fun requestRequiredPermissions(activity: Activity, tag: String) {
+    fun requestRequiredPermissions(activity: Activity, tag: String) {
         Log.d(tag, "requestRecordPermission: ")
         ActivityCompat.requestPermissions(activity, PERMISSIONS, AUDIO_RECORD_REQUEST)
-
     }
 
     fun isRequiredPermissionsGranted(context: Context?, tag: String): Boolean {

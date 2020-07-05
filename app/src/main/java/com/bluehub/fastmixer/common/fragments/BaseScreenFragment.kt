@@ -10,6 +10,27 @@ abstract class BaseScreenFragment: BaseFragment() {
 
     abstract fun enableControls()
 
+    private fun checkRecordAudioPermission(): Boolean {
+
+        Log.d(TAG, "checkRecordAudioPermission: ")
+
+        val isRecordingAllowed = PermissionManager.isRequiredPermissionsGranted(context, TAG)
+        Log.i(TAG, "checkRecordAudioPermission: $isRecordingAllowed")
+
+        if (!isRecordingAllowed) {
+            activity?.let {
+                PermissionManager.requestRequiredPermissions(activity!!, TAG)
+                disableControls()
+            }
+        } else {
+
+            enableControls()
+
+        }
+
+        return isRecordingAllowed
+    }
+
     override fun onRequestPermissionsResult(
         requestCode: Int, permissions: Array<String>,
         grantResults: IntArray

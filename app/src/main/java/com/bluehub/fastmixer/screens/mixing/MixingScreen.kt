@@ -23,10 +23,9 @@ class MixingScreen : BaseScreenFragment() {
 
     override var TAG: String = javaClass.simpleName
 
-    @Inject
-    lateinit var mViewModelFactory: ViewModelFactory
-
     private lateinit var viewModel: MixingScreenViewModel
+    private lateinit var viewModelFactory: MixingScreenViewModelFactory
+
     private lateinit var dataBinding: MixingScreenBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,7 +40,8 @@ class MixingScreen : BaseScreenFragment() {
         dataBinding = DataBindingUtil
             .inflate(inflater, R.layout.mixing_screen, container, false)
 
-        viewModel = ViewModelProviders.of(this, mViewModelFactory)
+        viewModelFactory = MixingScreenViewModelFactory(context, TAG)
+        viewModel = ViewModelProviders.of(this, viewModelFactory)
             .get(MixingScreenViewModel::class.java)
 
         dataBinding.mixingScreenViewModel = viewModel

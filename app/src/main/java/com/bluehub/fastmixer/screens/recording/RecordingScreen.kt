@@ -13,6 +13,7 @@ import com.bluehub.fastmixer.common.fragments.BaseFragment
 import com.bluehub.fastmixer.common.fragments.BaseScreenFragment
 import com.bluehub.fastmixer.common.viewmodel.ViewModelFactory
 import com.bluehub.fastmixer.databinding.RecordingScreenBinding
+import com.bluehub.fastmixer.screens.mixing.MixingScreenViewModelFactory
 import javax.inject.Inject
 
 class RecordingScreen : BaseScreenFragment() {
@@ -23,10 +24,9 @@ class RecordingScreen : BaseScreenFragment() {
 
     override var TAG: String = javaClass.simpleName
 
-    @Inject
-    lateinit var mViewModelFactory: ViewModelFactory
-
     private lateinit var dataBinding: RecordingScreenBinding
+
+    private lateinit var viewModelFactory: RecordingScreenViewModelFactory
     private lateinit var viewModel: RecordingScreenViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,7 +41,8 @@ class RecordingScreen : BaseScreenFragment() {
         dataBinding = DataBindingUtil
             .inflate(inflater, R.layout.recording_screen, container, false)
 
-        viewModel = ViewModelProviders.of(this, mViewModelFactory)
+        viewModelFactory = RecordingScreenViewModelFactory(context, TAG)
+        viewModel = ViewModelProviders.of(this)
             .get(RecordingScreenViewModel::class.java)
 
         dataBinding.recordingScreenViewModel = viewModel

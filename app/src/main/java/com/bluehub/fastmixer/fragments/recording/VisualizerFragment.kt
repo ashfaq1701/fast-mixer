@@ -7,8 +7,6 @@ import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProviders
 import com.bluehub.fastmixer.R
 import com.bluehub.fastmixer.common.fragments.BaseFragment
-import com.bluehub.fastmixer.common.viewmodel.ViewModelFactory
-import javax.inject.Inject
 
 class VisualizerFragment : BaseFragment() {
 
@@ -16,15 +14,14 @@ class VisualizerFragment : BaseFragment() {
         fun newInstance() = VisualizerFragment()
     }
 
-    @Inject
-    lateinit var mViewModelFactory: ViewModelFactory
+    override var TAG: String = javaClass.simpleName
 
     private lateinit var viewModel: VisualizerViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         getPresentationComponent().inject(this)
-        viewModel = ViewModelProviders.of(this, mViewModelFactory)
+        viewModel = ViewModelProviders.of(this)
             .get(VisualizerViewModel::class.java)
     }
 
