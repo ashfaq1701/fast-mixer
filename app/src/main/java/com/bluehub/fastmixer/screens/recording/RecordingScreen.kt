@@ -10,13 +10,11 @@ import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.bluehub.fastmixer.R
 import com.bluehub.fastmixer.common.fragments.BaseFragment
-import com.bluehub.fastmixer.common.fragments.BaseScreenFragment
-import com.bluehub.fastmixer.common.viewmodel.ViewModelFactory
+import com.bluehub.fastmixer.common.permissions.PermissionFragmentInterface
+import com.bluehub.fastmixer.common.permissions.ViewModelPermissionInterface
 import com.bluehub.fastmixer.databinding.RecordingScreenBinding
-import com.bluehub.fastmixer.screens.mixing.MixingScreenViewModelFactory
-import javax.inject.Inject
 
-class RecordingScreen : BaseScreenFragment() {
+class RecordingScreen : BaseFragment(), PermissionFragmentInterface {
 
     companion object {
         fun newInstance() = RecordingScreen()
@@ -26,8 +24,8 @@ class RecordingScreen : BaseScreenFragment() {
 
     private lateinit var dataBinding: RecordingScreenBinding
 
+    override lateinit var viewModel: ViewModelPermissionInterface
     private lateinit var viewModelFactory: RecordingScreenViewModelFactory
-    private lateinit var viewModel: RecordingScreenViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,14 +40,24 @@ class RecordingScreen : BaseScreenFragment() {
             .inflate(inflater, R.layout.recording_screen, container, false)
 
         viewModelFactory = RecordingScreenViewModelFactory(context, TAG)
-        viewModel = ViewModelProviders.of(this)
+        viewModel = ViewModelProviders.of(this, viewModelFactory)
             .get(RecordingScreenViewModel::class.java)
 
-        dataBinding.recordingScreenViewModel = viewModel
+        dataBinding.viewModel = viewModel as RecordingScreenViewModel
 
         dataBinding.lifecycleOwner = viewLifecycleOwner
 
-        viewModel.eventSetRecording.observe(viewLifecycleOwner, Observer { setRecording ->
+        setPermissionEvents()
+        initUI()
+
+        return dataBinding.root
+    }
+
+    fun initUI() {
+
+        val localViewModel = viewModel as RecordingScreenViewModel
+
+        localViewModel.eventSetRecording.observe(viewLifecycleOwner, Observer { setRecording ->
             if (setRecording) {
                 dataBinding.toggleRecord.text = getString(R.string.stop_recording_label)
             } else {
@@ -57,25 +65,11 @@ class RecordingScreen : BaseScreenFragment() {
             }
         })
 
-        viewModel.eventDoneRecording.observe(viewLifecycleOwner, Observer { doneRecording ->
+        localViewModel.eventDoneRecording.observe(viewLifecycleOwner, Observer { doneRecording ->
             if (doneRecording) {
                 findNavController().navigate(RecordingScreenDirections.actionRecordingScreenToMixingScreen())
-                viewModel.resetDoneRecording()
+                localViewModel.resetDoneRecording()
             }
         })
-
-        return dataBinding.root
-    }
-
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-    }
-
-    override fun disableControls() {
-        dataBinding.toggleRecord.isEnabled = false
-    }
-
-    override fun enableControls() {
-        dataBinding.toggleRecord.isEnabled = true
     }
 }

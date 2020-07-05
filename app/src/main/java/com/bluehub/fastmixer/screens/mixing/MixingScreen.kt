@@ -10,20 +10,18 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import com.bluehub.fastmixer.R
 import com.bluehub.fastmixer.common.fragments.BaseFragment
-import com.bluehub.fastmixer.common.fragments.BaseScreenFragment
-import com.bluehub.fastmixer.common.viewmodel.ViewModelFactory
+import com.bluehub.fastmixer.common.permissions.PermissionFragmentInterface
+import com.bluehub.fastmixer.common.permissions.ViewModelPermissionInterface
 import com.bluehub.fastmixer.databinding.MixingScreenBinding
-import com.bluehub.fastmixer.screens.recording.RecordingScreenViewModel
-import javax.inject.Inject
 
-class MixingScreen : BaseScreenFragment() {
+class MixingScreen : BaseFragment(), PermissionFragmentInterface {
     companion object {
         fun newInstance() = MixingScreen()
     }
 
     override var TAG: String = javaClass.simpleName
 
-    private lateinit var viewModel: MixingScreenViewModel
+    override lateinit var viewModel: ViewModelPermissionInterface
     private lateinit var viewModelFactory: MixingScreenViewModelFactory
 
     private lateinit var dataBinding: MixingScreenBinding
@@ -44,30 +42,25 @@ class MixingScreen : BaseScreenFragment() {
         viewModel = ViewModelProviders.of(this, viewModelFactory)
             .get(MixingScreenViewModel::class.java)
 
-        dataBinding.mixingScreenViewModel = viewModel
+        dataBinding.mixingScreenViewModel = viewModel as MixingScreenViewModel
 
         dataBinding.lifecycleOwner = viewLifecycleOwner
 
-        viewModel.eventRecord.observe(viewLifecycleOwner, Observer { record ->
-            if (record) {
-                findNavController().navigate(MixingScreenDirections.actionMixingScreenToRecordingScreen())
-                viewModel.onRecordNavigated()
-            }
-        })
+        setPermissionEvents()
+        initUI()
 
         return dataBinding.root
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        // TODO: Use the ViewModel
-    }
+    fun initUI() {
 
-    override fun disableControls() {
-        dataBinding.goToRecord.isEnabled = false
-    }
+        val localViewModel = viewModel as MixingScreenViewModel
 
-    override fun enableControls() {
-        dataBinding.goToRecord.isEnabled = true
+        localViewModel.eventRecord.observe(viewLifecycleOwner, Observer { record ->
+            if (record) {
+                findNavController().navigate(MixingScreenDirections.actionMixingScreenToRecordingScreen())
+                localViewModel.onRecordNavigated()
+            }
+        })
     }
 }

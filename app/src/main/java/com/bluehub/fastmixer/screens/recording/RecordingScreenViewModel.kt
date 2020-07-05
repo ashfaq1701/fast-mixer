@@ -4,9 +4,10 @@ import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.bluehub.fastmixer.common.viewmodel.BaseScreenViewModel
+import com.bluehub.fastmixer.common.permissions.ViewModelPermissionInterface
 
-class RecordingScreenViewModel(val context: Context?, val tag: String) : BaseScreenViewModel(context, tag) {
+class RecordingScreenViewModel(override val context: Context?, override val tag: String) : ViewModel(),
+    ViewModelPermissionInterface {
     private val _eventSetRecording = MutableLiveData<Boolean>(false)
     val eventSetRecording: LiveData<Boolean>
         get() = _eventSetRecording

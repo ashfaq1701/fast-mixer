@@ -6,7 +6,7 @@
 
     <data>
         <variable
-            name="recordingScreenViewModel"
+            name="viewModel"
             type="com.bluehub.fastmixer.screens.recording.RecordingScreenViewModel" />
     </data>
 
@@ -27,7 +27,7 @@
             android:id="@+id/toggle_record"
             android:layout_width="@dimen/record_button_width"
             android:layout_height="@dimen/record_button_height"
-            android:onClick="@{() -> recordingScreenViewModel.toggleRecording()}"
+            android:onClick="@{() -> viewModel.toggleRecording()}"
             android:text="@string/start_recording_label"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/recording_visualizer" />
@@ -36,7 +36,7 @@
             android:id="@+id/record_done"
             android:layout_width="@dimen/record_button_width"
             android:layout_height="@dimen/record_button_height"
-            android:onClick="@{() -> recordingScreenViewModel.setDoneRecording()}"
+            android:onClick="@{() -> viewModel.setDoneRecording()}"
             android:text="@string/done"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="1.0"

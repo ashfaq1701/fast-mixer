@@ -8,20 +8,42 @@ import android.util.Log
 import androidx.core.app.ActivityCompat
 
 object PermissionManager {
-    const val AUDIO_RECORD_REQUEST = 12446
+    const val REQUEST_GROUP_ID = 12446
 
-    val PERMISSIONS = arrayOf(
-        Manifest.permission.RECORD_AUDIO,
-        Manifest.permission.READ_EXTERNAL_STORAGE,
-        Manifest.permission.WRITE_EXTERNAL_STORAGE
-    )
-
-    fun requestRequiredPermissions(activity: Activity, tag: String) {
-        Log.d(tag, "requestRecordPermission: ")
-        ActivityCompat.requestPermissions(activity, PERMISSIONS, AUDIO_RECORD_REQUEST)
+    fun isRecordPermissionGranted(context: Context?, tag: String): Boolean {
+        context?.let {
+           return ActivityCompat
+               .checkSelfPermission(
+                   context,
+                   Manifest.permission.RECORD_AUDIO
+               ) == PackageManager.PERMISSION_GRANTED
+        }
+        return false
     }
 
-    fun isRequiredPermissionsGranted(context: Context?, tag: String): Boolean {
+    fun isReadStoragePermissionGranted(context: Context?, tag: String): Boolean {
+        context?.let {
+            return ActivityCompat
+                .checkSelfPermission(
+                    context,
+                    Manifest.permission.READ_EXTERNAL_STORAGE
+                ) == PackageManager.PERMISSION_GRANTED
+        }
+        return false
+    }
+
+    fun isWriteStoragePermissionGranted(context: Context?, tag: String): Boolean {
+        context?.let {
+            return ActivityCompat
+                .checkSelfPermission(
+                    context,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE
+                ) == PackageManager.PERMISSION_GRANTED
+        }
+        return false
+    }
+
+    fun isAllPermissionsGranted(context: Context?, tag: String): Boolean {
         context?.let {
             val permissionStatus = (ActivityCompat
                 .checkSelfPermission(
