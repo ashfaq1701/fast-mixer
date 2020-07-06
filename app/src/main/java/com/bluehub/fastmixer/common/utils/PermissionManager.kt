@@ -10,67 +10,38 @@ class PermissionManager private constructor() {
     companion object {
         const val REQUEST_GROUP_ID = 12446
 
+        val allPermissions = arrayOf(Manifest.permission.RECORD_AUDIO,
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE)
+
         fun create(): PermissionManager {
             return PermissionManager()
         }
     }
 
-    fun isRecordPermissionGranted(context: Context?, tag: String): Boolean {
+    fun isSpecifiedPermissionsGranted(permissions: Array<String>, context: Context?): Boolean {
         context?.let {
-           return ActivityCompat
-               .checkSelfPermission(
-                   context,
-                   Manifest.permission.RECORD_AUDIO
-               ) == PackageManager.PERMISSION_GRANTED
-        }
-        return false
-    }
-
-    fun isReadStoragePermissionGranted(context: Context?, tag: String): Boolean {
-        context?.let {
-            return ActivityCompat
-                .checkSelfPermission(
-                    context,
-                    Manifest.permission.READ_EXTERNAL_STORAGE
-                ) == PackageManager.PERMISSION_GRANTED
-        }
-        return false
-    }
-
-    fun isWriteStoragePermissionGranted(context: Context?, tag: String): Boolean {
-        context?.let {
-            return ActivityCompat
-                .checkSelfPermission(
-                    context,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE
-                ) == PackageManager.PERMISSION_GRANTED
+            return permissions.fold(true) {result, permission ->
+                result && ActivityCompat
+                    .checkSelfPermission(
+                        context,
+                        permission
+                    ) == PackageManager.PERMISSION_GRANTED
+            }
         }
         return false
     }
 
     fun isAllPermissionsGranted(context: Context?, tag: String): Boolean {
         context?.let {
-            val permissionStatus = (ActivityCompat
-                .checkSelfPermission(
-                    context,
-                    Manifest.permission.RECORD_AUDIO
-                ) == PackageManager.PERMISSION_GRANTED) &&
-                    (ActivityCompat
-                        .checkSelfPermission(
-                            context,
-                            Manifest.permission.READ_EXTERNAL_STORAGE
-                        ) == PackageManager.PERMISSION_GRANTED) &&
-                    (ActivityCompat
-                        .checkSelfPermission(
-                            context,
-                            Manifest.permission.WRITE_EXTERNAL_STORAGE
-                        ) == PackageManager.PERMISSION_GRANTED)
-
-            Log.d(tag, "isRequiredPermissionsGranted: $permissionStatus")
-
-            return permissionStatus
+            return PermissionManager.allPermissions.fold(true) { result, permission ->
+                result && ActivityCompat
+                    .checkSelfPermission(
+                        context,
+                        permission
+                    ) == PackageManager.PERMISSION_GRANTED
+            }
         }
-
         return false
     }
 }
