@@ -32,7 +32,7 @@ class PermissionManager private constructor() {
         return false
     }
 
-    fun isAllPermissionsGranted(context: Context?, tag: String): Boolean {
+    fun isAllPermissionsGranted(context: Context?): Boolean {
         context?.let {
             return PermissionManager.allPermissions.fold(true) { result, permission ->
                 result && ActivityCompat
