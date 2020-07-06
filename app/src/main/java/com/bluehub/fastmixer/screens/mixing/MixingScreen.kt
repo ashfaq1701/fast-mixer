@@ -11,8 +11,10 @@ import androidx.navigation.fragment.findNavController
 import com.bluehub.fastmixer.R
 import com.bluehub.fastmixer.common.fragments.BaseFragment
 import com.bluehub.fastmixer.common.permissions.PermissionFragmentInterface
-import com.bluehub.fastmixer.common.permissions.ViewModelPermissionInterface
+import com.bluehub.fastmixer.common.permissions.PermissionViewModel
+import com.bluehub.fastmixer.common.utils.DialogManager
 import com.bluehub.fastmixer.databinding.MixingScreenBinding
+import javax.inject.Inject
 
 class MixingScreen : BaseFragment(), PermissionFragmentInterface {
     companion object {
@@ -21,7 +23,11 @@ class MixingScreen : BaseFragment(), PermissionFragmentInterface {
 
     override var TAG: String = javaClass.simpleName
 
-    override lateinit var viewModel: ViewModelPermissionInterface
+    override lateinit var viewModel: PermissionViewModel
+
+    @Inject
+    override lateinit var dialogManager: DialogManager
+
     private lateinit var viewModelFactory: MixingScreenViewModelFactory
 
     private lateinit var dataBinding: MixingScreenBinding

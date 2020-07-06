@@ -1,14 +1,19 @@
 package com.bluehub.fastmixer.common.utils
 
 import android.Manifest
-import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
 import android.util.Log
 import androidx.core.app.ActivityCompat
 
-object PermissionManager {
-    const val REQUEST_GROUP_ID = 12446
+class PermissionManager private constructor() {
+    companion object {
+        const val REQUEST_GROUP_ID = 12446
+
+        fun create(): PermissionManager {
+            return PermissionManager()
+        }
+    }
 
     fun isRecordPermissionGranted(context: Context?, tag: String): Boolean {
         context?.let {

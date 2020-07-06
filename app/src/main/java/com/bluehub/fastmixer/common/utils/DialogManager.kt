@@ -9,19 +9,25 @@ import android.util.Log
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 
-object DialogManager {
-    private val TAG = DialogManager::class.java.simpleName
+class DialogManager private constructor() {
+    private val tag = DialogManager::class.java.simpleName
+
+    companion object {
+        fun create(): DialogManager {
+            return DialogManager()
+        }
+    }
 
     fun showPermissionsErrorDialog(context: Context) {
 
-        Log.d(TAG, "showPermissionsErrorDialog(): ")
+        Log.d(tag, "showPermissionsErrorDialog(): ")
 
         if (!((context as AppCompatActivity).isFinishing)) {
 
             var dialogTheme = android.R.style.Theme_Holo_Light_Dialog
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                Log.i(TAG, "showPermissionsErrorDialog: All permissions are not allowed, Show error dialog, Build.VERSION.SDK_INT >= 23")
+                Log.i(tag, "showPermissionsErrorDialog: All permissions are not allowed, Show error dialog, Build.VERSION.SDK_INT >= 23")
                 dialogTheme = android.R.style.Theme_Material_Light_Dialog
             }
 
@@ -32,13 +38,13 @@ object DialogManager {
             builder.setCancelable(false)
 
             builder.setPositiveButton("Go to Settings") { dialog, _ ->
-                Log.d(TAG, "positiveButton::onClick: ")
+                Log.d(tag, "positiveButton::onClick: ")
                 dialog.dismiss()
                 openAppSettingsPage(context)
             }
 
             builder.setNegativeButton("Cancel") { dialog, _ ->
-                Log.d(TAG, "negativeButton::onClick: ")
+                Log.d(tag, "negativeButton::onClick: ")
                 dialog.dismiss()
             }
 

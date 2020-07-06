@@ -11,8 +11,10 @@ import androidx.navigation.fragment.findNavController
 import com.bluehub.fastmixer.R
 import com.bluehub.fastmixer.common.fragments.BaseFragment
 import com.bluehub.fastmixer.common.permissions.PermissionFragmentInterface
-import com.bluehub.fastmixer.common.permissions.ViewModelPermissionInterface
+import com.bluehub.fastmixer.common.permissions.PermissionViewModel
+import com.bluehub.fastmixer.common.utils.DialogManager
 import com.bluehub.fastmixer.databinding.RecordingScreenBinding
+import javax.inject.Inject
 
 class RecordingScreen : BaseFragment(), PermissionFragmentInterface {
 
@@ -24,7 +26,10 @@ class RecordingScreen : BaseFragment(), PermissionFragmentInterface {
 
     private lateinit var dataBinding: RecordingScreenBinding
 
-    override lateinit var viewModel: ViewModelPermissionInterface
+    @Inject
+    override lateinit var dialogManager: DialogManager
+
+    override lateinit var viewModel: PermissionViewModel
     private lateinit var viewModelFactory: RecordingScreenViewModelFactory
 
     override fun onCreate(savedInstanceState: Bundle?) {
