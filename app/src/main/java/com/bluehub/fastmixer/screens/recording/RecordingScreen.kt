@@ -9,14 +9,13 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.bluehub.fastmixer.R
-import com.bluehub.fastmixer.common.fragments.BaseFragment
-import com.bluehub.fastmixer.common.permissions.PermissionFragmentInterface
+import com.bluehub.fastmixer.common.permissions.PermissionFragment
 import com.bluehub.fastmixer.common.permissions.PermissionViewModel
 import com.bluehub.fastmixer.common.utils.DialogManager
 import com.bluehub.fastmixer.databinding.RecordingScreenBinding
 import javax.inject.Inject
 
-class RecordingScreen : BaseFragment(), PermissionFragmentInterface {
+class RecordingScreen : PermissionFragment() {
 
     companion object {
         fun newInstance() = RecordingScreen()
