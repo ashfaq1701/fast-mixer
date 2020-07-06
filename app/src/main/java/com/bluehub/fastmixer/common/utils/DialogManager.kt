@@ -21,7 +21,7 @@ class DialogManager private constructor() {
         }
     }
 
-    fun showPermissionsErrorDialog(context: Context, permission: String) {
+    fun showPermissionsErrorDialog(context: Context, permission: String, neverAskAgain: Boolean) {
 
         Log.d(tag, "showPermissionsErrorDialog(): ")
 
@@ -47,10 +47,12 @@ class DialogManager private constructor() {
             builder.setMessage(message)
             builder.setCancelable(false)
 
-            builder.setPositiveButton("Go to Settings") { dialog, _ ->
-                Log.d(tag, "positiveButton::onClick: ")
-                dialog.dismiss()
-                openAppSettingsPage(context)
+            if (neverAskAgain) {
+                builder.setPositiveButton("Go to Settings") { dialog, _ ->
+                    Log.d(tag, "positiveButton::onClick: ")
+                    dialog.dismiss()
+                    openAppSettingsPage(context)
+                }
             }
 
             builder.setNegativeButton("Cancel") { dialog, _ ->

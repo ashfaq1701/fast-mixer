@@ -12,6 +12,7 @@ import com.bluehub.fastmixer.R
 import com.bluehub.fastmixer.common.permissions.PermissionFragment
 import com.bluehub.fastmixer.common.permissions.PermissionViewModel
 import com.bluehub.fastmixer.common.utils.DialogManager
+import com.bluehub.fastmixer.common.utils.ScreenConstants
 import com.bluehub.fastmixer.databinding.RecordingScreenBinding
 import javax.inject.Inject
 
@@ -72,6 +73,14 @@ class RecordingScreen : PermissionFragment() {
             if (goBack) {
                 findNavController().navigate(RecordingScreenDirections.actionRecordingScreenToMixingScreen())
                 localViewModel.resetGoBack()
+            }
+        })
+
+        localViewModel.eventRecordPermission.observe(viewLifecycleOwner, Observer { record ->
+            if (record.fromCallback && record.hasPermission) {
+                when(record.permissionCode) {
+                    ScreenConstants.TOGGLE_RECORDING -> localViewModel.toggleRecording()
+                }
             }
         })
     }

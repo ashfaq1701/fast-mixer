@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.bluehub.fastmixer.common.permissions.PermissionViewModel
 import com.bluehub.fastmixer.common.utils.PermissionManager
+import com.bluehub.fastmixer.common.utils.ScreenConstants
 import javax.inject.Inject
 
 class MixingScreenViewModel(override val context: Context?, override val tag: String): PermissionViewModel(context, tag) {
@@ -30,14 +31,14 @@ class MixingScreenViewModel(override val context: Context?, override val tag: St
 
     fun onReadFromDisk() {
         if(!checkReadFilePermission()) {
-            setRequestReadFilePermission()
+            setRequestReadFilePermission(ScreenConstants.READ_FROM_FILE)
             return
         }
     }
 
     fun onSaveToDisk() {
         if(!checkWriteFilePermission()) {
-            setRequestWriteFilePermission()
+            setRequestWriteFilePermission(ScreenConstants.WRITE_TO_FILE)
             return
         }
     }

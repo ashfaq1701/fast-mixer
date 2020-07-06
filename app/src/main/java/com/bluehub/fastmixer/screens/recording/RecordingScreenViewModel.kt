@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.bluehub.fastmixer.common.permissions.PermissionViewModel
 import com.bluehub.fastmixer.common.utils.PermissionManager
+import com.bluehub.fastmixer.common.utils.ScreenConstants
 import javax.inject.Inject
 
 class RecordingScreenViewModel(override val context: Context?, override val tag: String) : PermissionViewModel(context, tag) {
@@ -26,7 +27,7 @@ class RecordingScreenViewModel(override val context: Context?, override val tag:
 
     fun toggleRecording() {
         if (!checkRecordingPermission()) {
-            setRequestRecordPermission()
+            setRequestRecordPermission(ScreenConstants.TOGGLE_RECORDING)
             return
         }
 
