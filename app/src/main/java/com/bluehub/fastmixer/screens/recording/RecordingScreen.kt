@@ -58,7 +58,6 @@ class RecordingScreen : PermissionFragment() {
     }
 
     fun initUI() {
-
         val localViewModel = viewModel as RecordingScreenViewModel
 
         localViewModel.eventSetRecording.observe(viewLifecycleOwner, Observer { setRecording ->
@@ -69,10 +68,10 @@ class RecordingScreen : PermissionFragment() {
             }
         })
 
-        localViewModel.eventDoneRecording.observe(viewLifecycleOwner, Observer { doneRecording ->
-            if (doneRecording) {
+        localViewModel.eventGoBack.observe(viewLifecycleOwner, Observer { goBack ->
+            if (goBack) {
                 findNavController().navigate(RecordingScreenDirections.actionRecordingScreenToMixingScreen())
-                localViewModel.resetDoneRecording()
+                localViewModel.resetGoBack()
             }
         })
     }

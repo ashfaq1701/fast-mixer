@@ -58,7 +58,6 @@ class MixingScreen : PermissionFragment() {
     }
 
     fun initUI() {
-
         val localViewModel = viewModel as MixingScreenViewModel
 
         localViewModel.eventRecord.observe(viewLifecycleOwner, Observer { record ->

@@ -20,11 +20,16 @@ class RecordingScreenViewModel(override val context: Context?, override val tag:
     val eventSetRecording: LiveData<Boolean>
         get() = _eventSetRecording
 
-    private val _eventDoneRecording = MutableLiveData<Boolean>(false)
-    val eventDoneRecording: LiveData<Boolean>
-        get() = _eventDoneRecording
+    private val _eventGoBack = MutableLiveData<Boolean>(false)
+    val eventGoBack: LiveData<Boolean>
+        get() = _eventGoBack
 
     fun toggleRecording() {
+        if (!checkRecordingPermission()) {
+            setRequestRecordPermission()
+            return
+        }
+
         _eventSetRecording.value = !_eventSetRecording.value!!
 
         if (_eventSetRecording.value == true) {
@@ -34,12 +39,12 @@ class RecordingScreenViewModel(override val context: Context?, override val tag:
         }
     }
 
-    fun setDoneRecording() {
-        _eventDoneRecording.value = true
+    fun setGoBack() {
+        _eventGoBack.value = true
     }
 
-    fun resetDoneRecording() {
-        _eventDoneRecording.value = false
+    fun resetGoBack() {
+        _eventGoBack.value = false
     }
 
     fun startRecording() {

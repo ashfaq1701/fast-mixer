@@ -1,5 +1,6 @@
 package com.bluehub.fastmixer.common.permissions
 
+import android.Manifest
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -45,42 +46,6 @@ abstract class PermissionViewModel(open val context: Context?, open val tag: Str
     private val _eventShowWriteFilePermissionDialog = MutableLiveData<Boolean>(false)
     val eventShowWriteFilePermissionDialog: LiveData<Boolean>
         get() = _eventShowWriteFilePermissionDialog
-
-    private val _eventEnableRecordControls = MutableLiveData<Boolean>(true)
-    val eventEnableRecordControls: LiveData<Boolean>
-        get() = _eventEnableRecordControls
-
-    private val _eventEnableReadFileControls = MutableLiveData<Boolean>(true)
-    val eventEnableReadFileControls: LiveData<Boolean>
-        get() = _eventEnableReadFileControls
-
-    private val _eventEnableWriteFileControls = MutableLiveData<Boolean>(true)
-    val eventEnableWriteFileControls: LiveData<Boolean>
-        get() = _eventEnableWriteFileControls
-
-    fun enableRecordControls() {
-        _eventEnableRecordControls.value = true
-    }
-
-    fun disableRecordControls() {
-        _eventEnableRecordControls.value = false
-    }
-
-    fun enableReadFileControls() {
-        _eventEnableReadFileControls.value = true
-    }
-
-    fun disableReadFileControls() {
-        _eventEnableReadFileControls.value = false
-    }
-
-    fun enableWriteFileControls() {
-        _eventEnableWriteFileControls.value = true
-    }
-
-    fun disableWriteFileControls() {
-        _eventEnableWriteFileControls.value = false
-    }
 
     fun setRequestRecordPermission() {
         _eventRequestRecordPermission.value = true
@@ -128,5 +93,38 @@ abstract class PermissionViewModel(open val context: Context?, open val tag: Str
 
     fun hideWriteFilePermissionDialog() {
         _eventShowWriteFilePermissionDialog.value = false
+    }
+
+    fun checkRecordingPermission(): Boolean {
+        return if (permissionManager.isSpecifiedPermissionsGranted(arrayOf(Manifest.permission.RECORD_AUDIO), context)) {
+            _eventRecordPermission.value = PermissionHolder(permissionChecked = true, hasPermission = true)
+            true
+        } else {
+            _eventRecordPermission.value = PermissionHolder(permissionChecked = true, hasPermission = false)
+            false
+        }
+    }
+
+    fun checkReadFilePermission(): Boolean {
+        return if (permissionManager.isSpecifiedPermissionsGranted(arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), context)) {
+            _eventReadFilePermission.value = PermissionHolder(permissionChecked = true, hasPermission = true)
+            true
+        } else {
+            _eventReadFilePermission.value =
+                PermissionHolder(permissionChecked = true, hasPermission = false)
+            false
+        }
+    }
+
+    fun checkWriteFilePermission(): Boolean {
+        return if (permissionManager.isSpecifiedPermissionsGranted(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), context)) {
+            _eventWriteFilePermission.value =
+                PermissionHolder(permissionChecked = true, hasPermission = true)
+            true
+        } else {
+            _eventWriteFilePermission.value =
+                PermissionHolder(permissionChecked = true, hasPermission = false)
+            false
+        }
     }
 }

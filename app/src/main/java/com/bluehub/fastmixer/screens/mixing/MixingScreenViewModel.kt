@@ -29,11 +29,17 @@ class MixingScreenViewModel(override val context: Context?, override val tag: St
     }
 
     fun onReadFromDisk() {
-
+        if(!checkReadFilePermission()) {
+            setRequestReadFilePermission()
+            return
+        }
     }
 
     fun onSaveToDisk() {
-
+        if(!checkWriteFilePermission()) {
+            setRequestWriteFilePermission()
+            return
+        }
     }
 
     fun onRecordNavigated() {
