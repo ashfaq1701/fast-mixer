@@ -83,7 +83,43 @@ abstract class PermissionFragment: BaseFragment() {
                 viewModel.hideWriteFilePermissionDialog()
             }
         })
+
+        viewModel.eventEnableRecordControls.observe(viewLifecycleOwner, Observer { recordControlsEnable ->
+            if (recordControlsEnable) {
+                enableRecordingControls()
+            } else {
+                disableRecordingControls()
+            }
+        })
+
+        viewModel.eventEnableReadFileControls.observe(viewLifecycleOwner, Observer { readFileControlsEnable ->
+            if (readFileControlsEnable) {
+                enableReadFileControls()
+            } else {
+                disableReadFileControls()
+            }
+        })
+
+        viewModel.eventEnableWriteFileControls.observe(viewLifecycleOwner, Observer { writeFileControlsEnable ->
+            if (writeFileControlsEnable) {
+                enableWriteFileControls()
+            } else {
+                disableWriteFileControls()
+            }
+        })
     }
+
+    open fun enableRecordingControls() {}
+
+    open fun disableRecordingControls() {}
+
+    open fun enableReadFileControls() {}
+
+    open fun disableReadFileControls() {}
+
+    open fun enableWriteFileControls() {}
+
+    open fun disableWriteFileControls() {}
 
     fun requestPermissions(permissions: Array<String>) {
         requestPermissions(permissions, PermissionManager.REQUEST_GROUP_ID)
