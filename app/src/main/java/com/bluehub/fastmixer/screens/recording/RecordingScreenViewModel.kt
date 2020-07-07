@@ -36,7 +36,14 @@ class RecordingScreenViewModel(override val context: Context?, override val tag:
         if (_eventSetRecording.value == true) {
             startRecording()
         } else {
-            stopRecording()
+            pauseRecording()
+        }
+    }
+
+    fun stopRecording() {
+        if (!checkRecordingPermission()) {
+            setRequestRecordPermission(ScreenConstants.STOP_RECORDING)
+            return
         }
     }
 
@@ -52,7 +59,7 @@ class RecordingScreenViewModel(override val context: Context?, override val tag:
 
     }
 
-    fun stopRecording() {
+    fun pauseRecording() {
 
     }
 }

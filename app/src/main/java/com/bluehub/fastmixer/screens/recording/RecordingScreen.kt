@@ -80,6 +80,7 @@ class RecordingScreen : PermissionFragment() {
             if (record.fromCallback && record.hasPermission) {
                 when(record.permissionCode) {
                     ScreenConstants.TOGGLE_RECORDING -> localViewModel.toggleRecording()
+                    ScreenConstants.STOP_RECORDING -> localViewModel.stopRecording()
                 }
             }
         })

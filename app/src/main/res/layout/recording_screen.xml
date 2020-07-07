@@ -33,14 +33,24 @@
             app:layout_constraintTop_toBottomOf="@id/recording_visualizer" />
 
         <Button
-            android:id="@+id/go_back"
+            android:id="@+id/stop_recording"
             android:layout_width="@dimen/record_button_width"
             android:layout_height="@dimen/record_button_height"
-            android:onClick="@{() -> viewModel.setGoBack()}"
-            android:text="@string/done"
+            android:onClick="@{() -> viewModel.stopRecording()}"
+            android:text="@string/stop"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toEndOf="@+id/toggle_record"
             app:layout_constraintTop_toBottomOf="@id/recording_visualizer" />
+
+        <Button
+            android:id="@+id/go_back"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/record_button_height"
+            android:onClick="@{() -> viewModel.setGoBack()}"
+            android:text="@string/done"
+            app:layout_constraintEnd_toEndOf="@id/stop_recording"
+            app:layout_constraintStart_toStartOf="@+id/toggle_record"
+            app:layout_constraintTop_toBottomOf="@id/toggle_record" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
