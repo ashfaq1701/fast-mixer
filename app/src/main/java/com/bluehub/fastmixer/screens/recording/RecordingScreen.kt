@@ -69,6 +69,14 @@ class RecordingScreen : PermissionFragment() {
             }
         })
 
+        localViewModel.eventSetPlaying.observe(viewLifecycleOwner, Observer { setPlaying ->
+            if (!setPlaying) {
+                dataBinding.togglePlay.text = getString(R.string.play_label)
+            } else {
+                dataBinding.togglePlay.text = getString(R.string.pause_label)
+            }
+        })
+
         localViewModel.eventGoBack.observe(viewLifecycleOwner, Observer { goBack ->
             if (goBack) {
                 findNavController().navigate(RecordingScreenDirections.actionRecordingScreenToMixingScreen())

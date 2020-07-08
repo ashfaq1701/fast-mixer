@@ -21,6 +21,10 @@ class RecordingScreenViewModel(override val context: Context?, override val tag:
     val eventSetRecording: LiveData<Boolean>
         get() = _eventSetRecording
 
+    private val _eventSetPlaying = MutableLiveData<Boolean>(false)
+    val eventSetPlaying: LiveData<Boolean>
+        get() = _eventSetPlaying
+
     private val _eventGoBack = MutableLiveData<Boolean>(false)
     val eventGoBack: LiveData<Boolean>
         get() = _eventGoBack
@@ -37,6 +41,15 @@ class RecordingScreenViewModel(override val context: Context?, override val tag:
             startRecording()
         } else {
             pauseRecording()
+        }
+    }
+
+    fun togglePlay() {
+        _eventSetPlaying.value = !_eventSetPlaying.value!!
+        if(_eventSetPlaying.value == true) {
+            startPlaying()
+        } else {
+            pausePlaying()
         }
     }
 
@@ -60,6 +73,14 @@ class RecordingScreenViewModel(override val context: Context?, override val tag:
     }
 
     fun pauseRecording() {
+
+    }
+
+    fun startPlaying() {
+
+    }
+
+    fun pausePlaying() {
 
     }
 }

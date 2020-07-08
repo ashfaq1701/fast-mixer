@@ -10,4 +10,6 @@
     <string name="write_external_storage_permission_needed">Write external file permission is needed to be able to write into external storage</string>
     <string name="done">Done</string>
     <string name="stop">Stop</string>
+    <string name="play_label">Play</string>
+    <string name="pause_label">Pause</string>
 </resources>
