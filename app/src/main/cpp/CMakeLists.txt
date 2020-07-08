@@ -5,7 +5,7 @@
 
 cmake_minimum_required(VERSION 3.4.1)
 
-set(FFMPEG_DIR ${PROJECT_SOURCE_DIR}/ffmpeg-build/${ANDROID_ABI})
+set(FFMPEG_DIR ${PROJECT_SOURCE_DIR}/../../../../cpp_dependencies/ffmpeg-build/${ANDROID_ABI})
 include_directories(${FFMPEG_DIR}/include)
 
 # Creates and names a library, sets it as either STATIC
@@ -23,7 +23,7 @@ add_library( # Sets the name of the library.
              native-lib.cpp )
 
 # Build the Oboe library
-set (OBOE_DIR ./oboe)
+set (OBOE_DIR ../../../../cpp_dependencies/oboe)
 add_subdirectory (${OBOE_DIR} ./oboe)
 
 # Make the Oboe public headers available to our app
