@@ -29,6 +29,11 @@ add_subdirectory (${OBOE_DIR} ./oboe)
 # Make the Oboe public headers available to our app
 include_directories (${OBOE_DIR}/include)
 
+### ADD LIBSNDFILE LIBRARY
+set(LIB_SND_FILE_DIR ../../../../cpp_dependencies/libsndfile)
+add_subdirectory(${LIB_SND_FILE_DIR} ./sndfile)
+include_directories(${LIB_SND_FILE_DIR}/src)
+
 # Searches for a specified prebuilt library and stores the path as a
 # variable. Because CMake includes system libraries in the search path by
 # default, you only need to specify the name of the public NDK library
@@ -76,4 +81,5 @@ target_link_libraries( # Specifies the target library.
                        # Links the target library to the log library
                        # included in the NDK.
                        ${log-lib}
-                       oboe)
+                       oboe
+                       sndfile)
