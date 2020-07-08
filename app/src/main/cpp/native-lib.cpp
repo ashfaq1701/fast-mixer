@@ -1,10 +1,22 @@
+#ifndef MODULE_NAME
+#define MODULE_NAME  "native-lib"
+#endif
+
 #include <jni.h>
 #include <string>
+#include "AudioEngine.h"
+#include "logging_macros.h"
 
-extern "C" JNIEXPORT jstring JNICALL
-Java_com_bluehub_fastmixer_screens_mixing_MixingFragment_stringFromJNI(
-        JNIEnv* env,
-        jobject /* this */) {
-    std::string hello = "Hello from C++";
-    return env->NewStringUTF(hello.c_str());
+const char *TAG = "native-lib: %s";
+static AudioEngine *audioEngine = nullptr;
+
+extern "C" {
+    JNIEXPORT bool JNICALL
+    Java_com_bluehub_fastmixer_AudioEngine_create(JNIEnv *env, jclass) {
+        LOGD(TAG, "create(): ");
+        if (audioEngine == nullptr) {
+            audioEngine = new AudioEngine();
+        }
+        return (audioEngine != nullptr);
+    }
 }

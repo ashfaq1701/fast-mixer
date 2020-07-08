@@ -14,12 +14,13 @@ include_directories(${FFMPEG_DIR}/include)
 # Gradle automatically packages shared libraries with your APK.
 
 add_library( # Sets the name of the library.
-             native-lib
+             audioEngine
 
              # Sets the library as a shared library.
              SHARED
 
              # Provides a relative path to your source file(s).
+             AudioEngine.cpp
              native-lib.cpp )
 
 # Build the Oboe library
@@ -71,15 +72,14 @@ set_target_properties(avfilter PROPERTIES IMPORTED_LOCATION
 # can link multiple libraries, such as libraries you define in this
 # build script, prebuilt third-party libraries, or system libraries.
 
-target_link_libraries( # Specifies the target library.
-                       native-lib
+target_link_libraries(
+                       audioEngine
+                       ${log-lib}
+                       oboe
+                       sndfile
                        avformat
                        avutil
                        avcodec
                        swresample
                        avfilter
-                       # Links the target library to the log library
-                       # included in the NDK.
-                       ${log-lib}
-                       oboe
-                       sndfile)
+                       )
