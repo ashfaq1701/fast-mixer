@@ -1,3 +1,6 @@
 [submodule "cpp_dependencies/oboe"]
 	path = cpp_dependencies/oboe
 	url = git@github.com:google/oboe.git
+[submodule "cpp_dependencies/libsndfile"]
+	path = cpp_dependencies/libsndfile
+	url = git@github.com:erikd/libsndfile.git
