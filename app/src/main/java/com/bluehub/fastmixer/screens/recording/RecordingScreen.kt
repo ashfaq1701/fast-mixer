@@ -35,6 +35,7 @@ class RecordingScreen : PermissionFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         getPresentationComponent().inject(this)
+        audioEngine.create()
     }
 
     override fun onCreateView(
@@ -44,7 +45,7 @@ class RecordingScreen : PermissionFragment() {
         dataBinding = DataBindingUtil
             .inflate(inflater, R.layout.recording_screen, container, false)
 
-        viewModelFactory = RecordingScreenViewModelFactory(context, TAG)
+        viewModelFactory = RecordingScreenViewModelFactory(context, audioEngine, TAG)
         viewModel = ViewModelProviders.of(this, viewModelFactory)
             .get(RecordingScreenViewModel::class.java)
 

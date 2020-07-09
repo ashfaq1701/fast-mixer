@@ -44,7 +44,7 @@ class MixingScreen : PermissionFragment() {
         dataBinding = DataBindingUtil
             .inflate(inflater, R.layout.mixing_screen, container, false)
 
-        viewModelFactory = MixingScreenViewModelFactory(context, TAG)
+        viewModelFactory = MixingScreenViewModelFactory(context, audioEngine, TAG)
         viewModel = ViewModelProviders.of(this, viewModelFactory)
             .get(MixingScreenViewModel::class.java)
 
