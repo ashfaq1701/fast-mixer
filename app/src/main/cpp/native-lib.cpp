@@ -12,7 +12,7 @@ static AudioEngine *audioEngine = nullptr;
 
 extern "C" {
     JNIEXPORT bool JNICALL
-    Java_com_bluehub_fastmixer_AudioEngine_create(JNIEnv *env, jclass) {
+    Java_com_bluehub_fastmixer_common_audio_AudioEngine_create(JNIEnv *env, jclass) {
         LOGD(TAG, "create(): ");
         if (audioEngine == nullptr) {
             audioEngine = new AudioEngine();

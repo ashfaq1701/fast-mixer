@@ -13,6 +13,4 @@ interface PresentationComponent {
     fun inject(recordingScreen: RecordingScreen)
 
     fun inject(visualizerFragment: VisualizerFragment)
-
-    fun inject(permissionViewModel: PermissionViewModel)
 }
