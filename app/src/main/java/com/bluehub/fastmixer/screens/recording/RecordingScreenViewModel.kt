@@ -3,7 +3,6 @@ package com.bluehub.fastmixer.screens.recording
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import com.bluehub.fastmixer.common.audio.AudioEngineProxy
 import com.bluehub.fastmixer.common.permissions.PermissionViewModel
 import com.bluehub.fastmixer.common.utils.PermissionManager
@@ -18,13 +17,13 @@ class RecordingScreenViewModel(override val context: Context?, val audioEnginePr
     @Inject
     override lateinit var permissionManager: PermissionManager
 
-    private val _eventSetRecording = MutableLiveData<Boolean>(false)
-    val eventSetRecording: LiveData<Boolean>
-        get() = _eventSetRecording
+    private val _eventIsRecording = MutableLiveData<Boolean>(false)
+    val eventIsRecording: LiveData<Boolean>
+        get() = _eventIsRecording
 
-    private val _eventSetPlaying = MutableLiveData<Boolean>(false)
-    val eventSetPlaying: LiveData<Boolean>
-        get() = _eventSetPlaying
+    private val _eventIsPlaying = MutableLiveData<Boolean>(false)
+    val eventIsPlaying: LiveData<Boolean>
+        get() = _eventIsPlaying
 
     private val _eventGoBack = MutableLiveData<Boolean>(false)
     val eventGoBack: LiveData<Boolean>
@@ -36,9 +35,9 @@ class RecordingScreenViewModel(override val context: Context?, val audioEnginePr
             return
         }
 
-        _eventSetRecording.value = !_eventSetRecording.value!!
+        _eventIsRecording.value = !_eventIsRecording.value!!
 
-        if (_eventSetRecording.value == true) {
+        if (_eventIsRecording.value == true) {
             startRecording()
         } else {
             pauseRecording()
@@ -46,19 +45,16 @@ class RecordingScreenViewModel(override val context: Context?, val audioEnginePr
     }
 
     fun togglePlay() {
-        _eventSetPlaying.value = !_eventSetPlaying.value!!
-        if(_eventSetPlaying.value == true) {
+        _eventIsPlaying.value = !_eventIsPlaying.value!!
+        if(_eventIsPlaying.value == true) {
             startPlaying()
         } else {
             pausePlaying()
         }
     }
 
-    fun stopRecording() {
-        if (!checkRecordingPermission()) {
-            setRequestRecordPermission(ScreenConstants.STOP_RECORDING)
-            return
-        }
+    fun reset() {
+
     }
 
     fun setGoBack() {

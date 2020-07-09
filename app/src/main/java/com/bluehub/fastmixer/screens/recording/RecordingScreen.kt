@@ -62,16 +62,16 @@ class RecordingScreen : PermissionFragment() {
     fun initUI() {
         val localViewModel = viewModel as RecordingScreenViewModel
 
-        localViewModel.eventSetRecording.observe(viewLifecycleOwner, Observer { setRecording ->
-            if (setRecording) {
+        localViewModel.eventIsRecording.observe(viewLifecycleOwner, Observer { isRecording ->
+            if (isRecording) {
                 dataBinding.toggleRecord.text = getString(R.string.stop_recording_label)
             } else {
                 dataBinding.toggleRecord.text = getString(R.string.start_recording_label)
             }
         })
 
-        localViewModel.eventSetPlaying.observe(viewLifecycleOwner, Observer { setPlaying ->
-            if (!setPlaying) {
+        localViewModel.eventIsPlaying.observe(viewLifecycleOwner, Observer { isPlaying ->
+            if (!isPlaying) {
                 dataBinding.togglePlay.text = getString(R.string.play_label)
             } else {
                 dataBinding.togglePlay.text = getString(R.string.pause_label)
@@ -89,7 +89,7 @@ class RecordingScreen : PermissionFragment() {
             if (record.fromCallback && record.hasPermission) {
                 when(record.permissionCode) {
                     ScreenConstants.TOGGLE_RECORDING -> localViewModel.toggleRecording()
-                    ScreenConstants.STOP_RECORDING -> localViewModel.stopRecording()
+                    ScreenConstants.STOP_RECORDING -> localViewModel.reset()
                 }
             }
         })
