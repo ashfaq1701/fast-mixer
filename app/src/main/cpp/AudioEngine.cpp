@@ -15,7 +15,23 @@ AudioEngine::~AudioEngine() {
 }
 
 void AudioEngine::openRecordingStream() {
+    LOGD("TAG", "openRecordingStream(): ");
+    oboe::AudioStreamBuilder builder;
+    setupRecordingStreamParameters(&builder);
+    oboe::Result result = builder.openStream(&mRecordingStream);
 
+    if (result == oboe::Result::OK && mRecordingStream) {
+        assert(mRecordingStream->getChannelCount() == mInputChannelCount);
+        mSampleRate = mRecordingStream->getSampleRate();
+        mFormat = mRecordingStream->getFormat();
+        LOGV(TAG, "openRecordingStream(): mSampleRate = ");
+        LOGV(TAG, std::to_string(mSampleRate).c_str());
+
+        LOGV(TAG, "openRecordingStream(): mFormat = ");
+        LOGV(TAG, oboe::convertToText(mFormat));
+    } else {
+        LOGE(TAG, "Failed to create recording stream. Error: %s", oboe::convertToText(result));
+    }
 }
 
 void AudioEngine::openLivePlaybackStream() {
