@@ -11,7 +11,8 @@ AudioEngine::AudioEngine() {
 }
 
 AudioEngine::~AudioEngine() {
-
+    stopStream(mRecordingStream);
+    closeStream(mRecordingStream);
 }
 
 void AudioEngine::openRecordingStream() {
@@ -43,20 +44,55 @@ void AudioEngine::openPlaybackStream() {
 }
 
 void AudioEngine::startStream(oboe::AudioStream *stream) {
-
+    LOGD(TAG, "startStream(): ");
+    assert(stream);
+    if (stream) {
+        oboe::Result result = stream->requestStart();
+        if (result != oboe::Result::OK) {
+            LOGE(TAG, "Error starting the stream: %s", oboe::convertToText(result));
+        }
+    }
 }
 
 void AudioEngine::stopStream(oboe::AudioStream *stream) {
-
+    LOGD("stopStream(): ");
+    if (stream) {
+        oboe::Result result = stream->stop(0L);
+        if (result != oboe::Result::OK) {
+            LOGE(TAG, "Error stopping the stream: %s", oboe::convertToText(result));
+        }
+        LOGW(TAG, "stopStream(): Total samples = ");
+        //LOGW(TAG, std::to_string(mSoundRecording.getTotalSamples()).c_str());
+    }
 }
 
 void AudioEngine::closeStream(oboe::AudioStream *stream) {
+    LOGD("closeStream(): ");
+    if (stream) {
+        oboe::Result result = stream->close();
+        if (result != oboe::Result::OK) {
+            LOGE(TAG, "Error closing stream. %s", oboe::convertToText(result));
+        } else {
+            stream = nullptr;
+        }
 
+        LOGW(TAG, "closeStream(): mTotalSamples = ");
+        //LOGW(TAG, std::to_string(mSoundRecording.getTotalSamples()).c_str());
+    }
 }
 
 oboe::AudioStreamBuilder *
 AudioEngine::setupRecordingStreamParameters(oboe::AudioStreamBuilder *builder) {
-    return nullptr;
+    LOGD(TAG, "setUpRecordingStreamParameters(): ");
+    builder->setAudioApi(mAudioApi)
+        ->setFormat(mFormat)
+        ->setSharingMode(oboe::SharingMode::Exclusive)
+        ->setPerformanceMode(oboe::PerformanceMode::LowLatency)
+        ->setCallback(&recordingCallback)
+        ->setDeviceId(mRecordingDeviceId)
+        ->setDirection(oboe::Direction::Input)
+        ->setChannelCount(mInputChannelCount);
+    return builder;
 }
 
 oboe::AudioStreamBuilder *

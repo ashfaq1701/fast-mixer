@@ -11,7 +11,7 @@ const char *TAG = "native-lib: %s";
 static AudioEngine *audioEngine = nullptr;
 
 extern "C" {
-    JNIEXPORT bool JNICALL
+    JNIEXPORT jboolean JNICALL
     Java_com_bluehub_fastmixer_common_audio_AudioEngine_create(JNIEnv *env, jclass) {
         LOGD(TAG, "create(): ");
         if (audioEngine == nullptr) {

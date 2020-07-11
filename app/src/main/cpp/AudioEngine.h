@@ -12,12 +12,14 @@
 #include <oboe/Definitions.h>
 #include <oboe/AudioStream.h>
 #include "logging_macros.h"
+#include "RecordingCallback.h"
+#include "SoundRecording.h"
 
 class AudioEngine {
 public:
     AudioEngine();
     ~AudioEngine();
-
+    RecordingCallback recordingCallback = RecordingCallback(&mSoundRecording);
 
 private:
     const char* TAG = "Audio Engine: %s";
@@ -35,6 +37,8 @@ private:
     oboe::AudioStream *mRecordingStream = nullptr;
     oboe::AudioStream *mLivePlaybackStream = nullptr;
     oboe::AudioStream *mPlaybackStream = nullptr;
+
+    SoundRecording mSoundRecording;
 
     void openRecordingStream();
     void openLivePlaybackStream();
