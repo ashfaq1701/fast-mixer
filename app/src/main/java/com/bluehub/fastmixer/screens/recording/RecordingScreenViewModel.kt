@@ -7,12 +7,18 @@ import com.bluehub.fastmixer.common.audio.AudioEngineProxy
 import com.bluehub.fastmixer.common.permissions.PermissionViewModel
 import com.bluehub.fastmixer.common.utils.PermissionManager
 import com.bluehub.fastmixer.common.utils.ScreenConstants
+import kotlinx.coroutines.*
 import javax.inject.Inject
 
 class RecordingScreenViewModel(override val context: Context?, val audioEngineProxy: AudioEngineProxy, override val tag: String) : PermissionViewModel(context, tag) {
     init {
         getViewModelComponent().inject(this)
     }
+
+    private var viewModelJob = Job()
+    private val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
+
+
 
     @Inject
     override lateinit var permissionManager: PermissionManager
@@ -38,9 +44,13 @@ class RecordingScreenViewModel(override val context: Context?, val audioEnginePr
         _eventIsRecording.value = !_eventIsRecording.value!!
 
         if (_eventIsRecording.value == true) {
-            startRecording()
+            uiScope.launch {
+                startRecording()
+            }
         } else {
-            pauseRecording()
+            uiScope.launch {
+                pauseRecording()
+            }
         }
     }
 
@@ -71,12 +81,16 @@ class RecordingScreenViewModel(override val context: Context?, val audioEnginePr
         _eventGoBack.value = false
     }
 
-    private fun startRecording() {
-        audioEngineProxy.startRecording()
+    private suspend fun startRecording() {
+        withContext(Dispatchers.IO) {
+            audioEngineProxy.startRecording()
+        }
     }
 
-    private fun pauseRecording() {
-        audioEngineProxy.pauseRecording()
+    private suspend fun pauseRecording() {
+        withContext(Dispatchers.IO) {
+            audioEngineProxy.pauseRecording()
+        }
     }
 
     fun startPlaying() {
@@ -85,5 +99,10 @@ class RecordingScreenViewModel(override val context: Context?, val audioEnginePr
 
     fun pausePlaying() {
 
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        viewModelJob.cancel()
     }
 }
