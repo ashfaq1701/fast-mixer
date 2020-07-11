@@ -59,6 +59,11 @@ class RecordingScreen : PermissionFragment() {
         return dataBinding.root
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        (viewModel as RecordingScreenViewModel).deleteAudioEngine()
+    }
+
     fun initUI() {
         val localViewModel = viewModel as RecordingScreenViewModel
 

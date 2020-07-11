@@ -21,6 +21,10 @@ public:
     ~AudioEngine();
     RecordingCallback recordingCallback = RecordingCallback(&mSoundRecording);
 
+    void startRecording();
+    void stopRecording();
+    void pauseRecording();
+
 private:
     const char* TAG = "Audio Engine: %s";
 

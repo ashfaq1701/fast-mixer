@@ -15,8 +15,30 @@ AudioEngine::~AudioEngine() {
     closeStream(mRecordingStream);
 }
 
+void AudioEngine::startRecording() {
+    LOGD(TAG, "startRecording(): ");
+    openRecordingStream();
+    if (mRecordingStream) {
+        startStream(mRecordingStream);
+    } else {
+        LOGE(TAG, "startRecording(): Failed to create recording (%p) stream", mRecordingStream);
+        closeStream(mRecordingStream);
+    }
+}
+
+void AudioEngine::stopRecording() {
+    LOGD(TAG, "stopRecording(): ");
+    stopStream(mRecordingStream);
+    closeStream(mRecordingStream);
+}
+
+void AudioEngine::pauseRecording() {
+    LOGD(TAG, "pauseRecording(): ");
+    stopStream(mRecordingStream);
+}
+
 void AudioEngine::openRecordingStream() {
-    LOGD("TAG", "openRecordingStream(): ");
+    LOGD(TAG, "openRecordingStream(): ");
     oboe::AudioStreamBuilder builder;
     setupRecordingStreamParameters(&builder);
     oboe::Result result = builder.openStream(&mRecordingStream);
@@ -62,7 +84,7 @@ void AudioEngine::stopStream(oboe::AudioStream *stream) {
             LOGE(TAG, "Error stopping the stream: %s", oboe::convertToText(result));
         }
         LOGW(TAG, "stopStream(): Total samples = ");
-        //LOGW(TAG, std::to_string(mSoundRecording.getTotalSamples()).c_str());
+        LOGW(TAG, std::to_string(mSoundRecording.getTotalSamples()).c_str());
     }
 }
 
@@ -77,7 +99,7 @@ void AudioEngine::closeStream(oboe::AudioStream *stream) {
         }
 
         LOGW(TAG, "closeStream(): mTotalSamples = ");
-        //LOGW(TAG, std::to_string(mSoundRecording.getTotalSamples()).c_str());
+        LOGW(TAG, std::to_string(mSoundRecording.getTotalSamples()).c_str());
     }
 }
 

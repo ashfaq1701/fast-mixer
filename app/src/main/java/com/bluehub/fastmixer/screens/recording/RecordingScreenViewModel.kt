@@ -53,11 +53,17 @@ class RecordingScreenViewModel(override val context: Context?, val audioEnginePr
         }
     }
 
-    fun reset() {
+    fun deleteAudioEngine() {
+        audioEngineProxy.delete()
+    }
 
+    fun reset() {
+        audioEngineProxy.stopRecording()
     }
 
     fun setGoBack() {
+        audioEngineProxy.stopRecording()
+        deleteAudioEngine()
         _eventGoBack.value = true
     }
 
@@ -65,12 +71,12 @@ class RecordingScreenViewModel(override val context: Context?, val audioEnginePr
         _eventGoBack.value = false
     }
 
-    fun startRecording() {
-
+    private fun startRecording() {
+        audioEngineProxy.startRecording()
     }
 
-    fun pauseRecording() {
-
+    private fun pauseRecording() {
+        audioEngineProxy.pauseRecording()
     }
 
     fun startPlaying() {
