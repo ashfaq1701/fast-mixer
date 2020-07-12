@@ -1,6 +1,7 @@
 package com.bluehub.fastmixer.screens.recording
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.bluehub.fastmixer.common.audio.AudioEngineProxy
@@ -13,6 +14,7 @@ import javax.inject.Inject
 class RecordingScreenViewModel(override val context: Context?, val audioEngineProxy: AudioEngineProxy, override val tag: String) : PermissionViewModel(context, tag) {
     init {
         getViewModelComponent().inject(this)
+        audioEngineProxy.create()
     }
 
     private var viewModelJob = Job()
@@ -111,5 +113,6 @@ class RecordingScreenViewModel(override val context: Context?, val audioEnginePr
     override fun onCleared() {
         super.onCleared()
         viewModelJob.cancel()
+        deleteAudioEngine()
     }
 }

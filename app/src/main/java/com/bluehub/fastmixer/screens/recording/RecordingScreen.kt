@@ -36,7 +36,6 @@ class RecordingScreen : PermissionFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         getPresentationComponent().inject(this)
-        audioEngine.create()
     }
 
     override fun onCreateView(
@@ -58,11 +57,6 @@ class RecordingScreen : PermissionFragment() {
         initUI()
 
         return dataBinding.root
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        (viewModel as RecordingScreenViewModel).deleteAudioEngine()
     }
 
     fun initUI() {
