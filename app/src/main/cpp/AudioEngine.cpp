@@ -11,8 +11,7 @@ AudioEngine::AudioEngine() {
 }
 
 AudioEngine::~AudioEngine() {
-    stopStream(mRecordingStream);
-    closeStream(mRecordingStream);
+    stopRecording();
 }
 
 void AudioEngine::startRecording() {
@@ -27,9 +26,16 @@ void AudioEngine::startRecording() {
 }
 
 void AudioEngine::stopRecording() {
-    LOGD(TAG, "stopRecording(): ");
-    stopStream(mRecordingStream);
-    closeStream(mRecordingStream);
+    LOGD(TAG, "stopRecording(): %d");
+
+    if (!mRecordingStream) {
+        return;
+    }
+
+    if (mRecordingStream->getState() != oboe::StreamState::Closed) {
+        stopStream(mRecordingStream);
+        closeStream(mRecordingStream);
+    }
 }
 
 void AudioEngine::pauseRecording() {
@@ -81,7 +87,8 @@ void AudioEngine::stopStream(oboe::AudioStream *stream) {
     if (stream) {
         oboe::Result result = stream->stop(0L);
         if (result != oboe::Result::OK) {
-            LOGE(TAG, "Error stopping the stream: %s", oboe::convertToText(result));
+            LOGE(TAG, "Error stopping the stream: %s");
+            LOGE(TAG, oboe::convertToText(result));
         }
         LOGW(TAG, "stopStream(): Total samples = ");
         LOGW(TAG, std::to_string(mSoundRecording.getTotalSamples()).c_str());
@@ -90,6 +97,7 @@ void AudioEngine::stopStream(oboe::AudioStream *stream) {
 
 void AudioEngine::closeStream(oboe::AudioStream *stream) {
     LOGD("closeStream(): ");
+
     if (stream) {
         oboe::Result result = stream->close();
         if (result != oboe::Result::OK) {

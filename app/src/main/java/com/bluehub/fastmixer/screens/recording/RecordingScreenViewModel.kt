@@ -18,8 +18,6 @@ class RecordingScreenViewModel(override val context: Context?, val audioEnginePr
     private var viewModelJob = Job()
     private val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
 
-
-
     @Inject
     override lateinit var permissionManager: PermissionManager
 
@@ -68,13 +66,22 @@ class RecordingScreenViewModel(override val context: Context?, val audioEnginePr
     }
 
     fun reset() {
-        audioEngineProxy.stopRecording()
+        uiScope.launch {
+            stopRecording()
+        }
     }
 
     fun setGoBack() {
-        audioEngineProxy.stopRecording()
-        deleteAudioEngine()
-        _eventGoBack.value = true
+        uiScope.launch {
+            stopRecording()
+            _eventGoBack.value = true
+        }
+    }
+
+    suspend fun stopRecording() {
+        withContext(Dispatchers.IO) {
+            audioEngineProxy.stopRecording()
+        }
     }
 
     fun resetGoBack() {

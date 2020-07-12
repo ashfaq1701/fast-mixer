@@ -8,7 +8,8 @@
     <fragment
         android:id="@+id/mixingScreen"
         android:name="com.bluehub.fastmixer.screens.mixing.MixingScreen"
-        android:label="MixingScreen" >
+        android:label="MixingScreen"
+        tools:layout="@layout/mixing_screen">
         <action
             android:id="@+id/action_mixingScreen_to_recordingScreen"
             app:destination="@id/recordingScreen" />
@@ -20,6 +21,8 @@
         tools:layout="@layout/recording_screen" >
         <action
             android:id="@+id/action_recordingScreen_to_mixingScreen"
-            app:destination="@id/mixingScreen" />
+            app:destination="@id/mixingScreen"
+            app:popUpTo="@id/mixingScreen"
+            app:popUpToInclusive="true" />
     </fragment>
 </navigation>

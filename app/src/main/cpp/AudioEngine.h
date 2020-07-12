@@ -26,7 +26,7 @@ public:
     void pauseRecording();
 
 private:
-    const char* TAG = "Audio Engine: %s";
+    const char* TAG = "Audio Engine:: %s";
 
     int32_t mRecordingDeviceId = oboe::VoiceRecognition;
     int32_t mPlaybackDeviceId = 6;
