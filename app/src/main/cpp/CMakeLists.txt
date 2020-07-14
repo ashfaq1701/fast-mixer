@@ -23,6 +23,8 @@ add_library( # Sets the name of the library.
              SoundRecording.cpp
              AudioEngine.cpp
              RecordingCallback.cpp
+             LivePlaybackCallback.cpp
+             PlaybackCallback.cpp
              native-lib.cpp )
 
 # Build the Oboe library

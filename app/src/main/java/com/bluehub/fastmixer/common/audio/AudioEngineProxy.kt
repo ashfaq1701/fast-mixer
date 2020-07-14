@@ -1,7 +1,7 @@
 package com.bluehub.fastmixer.common.audio
 
 class AudioEngineProxy {
-    fun create(appPathStr: String, recordingSessionIdStr: String): Boolean = AudioEngine.create(appPathStr, recordingSessionIdStr)
+    fun create(appPathStr: String, recordingSessionIdStr: String, playback: Boolean): Boolean = AudioEngine.create(appPathStr, recordingSessionIdStr, playback)
 
     fun delete() = AudioEngine.delete()
 

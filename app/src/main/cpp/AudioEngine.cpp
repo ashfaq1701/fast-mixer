@@ -6,11 +6,14 @@
 #include "AudioEngine.h"
 #include "logging_macros.h"
 
-AudioEngine::AudioEngine(char* appDir, char* recordingSessionId) {
+AudioEngine::AudioEngine(char* appDir, char* recordingSessionId, bool playback) {
     assert(mInputChannelCount == mOutputChannelCount);
     mAppDir = appDir;
     mRecordingSessionId = recordingSessionId;
+    mPlayback = playback;
     recordingCallback = RecordingCallback(&mSoundRecording, strcat(mAppDir, "/recording"));
+    livePlaybackCallback = LivePlaybackCallback();
+    playbackCallback = PlaybackCallback();
 }
 
 AudioEngine::~AudioEngine() {
