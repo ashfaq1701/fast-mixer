@@ -15,8 +15,9 @@ extern "C" {
     Java_com_bluehub_fastmixer_common_audio_AudioEngine_create(JNIEnv *env, jclass, jstring appDirStr, jstring recordingSessionIdStr) {
         LOGD(TAG, "create(): ");
         if (audioEngine == nullptr) {
-            const char* appDir = env->GetStringUTFChars(appDirStr, NULL);
-            const char* recordingSessionId = env->GetStringUTFChars(recordingSessionIdStr, NULL);
+            char* appDir = const_cast<char *>(env->GetStringUTFChars(appDirStr, NULL));
+            char* recordingSessionId = const_cast<char *>(env->GetStringUTFChars(
+                    recordingSessionIdStr, NULL));
             audioEngine = new AudioEngine(appDir, recordingSessionId);
         }
         return (audioEngine != nullptr);

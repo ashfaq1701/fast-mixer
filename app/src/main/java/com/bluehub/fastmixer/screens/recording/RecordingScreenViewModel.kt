@@ -38,13 +38,12 @@ class RecordingScreenViewModel(override val context: Context?, val audioEnginePr
     init {
         getViewModelComponent().inject(this)
 
-        val cacheDir = context!!.cacheDir.absolutePath + "/" + recordingSessionId
-
-        val cacheDirFile = File(cacheDir)
-        if (!cacheDirFile.exists()) {
-            cacheDirFile.mkdir()
+        uiScope.launch {
+            withContext(Dispatchers.IO) {
+                val cacheDir = createCacheDirectory()
+                audioEngineProxy.create(cacheDir, recordingSessionId)
+            }
         }
-        audioEngineProxy.create(cacheDir, recordingSessionId)
     }
 
     fun toggleRecording() {
@@ -64,6 +63,15 @@ class RecordingScreenViewModel(override val context: Context?, val audioEnginePr
                 pauseRecording()
             }
         }
+    }
+
+    private fun createCacheDirectory(): String {
+        val cacheDir = context!!.cacheDir.absolutePath + "/" + recordingSessionId
+        val cacheDirFile = File(cacheDir)
+        if (!cacheDirFile.exists()) {
+            cacheDirFile.mkdir()
+        }
+        return cacheDir
     }
 
     fun togglePlay() {

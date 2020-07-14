@@ -13,6 +13,6 @@ oboe::DataCallbackResult
 RecordingCallback::processRecordingFrames(oboe::AudioStream *audioStream, int16_t *audioData,
                                           int32_t numFrames) {
     LOGD(TAG, "processingRecordingFrame(): ");
-    int32_t framesWritten = mSoundRecording->write(audioData, numFrames);
+    int32_t framesWritten = mSoundRecording->write(audioData, numFrames, mRecordingFilePath);
     return oboe::DataCallbackResult::Continue;
 }
