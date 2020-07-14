@@ -6,7 +6,7 @@ class AudioEngine {
             System.loadLibrary("audioEngine")
         }
 
-        @JvmStatic external fun create(): Boolean
+        @JvmStatic external fun create(appPathStr: String, recordingSessionIdStr: String): Boolean
 
         @JvmStatic external fun delete()
 

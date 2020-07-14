@@ -17,7 +17,7 @@
 
 class AudioEngine {
 public:
-    AudioEngine();
+    AudioEngine(const char* appDir, const char* mRecordingSessionId);
     ~AudioEngine();
     RecordingCallback recordingCallback = RecordingCallback(&mSoundRecording);
 
@@ -28,6 +28,8 @@ public:
 private:
     const char* TAG = "Audio Engine:: %s";
 
+    const char* mRecordingSessionId = nullptr;
+    const char* mAppDir = nullptr;
     int32_t mRecordingDeviceId = oboe::VoiceRecognition;
     int32_t mPlaybackDeviceId = 6;
     oboe::AudioFormat mFormat = oboe::AudioFormat::I16;

@@ -11,6 +11,8 @@ import com.bluehub.fastmixer.common.utils.ScreenConstants
 import javax.inject.Inject
 
 class MixingScreenViewModel(override val context: Context?, val audioEngine: AudioEngineProxy, override val tag: String): PermissionViewModel(context, tag) {
+    override var TAG: String = javaClass.simpleName
+
     init {
         getViewModelComponent().inject(this)
     }

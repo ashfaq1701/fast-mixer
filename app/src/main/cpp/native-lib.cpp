@@ -12,10 +12,12 @@ static AudioEngine *audioEngine = nullptr;
 
 extern "C" {
     JNIEXPORT jboolean JNICALL
-    Java_com_bluehub_fastmixer_common_audio_AudioEngine_create(JNIEnv *env, jclass) {
+    Java_com_bluehub_fastmixer_common_audio_AudioEngine_create(JNIEnv *env, jclass, jstring appDirStr, jstring recordingSessionIdStr) {
         LOGD(TAG, "create(): ");
         if (audioEngine == nullptr) {
-            audioEngine = new AudioEngine();
+            const char* appDir = env->GetStringUTFChars(appDirStr, NULL);
+            const char* recordingSessionId = env->GetStringUTFChars(recordingSessionIdStr, NULL);
+            audioEngine = new AudioEngine(appDir, recordingSessionId);
         }
         return (audioEngine != nullptr);
     }

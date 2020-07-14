@@ -6,8 +6,10 @@
 #include "AudioEngine.h"
 #include "logging_macros.h"
 
-AudioEngine::AudioEngine() {
+AudioEngine::AudioEngine(const char* appDir, const char* recordingSessionId) {
     assert(mInputChannelCount == mOutputChannelCount);
+    mAppDir = appDir;
+    mRecordingSessionId = recordingSessionId;
 }
 
 AudioEngine::~AudioEngine() {

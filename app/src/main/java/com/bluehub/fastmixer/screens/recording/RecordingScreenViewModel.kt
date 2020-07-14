@@ -9,14 +9,14 @@ import com.bluehub.fastmixer.common.permissions.PermissionViewModel
 import com.bluehub.fastmixer.common.utils.PermissionManager
 import com.bluehub.fastmixer.common.utils.ScreenConstants
 import kotlinx.coroutines.*
+import java.io.File
+import java.util.*
 import javax.inject.Inject
 
 class RecordingScreenViewModel(override val context: Context?, val audioEngineProxy: AudioEngineProxy, override val tag: String) : PermissionViewModel(context, tag) {
-    init {
-        getViewModelComponent().inject(this)
-        audioEngineProxy.create()
-    }
+    override var TAG: String = javaClass.simpleName
 
+    private val recordingSessionId = UUID.randomUUID().toString()
     private var viewModelJob = Job()
     private val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
 
@@ -34,6 +34,18 @@ class RecordingScreenViewModel(override val context: Context?, val audioEnginePr
     private val _eventGoBack = MutableLiveData<Boolean>(false)
     val eventGoBack: LiveData<Boolean>
         get() = _eventGoBack
+
+    init {
+        getViewModelComponent().inject(this)
+
+        val cacheDir = context!!.cacheDir.absolutePath + "/" + recordingSessionId
+
+        val cacheDirFile = File(cacheDir)
+        if (!cacheDirFile.exists()) {
+            cacheDirFile.mkdir()
+        }
+        audioEngineProxy.create(cacheDir, recordingSessionId)
+    }
 
     fun toggleRecording() {
         if (!checkRecordingPermission()) {

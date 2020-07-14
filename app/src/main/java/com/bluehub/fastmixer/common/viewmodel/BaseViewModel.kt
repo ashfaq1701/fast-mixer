@@ -6,6 +6,7 @@ import com.bluehub.fastmixer.common.dependencyinjection.viewmodel.ViewModelCompo
 import com.bluehub.fastmixer.common.dependencyinjection.viewmodel.ViewModelModule
 
 open class BaseViewModel: ViewModel() {
+    open var TAG: String = ""
 
     private lateinit var mViewModelComponent: ViewModelComponent
 
