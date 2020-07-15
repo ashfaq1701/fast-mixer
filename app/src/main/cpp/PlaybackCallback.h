@@ -8,6 +8,7 @@
 #include <oboe/Definitions.h>
 #include <oboe/AudioStream.h>
 #include "logging_macros.h"
+#include "SoundRecording.h"
 
 #ifndef MODULE_NAME
 #define MODULE_NAME  "PlaybackCallback"
