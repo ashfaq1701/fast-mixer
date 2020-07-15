@@ -31,6 +31,10 @@ class RecordingScreenViewModel(override val context: Context?, val audioEnginePr
     val eventIsPlaying: LiveData<Boolean>
         get() = _eventIsPlaying
 
+    private val _eventLivePlaybackSet = MutableLiveData<Boolean>(true)
+    val eventLivePlayback: LiveData<Boolean>
+        get() = _eventLivePlaybackSet
+
     private val _eventGoBack = MutableLiveData<Boolean>(false)
     val eventGoBack: LiveData<Boolean>
         get() = _eventGoBack
@@ -57,10 +61,20 @@ class RecordingScreenViewModel(override val context: Context?, val audioEnginePr
         if (_eventIsRecording.value == true) {
             uiScope.launch {
                 startRecording()
+                _eventLivePlaybackSet.value?.let {
+                    if (it) {
+                        startLivePlayback()
+                    }
+                }
             }
         } else {
             uiScope.launch {
                 pauseRecording()
+                _eventLivePlaybackSet.value?.let {
+                    if (it) {
+                        pauseLivePlayback()
+                    }
+                }
             }
         }
     }
@@ -90,19 +104,23 @@ class RecordingScreenViewModel(override val context: Context?, val audioEnginePr
     fun reset() {
         uiScope.launch {
             stopRecording()
+            _eventLivePlaybackSet.value?.let {
+                if (it) {
+                    stopLivePlayback()
+                }
+            }
         }
     }
 
     fun setGoBack() {
         uiScope.launch {
             stopRecording()
+            _eventLivePlaybackSet.value?.let {
+                if (it) {
+                    stopLivePlayback()
+                }
+            }
             _eventGoBack.value = true
-        }
-    }
-
-    suspend fun stopRecording() {
-        withContext(Dispatchers.IO) {
-            audioEngineProxy.stopRecording()
         }
     }
 
@@ -119,6 +137,30 @@ class RecordingScreenViewModel(override val context: Context?, val audioEnginePr
     private suspend fun pauseRecording() {
         withContext(Dispatchers.IO) {
             audioEngineProxy.pauseRecording()
+        }
+    }
+
+    suspend fun stopRecording() {
+        withContext(Dispatchers.IO) {
+            audioEngineProxy.stopRecording()
+        }
+    }
+
+    suspend fun startLivePlayback() {
+        withContext(Dispatchers.IO) {
+            audioEngineProxy.startLivePlayback()
+        }
+    }
+
+    suspend fun pauseLivePlayback() {
+        withContext(Dispatchers.IO) {
+            audioEngineProxy.pauseLivePlayback()
+        }
+    }
+
+    suspend fun stopLivePlayback() {
+        withContext(Dispatchers.IO) {
+            audioEngineProxy.stopRecording()
         }
     }
 

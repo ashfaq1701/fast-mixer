@@ -14,12 +14,14 @@
 
 class SoundRecording {
 public:
-    int32_t write(const int16_t *sourceData, int32_t numSamples, char* recordingFilePath);
+    int32_t write(const int16_t *sourceData, int32_t numSamples);
     int32_t getTotalSamples() const { return mTotalSamples; }
+    void setRecordingFilePath(char* recordingFilePath);
 
 private:
     const char* TAG = "SoundRecording:: %d";
 
+    char *mRecordingFilePath = nullptr;
     std::atomic<int32_t> mTotalSamples {0};
     int16_t gain_factor = 2;
 };

@@ -10,7 +10,8 @@ AudioEngine::AudioEngine(char* appDir, char* recordingSessionId) {
     assert(mInputChannelCount == mOutputChannelCount);
     mAppDir = appDir;
     mRecordingSessionId = recordingSessionId;
-    recordingCallback = RecordingCallback(&mSoundRecording, strcat(mAppDir, "/recording"));
+    mSoundRecording.setRecordingFilePath(strcat(mAppDir, "/recording"));
+    recordingCallback = RecordingCallback(&mSoundRecording);
     livePlaybackCallback = LivePlaybackCallback();
     playbackCallback = PlaybackCallback();
 }

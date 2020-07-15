@@ -19,14 +19,12 @@ class RecordingCallback : public oboe::AudioStreamCallback {
 private:
     const char* TAG = "RecordingCallback:: %s";
     SoundRecording* mSoundRecording = nullptr;
-    char* mRecordingFilePath = nullptr;
 
 public:
     RecordingCallback() = default;
 
-    explicit RecordingCallback(SoundRecording* recording, char* recordingFilePath) {
+    explicit RecordingCallback(SoundRecording* recording) {
         mSoundRecording = recording;
-        mRecordingFilePath = recordingFilePath;
     }
 
     oboe::DataCallbackResult
