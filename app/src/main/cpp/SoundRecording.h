@@ -22,10 +22,23 @@ public:
     int32_t read(int16_t *targetData, int32_t numSamples);
     int32_t getTotalSamples() const { return mTotalSamples; }
 
+    void openRecordingFp();
+    void closeRecordingFp();
+
+    void openLivePlaybackFp();
+    void closeLivePlaybackFp();
+
 private:
     const char* TAG = "SoundRecording:: %s";
 
     std::string mRecordingFilePath;
+
+    FILE* recordingFp = nullptr;
+    FILE* livePlaybackFp = nullptr;
+
+    bool isRecordingFpOpen = false;
+    bool isLiveFpOpen = false;
+
     int32_t mTotalSamples = 0;
     int32_t mTotalRead = 0;
     int16_t gain_factor = 1;

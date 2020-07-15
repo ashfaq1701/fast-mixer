@@ -26,6 +26,7 @@ void AudioEngine::startLivePlayback() {
     LOGD(TAG, "startLivePlayback(): ");
     openLivePlaybackStream();
     if (mLivePlaybackStream) {
+        mSoundRecording.openLivePlaybackFp();
         startStream(mLivePlaybackStream);
     } else {
         LOGE(TAG, "startLivePlayback(): Failed to create live playback (%p) stream", mLivePlaybackStream);
@@ -43,18 +44,21 @@ void AudioEngine::stopLivePlayback() {
     if (mLivePlaybackStream->getState() != oboe::StreamState::Closed) {
         stopStream(mLivePlaybackStream);
         closeStream(mLivePlaybackStream);
+        mSoundRecording.closeLivePlaybackFp();
     }
 }
 
 void AudioEngine::pauseLivePlayback() {
     LOGD(TAG, "pauseLivePlayback(): ");
     stopStream(mLivePlaybackStream);
+    mSoundRecording.closeLivePlaybackFp();
 }
 
 void AudioEngine::startRecording() {
     LOGD(TAG, "startRecording(): ");
     openRecordingStream();
     if (mRecordingStream) {
+        mSoundRecording.openRecordingFp();
         startStream(mRecordingStream);
     } else {
         LOGE(TAG, "startRecording(): Failed to create recording (%p) stream", mRecordingStream);
@@ -72,12 +76,14 @@ void AudioEngine::stopRecording() {
     if (mRecordingStream->getState() != oboe::StreamState::Closed) {
         stopStream(mRecordingStream);
         closeStream(mRecordingStream);
+        mSoundRecording.closeRecordingFp();
     }
 }
 
 void AudioEngine::pauseRecording() {
     LOGD(TAG, "pauseRecording(): ");
     stopStream(mRecordingStream);
+    mSoundRecording.closeRecordingFp();
 }
 
 void AudioEngine::openRecordingStream() {
