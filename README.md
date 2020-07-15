@@ -4,7 +4,7 @@ This is an ongoing project using [google/oboe](https://github.com/google/oboe) c
 
 To run this project install NDK and CMake in Android Studio.
 
-This project uses some c++ projects (oboe and libsndfile) as submodules. After cloning run below command,
+This project uses some C++ projects (oboe and libsndfile) as submodules. After cloning run below command,
 
 ```bash
 git submodule update --init
