@@ -70,10 +70,59 @@ void AudioEngine::openRecordingStream() {
 }
 
 void AudioEngine::openLivePlaybackStream() {
+    LOGD(TAG, "openLivePlaybackStream(): ");
+    oboe::AudioStreamBuilder builder;
+    setupLivePlaybackStreamParameters(&builder,mAudioApi, mFormat, &livePlaybackCallback,
+                                      mPlaybackDeviceId, mSampleRate, mOutputChannelCount);
+    oboe::Result result = builder.openStream(&mLivePlaybackStream);
+    if (result == oboe::Result::OK && mLivePlaybackStream) {
+        assert(mLivePlaybackStream->getChannelCount() == mOutputChannelCount);
+//        assert(mLivePlaybackStream->getSampleRate() == mSampleRate);
+        assert(mLivePlaybackStream->getFormat() == mFormat);
 
+        mSampleRate = mLivePlaybackStream->getSampleRate();
+        LOGV(TAG, "openLivePlaybackStream(): mSampleRate = ");
+        LOGV(TAG, std::to_string(mSampleRate).c_str());
+
+        mFramesPerBurst = mLivePlaybackStream->getFramesPerBurst();
+        LOGV(TAG, "openLivePlaybackStream(): mFramesPerBurst = ");
+        LOGV(TAG, std::to_string(mFramesPerBurst).c_str());
+
+        // Set the buffer size to the burst size - this will give us the minimum possible latency
+        mLivePlaybackStream->setBufferSizeInFrames(mFramesPerBurst);
+
+    } else {
+        LOGE(TAG, "openLivePlaybackStream(): Failed to create live playback stream. Error: %s",
+             oboe::convertToText(result));
+    }
 }
 
 void AudioEngine::openPlaybackStream() {
+    LOGD(TAG, "openLivePlaybackStream(): ");
+    oboe::AudioStreamBuilder builder;
+    setupLivePlaybackStreamParameters(&builder, mAudioApi, mFormat, &playbackCallback,
+                                      mPlaybackDeviceId, mSampleRate, mOutputChannelCount);
+    oboe::Result result = builder.openStream(&mPlaybackStream);
+    if (result == oboe::Result::OK && mPlaybackStream) {
+        assert(mPlaybackStream->getChannelCount() == mOutputChannelCount);
+//        assert(mPlaybackStream->getSampleRate() == mSampleRate);
+        assert(mPlaybackStream->getFormat() == mFormat);
+
+        mSampleRate = mPlaybackStream->getSampleRate();
+        LOGV(TAG, "openPlaybackStream(): mSampleRate = ");
+        LOGV(TAG, std::to_string(mSampleRate).c_str());
+
+        mFramesPerBurst = mPlaybackStream->getFramesPerBurst();
+        LOGV(TAG, "openPlaybackStream(): mFramesPerBurst = ");
+        LOGV(TAG, std::to_string(mFramesPerBurst).c_str());
+
+        // Set the buffer size to the burst size - this will give us the minimum possible latency
+        mPlaybackStream->setBufferSizeInFrames(mFramesPerBurst);
+
+    } else {
+        LOGE(TAG, "openPlaybackStream(): Failed to create playback stream. Error: %s",
+             oboe::convertToText(result));
+    }
 
 }
 
@@ -138,7 +187,17 @@ AudioEngine::setupLivePlaybackStreamParameters(oboe::AudioStreamBuilder *builder
                                                oboe::AudioStreamCallback *audioStreamCallback,
                                                int32_t deviceId, int32_t sampleRate,
                                                int channelCount) {
-    return nullptr;
+    LOGD(TAG, "setupLivePlaybackStreamParameters()");
+    builder->setAudioApi(audioApi)
+            ->setFormat(audioFormat)
+            ->setSharingMode(oboe::SharingMode::Exclusive)
+            ->setPerformanceMode(oboe::PerformanceMode::LowLatency)
+            ->setCallback(audioStreamCallback)
+            ->setDeviceId(deviceId)
+            ->setDirection(oboe::Direction::Output)
+            ->setSampleRate(sampleRate)
+            ->setChannelCount(channelCount);
+    return builder;
 }
 
 oboe::AudioStreamBuilder *
@@ -146,5 +205,15 @@ AudioEngine::setupPlaybackStreamParameters(oboe::AudioStreamBuilder *builder,
                                            oboe::AudioApi audioApi, oboe::AudioFormat audioFormat,
                                            oboe::AudioStreamCallback *audioStreamCallback,
                                            int32_t deviceId, int32_t sampleRate, int channelCount) {
-    return nullptr;
+    LOGD(TAG, "setupPlaybackStreamParameters()");
+    builder->setAudioApi(audioApi)
+            ->setFormat(audioFormat)
+            ->setSharingMode(oboe::SharingMode::Exclusive)
+            ->setPerformanceMode(oboe::PerformanceMode::LowLatency)
+            ->setCallback(audioStreamCallback)
+            ->setDeviceId(deviceId)
+            ->setDirection(oboe::Direction::Output)
+            ->setSampleRate(sampleRate)
+            ->setChannelCount(channelCount);
+    return builder;
 }
