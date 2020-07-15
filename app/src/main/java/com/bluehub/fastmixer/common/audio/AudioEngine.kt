@@ -6,7 +6,7 @@ class AudioEngine {
             System.loadLibrary("audioEngine")
         }
 
-        @JvmStatic external fun create(appPathStr: String, recordingSessionIdStr: String, playback: Boolean): Boolean
+        @JvmStatic external fun create(appPathStr: String, recordingSessionIdStr: String): Boolean
 
         @JvmStatic external fun delete()
 
@@ -15,5 +15,11 @@ class AudioEngine {
         @JvmStatic external fun stopRecording()
 
         @JvmStatic external fun pauseRecording()
+
+        @JvmStatic external fun startLivePlayback()
+
+        @JvmStatic external fun stopLivePlayback()
+
+        @JvmStatic external fun pauseLivePlayback()
     }
 }

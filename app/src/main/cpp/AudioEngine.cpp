@@ -6,11 +6,10 @@
 #include "AudioEngine.h"
 #include "logging_macros.h"
 
-AudioEngine::AudioEngine(char* appDir, char* recordingSessionId, bool playback) {
+AudioEngine::AudioEngine(char* appDir, char* recordingSessionId) {
     assert(mInputChannelCount == mOutputChannelCount);
     mAppDir = appDir;
     mRecordingSessionId = recordingSessionId;
-    mPlayback = playback;
     recordingCallback = RecordingCallback(&mSoundRecording, strcat(mAppDir, "/recording"));
     livePlaybackCallback = LivePlaybackCallback();
     playbackCallback = PlaybackCallback();
@@ -18,6 +17,36 @@ AudioEngine::AudioEngine(char* appDir, char* recordingSessionId, bool playback) 
 
 AudioEngine::~AudioEngine() {
     stopRecording();
+    stopLivePlayback();
+}
+
+void AudioEngine::startLivePlayback() {
+    LOGD(TAG, "startLivePlayback(): ");
+    openLivePlaybackStream();
+    if (mLivePlaybackStream) {
+        startStream(mLivePlaybackStream);
+    } else {
+        LOGE(TAG, "startLivePlayback(): Failed to create live playback (%p) stream", mLivePlaybackStream);
+        closeStream(mLivePlaybackStream);
+    }
+}
+
+void AudioEngine::stopLivePlayback() {
+    LOGD(TAG, "stopLivePlayback(): %d");
+
+    if (!mLivePlaybackStream) {
+        return;
+    }
+
+    if (mLivePlaybackStream->getState() != oboe::StreamState::Closed) {
+        stopStream(mLivePlaybackStream);
+        closeStream(mLivePlaybackStream);
+    }
+}
+
+void AudioEngine::pauseLivePlayback() {
+    LOGD(TAG, "pauseLivePlayback(): ");
+    stopStream(mLivePlaybackStream);
 }
 
 void AudioEngine::startRecording() {
@@ -88,7 +117,6 @@ void AudioEngine::openLivePlaybackStream() {
         LOGV(TAG, "openLivePlaybackStream(): mFramesPerBurst = ");
         LOGV(TAG, std::to_string(mFramesPerBurst).c_str());
 
-        // Set the buffer size to the burst size - this will give us the minimum possible latency
         mLivePlaybackStream->setBufferSizeInFrames(mFramesPerBurst);
 
     } else {
@@ -176,7 +204,9 @@ AudioEngine::setupRecordingStreamParameters(oboe::AudioStreamBuilder *builder) {
         ->setCallback(&recordingCallback)
         ->setDeviceId(mRecordingDeviceId)
         ->setDirection(oboe::Direction::Input)
-        ->setChannelCount(mInputChannelCount);
+        ->setChannelCount(mInputChannelCount)
+        ->setFramesPerCallback(mRecordingFramesPerCallback);
+
     return builder;
 }
 
@@ -196,7 +226,8 @@ AudioEngine::setupLivePlaybackStreamParameters(oboe::AudioStreamBuilder *builder
             ->setDeviceId(deviceId)
             ->setDirection(oboe::Direction::Output)
             ->setSampleRate(sampleRate)
-            ->setChannelCount(channelCount);
+            ->setChannelCount(channelCount)
+            ->setFramesPerCallback(mRecordingFramesPerCallback);;
     return builder;
 }
 

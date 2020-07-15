@@ -41,7 +41,7 @@ class RecordingScreenViewModel(override val context: Context?, val audioEnginePr
         uiScope.launch {
             withContext(Dispatchers.IO) {
                 val cacheDir = createCacheDirectory()
-                audioEngineProxy.create(cacheDir, recordingSessionId, true)
+                audioEngineProxy.create(cacheDir, recordingSessionId)
             }
         }
     }

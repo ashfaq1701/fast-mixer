@@ -19,7 +19,7 @@
 
 class AudioEngine {
 public:
-    AudioEngine(char* appDir, char* mRecordingSessionId, bool playback);
+    AudioEngine(char* appDir, char* mRecordingSessionId);
     ~AudioEngine();
 
     RecordingCallback recordingCallback;
@@ -29,6 +29,10 @@ public:
     void startRecording();
     void stopRecording();
     void pauseRecording();
+
+    void startLivePlayback();
+    void stopLivePlayback();
+    void pauseLivePlayback();
 
 private:
     const char* TAG = "Audio Engine:: %s";
@@ -50,6 +54,9 @@ private:
     oboe::AudioStream *mRecordingStream = nullptr;
     oboe::AudioStream *mLivePlaybackStream = nullptr;
     oboe::AudioStream *mPlaybackStream = nullptr;
+
+    int32_t mRecordingFramesPerCallback = 96;
+    int32_t mLivePlaybackFramesPerCallback = mRecordingFramesPerCallback;
 
     SoundRecording mSoundRecording;
 

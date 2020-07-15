@@ -12,13 +12,13 @@ static AudioEngine *audioEngine = nullptr;
 
 extern "C" {
     JNIEXPORT jboolean JNICALL
-    Java_com_bluehub_fastmixer_common_audio_AudioEngine_create(JNIEnv *env, jclass, jstring appDirStr, jstring recordingSessionIdStr, jboolean playback) {
+    Java_com_bluehub_fastmixer_common_audio_AudioEngine_create(JNIEnv *env, jclass, jstring appDirStr, jstring recordingSessionIdStr) {
         LOGD(TAG, "create(): ");
         if (audioEngine == nullptr) {
             char* appDir = const_cast<char *>(env->GetStringUTFChars(appDirStr, NULL));
             char* recordingSessionId = const_cast<char *>(env->GetStringUTFChars(
                     recordingSessionIdStr, NULL));
-            audioEngine = new AudioEngine(appDir, recordingSessionId, playback == JNI_TRUE);
+            audioEngine = new AudioEngine(appDir, recordingSessionId);
         }
         return (audioEngine != nullptr);
     }
@@ -52,13 +52,43 @@ extern "C" {
 
     JNIEXPORT void JNICALL
     Java_com_bluehub_fastmixer_common_audio_AudioEngine_pauseRecording(JNIEnv *env, jclass) {
-    LOGD(TAG, "pauseRecording(): ");
-    if (audioEngine == nullptr) {
-        LOGE("audioEngine is null, you must call create() method before calling this method");
-        return;
+        LOGD(TAG, "pauseRecording(): ");
+        if (audioEngine == nullptr) {
+            LOGE("audioEngine is null, you must call create() method before calling this method");
+            return;
+        }
+        audioEngine->pauseRecording();
     }
-    audioEngine->pauseRecording();
-}
+
+    JNIEXPORT void JNICALL
+    Java_com_bluehub_fastmixer_common_audio_AudioEngine_startLivePlayback(JNIEnv *env, jclass) {
+        LOGD(TAG, "startLivePlayback(): ");
+        if (audioEngine == nullptr) {
+            LOGE("audioEngine is null, you must call create() method before calling this method");
+            return;
+        }
+        audioEngine->startLivePlayback();
+    }
+
+    JNIEXPORT void JNICALL
+    Java_com_bluehub_fastmixer_common_audio_AudioEngine_stopLivePlayback(JNIEnv *env, jclass) {
+        LOGD(TAG, "stopLivePlayback(): ");
+        if (audioEngine == nullptr) {
+            LOGE("audioEngine is null, you must call create() method before calling this method");
+            return;
+        }
+        audioEngine->stopLivePlayback();
+    }
+
+    JNIEXPORT void JNICALL
+    Java_com_bluehub_fastmixer_common_audio_AudioEngine_pauseLivePlayback(JNIEnv *env, jclass) {
+        LOGD(TAG, "pauseLivePlayback(): ");
+        if (audioEngine == nullptr) {
+            LOGE("audioEngine is null, you must call create() method before calling this method");
+            return;
+        }
+        audioEngine->pauseLivePlayback();
+    }
 
 
 }
