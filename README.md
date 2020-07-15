@@ -1,6 +1,6 @@
 # Fast Mixer
 
-This is an ongoing project using [google/oboe](https://github.com/google/oboe) c++ library. This is going to be an easy to use mixer for recorded streams and external audio files.
+This is an ongoing project using [google/oboe](https://github.com/google/oboe) c++ library. This is going to be an easy to use mixer for recorded streams and external audio files. I want to credit [sheraz-nadeem/oboe_recorder_sample](https://github.com/sheraz-nadeem/oboe_recorder_sample) for getting the required structure of such a project.
 
 To run this project install NDK and CMake in Android Studio.
 
