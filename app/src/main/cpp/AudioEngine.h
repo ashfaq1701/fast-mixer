@@ -55,7 +55,7 @@ private:
     oboe::AudioStream *mLivePlaybackStream = nullptr;
     oboe::AudioStream *mPlaybackStream = nullptr;
 
-    int32_t mRecordingFramesPerCallback = 48;
+    int32_t mRecordingFramesPerCallback = 24;
     int32_t mLivePlaybackFramesPerCallback = mRecordingFramesPerCallback;
 
     SoundRecording mSoundRecording;
