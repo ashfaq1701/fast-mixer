@@ -39,7 +39,7 @@ private:
 
     std::atomic<int32_t> mTotalSamples {0};
     std::atomic<int32_t> mTotalRead {0};
-    int16_t gain_factor = 1;
+    int16_t gain_factor = 2;
 };
 
 
