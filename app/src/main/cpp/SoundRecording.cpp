@@ -5,33 +5,48 @@
 #include <cstdint>
 #include <cstdio>
 #include <string>
+#include <thread>
 #include "SoundRecording.h"
 #include "logging_macros.h"
 #include "Utils.h"
 
-int32_t SoundRecording::write(const int16_t *sourceData, int32_t numSamples) {
-    auto *buffer = new int16_t[numSamples]{0};
+void SoundRecording::write_runnable(const int16_t *sourceData, int32_t numSamples, SoundRecording* soundRecording) {
+    if (soundRecording->isRecordingFpOpen) {
+        auto *buffer = new int16_t[numSamples]{0};
 
-    for (int i = 0; i < numSamples; i++) {
-        buffer[i] = gain_factor * sourceData[i];
+        for (int i = 0; i < numSamples; i++) {
+            buffer[i] = soundRecording->gain_factor * sourceData[i];
+        }
+
+        fwrite(buffer, sizeof(*buffer), numSamples, soundRecording->recordingFp);
+        fflush(soundRecording->recordingFp);
+
+        soundRecording->mTotalSamples += numSamples;
     }
+}
 
-    fwrite(buffer, sizeof(*buffer), numSamples, recordingFp);
-    fflush(recordingFp);
+void SoundRecording::read_runnable(int16_t *targetData, int32_t numSamples, SoundRecording* soundRecording) {
+    LOGD(soundRecording->TAG, "read(): ");
+    LOGD(soundRecording->TAG, std::to_string(numSamples).c_str());
 
-    mTotalSamples += numSamples;
+    int32_t framesRead = 0;
+    if (soundRecording->isLiveFpOpen) {
+        framesRead = fread(targetData, sizeof(int16_t), numSamples, soundRecording->livePlaybackFp);
+        soundRecording->mTotalRead += framesRead;
+    }
+}
+
+int32_t SoundRecording::write(const int16_t *sourceData, int32_t numSamples) {
+    std::thread write_thread(write_runnable, sourceData, numSamples, this);
+    write_thread.detach();
     return numSamples;
 }
 
-int32_t SoundRecording::read(int16_t *targetData, int32_t numSamples) {
+void SoundRecording::read(int16_t *targetData, int32_t numSamples) {
     LOGD(TAG, "read(): ");
     LOGD(TAG, std::to_string(numSamples).c_str());
-    int32_t framesRead = 0;
-
-    framesRead = fread(targetData, sizeof(int16_t), numSamples, livePlaybackFp);
-
-    mTotalRead += framesRead;
-    return framesRead;
+    std::thread read_thread(read_runnable, targetData, numSamples, this);
+    read_thread.detach();
 }
 
 void SoundRecording::openRecordingFp() {
