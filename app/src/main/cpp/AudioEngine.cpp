@@ -11,7 +11,7 @@ AudioEngine::AudioEngine(char* appDir, char* recordingSessionId) {
     mAppDir = appDir;
     mRecordingSessionId = recordingSessionId;
     char* recordingFilePath = strcat(mAppDir, "/recording");
-    mSoundRecording = SoundRecording(recordingFilePath);
+    mSoundRecording.setRecordingFilePath(recordingFilePath);
     recordingCallback = RecordingCallback(&mSoundRecording);
     livePlaybackCallback = LivePlaybackCallback(&mSoundRecording);
     playbackCallback = PlaybackCallback();

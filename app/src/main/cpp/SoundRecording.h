@@ -12,12 +12,6 @@
 
 class SoundRecording {
 public:
-    SoundRecording() = default;
-
-    explicit SoundRecording(std::string recordingFilePath) {
-        mRecordingFilePath = recordingFilePath;
-    }
-
     int32_t write(const int16_t *sourceData, int32_t numSamples);
     int32_t read(int16_t *targetData, int32_t numSamples);
     int32_t getTotalSamples() const { return mTotalSamples; }
@@ -27,6 +21,10 @@ public:
 
     void openLivePlaybackFp();
     void closeLivePlaybackFp();
+
+    void setRecordingFilePath(std::string recordingFilePath) {
+        mRecordingFilePath = recordingFilePath;
+    }
 
 private:
     const char* TAG = "SoundRecording:: %s";
@@ -39,8 +37,8 @@ private:
     bool isRecordingFpOpen = false;
     bool isLiveFpOpen = false;
 
-    int32_t mTotalSamples = 0;
-    int32_t mTotalRead = 0;
+    std::atomic<int32_t> mTotalSamples {0};
+    std::atomic<int32_t> mTotalRead {0};
     int16_t gain_factor = 1;
 };
 

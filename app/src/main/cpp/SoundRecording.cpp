@@ -17,6 +17,7 @@ int32_t SoundRecording::write(const int16_t *sourceData, int32_t numSamples) {
     }
 
     fwrite(buffer, sizeof(*buffer), numSamples, recordingFp);
+    fflush(recordingFp);
 
     mTotalSamples += numSamples;
     return numSamples;
