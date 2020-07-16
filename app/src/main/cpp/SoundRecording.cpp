@@ -5,7 +5,7 @@
 #include <cstdint>
 #include <cstdio>
 #include <string>
-#include <thread>
+#include <future>
 #include "SoundRecording.h"
 #include "logging_macros.h"
 #include "Utils.h"
@@ -37,16 +37,14 @@ void SoundRecording::read_runnable(int16_t *targetData, int32_t numSamples, Soun
 }
 
 int32_t SoundRecording::write(const int16_t *sourceData, int32_t numSamples) {
-    std::thread write_thread(write_runnable, sourceData, numSamples, this);
-    write_thread.detach();
+    std::async(write_runnable, sourceData, numSamples, this);
     return numSamples;
 }
 
 void SoundRecording::read(int16_t *targetData, int32_t numSamples) {
     LOGD(TAG, "read(): ");
     LOGD(TAG, std::to_string(numSamples).c_str());
-    std::thread read_thread(read_runnable, targetData, numSamples, this);
-    read_thread.detach();
+    std::async(read_runnable, targetData, numSamples, this);
 }
 
 void SoundRecording::openRecordingFp() {
