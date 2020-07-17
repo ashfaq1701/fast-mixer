@@ -44,7 +44,8 @@ int32_t SoundRecording::write(const int16_t *sourceData, int32_t numSamples) {
 void SoundRecording::read(int16_t *targetData, int32_t numSamples) {
     LOGD(TAG, "read(): ");
     LOGD(TAG, std::to_string(numSamples).c_str());
-    std::async(std::launch::async, read_runnable, targetData, numSamples, this);
+    // Live playback in main thread to prevent occasional lag that is being happened
+    read_runnable(targetData, numSamples, this);
 }
 
 void SoundRecording::openRecordingFp() {
