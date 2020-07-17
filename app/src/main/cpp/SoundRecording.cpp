@@ -37,7 +37,7 @@ void SoundRecording::read_runnable(int16_t *targetData, int32_t numSamples, Soun
 }
 
 int32_t SoundRecording::write(const int16_t *sourceData, int32_t numSamples) {
-    std::async(std::launch::async, write_runnable, sourceData, numSamples, this);
+    write_runnable(sourceData, numSamples, this);
     return numSamples;
 }
 
