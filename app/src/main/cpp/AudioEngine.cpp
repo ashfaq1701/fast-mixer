@@ -14,7 +14,7 @@ AudioEngine::AudioEngine(char* appDir, char* recordingSessionId) {
     mSoundRecording.setRecordingFilePath(recordingFilePath);
     recordingCallback = RecordingCallback(&mSoundRecording);
     livePlaybackCallback = LivePlaybackCallback(&mSoundRecording);
-    playbackCallback = PlaybackCallback();
+    playbackCallback = PlaybackCallback(&mSoundRecording);
 }
 
 AudioEngine::~AudioEngine() {
@@ -104,6 +104,38 @@ void AudioEngine::openRecordingStream() {
     } else {
         LOGE(TAG, "Failed to create recording stream. Error: %s", oboe::convertToText(result));
     }
+}
+
+void AudioEngine::startPlayback() {
+    LOGD(TAG, "startPlayback(): ");
+    openPlaybackStream();
+    if (mPlaybackStream) {
+        mSoundRecording.openPlaybackFp();
+        startStream(mPlaybackStream);
+    } else {
+        LOGE(TAG, "startPlayback(): Failed to create playback (%p) stream", mPlaybackStream);
+        closeStream(mPlaybackStream);
+    }
+}
+
+void AudioEngine::stopPlayback() {
+    LOGD(TAG, "stopPlayback(): %d");
+
+    if (!mPlaybackStream) {
+        return;
+    }
+
+    if (mPlaybackStream->getState() != oboe::StreamState::Closed) {
+        stopStream(mPlaybackStream);
+        closeStream(mPlaybackStream);
+        mSoundRecording.closePlaybackFp();
+    }
+}
+
+void AudioEngine::pausePlayback() {
+    LOGD(TAG, "pausePlayback(): ");
+    stopStream(mPlaybackStream);
+    mSoundRecording.closePlaybackFp();
 }
 
 void AudioEngine::openLivePlaybackStream() {

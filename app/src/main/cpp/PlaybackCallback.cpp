@@ -3,6 +3,7 @@
 //
 
 #include "PlaybackCallback.h"
+#include "Utils.h"
 
 oboe::DataCallbackResult
 PlaybackCallback::onAudioReady(oboe::AudioStream *audioStream, void *audioData,
@@ -14,5 +15,9 @@ oboe::DataCallbackResult
 PlaybackCallback::processPlaybackFrame(oboe::AudioStream *audioStream, int16_t *audioData,
                                                int32_t numFrames) {
     LOGD(TAG, "processingPlaybackFrame(): ");
+    fillArrayWithZeros(audioData, numFrames);
+    LOGD(TAG, "audioData prepared");
+    mSoundRecording->read_playback(audioData, numFrames);
+    LOGD(TAG, "read called");
     return oboe::DataCallbackResult::Continue;
 }

@@ -109,9 +109,13 @@ class RecordingScreenViewModel(override val context: Context?, val audioEnginePr
     fun togglePlay() {
         _eventIsPlaying.value = !_eventIsPlaying.value!!
         if(_eventIsPlaying.value == true) {
-            startPlaying()
+            uiScope.launch {
+                startPlaying()
+            }
         } else {
-            pausePlaying()
+            uiScope.launch {
+                pausePlaying()
+            }
         }
     }
 
@@ -182,12 +186,16 @@ class RecordingScreenViewModel(override val context: Context?, val audioEnginePr
         }
     }
 
-    fun startPlaying() {
-
+    suspend fun startPlaying() {
+        withContext(Dispatchers.IO) {
+            audioEngineProxy.startPlayback()
+        }
     }
 
-    fun pausePlaying() {
-
+    suspend fun pausePlaying() {
+        withContext(Dispatchers.IO) {
+            audioEngineProxy.pausePlayback()
+        }
     }
 
     override fun onCleared() {

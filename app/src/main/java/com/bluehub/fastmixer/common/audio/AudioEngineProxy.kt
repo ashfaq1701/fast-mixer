@@ -16,4 +16,10 @@ class AudioEngineProxy {
     fun stopLivePlayback() = AudioEngine.stopLivePlayback()
 
     fun pauseLivePlayback() = AudioEngine.pauseLivePlayback()
+
+    fun startPlayback() = AudioEngine.startPlayback()
+
+    fun stopPlayback() = AudioEngine.stopPlayback()
+
+    fun pausePlayback() = AudioEngine.pausePlayback()
 }

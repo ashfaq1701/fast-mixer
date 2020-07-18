@@ -17,7 +17,7 @@ LivePlaybackCallback::processLivePlaybackFrame(oboe::AudioStream *audioStream, i
                                              int32_t numFrames) {
     LOGD(TAG, "processingLivePlaybackFrame(): ");
     fillArrayWithZeros(audioData, numFrames);
-    mSoundRecording->read(audioData, numFrames);
+    mSoundRecording->read_live_playback(audioData, numFrames);
 
     return oboe::DataCallbackResult::Continue;
 }

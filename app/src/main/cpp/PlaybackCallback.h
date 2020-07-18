@@ -18,9 +18,14 @@
 class PlaybackCallback : public oboe::AudioStreamCallback {
 private:
     const char* TAG = "PlaybackCallback:: %s";
+    SoundRecording* mSoundRecording = nullptr;
 
 public:
     PlaybackCallback() = default;
+
+    PlaybackCallback(SoundRecording* recording) {
+        mSoundRecording = recording;
+    }
 
     oboe::DataCallbackResult
     onAudioReady(oboe::AudioStream *audioStream, void *audioData, int32_t numFrames);
