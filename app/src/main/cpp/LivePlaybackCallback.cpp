@@ -14,10 +14,7 @@ LivePlaybackCallback::onAudioReady(oboe::AudioStream *audioStream, void *audioDa
 oboe::DataCallbackResult
 LivePlaybackCallback::processLivePlaybackFrame(oboe::AudioStream *audioStream, int16_t *audioData,
                                              int32_t numFrames) {
-    LOGD(TAG, "processingLivePlaybackFrame(): ");
     fillArrayWithZeros(audioData, numFrames);
     int64_t framesWritten = mSoundRecording->read(audioData, numFrames);
-    LOGD(TAG, "Frames written: ");
-    LOGD(TAG, std::to_string(framesWritten).c_str());
     return oboe::DataCallbackResult::Continue;
 }

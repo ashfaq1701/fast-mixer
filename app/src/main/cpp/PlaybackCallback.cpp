@@ -13,6 +13,5 @@ PlaybackCallback::onAudioReady(oboe::AudioStream *audioStream, void *audioData,
 oboe::DataCallbackResult
 PlaybackCallback::processPlaybackFrame(oboe::AudioStream *audioStream, int16_t *audioData,
                                                int32_t numFrames) {
-    LOGD(TAG, "processingPlaybackFrame(): ");
     return oboe::DataCallbackResult::Continue;
 }

@@ -10,6 +10,10 @@ AudioEngine::AudioEngine(char* appDir, char* recordingSessionId) {
     assert(mInputChannelCount == mOutputChannelCount);
     mAppDir = appDir;
     mRecordingSessionId = recordingSessionId;
+
+    char* recordingFilePath = strcat(mAppDir, "/recording");
+    mSoundRecording.setRecordingFilePath(recordingFilePath);
+
     recordingCallback = RecordingCallback(&mSoundRecording);
     livePlaybackCallback = LivePlaybackCallback(&mSoundRecording);
     playbackCallback = PlaybackCallback();
@@ -70,12 +74,14 @@ void AudioEngine::stopRecording() {
     if (mRecordingStream->getState() != oboe::StreamState::Closed) {
         stopStream(mRecordingStream);
         closeStream(mRecordingStream);
+        mSoundRecording.flush_buffer();
     }
 }
 
 void AudioEngine::pauseRecording() {
     LOGD(TAG, "pauseRecording(): ");
     stopStream(mRecordingStream);
+    mSoundRecording.flush_buffer();
 }
 
 void AudioEngine::openRecordingStream() {
