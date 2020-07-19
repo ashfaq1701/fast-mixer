@@ -34,6 +34,10 @@ public:
     void stopLivePlayback();
     void pauseLivePlayback();
 
+    void startPlayback();
+    void stopPlayback();
+    void pausePlayback();
+
 private:
     const char* TAG = "Audio Engine:: %s";
 

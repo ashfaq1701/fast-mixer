@@ -21,5 +21,11 @@ class AudioEngine {
         @JvmStatic external fun stopLivePlayback()
 
         @JvmStatic external fun pauseLivePlayback()
+
+        @JvmStatic external fun startPlayback()
+
+        @JvmStatic external fun stopPlayback()
+
+        @JvmStatic external fun pausePlayback()
     }
 }

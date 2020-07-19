@@ -15,6 +15,6 @@ oboe::DataCallbackResult
 LivePlaybackCallback::processLivePlaybackFrame(oboe::AudioStream *audioStream, int16_t *audioData,
                                              int32_t numFrames) {
     fillArrayWithZeros(audioData, numFrames);
-    int64_t framesWritten = mSoundRecording->read(audioData, numFrames);
+    int64_t framesWritten = mSoundRecording->read_live_playback(audioData, numFrames);
     return oboe::DataCallbackResult::Continue;
 }

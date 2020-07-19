@@ -61,6 +61,36 @@ extern "C" {
     }
 
     JNIEXPORT void JNICALL
+    Java_com_bluehub_fastmixer_common_audio_AudioEngine_startPlayback(JNIEnv *env, jclass) {
+        LOGD(TAG, "startPlayback(): ");
+        if (audioEngine == nullptr) {
+            LOGE("audioEngine is null, you must call create() method before calling this method");
+            return;
+        }
+        audioEngine->startPlayback();
+    }
+
+    JNIEXPORT void JNICALL
+    Java_com_bluehub_fastmixer_common_audio_AudioEngine_stopPlayback(JNIEnv *env, jclass) {
+        LOGD(TAG, "stopPlayback(): ");
+        if (audioEngine == nullptr) {
+            LOGE("audioEngine is null, you must call create() method before calling this method");
+            return;
+        }
+        audioEngine->stopPlayback();
+    }
+
+    JNIEXPORT void JNICALL
+    Java_com_bluehub_fastmixer_common_audio_AudioEngine_pausePlayback(JNIEnv *env, jclass) {
+        LOGD(TAG, "pausePlayback(): ");
+        if (audioEngine == nullptr) {
+            LOGE("audioEngine is null, you must call create() method before calling this method");
+            return;
+        }
+        audioEngine->pausePlayback();
+    }
+
+    JNIEXPORT void JNICALL
     Java_com_bluehub_fastmixer_common_audio_AudioEngine_startLivePlayback(JNIEnv *env, jclass) {
         LOGD(TAG, "startLivePlayback(): ");
         if (audioEngine == nullptr) {

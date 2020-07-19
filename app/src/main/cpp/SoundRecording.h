@@ -24,7 +24,8 @@ public:
     TaskQueue *taskQueue;
 
     int32_t write(const int16_t *sourceData, int32_t numSamples);
-    int32_t read(int16_t *targetData, int32_t numSamples);
+    int32_t read_live_playback(int16_t *targetData, int32_t numSamples);
+    void read_playback(int16_t *targetData, int32_t numSamples);
     int32_t getTotalSamples() const { return mTotalSamples; }
 
     void flush_buffer();
@@ -33,10 +34,17 @@ public:
         mRecordingFilePath = recordingFilePath;
     }
 
+    void openPlaybackFp();
+    void closePlaybackFp();
+
 private:
     const char* TAG = "SoundRecording:: %s";
 
     std::string mRecordingFilePath;
+
+    FILE* playbackFp = nullptr;
+    std::atomic<bool> isPlaybackFpOpen {false};
+    std::atomic<int32_t> mTotalReadPlayback {0};
 
     std::atomic<int32_t> mTotalSamples {0};
     std::atomic<int32_t> mIteration { 1 };
@@ -52,6 +60,8 @@ private:
     int16_t* mData = new int16_t[kMaxSamples]{0};
 
     static void flush_to_file(int16_t* buffer, int length, const std::string& recordingFilePath);
+
+    static void read_playback_runnable(int16_t *targetData, int32_t numSamples, SoundRecording* soundRecording);
 };
 
 
