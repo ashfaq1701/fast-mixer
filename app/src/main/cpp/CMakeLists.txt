@@ -8,24 +8,26 @@ cmake_minimum_required(VERSION 3.4.1)
 set(FFMPEG_DIR ${PROJECT_SOURCE_DIR}/../../../../cpp_dependencies/ffmpeg-build/${ANDROID_ABI})
 include_directories(${FFMPEG_DIR}/include)
 
+include_directories(taskqueue)
+
 # Creates and names a library, sets it as either STATIC
 # or SHARED, and provides the relative paths to its source code.
 # You can define multiple libraries, and CMake builds them for you.
 # Gradle automatically packages shared libraries with your APK.
 
 add_library( # Sets the name of the library.
-             audioEngine
+        audioEngine
 
-             # Sets the library as a shared library.
-             SHARED
+        # Sets the library as a shared library.
+        SHARED
 
-             # Provides a relative path to your source file(s).
-             SoundRecording.cpp
-             AudioEngine.cpp
-             RecordingCallback.cpp
-             LivePlaybackCallback.cpp
-             PlaybackCallback.cpp
-             native-lib.cpp )
+        # Provides a relative path to your source file(s).
+        SoundRecording.cpp
+        AudioEngine.cpp
+        RecordingCallback.cpp
+        LivePlaybackCallback.cpp
+        PlaybackCallback.cpp
+        native-lib.cpp )
 
 # Build the Oboe library
 set (OBOE_DIR ../../../../cpp_dependencies/oboe)
@@ -46,11 +48,11 @@ include_directories(${LIB_SND_FILE_DIR}/src)
 # completing its build.
 
 find_library( # Sets the name of the path variable.
-              log-lib
+        log-lib
 
-              # Specifies the name of the NDK library that
-              # you want CMake to locate.
-              log )
+        # Specifies the name of the NDK library that
+        # you want CMake to locate.
+        log )
 
 add_library( avformat SHARED IMPORTED)
 set_target_properties(avformat PROPERTIES IMPORTED_LOCATION
@@ -77,13 +79,13 @@ set_target_properties(avfilter PROPERTIES IMPORTED_LOCATION
 # build script, prebuilt third-party libraries, or system libraries.
 
 target_link_libraries(
-                       audioEngine
-                       ${log-lib}
-                       oboe
-                       sndfile
-                       avformat
-                       avutil
-                       avcodec
-                       swresample
-                       avfilter
-                       )
+        audioEngine
+        ${log-lib}
+        oboe
+        sndfile
+        avformat
+        avutil
+        avcodec
+        swresample
+        avfilter
+)

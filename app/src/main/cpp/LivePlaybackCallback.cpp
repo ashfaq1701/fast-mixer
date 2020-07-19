@@ -2,7 +2,6 @@
 // Created by Ashfaq Salehin on 15/7/2020 AD.
 //
 
-#include <thread>
 #include "LivePlaybackCallback.h"
 #include "Utils.h"
 
@@ -15,10 +14,7 @@ LivePlaybackCallback::onAudioReady(oboe::AudioStream *audioStream, void *audioDa
 oboe::DataCallbackResult
 LivePlaybackCallback::processLivePlaybackFrame(oboe::AudioStream *audioStream, int16_t *audioData,
                                              int32_t numFrames) {
-    LOGD(TAG, "processingLivePlaybackFrame(): ");
     fillArrayWithZeros(audioData, numFrames);
-    mSoundRecording->read_live_playback(audioData, numFrames);
-
+    int64_t framesWritten = mSoundRecording->read_live_playback(audioData, numFrames);
     return oboe::DataCallbackResult::Continue;
 }
-
