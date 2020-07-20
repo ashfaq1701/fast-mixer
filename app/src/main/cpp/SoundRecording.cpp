@@ -36,6 +36,10 @@ void SoundRecording::flush_to_file(int16_t* buffer, int length, const std::strin
 int32_t SoundRecording::write(const int16_t *sourceData, int32_t numSamples) {
     LOGD(TAG, "write(): ");
 
+    if (mWriteIndex + numSamples > mIteration * kMaxSamples) {
+        readyToFlush = true;
+    }
+
     if (readyToFlush) {
         if (livePlaybackEnabled && mLivePlaybackReadIndex >= kMaxSamples) {
             toFlush = true;
@@ -60,7 +64,6 @@ int32_t SoundRecording::write(const int16_t *sourceData, int32_t numSamples) {
 
     if (mWriteIndex + numSamples > mIteration * kMaxSamples) {
         LOGW(TAG, "write: mWriteIndex + numSamples > kMaxSamples");
-        readyToFlush = true;
         mIteration++;
         int32_t newSize = mIteration * kMaxSamples;
         auto * newData = new int16_t[newSize]{0};
