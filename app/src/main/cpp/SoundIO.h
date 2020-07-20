@@ -2,22 +2,22 @@
 // Created by asalehin on 7/11/20.
 //
 
-#ifndef FAST_MIXER_SOUNDRECORDING_H
-#define FAST_MIXER_SOUNDRECORDING_H
+#ifndef FAST_MIXER_SOUNDIO_H
+#define FAST_MIXER_SOUNDIO_H
 
 #include<TaskQueue.h>
 
 #ifndef MODULE_NAME
-#define MODULE_NAME  "SoundRecording"
+#define MODULE_NAME  "SoundIO"
 #endif
 
-class SoundRecording {
+class SoundIO {
 public:
-    SoundRecording() {
+    SoundIO() {
         taskQueue = new TaskQueue();
     }
 
-    ~SoundRecording() {
+    ~SoundIO() {
         taskQueue->stop_queue();
     }
 
@@ -38,7 +38,7 @@ public:
     void closePlaybackFp();
 
 private:
-    const char* TAG = "SoundRecording:: %s";
+    const char* TAG = "SoundIO:: %s";
 
     std::string mRecordingFilePath;
 
@@ -61,7 +61,7 @@ private:
 
     static void flush_to_file(int16_t* buffer, int length, const std::string& recordingFilePath);
 
-    static void read_playback_runnable(int16_t *targetData, int32_t numSamples, SoundRecording* soundRecording);
+    static void read_playback_runnable(int16_t *targetData, int32_t numSamples, SoundIO* soundIo);
 
     void perform_flush(int flushIndex);
 
@@ -73,4 +73,4 @@ private:
 };
 
 
-#endif //FAST_MIXER_SOUNDRECORDING_H
+#endif //FAST_MIXER_SOUNDIO_H

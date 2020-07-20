@@ -13,7 +13,7 @@
 #include <oboe/AudioStream.h>
 #include "logging_macros.h"
 #include "RecordingCallback.h"
-#include "SoundRecording.h"
+#include "SoundIO.h"
 #include "LivePlaybackCallback.h"
 #include "PlaybackCallback.h"
 
@@ -62,7 +62,7 @@ private:
     int32_t mRecordingFramesPerCallback = 24;
     int32_t mLivePlaybackFramesPerCallback = mRecordingFramesPerCallback;
 
-    SoundRecording mSoundRecording;
+    SoundIO mSoundIO;
 
     void openRecordingStream();
     void openLivePlaybackStream();

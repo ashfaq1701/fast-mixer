@@ -6,32 +6,32 @@
 #include <cstdio>
 #include <string>
 #include <unistd.h>
-#include "SoundRecording.h"
+#include "SoundIO.h"
 #include "logging_macros.h"
 #include "Utils.h"
 #include <mutex>
 #include <condition_variable>
 
-std::mutex SoundRecording::mtx;
-std::condition_variable SoundRecording::reallocated;
-bool SoundRecording::is_reallocated = false;
+std::mutex SoundIO::mtx;
+std::condition_variable SoundIO::reallocated;
+bool SoundIO::is_reallocated = false;
 
-bool SoundRecording::check_if_reallocated() {
+bool SoundIO::check_if_reallocated() {
     return is_reallocated;
 }
 
-void SoundRecording::read_playback_runnable(int16_t *targetData, int32_t numSamples, SoundRecording* soundRecording) {
-    LOGD(soundRecording->TAG, "readPlayback(): ");
-    LOGD(soundRecording->TAG, std::to_string(numSamples).c_str());
+void SoundIO::read_playback_runnable(int16_t *targetData, int32_t numSamples, SoundIO* soundIO) {
+    LOGD(soundIO->TAG, "readPlayback(): ");
+    LOGD(soundIO->TAG, std::to_string(numSamples).c_str());
 
     int32_t framesRead = 0;
-    if (soundRecording->isPlaybackFpOpen) {
-        framesRead = fread(targetData, sizeof(int16_t), numSamples, soundRecording->playbackFp);
-        soundRecording->mTotalReadPlayback += framesRead;
+    if (soundIO->isPlaybackFpOpen) {
+        framesRead = fread(targetData, sizeof(int16_t), numSamples, soundIO->playbackFp);
+        soundIO->mTotalReadPlayback += framesRead;
     }
 }
 
-void SoundRecording::read_playback(int16_t *targetData, int32_t numSamples) {
+void SoundIO::read_playback(int16_t *targetData, int32_t numSamples) {
     LOGD(TAG, "read(): ");
     LOGD(TAG, std::to_string(numSamples).c_str());
     if (this->mTotalReadPlayback < mTotalSamples) {
@@ -39,7 +39,7 @@ void SoundRecording::read_playback(int16_t *targetData, int32_t numSamples) {
     }
 }
 
-void SoundRecording::flush_to_file(int16_t* buffer, int length, const std::string& recordingFilePath) {
+void SoundIO::flush_to_file(int16_t* buffer, int length, const std::string& recordingFilePath) {
     FILE* f = fopen(recordingFilePath.c_str(), "ab");
     fwrite(buffer, sizeof(*buffer), length, f);
     fclose(f);
@@ -49,7 +49,7 @@ void SoundRecording::flush_to_file(int16_t* buffer, int length, const std::strin
     is_reallocated = false;
 }
 
-void SoundRecording::perform_flush(int flushIndex) {
+void SoundIO::perform_flush(int flushIndex) {
     int16_t* oldBuffer = mData;
     is_reallocated = false;
     taskQueue->enqueue(flush_to_file, oldBuffer, flushIndex, mRecordingFilePath);
@@ -65,7 +65,7 @@ void SoundRecording::perform_flush(int flushIndex) {
     mIteration = 1;
 }
 
-int32_t SoundRecording::write(const int16_t *sourceData, int32_t numSamples) {
+int32_t SoundIO::write(const int16_t *sourceData, int32_t numSamples) {
     LOGD(TAG, "write(): ");
 
     if (mWriteIndex + numSamples > kMaxSamples) {
@@ -111,7 +111,7 @@ int32_t SoundRecording::write(const int16_t *sourceData, int32_t numSamples) {
     return numSamples;
 }
 
-void SoundRecording::flush_buffer() {
+void SoundIO::flush_buffer() {
     if (mWriteIndex > 0) {
         int16_t* oldBuffer = mData;
         is_reallocated = false;
@@ -127,7 +127,7 @@ void SoundRecording::flush_buffer() {
     }
 }
 
-int32_t SoundRecording::read_live_playback(int16_t *targetData, int32_t numSamples) {
+int32_t SoundIO::read_live_playback(int16_t *targetData, int32_t numSamples) {
     int32_t framesRead = 0;
     while (framesRead < numSamples && mLivePlaybackReadIndex < mTotalSamples) {
         targetData[framesRead++] = mData[mLivePlaybackReadIndex++];
@@ -135,7 +135,7 @@ int32_t SoundRecording::read_live_playback(int16_t *targetData, int32_t numSampl
     return framesRead;
 }
 
-void SoundRecording::openPlaybackFp() {
+void SoundIO::openPlaybackFp() {
     if (!isPlaybackFpOpen) {
         playbackFp = fopen(mRecordingFilePath.c_str(), "rb");
         if (playbackFp != nullptr) {
@@ -145,7 +145,7 @@ void SoundRecording::openPlaybackFp() {
     }
 }
 
-void SoundRecording::closePlaybackFp() {
+void SoundIO::closePlaybackFp() {
     if (isPlaybackFpOpen) {
         fclose(playbackFp);
         isPlaybackFpOpen = false;

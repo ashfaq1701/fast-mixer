@@ -8,7 +8,7 @@
 #include <oboe/Definitions.h>
 #include <oboe/AudioStream.h>
 #include "logging_macros.h"
-#include "SoundRecording.h"
+#include "SoundIO.h"
 
 #ifndef MODULE_NAME
 #define MODULE_NAME  "LivePlaybackCallback"
@@ -18,13 +18,13 @@
 class LivePlaybackCallback : public oboe::AudioStreamCallback {
 private:
     const char* TAG = "LivePlaybackCallback:: %s";
-    SoundRecording* mSoundRecording = nullptr;
+    SoundIO* mSoundIO = nullptr;
 
 public:
     LivePlaybackCallback() = default;
 
-    LivePlaybackCallback(SoundRecording* recording) {
-        mSoundRecording = recording;
+    LivePlaybackCallback(SoundIO* recording) {
+        mSoundIO = recording;
     }
 
     oboe::DataCallbackResult
