@@ -62,6 +62,8 @@ private:
     static void flush_to_file(int16_t* buffer, int length, const std::string& recordingFilePath);
 
     static void read_playback_runnable(int16_t *targetData, int32_t numSamples, SoundRecording* soundRecording);
+
+    void perform_flush(int flushIndex);
 };
 
 

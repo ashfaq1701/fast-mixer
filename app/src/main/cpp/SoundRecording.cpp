@@ -5,9 +5,20 @@
 #include <cstdint>
 #include <cstdio>
 #include <string>
+#include <unistd.h>
 #include "SoundRecording.h"
 #include "logging_macros.h"
 #include "Utils.h"
+#include <mutex>
+#include <condition_variable>
+
+std::mutex mtx;
+std::condition_variable reallocated;
+bool is_reallocated = false;
+
+bool check_if_reallocated() {
+    return is_reallocated;
+}
 
 void SoundRecording::read_playback_runnable(int16_t *targetData, int32_t numSamples, SoundRecording* soundRecording) {
     LOGD(soundRecording->TAG, "readPlayback(): ");
@@ -32,39 +43,57 @@ void SoundRecording::flush_to_file(int16_t* buffer, int length, const std::strin
     FILE* f = fopen(recordingFilePath.c_str(), "ab");
     fwrite(buffer, sizeof(*buffer), length, f);
     fclose(f);
+    std::unique_lock<std::mutex> lck(mtx);
+    reallocated.wait(lck, check_if_reallocated);
+    delete[] buffer;
+    is_reallocated = false;
+}
+
+void SoundRecording::perform_flush(int flushIndex) {
+    int16_t* oldBuffer = mData;
+    taskQueue->enqueue(flush_to_file, oldBuffer, flushIndex, mRecordingFilePath);
+
+    auto * newData = new int16_t[kMaxSamples]{0};
+    std::copy(mData + flushIndex, mData + mWriteIndex, newData);
+    mData = newData;
+    is_reallocated = true;
+    mWriteIndex -= flushIndex;
+    mLivePlaybackReadIndex -= flushIndex;
+    readyToFlush = false;
+    toFlush = false;
+    mIteration = 1;
 }
 
 int32_t SoundRecording::write(const int16_t *sourceData, int32_t numSamples) {
     LOGD(TAG, "write(): ");
 
-    if (mWriteIndex + numSamples > mIteration * kMaxSamples) {
+    if (mWriteIndex + numSamples > kMaxSamples) {
         readyToFlush = true;
     }
 
+    int flushIndex = 0;
     if (readyToFlush) {
-        if (livePlaybackEnabled && mLivePlaybackReadIndex >= kMaxSamples) {
+        int upperBound  = 0;
+        if (mWriteIndex < kMaxSamples) {
+            upperBound = mWriteIndex;
+        } else {
+            upperBound = kMaxSamples;
+        }
+        if (livePlaybackEnabled && mLivePlaybackReadIndex >= upperBound) {
+            flushIndex = upperBound;
             toFlush = true;
         } else if (!livePlaybackEnabled) {
+            flushIndex = mWriteIndex;
             toFlush = true;
         }
     }
 
     if (toFlush) {
-        int16_t* oldBuffer = mData;
-        taskQueue->enqueue(flush_to_file, oldBuffer, kMaxSamples * (mIteration - 1), mRecordingFilePath);
-
-        auto * newData = new int16_t[kMaxSamples]{0};
-        std::copy(mData + kMaxSamples * (mIteration - 1), mData + mWriteIndex, newData);
-        mData = newData;
-        mWriteIndex -= kMaxSamples;
-        mLivePlaybackReadIndex -= kMaxSamples;
-        readyToFlush = false;
-        toFlush = false;
-        mIteration = 1;
+        perform_flush(flushIndex);
     }
 
     if (mWriteIndex + numSamples > mIteration * kMaxSamples) {
-        LOGW(TAG, "write: mWriteIndex + numSamples > kMaxSamples");
+        readyToFlush = true;
         mIteration++;
         int32_t newSize = mIteration * kMaxSamples;
         auto * newData = new int16_t[newSize]{0};
@@ -90,6 +119,7 @@ void SoundRecording::flush_buffer() {
         mWriteIndex = 0;
         mLivePlaybackReadIndex = 0;
         mData = new int16_t[kMaxSamples]{0};
+        is_reallocated = true;
         readyToFlush = false;
         toFlush = false;
     }
@@ -106,8 +136,10 @@ int32_t SoundRecording::read_live_playback(int16_t *targetData, int32_t numSampl
 void SoundRecording::openPlaybackFp() {
     if (!isPlaybackFpOpen) {
         playbackFp = fopen(mRecordingFilePath.c_str(), "rb");
-        isPlaybackFpOpen = true;
-        fseek(playbackFp, mTotalReadPlayback * sizeof(int16_t), SEEK_SET);
+        if (playbackFp != nullptr) {
+            isPlaybackFpOpen = true;
+            fseek(playbackFp, mTotalReadPlayback * sizeof(int16_t), SEEK_SET);
+        }
     }
 }
 

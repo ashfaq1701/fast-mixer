@@ -142,6 +142,11 @@ class RecordingScreenViewModel(override val context: Context?, val audioEnginePr
                     stopLivePlayback()
                 }
             }
+            _eventIsPlaying.value?.let {
+                if (it) {
+                    stopPlaying()
+                }
+            }
             _eventGoBack.value = true
         }
     }
@@ -195,6 +200,12 @@ class RecordingScreenViewModel(override val context: Context?, val audioEnginePr
     suspend fun pausePlaying() {
         withContext(Dispatchers.IO) {
             audioEngineProxy.pausePlayback()
+        }
+    }
+
+    suspend fun stopPlaying() {
+        withContext(Dispatchers.IO) {
+            audioEngineProxy.stopPlayback()
         }
     }
 
