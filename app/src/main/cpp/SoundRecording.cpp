@@ -23,8 +23,9 @@ void SoundRecording::read_playback_runnable(int16_t *targetData, int32_t numSamp
 void SoundRecording::read_playback(int16_t *targetData, int32_t numSamples) {
     LOGD(TAG, "read(): ");
     LOGD(TAG, std::to_string(numSamples).c_str());
-    // Live playback in main thread to prevent occasional lag that is being happened
-    read_playback_runnable(targetData, numSamples, this);
+    if (this->mTotalReadPlayback < mTotalSamples) {
+        read_playback_runnable(targetData, numSamples, this);
+    }
 }
 
 void SoundRecording::flush_to_file(int16_t* buffer, int length, const std::string& recordingFilePath) {
