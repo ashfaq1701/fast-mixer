@@ -64,6 +64,12 @@ private:
     static void read_playback_runnable(int16_t *targetData, int32_t numSamples, SoundRecording* soundRecording);
 
     void perform_flush(int flushIndex);
+
+    static std::mutex mtx;
+    static std::condition_variable reallocated;
+    static bool is_reallocated;
+
+    static bool check_if_reallocated();
 };
 
 

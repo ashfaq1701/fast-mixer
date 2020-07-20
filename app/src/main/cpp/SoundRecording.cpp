@@ -12,11 +12,11 @@
 #include <mutex>
 #include <condition_variable>
 
-std::mutex mtx;
-std::condition_variable reallocated;
-bool is_reallocated = false;
+std::mutex SoundRecording::mtx;
+std::condition_variable SoundRecording::reallocated;
+bool SoundRecording::is_reallocated = false;
 
-bool check_if_reallocated() {
+bool SoundRecording::check_if_reallocated() {
     return is_reallocated;
 }
 
@@ -51,6 +51,7 @@ void SoundRecording::flush_to_file(int16_t* buffer, int length, const std::strin
 
 void SoundRecording::perform_flush(int flushIndex) {
     int16_t* oldBuffer = mData;
+    is_reallocated = false;
     taskQueue->enqueue(flush_to_file, oldBuffer, flushIndex, mRecordingFilePath);
 
     auto * newData = new int16_t[kMaxSamples]{0};
@@ -113,6 +114,7 @@ int32_t SoundRecording::write(const int16_t *sourceData, int32_t numSamples) {
 void SoundRecording::flush_buffer() {
     if (mWriteIndex > 0) {
         int16_t* oldBuffer = mData;
+        is_reallocated = false;
         taskQueue->enqueue(flush_to_file, oldBuffer, static_cast<int>(mWriteIndex), mRecordingFilePath);
 
         mIteration = 1;
