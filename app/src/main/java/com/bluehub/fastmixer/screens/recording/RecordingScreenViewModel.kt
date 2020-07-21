@@ -48,8 +48,10 @@ class RecordingScreenViewModel(override val context: Context?, val audioEnginePr
         getViewModelComponent().inject(this)
         uiScope.launch {
             withContext(Dispatchers.IO) {
-                val cacheDir = createCacheDirectory()
-                audioEngineProxy.create(cacheDir, recordingSessionId)
+                context?.let {
+                    val cacheDir = createCacheDirectory()
+                    audioEngineProxy.create(context.assets, cacheDir, recordingSessionId)
+                }
             }
         }
         audioDeviceChangeListener.setRestartInputCallback {

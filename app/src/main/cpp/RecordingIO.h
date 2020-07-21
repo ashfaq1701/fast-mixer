@@ -15,7 +15,7 @@
 
 class RecordingIO {
 public:
-    RecordingIO() {
+    RecordingIO(AAssetManager &assetManager) : assetManager(assetManager) {
         taskQueue = new TaskQueue();
     }
 
@@ -53,18 +53,18 @@ private:
     std::string mRecordingFilePath;
 
     FILE* playbackFp = nullptr;
-    std::atomic<bool> isPlaybackFpOpen {false};
-    std::atomic<int32_t> mTotalReadPlayback {0};
+    bool isPlaybackFpOpen = false;
+    int32_t mTotalReadPlayback = 0;
 
     std::unique_ptr<Player> mRecordedTrack;
 
     int32_t mChannelCount;
     int32_t mSampleRate;
 
-    std::atomic<int32_t> mTotalSamples {0};
-    std::atomic<int32_t> mIteration { 1 };
-    std::atomic<int32_t> mWriteIndex { 0 };
-    std::atomic<int32_t> mLivePlaybackReadIndex {0 };
+    int32_t mTotalSamples = 0;
+    int32_t mIteration = 1;
+    int32_t mWriteIndex = 0;
+    int32_t mLivePlaybackReadIndex = 0;
     const int kMaxSamples = 480000; // 10s of audio data @ 48kHz
     const int16_t gain_factor = 2;
 
@@ -79,6 +79,8 @@ private:
     static void read_playback_runnable(int16_t *targetData, int32_t numSamples, RecordingIO* recordingIo);
 
     void perform_flush(int flushIndex);
+
+    AAssetManager& assetManager;
 
     static std::mutex mtx;
     static std::condition_variable reallocated;

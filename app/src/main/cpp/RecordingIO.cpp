@@ -36,6 +36,14 @@ void RecordingIO::read_playback(int16_t *targetData, int32_t numSamples) {
     LOGD(TAG, "read(): ");
     LOGD(TAG, std::to_string(numSamples).c_str());
 
+    if (mRecordingFilePath.empty() || (access(mRecordingFilePath.c_str(), F_OK ) == -1)) {
+        return;
+    }
+
+    if (mRecordedTrack == nullptr) {
+        return;
+    }
+
     if (this->mTotalReadPlayback < mTotalSamples) {
         read_playback_runnable(targetData, numSamples, this);
     }
