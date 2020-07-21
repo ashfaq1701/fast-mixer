@@ -19,6 +19,7 @@ AudioEngine::AudioEngine(AAssetManager& assetManager, char* appDir, char* record
     livePlaybackCallback = LivePlaybackCallback(&mRecordingIO);
     playbackCallback = PlaybackCallback(&mRecordingIO);
 
+    mRecordingIO.set_channel_count(mInputChannelCount);
     mRecordingIO.set_sample_rate(mSampleRate);
 }
 
@@ -60,8 +61,6 @@ void AudioEngine::startPlayback() {
     LOGD(TAG, "startPlayback(): ");
     openPlaybackStream();
     if (mPlaybackStream) {
-        mRecordingIO.set_sample_rate(mPlaybackStream->getSampleRate());
-        mRecordingIO.set_channel_count(mPlaybackStream->getChannelCount());
         mRecordingIO.openPlaybackFp();
         startStream(mPlaybackStream);
     } else {
