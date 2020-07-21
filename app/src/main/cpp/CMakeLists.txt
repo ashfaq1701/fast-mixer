@@ -21,7 +21,7 @@ add_library( # Sets the name of the library.
         SHARED
 
         # Provides a relative path to your source file(s).
-        SoundIO.cpp
+        RecordingIO.cpp
         AudioEngine.cpp
 
         audio/AAssetDataSource.cpp

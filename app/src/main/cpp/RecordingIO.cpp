@@ -6,41 +6,42 @@
 #include <cstdio>
 #include <string>
 #include <unistd.h>
-#include "SoundIO.h"
+#include "RecordingIO.h"
 #include "logging_macros.h"
 #include "Utils.h"
 #include <mutex>
 #include <condition_variable>
 #include "Constants.h"
 
-std::mutex SoundIO::mtx;
-std::condition_variable SoundIO::reallocated;
-bool SoundIO::is_reallocated = false;
+std::mutex RecordingIO::mtx;
+std::condition_variable RecordingIO::reallocated;
+bool RecordingIO::is_reallocated = false;
 
-bool SoundIO::check_if_reallocated() {
+bool RecordingIO::check_if_reallocated() {
     return is_reallocated;
 }
 
-void SoundIO::read_playback_runnable(int16_t *targetData, int32_t numSamples, SoundIO* soundIO) {
-    LOGD(soundIO->TAG, "readPlayback(): ");
-    LOGD(soundIO->TAG, std::to_string(numSamples).c_str());
+void RecordingIO::read_playback_runnable(int16_t *targetData, int32_t numSamples, RecordingIO* recordingIO) {
+    LOGD(recordingIO->TAG, "readPlayback(): ");
+    LOGD(recordingIO->TAG, std::to_string(numSamples).c_str());
 
     int32_t framesRead = 0;
-    if (soundIO->isPlaybackFpOpen) {
-        framesRead = fread(targetData, sizeof(int16_t), numSamples, soundIO->playbackFp);
-        soundIO->mTotalReadPlayback += framesRead;
+    if (recordingIO->isPlaybackFpOpen) {
+        framesRead = fread(targetData, sizeof(int16_t), numSamples, recordingIO->playbackFp);
+        recordingIO->mTotalReadPlayback += framesRead;
     }
 }
 
-void SoundIO::read_playback(int16_t *targetData, int32_t numSamples) {
+void RecordingIO::read_playback(int16_t *targetData, int32_t numSamples) {
     LOGD(TAG, "read(): ");
     LOGD(TAG, std::to_string(numSamples).c_str());
+
     if (this->mTotalReadPlayback < mTotalSamples) {
         read_playback_runnable(targetData, numSamples, this);
     }
 }
 
-void SoundIO::flush_to_file(int16_t* buffer, int length, const std::string& recordingFilePath) {
+void RecordingIO::flush_to_file(int16_t* buffer, int length, const std::string& recordingFilePath) {
     FILE* f = fopen(recordingFilePath.c_str(), "ab");
     fwrite(buffer, sizeof(*buffer), length, f);
     fclose(f);
@@ -50,7 +51,7 @@ void SoundIO::flush_to_file(int16_t* buffer, int length, const std::string& reco
     is_reallocated = false;
 }
 
-void SoundIO::perform_flush(int flushIndex) {
+void RecordingIO::perform_flush(int flushIndex) {
     int16_t* oldBuffer = mData;
     is_reallocated = false;
     taskQueue->enqueue(flush_to_file, oldBuffer, flushIndex, mRecordingFilePath);
@@ -66,7 +67,7 @@ void SoundIO::perform_flush(int flushIndex) {
     mIteration = 1;
 }
 
-int32_t SoundIO::write(const int16_t *sourceData, int32_t numSamples) {
+int32_t RecordingIO::write(const int16_t *sourceData, int32_t numSamples) {
     LOGD(TAG, "write(): ");
 
     if (mWriteIndex + numSamples > kMaxSamples) {
@@ -112,7 +113,7 @@ int32_t SoundIO::write(const int16_t *sourceData, int32_t numSamples) {
     return numSamples;
 }
 
-void SoundIO::flush_buffer() {
+void RecordingIO::flush_buffer() {
     if (mWriteIndex > 0) {
         int16_t* oldBuffer = mData;
         is_reallocated = false;
@@ -128,7 +129,7 @@ void SoundIO::flush_buffer() {
     }
 }
 
-int32_t SoundIO::read_live_playback(int16_t *targetData, int32_t numSamples) {
+int32_t RecordingIO::read_live_playback(int16_t *targetData, int32_t numSamples) {
     int32_t framesRead = 0;
     while (framesRead < numSamples && mLivePlaybackReadIndex < mTotalSamples) {
         targetData[framesRead++] = mData[mLivePlaybackReadIndex++];
@@ -136,7 +137,7 @@ int32_t SoundIO::read_live_playback(int16_t *targetData, int32_t numSamples) {
     return framesRead;
 }
 
-void SoundIO::openPlaybackFp() {
+void RecordingIO::openPlaybackFp() {
     if (!isPlaybackFpOpen) {
         playbackFp = fopen(mRecordingFilePath.c_str(), "rb");
         if (playbackFp != nullptr) {
@@ -146,7 +147,7 @@ void SoundIO::openPlaybackFp() {
     }
 }
 
-void SoundIO::closePlaybackFp() {
+void RecordingIO::closePlaybackFp() {
     if (isPlaybackFpOpen) {
         fclose(playbackFp);
         isPlaybackFpOpen = false;

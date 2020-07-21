@@ -12,11 +12,13 @@ AudioEngine::AudioEngine(char* appDir, char* recordingSessionId) {
     mRecordingSessionId = recordingSessionId;
 
     char* recordingFilePath = strcat(mAppDir, "/recording");
-    mSoundIO.setRecordingFilePath(recordingFilePath);
+    mRecordingIO.setRecordingFilePath(recordingFilePath);
 
-    recordingCallback = RecordingCallback(&mSoundIO);
-    livePlaybackCallback = LivePlaybackCallback(&mSoundIO);
-    playbackCallback = PlaybackCallback(&mSoundIO);
+    recordingCallback = RecordingCallback(&mRecordingIO);
+    livePlaybackCallback = LivePlaybackCallback(&mRecordingIO);
+    playbackCallback = PlaybackCallback(&mRecordingIO);
+
+    mRecordingIO.set_sample_rate(mSampleRate);
 }
 
 AudioEngine::~AudioEngine() {
@@ -57,7 +59,9 @@ void AudioEngine::startPlayback() {
     LOGD(TAG, "startPlayback(): ");
     openPlaybackStream();
     if (mPlaybackStream) {
-        mSoundIO.openPlaybackFp();
+        mRecordingIO.set_sample_rate(mPlaybackStream->getSampleRate());
+        mRecordingIO.set_channel_count(mPlaybackStream->getChannelCount());
+        mRecordingIO.openPlaybackFp();
         startStream(mPlaybackStream);
     } else {
         LOGE(TAG, "startPlayback(): Failed to create playback (%p) stream", mPlaybackStream);
@@ -75,14 +79,14 @@ void AudioEngine::stopPlayback() {
     if (mPlaybackStream->getState() != oboe::StreamState::Closed) {
         stopStream(mPlaybackStream);
         closeStream(mPlaybackStream);
-        mSoundIO.closePlaybackFp();
+        mRecordingIO.closePlaybackFp();
     }
 }
 
 void AudioEngine::pausePlayback() {
     LOGD(TAG, "pausePlayback(): ");
     stopStream(mPlaybackStream);
-    mSoundIO.closePlaybackFp();
+    mRecordingIO.closePlaybackFp();
 }
 
 void AudioEngine::startRecording() {
@@ -106,14 +110,14 @@ void AudioEngine::stopRecording() {
     if (mRecordingStream->getState() != oboe::StreamState::Closed) {
         stopStream(mRecordingStream);
         closeStream(mRecordingStream);
-        mSoundIO.flush_buffer();
+        mRecordingIO.flush_buffer();
     }
 }
 
 void AudioEngine::pauseRecording() {
     LOGD(TAG, "pauseRecording(): ");
     stopStream(mRecordingStream);
-    mSoundIO.flush_buffer();
+    mRecordingIO.flush_buffer();
 }
 
 void AudioEngine::openRecordingStream() {
@@ -212,7 +216,7 @@ void AudioEngine::stopStream(oboe::AudioStream *stream) {
             LOGE(TAG, oboe::convertToText(result));
         }
         LOGW(TAG, "stopStream(): Total samples = ");
-        LOGW(TAG, std::to_string(mSoundIO.getTotalSamples()).c_str());
+        LOGW(TAG, std::to_string(mRecordingIO.getTotalSamples()).c_str());
     }
 }
 
@@ -228,7 +232,7 @@ void AudioEngine::closeStream(oboe::AudioStream *stream) {
         }
 
         LOGW(TAG, "closeStream(): mTotalSamples = ");
-        LOGW(TAG, std::to_string(mSoundIO.getTotalSamples()).c_str());
+        LOGW(TAG, std::to_string(mRecordingIO.getTotalSamples()).c_str());
     }
 }
 

@@ -2,24 +2,24 @@
 // Created by asalehin on 7/11/20.
 //
 
-#ifndef FAST_MIXER_SOUNDIO_H
-#define FAST_MIXER_SOUNDIO_H
+#ifndef FAST_MIXER_RECORDINGIO_H
+#define FAST_MIXER_RECORDINGIO_H
 
 #include<TaskQueue.h>
 #include <AAssetDataSource.h>
 #include <Player.h>
 
 #ifndef MODULE_NAME
-#define MODULE_NAME  "SoundIO"
+#define MODULE_NAME  "RecordingIO"
 #endif
 
-class SoundIO {
+class RecordingIO {
 public:
-    SoundIO() {
+    RecordingIO() {
         taskQueue = new TaskQueue();
     }
 
-    ~SoundIO() {
+    ~RecordingIO() {
         taskQueue->stop_queue();
     }
 
@@ -36,17 +36,30 @@ public:
         mRecordingFilePath = recordingFilePath;
     }
 
+    void set_channel_count(int32_t channelCount) {
+        mChannelCount = channelCount;
+    }
+
+    void set_sample_rate(int32_t sampleRate) {
+        mSampleRate = sampleRate;
+    }
+
     void openPlaybackFp();
     void closePlaybackFp();
 
 private:
-    const char* TAG = "SoundIO:: %s";
+    const char* TAG = "RecordingIO:: %s";
 
     std::string mRecordingFilePath;
 
     FILE* playbackFp = nullptr;
     std::atomic<bool> isPlaybackFpOpen {false};
     std::atomic<int32_t> mTotalReadPlayback {0};
+
+    std::unique_ptr<Player> mRecordedTrack;
+
+    int32_t mChannelCount;
+    int32_t mSampleRate;
 
     std::atomic<int32_t> mTotalSamples {0};
     std::atomic<int32_t> mIteration { 1 };
@@ -63,7 +76,7 @@ private:
 
     static void flush_to_file(int16_t* buffer, int length, const std::string& recordingFilePath);
 
-    static void read_playback_runnable(int16_t *targetData, int32_t numSamples, SoundIO* soundIo);
+    static void read_playback_runnable(int16_t *targetData, int32_t numSamples, RecordingIO* recordingIo);
 
     void perform_flush(int flushIndex);
 
@@ -75,4 +88,4 @@ private:
 };
 
 
-#endif //FAST_MIXER_SOUNDIO_H
+#endif //FAST_MIXER_RECORDINGIO_H
