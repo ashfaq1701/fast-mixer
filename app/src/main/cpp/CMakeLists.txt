@@ -5,10 +5,9 @@
 
 cmake_minimum_required(VERSION 3.4.1)
 
-set(FFMPEG_DIR ${PROJECT_SOURCE_DIR}/../../../../cpp_dependencies/ffmpeg-build/${ANDROID_ABI})
-include_directories(${FFMPEG_DIR}/include)
-
 include_directories(taskqueue)
+
+include_directories(audio)
 
 # Creates and names a library, sets it as either STATIC
 # or SHARED, and provides the relative paths to its source code.
@@ -24,6 +23,11 @@ add_library( # Sets the name of the library.
         # Provides a relative path to your source file(s).
         SoundIO.cpp
         AudioEngine.cpp
+
+        audio/AAssetDataSource.cpp
+        audio/Player.cpp
+        audio/FFMpegExtractor.cpp
+
         RecordingCallback.cpp
         LivePlaybackCallback.cpp
         PlaybackCallback.cpp
@@ -54,6 +58,9 @@ find_library( # Sets the name of the path variable.
         # you want CMake to locate.
         log )
 
+set(FFMPEG_DIR ${PROJECT_SOURCE_DIR}/../../../../cpp_dependencies/ffmpeg-build/${ANDROID_ABI})
+include_directories(audioEngine ${FFMPEG_DIR}/include)
+
 add_library( avformat SHARED IMPORTED)
 set_target_properties(avformat PROPERTIES IMPORTED_LOCATION
         ${FFMPEG_DIR}/lib/libavformat.so)
@@ -82,6 +89,7 @@ target_link_libraries(
         audioEngine
         ${log-lib}
         oboe
+        android
         sndfile
         avformat
         avutil

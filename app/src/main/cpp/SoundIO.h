@@ -6,6 +6,8 @@
 #define FAST_MIXER_SOUNDIO_H
 
 #include<TaskQueue.h>
+#include <AAssetDataSource.h>
+#include <Player.h>
 
 #ifndef MODULE_NAME
 #define MODULE_NAME  "SoundIO"

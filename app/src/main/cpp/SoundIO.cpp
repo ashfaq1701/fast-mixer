@@ -11,6 +11,7 @@
 #include "Utils.h"
 #include <mutex>
 #include <condition_variable>
+#include "Constants.h"
 
 std::mutex SoundIO::mtx;
 std::condition_variable SoundIO::reallocated;
