@@ -48,6 +48,7 @@ private:
     int32_t mRecordingDeviceId = oboe::Unprocessed;
     int32_t mPlaybackDeviceId = oboe::kUnspecified;
     oboe::AudioFormat mFormat = oboe::AudioFormat::I16;
+    oboe::AudioFormat mPlaybackFormat = oboe::AudioFormat::Float;
     int32_t mSampleRate = oboe::DefaultStreamValues::SampleRate;
     int32_t mFramesPerBurst{};
 

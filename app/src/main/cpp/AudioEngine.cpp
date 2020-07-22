@@ -172,7 +172,7 @@ void AudioEngine::openLivePlaybackStream() {
 void AudioEngine::openPlaybackStream() {
     LOGD(TAG, "openLivePlaybackStream(): ");
     oboe::AudioStreamBuilder builder;
-    setupLivePlaybackStreamParameters(&builder, mAudioApi, mFormat, &playbackCallback,
+    setupPlaybackStreamParameters(&builder, mAudioApi, mPlaybackFormat, &playbackCallback,
                                       mPlaybackDeviceId, mSampleRate, mOutputChannelCount);
     oboe::Result result = builder.openStream(&mPlaybackStream);
     if (result == oboe::Result::OK && mPlaybackStream) {

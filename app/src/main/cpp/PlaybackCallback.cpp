@@ -8,11 +8,11 @@
 oboe::DataCallbackResult
 PlaybackCallback::onAudioReady(oboe::AudioStream *audioStream, void *audioData,
                                int32_t numFrames) {
-    return processPlaybackFrame(audioStream, static_cast<int16_t *>(audioData), numFrames * audioStream->getChannelCount());
+    return processPlaybackFrame(audioStream, static_cast<float_t *>(audioData), numFrames * audioStream->getChannelCount());
 }
 
 oboe::DataCallbackResult
-PlaybackCallback::processPlaybackFrame(oboe::AudioStream *audioStream, int16_t *audioData,
+PlaybackCallback::processPlaybackFrame(oboe::AudioStream *audioStream, float *audioData,
                                        int32_t numFrames) {
     LOGD(TAG, "processingPlaybackFrame(): ");
     fillArrayWithZeros(audioData, numFrames);

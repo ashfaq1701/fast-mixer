@@ -21,17 +21,6 @@ bool RecordingIO::check_if_reallocated() {
     return is_reallocated;
 }
 
-void RecordingIO::read_playback_runnable(int16_t *targetData, int32_t numSamples, RecordingIO* recordingIO) {
-    LOGD(recordingIO->TAG, "readPlayback(): ");
-    LOGD(recordingIO->TAG, std::to_string(numSamples).c_str());
-
-    int32_t framesRead = 0;
-    if (recordingIO->isPlaybackFpOpen) {
-        framesRead = fread(targetData, sizeof(int16_t), numSamples, recordingIO->playbackFp);
-        recordingIO->mTotalReadPlayback += framesRead;
-    }
-}
-
 void RecordingIO::setup_audio_source() {
     if (!validate_audio_file()) {
         return;
@@ -70,7 +59,7 @@ bool RecordingIO::validate_audio_file() {
     return !(mRecordingFilePath.empty() || (access(mRecordingFilePath.c_str(), F_OK) == -1));
 }
 
-void RecordingIO::read_playback(int16_t *targetData, int32_t numSamples) {
+void RecordingIO::read_playback(float *targetData, int32_t numSamples) {
     LOGD(TAG, "read(): ");
     LOGD(TAG, std::to_string(numSamples).c_str());
 
@@ -83,7 +72,7 @@ void RecordingIO::read_playback(int16_t *targetData, int32_t numSamples) {
     }
 
     if (this->mTotalReadPlayback < mTotalSamples) {
-        read_playback_runnable(targetData, numSamples, this);
+        mRecordedTrack->renderAudio(targetData, numSamples);
     }
 }
 

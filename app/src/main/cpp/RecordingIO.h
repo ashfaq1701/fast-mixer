@@ -27,7 +27,7 @@ public:
 
     int32_t write(const int16_t *sourceData, int32_t numSamples);
     int32_t read_live_playback(int16_t *targetData, int32_t numSamples);
-    void read_playback(int16_t *targetData, int32_t numSamples);
+    void read_playback(float *targetData, int32_t numSamples);
     int32_t getTotalSamples() const { return mTotalSamples; }
 
     void flush_buffer();
@@ -64,6 +64,8 @@ private:
     int32_t mChannelCount = 0;
     int32_t mSampleRate = 0;
 
+    std::unique_ptr<float[]> mConversionBuffer { nullptr };
+
     int32_t mTotalSamples = 0;
     int32_t mIteration = 1;
     int32_t mWriteIndex = 0;
@@ -78,8 +80,6 @@ private:
     int16_t* mData = new int16_t[kMaxSamples]{0};
 
     static void flush_to_file(int16_t* buffer, int length, const std::string& recordingFilePath);
-
-    static void read_playback_runnable(int16_t *targetData, int32_t numSamples, RecordingIO* recordingIo);
 
     bool validate_audio_file();
 
