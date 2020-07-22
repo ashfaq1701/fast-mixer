@@ -12,7 +12,7 @@ AudioEngine::AudioEngine(AAssetManager& assetManager, char* appDir, char* record
     mAppDir = appDir;
     mRecordingSessionId = recordingSessionId;
 
-    char* recordingFilePath = strcat(mAppDir, "/recording");
+    char* recordingFilePath = strcat(mAppDir, "/recording.pcm");
     mRecordingIO.setRecordingFilePath(recordingFilePath);
 
     recordingCallback = RecordingCallback(&mRecordingIO);
