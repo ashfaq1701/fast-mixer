@@ -53,7 +53,7 @@ void AudioEngine::stopLivePlayback() {
 }
 
 void AudioEngine::pauseLivePlayback() {
-    LOGD(TAG, "pauseLivePlayback(): ");
+    LOGD(TAG, "pauseLivePlayback(): ");;
     stopStream(mLivePlaybackStream);
 }
 
@@ -61,6 +61,7 @@ void AudioEngine::startPlayback() {
     LOGD(TAG, "startPlayback(): ");
     openPlaybackStream();
     if (mPlaybackStream) {
+        mRecordingIO.setup_audio_source();
         mRecordingIO.openPlaybackFp();
         startStream(mPlaybackStream);
     } else {
@@ -71,8 +72,8 @@ void AudioEngine::startPlayback() {
 
 void AudioEngine::stopPlayback() {
     LOGD(TAG, "stopPlayback(): %d");
-
     if (!mPlaybackStream) {
+        mRecordingIO.stop_audio_source();
         return;
     }
 
@@ -85,6 +86,7 @@ void AudioEngine::stopPlayback() {
 
 void AudioEngine::pausePlayback() {
     LOGD(TAG, "pausePlayback(): ");
+    mRecordingIO.pause_audio_source();
     stopStream(mPlaybackStream);
     mRecordingIO.closePlaybackFp();
 }

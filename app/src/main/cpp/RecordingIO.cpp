@@ -32,11 +32,49 @@ void RecordingIO::read_playback_runnable(int16_t *targetData, int32_t numSamples
     }
 }
 
+void RecordingIO::setup_audio_source() {
+    if (!validate_audio_file()) {
+        return;
+    }
+
+    if (mChannelCount == 0 || mSampleRate == 0) {
+        return;
+    }
+
+    AudioProperties targetProperties {
+            .channelCount = mChannelCount,
+            .sampleRate = mSampleRate
+    };
+
+    std::shared_ptr<AAssetDataSource> audioSource {
+            AAssetDataSource::newFromCompressedAsset(mAssetManager, mRecordingFilePath.c_str(), targetProperties)
+    };
+
+    mRecordedTrack = std::make_unique<Player>(audioSource);
+    mRecordedTrack->setPlaying(true);
+}
+
+void RecordingIO::pause_audio_source() {
+    if (mRecordedTrack == nullptr) {
+        return;
+    }
+    mRecordedTrack->setPlaying(false);
+}
+
+void RecordingIO::stop_audio_source() {
+    pause_audio_source();
+    mRecordedTrack = nullptr;
+}
+
+bool RecordingIO::validate_audio_file() {
+    return !(mRecordingFilePath.empty() || (access(mRecordingFilePath.c_str(), F_OK) == -1));
+}
+
 void RecordingIO::read_playback(int16_t *targetData, int32_t numSamples) {
     LOGD(TAG, "read(): ");
     LOGD(TAG, std::to_string(numSamples).c_str());
 
-    if (mRecordingFilePath.empty() || (access(mRecordingFilePath.c_str(), F_OK ) == -1)) {
+    if (!validate_audio_file()) {
         return;
     }
 

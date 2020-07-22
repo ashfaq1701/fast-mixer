@@ -15,7 +15,7 @@
 
 class RecordingIO {
 public:
-    RecordingIO(AAssetManager &assetManager) : assetManager(assetManager) {
+    RecordingIO(AAssetManager &assetManager) : mAssetManager(assetManager) {
         taskQueue = new TaskQueue();
     }
 
@@ -44,6 +44,9 @@ public:
         mSampleRate = sampleRate;
     }
 
+    void setup_audio_source();
+    void pause_audio_source();
+    void stop_audio_source();
     void openPlaybackFp();
     void closePlaybackFp();
 
@@ -58,8 +61,8 @@ private:
 
     std::unique_ptr<Player> mRecordedTrack;
 
-    int32_t mChannelCount;
-    int32_t mSampleRate;
+    int32_t mChannelCount = 0;
+    int32_t mSampleRate = 0;
 
     int32_t mTotalSamples = 0;
     int32_t mIteration = 1;
@@ -78,9 +81,11 @@ private:
 
     static void read_playback_runnable(int16_t *targetData, int32_t numSamples, RecordingIO* recordingIo);
 
+    bool validate_audio_file();
+
     void perform_flush(int flushIndex);
 
-    AAssetManager& assetManager;
+    AAssetManager& mAssetManager;
 
     static std::mutex mtx;
     static std::condition_variable reallocated;
