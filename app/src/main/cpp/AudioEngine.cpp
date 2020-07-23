@@ -65,8 +65,12 @@ void AudioEngine::startPlayback() {
     LOGD(TAG, "startPlayback(): ");
     openPlaybackStream();
     if (mPlaybackStream) {
-        mRecordingIO.setup_audio_source();
-        startStream(mPlaybackStream);
+        if(mRecordingIO.setup_audio_source()) {
+            startStream(mPlaybackStream);
+        } else {
+            LOGD(TAG, "Could not open recorded file");
+            closeStream(mPlaybackStream);
+        }
     } else {
         LOGE(TAG, "startPlayback(): Failed to create playback (%p) stream", mPlaybackStream);
         closeStream(mPlaybackStream);
@@ -179,7 +183,7 @@ void AudioEngine::openPlaybackStream() {
     if (result == oboe::Result::OK && mPlaybackStream) {
         assert(mPlaybackStream->getChannelCount() == mOutputChannelCount);
 //        assert(mPlaybackStream->getSampleRate() == mSampleRate);
-        assert(mPlaybackStream->getFormat() == mFormat);
+        assert(mPlaybackStream->getFormat() == mPlaybackFormat);
 
         mSampleRate = mPlaybackStream->getSampleRate();
         LOGV(TAG, "openPlaybackStream(): mSampleRate = ");
@@ -212,7 +216,7 @@ void AudioEngine::startStream(oboe::AudioStream *stream) {
 
 void AudioEngine::stopStream(oboe::AudioStream *stream) {
     LOGD("stopStream(): ");
-    if (stream) {
+    if (stream && stream->getState() != oboe::StreamState::Closed) {
         oboe::Result result = stream->stop(0L);
         if (result != oboe::Result::OK) {
             LOGE(TAG, "Error stopping the stream: %s");

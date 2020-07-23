@@ -21,13 +21,13 @@ bool RecordingIO::check_if_reallocated() {
     return is_reallocated;
 }
 
-void RecordingIO::setup_audio_source() {
+bool RecordingIO::setup_audio_source() {
     if (!validate_audio_file()) {
-        return;
+        return false;
     }
 
     if (mChannelCount == 0 || mSampleRate == 0) {
-        return;
+        return false;
     }
 
     AudioProperties targetProperties {
@@ -39,8 +39,13 @@ void RecordingIO::setup_audio_source() {
             AAssetDataSource::newFromCompressedAsset(mAssetManager, mRecordingFilePath.c_str(), targetProperties)
     };
 
+    if (audioSource == nullptr) {
+        return false;
+    }
+
     mRecordedTrack = std::make_unique<Player>(audioSource);
     mRecordedTrack->setPlaying(true);
+    return true;
 }
 
 void RecordingIO::pause_audio_source() {

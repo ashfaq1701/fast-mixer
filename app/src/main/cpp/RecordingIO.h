@@ -44,7 +44,7 @@ public:
         mSampleRate = sampleRate;
     }
 
-    void setup_audio_source();
+    bool setup_audio_source();
     void pause_audio_source();
     void stop_audio_source();
 
