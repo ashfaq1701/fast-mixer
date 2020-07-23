@@ -89,7 +89,9 @@ void RecordingIO::flush_to_file(int16_t* buffer, int length, const std::string& 
 void RecordingIO::perform_flush(int flushIndex) {
     int16_t* oldBuffer = mData;
     is_reallocated = false;
-    taskQueue->enqueue(flush_to_file, oldBuffer, flushIndex, mRecordingFilePath);
+    taskQueue->enqueue([&]() {
+        flush_to_file(oldBuffer, flushIndex, mRecordingFilePath);
+    });
 
     auto * newData = new int16_t[kMaxSamples]{0};
     std::copy(mData + flushIndex, mData + mWriteIndex, newData);
@@ -152,7 +154,9 @@ void RecordingIO::flush_buffer() {
     if (mWriteIndex > 0) {
         int16_t* oldBuffer = mData;
         is_reallocated = false;
-        taskQueue->enqueue(flush_to_file, oldBuffer, static_cast<int>(mWriteIndex), mRecordingFilePath);
+        taskQueue->enqueue([&]() {
+            flush_to_file(oldBuffer, static_cast<int>(mWriteIndex), mRecordingFilePath);
+        });
 
         mIteration = 1;
         mWriteIndex = 0;

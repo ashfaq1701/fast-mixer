@@ -27,11 +27,8 @@ public:
         is_running = false;
     }
 
-    template<class F, class... Args>
-    auto enqueue(F&& f, Args&&... args) {
-        auto task = std::bind(std::forward<F>(f), std::forward<Args>(args)...);
-        auto func = [task](){ task(); };
-        q.push(func);
+    void enqueue(std::function<void()> f) {
+        q.push(f);
     }
 
 private:
@@ -49,7 +46,6 @@ private:
     }
 
     void executor_loop() {
-        int i = 0;
         while (is_running) {
             if (!q.empty()) {
                 auto f = q.front();
