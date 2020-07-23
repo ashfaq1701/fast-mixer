@@ -171,20 +171,3 @@ int32_t RecordingIO::read_live_playback(int16_t *targetData, int32_t numSamples)
     }
     return framesRead;
 }
-
-void RecordingIO::openPlaybackFp() {
-    if (!isPlaybackFpOpen) {
-        playbackFp = fopen(mRecordingFilePath.c_str(), "rb");
-        if (playbackFp != nullptr) {
-            isPlaybackFpOpen = true;
-            fseek(playbackFp, mTotalReadPlayback * sizeof(int16_t), SEEK_SET);
-        }
-    }
-}
-
-void RecordingIO::closePlaybackFp() {
-    if (isPlaybackFpOpen) {
-        fclose(playbackFp);
-        isPlaybackFpOpen = false;
-    }
-}

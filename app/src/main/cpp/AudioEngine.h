@@ -38,6 +38,10 @@ public:
     void stopPlayback();
     void pausePlayback();
 
+    static int32_t mSampleRate;
+    static int32_t mInputChannelCount;
+    static int32_t mOutputChannelCount;
+
 private:
     const char* TAG = "Audio Engine:: %s";
 
@@ -49,11 +53,7 @@ private:
     int32_t mPlaybackDeviceId = oboe::kUnspecified;
     oboe::AudioFormat mFormat = oboe::AudioFormat::I16;
     oboe::AudioFormat mPlaybackFormat = oboe::AudioFormat::Float;
-    int32_t mSampleRate = oboe::DefaultStreamValues::SampleRate;
     int32_t mFramesPerBurst{};
-
-    int32_t mInputChannelCount = oboe::ChannelCount::Stereo;
-    int32_t mOutputChannelCount = oboe::ChannelCount::Stereo;
 
     oboe::AudioApi mAudioApi = oboe::AudioApi::AAudio;
     oboe::AudioStream *mRecordingStream = nullptr;

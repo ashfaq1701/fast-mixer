@@ -47,16 +47,12 @@ public:
     void setup_audio_source();
     void pause_audio_source();
     void stop_audio_source();
-    void openPlaybackFp();
-    void closePlaybackFp();
 
 private:
     const char* TAG = "RecordingIO:: %s";
 
     std::string mRecordingFilePath;
 
-    FILE* playbackFp = nullptr;
-    bool isPlaybackFpOpen = false;
     int32_t mTotalReadPlayback = 0;
 
     std::unique_ptr<Player> mRecordedTrack;

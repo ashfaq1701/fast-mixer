@@ -6,6 +6,10 @@
 #include "AudioEngine.h"
 #include "logging_macros.h"
 
+int32_t AudioEngine::mSampleRate = oboe::DefaultStreamValues::SampleRate;
+int32_t AudioEngine::mInputChannelCount = oboe::ChannelCount::Stereo;
+int32_t AudioEngine::mOutputChannelCount = oboe::ChannelCount::Stereo;
+
 AudioEngine::AudioEngine(AAssetManager& assetManager, char* appDir, char* recordingSessionId): mAssetManager(assetManager),
                                                                                                mRecordingIO(assetManager) {
     assert(mInputChannelCount == mOutputChannelCount);
@@ -62,7 +66,6 @@ void AudioEngine::startPlayback() {
     openPlaybackStream();
     if (mPlaybackStream) {
         mRecordingIO.setup_audio_source();
-        mRecordingIO.openPlaybackFp();
         startStream(mPlaybackStream);
     } else {
         LOGE(TAG, "startPlayback(): Failed to create playback (%p) stream", mPlaybackStream);
@@ -80,7 +83,6 @@ void AudioEngine::stopPlayback() {
     if (mPlaybackStream->getState() != oboe::StreamState::Closed) {
         stopStream(mPlaybackStream);
         closeStream(mPlaybackStream);
-        mRecordingIO.closePlaybackFp();
     }
 }
 
@@ -88,7 +90,6 @@ void AudioEngine::pausePlayback() {
     LOGD(TAG, "pausePlayback(): ");
     mRecordingIO.pause_audio_source();
     stopStream(mPlaybackStream);
-    mRecordingIO.closePlaybackFp();
 }
 
 void AudioEngine::startRecording() {
