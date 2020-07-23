@@ -16,7 +16,7 @@ AudioEngine::AudioEngine(AAssetManager& assetManager, char* appDir, char* record
     mAppDir = appDir;
     mRecordingSessionId = recordingSessionId;
 
-    char* recordingFilePath = strcat(mAppDir, "/recording.pcm");
+    char* recordingFilePath = strcat(mAppDir, "/recording.wav");
     mRecordingIO.setRecordingFilePath(recordingFilePath);
 
     recordingCallback = RecordingCallback(&mRecordingIO);

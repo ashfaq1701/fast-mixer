@@ -7,6 +7,7 @@
 
 #include<TaskQueue.h>
 #include <AAssetDataSource.h>
+#include <sndfile.hh>
 #include <Player.h>
 
 #ifndef MODULE_NAME
@@ -62,6 +63,8 @@ private:
 
     std::unique_ptr<float[]> mConversionBuffer { nullptr };
 
+    std::unique_ptr<SndfileHandle> mRecordingFile {nullptr};
+
     int32_t mTotalSamples = 0;
     int32_t mIteration = 1;
     int32_t mWriteIndex = 0;
@@ -75,7 +78,7 @@ private:
 
     int16_t* mData = new int16_t[kMaxSamples]{0};
 
-    static void flush_to_file(int16_t* buffer, int length, const std::string& recordingFilePath);
+    static void flush_to_file(int16_t* buffer, int length, const std::string& recordingFilePath, std::unique_ptr<SndfileHandle>& recordingFile);
 
     bool validate_audio_file();
 

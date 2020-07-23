@@ -11,7 +11,9 @@
 #include "Utils.h"
 #include <mutex>
 #include <condition_variable>
+#include <sys/stat.h>
 #include "Constants.h"
+#include "AudioEngine.h"
 
 std::mutex RecordingIO::mtx;
 std::condition_variable RecordingIO::reallocated;
@@ -81,10 +83,14 @@ void RecordingIO::read_playback(float *targetData, int32_t numSamples) {
     }
 }
 
-void RecordingIO::flush_to_file(int16_t* buffer, int length, const std::string& recordingFilePath) {
-    FILE* f = fopen(recordingFilePath.c_str(), "ab");
-    fwrite(buffer, sizeof(*buffer), length, f);
-    fclose(f);
+void RecordingIO::flush_to_file(int16_t* buffer, int length, const std::string& recordingFilePath, std::unique_ptr<SndfileHandle>& recordingFile) {
+    if (recordingFile == nullptr) {
+        int format = SF_FORMAT_WAV | SF_FORMAT_PCM_16;
+        SndfileHandle file = SndfileHandle(recordingFilePath, SFM_WRITE, format, AudioEngine::mInputChannelCount, AudioEngine::mSampleRate);
+        recordingFile = std::make_unique<SndfileHandle>(file);
+    }
+    recordingFile->write(buffer, length);
+
     std::unique_lock<std::mutex> lck(mtx);
     reallocated.wait(lck, check_if_reallocated);
     delete[] buffer;
@@ -95,7 +101,7 @@ void RecordingIO::perform_flush(int flushIndex) {
     int16_t* oldBuffer = mData;
     is_reallocated = false;
     taskQueue->enqueue([&]() {
-        flush_to_file(oldBuffer, flushIndex, mRecordingFilePath);
+        flush_to_file(oldBuffer, flushIndex, mRecordingFilePath, mRecordingFile);
     });
 
     auto * newData = new int16_t[kMaxSamples]{0};
@@ -160,7 +166,7 @@ void RecordingIO::flush_buffer() {
         int16_t* oldBuffer = mData;
         is_reallocated = false;
         taskQueue->enqueue([&]() {
-            flush_to_file(oldBuffer, static_cast<int>(mWriteIndex), mRecordingFilePath);
+            flush_to_file(oldBuffer, static_cast<int>(mWriteIndex), mRecordingFilePath, mRecordingFile);
         });
 
         mIteration = 1;
