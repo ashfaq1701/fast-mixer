@@ -16,6 +16,7 @@
 
 #include <memory>
 #include <oboe/Definitions.h>
+#include <unistd.h>
 #include "FFMpegExtractor.h"
 #include "../logging_macros.h"
 
@@ -23,18 +24,26 @@ constexpr int kInternalBufferSize = 1152; // Use MP3 block size. https://wiki.hy
 
 int read(void *opaque, uint8_t *buf, int buf_size) {
 
-    auto asset = (AAsset *) opaque;
-    int bytesRead = AAsset_read(asset, buf, (size_t)buf_size);
+    auto asset = (FILE *) opaque;
+    int bytesRead = fread(buf, (size_t) buf_size, (size_t) buf_size, asset);
     return bytesRead;
+}
+
+long getFileSize(FILE *fp) {
+    FILE *fp2 = fdopen (dup(fileno (fp)), "r");
+    fseek(fp2, 0L, SEEK_END);
+    long res = ftell(fp2);
+    fclose(fp2);
+    return res;
 }
 
 int64_t seek(void *opaque, int64_t offset, int whence){
 
-    auto asset = (AAsset*)opaque;
+    auto asset = (FILE*)opaque;
 
     // See https://www.ffmpeg.org/doxygen/3.0/avio_8h.html#a427ff2a881637b47ee7d7f9e368be63f
-    if (whence == AVSEEK_SIZE) return AAsset_getLength(asset);
-    if (AAsset_seek(asset, offset, whence) == -1){
+    if (whence == AVSEEK_SIZE) return getFileSize(asset);
+    if (fseek(asset, offset, whence) == -1){
         return -1;
     } else {
         return 0;
