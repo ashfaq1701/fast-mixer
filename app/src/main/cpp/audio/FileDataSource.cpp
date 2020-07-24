@@ -17,25 +17,27 @@
 
 #include "../logging_macros.h"
 #include <oboe/Oboe.h>
-
-#include "AAssetDataSource.h"
+#include <regex>
+#include <string>
+#include <sys/stat.h>
+#include "FileDataSource.h"
 #include "FFMpegExtractor.h"
 
 
 constexpr int kMaxCompressionRatio { 12 };
 
-AAssetDataSource* AAssetDataSource::newFromCompressedAsset(
-        AAssetManager &assetManager,
+FileDataSource* FileDataSource::newFromCompressedFile(
         const char *filename,
         const AudioProperties targetProperties) {
 
-    AAsset *asset = AAssetManager_open(&assetManager, filename, AASSET_MODE_UNKNOWN);
-    if (!asset) {
+    std::string str(filename);
+    FILE* fl = fopen(filename, "r");
+    if (!fl) {
         LOGE("Failed to open asset %s", filename);
         return nullptr;
     }
 
-    off_t assetSize = AAsset_getLength(asset);
+    off_t assetSize = getFileSize(filename);
     LOGD("Opened %s, size %ld", filename, assetSize);
 
     // Allocate memory to store the decompressed audio. We don't know the exact
@@ -44,26 +46,25 @@ AAssetDataSource* AAssetDataSource::newFromCompressedAsset(
     const long maximumDataSizeInBytes = kMaxCompressionRatio * assetSize * sizeof(float);
     auto decodedData = new uint8_t[maximumDataSizeInBytes];
 
-    int64_t bytesDecoded = FFMpegExtractor::decode(asset, decodedData, targetProperties);
+    int64_t bytesDecoded = FFMpegExtractor::decode(fl, decodedData, targetProperties);
     auto numSamples = bytesDecoded / sizeof(float);
 
     // Now we know the exact number of samples we can create a float array to hold the audio data
     auto outputBuffer = std::make_unique<float[]>(numSamples);
-
-#if USE_FFMPEG==1
     memcpy(outputBuffer.get(), decodedData, (size_t)bytesDecoded);
-#else
-    // The NDK decoder can only decode to int16, we need to convert to floats
-    oboe::convertPcm16ToFloat(
-            reinterpret_cast<int16_t*>(decodedData),
-            outputBuffer.get(),
-            bytesDecoded / sizeof(int16_t));
-#endif
 
     delete[] decodedData;
-    AAsset_close(asset);
+    fclose(fl);
 
-    return new AAssetDataSource(std::move(outputBuffer),
-            numSamples,
-            targetProperties);
+    return new FileDataSource(std::move(outputBuffer),
+                              numSamples,
+                              targetProperties);
+}
+
+long FileDataSource::getFileSize(const char *fileName) {
+    struct stat st;
+    if(stat(fileName,&st)==0)
+        return (static_cast<long>(st.st_size));
+    else
+        return -1;
 }

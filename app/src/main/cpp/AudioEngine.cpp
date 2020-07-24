@@ -10,8 +10,7 @@ int32_t AudioEngine::mSampleRate = oboe::DefaultStreamValues::SampleRate;
 int32_t AudioEngine::mInputChannelCount = oboe::ChannelCount::Stereo;
 int32_t AudioEngine::mOutputChannelCount = oboe::ChannelCount::Stereo;
 
-AudioEngine::AudioEngine(AAssetManager& assetManager, char* appDir, char* recordingSessionId): mAssetManager(assetManager),
-                                                                                               mRecordingIO(assetManager) {
+AudioEngine::AudioEngine(char* appDir, char* recordingSessionId) {
     assert(mInputChannelCount == mOutputChannelCount);
     mAppDir = appDir;
     mRecordingSessionId = recordingSessionId;
@@ -22,9 +21,6 @@ AudioEngine::AudioEngine(AAssetManager& assetManager, char* appDir, char* record
     recordingCallback = RecordingCallback(&mRecordingIO);
     livePlaybackCallback = LivePlaybackCallback(&mRecordingIO);
     playbackCallback = PlaybackCallback(&mRecordingIO);
-
-    mRecordingIO.set_channel_count(mInputChannelCount);
-    mRecordingIO.set_sample_rate(mSampleRate);
 }
 
 AudioEngine::~AudioEngine() {

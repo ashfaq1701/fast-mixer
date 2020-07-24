@@ -3,8 +3,8 @@ package com.bluehub.fastmixer.common.audio
 import android.content.res.AssetManager
 
 class AudioEngineProxy {
-    fun create(assetManager: AssetManager, appPathStr: String, recordingSessionIdStr: String): Boolean =
-        AudioEngine.create(assetManager, appPathStr, recordingSessionIdStr)
+    fun create(appPathStr: String, recordingSessionIdStr: String): Boolean =
+        AudioEngine.create(appPathStr, recordingSessionIdStr)
 
     fun delete() = AudioEngine.delete()
 

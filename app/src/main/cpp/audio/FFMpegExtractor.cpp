@@ -41,7 +41,7 @@ int64_t seek(void *opaque, int64_t offset, int whence){
     }
 }
 
-bool FFMpegExtractor::createAVIOContext(AAsset *asset, uint8_t *buffer, uint32_t bufferSize,
+bool FFMpegExtractor::createAVIOContext(FILE *asset, uint8_t *buffer, uint32_t bufferSize,
                                         AVIOContext **avioContext) {
 
     constexpr int isBufferWriteable = 0;
@@ -117,7 +117,7 @@ AVStream *FFMpegExtractor::getBestAudioStream(AVFormatContext *avFormatContext) 
 }
 
 int64_t FFMpegExtractor::decode(
-        AAsset *asset,
+        FILE *fl,
         uint8_t *targetData,
         AudioProperties targetProperties) {
 
@@ -136,7 +136,7 @@ int64_t FFMpegExtractor::decode(
     };
     {
         AVIOContext *tmp = nullptr;
-        if (!createAVIOContext(asset, buffer, kInternalBufferSize, &tmp)){
+        if (!createAVIOContext(fl, buffer, kInternalBufferSize, &tmp)){
             LOGE("Could not create an AVIOContext");
             return returnValue;
         }

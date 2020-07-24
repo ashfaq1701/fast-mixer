@@ -14,33 +14,34 @@
  * limitations under the License.
  */
 
-#ifndef FAST_MIXER_AASSETDATASOURCE_H
-#define FAST_MIXER_AASSETDATASOURCE_H
+#ifndef FAST_MIXER_FILEDATASOURCE_H
+#define FAST_MIXER_FILEDATASOURCE_H
 
 #include <android/asset_manager.h>
 #include "../Constants.h"
 #include "DataSource.h"
 
-class AAssetDataSource : public DataSource {
+class FileDataSource : public DataSource {
 
 public:
     int64_t getSize() const override { return mBufferSize; }
     AudioProperties getProperties() const override { return mProperties; }
     const float* getData() const override { return mBuffer.get(); }
 
-    static AAssetDataSource* newFromCompressedAsset(
-            AAssetManager &assetManager,
+    static FileDataSource* newFromCompressedFile(
             const char *filename,
-            AudioProperties targetProperties);
+            const AudioProperties targetProperties);
 
 private:
 
-    AAssetDataSource(std::unique_ptr<float[]> data, size_t size,
-                     const AudioProperties properties)
+    FileDataSource(std::unique_ptr<float[]> data, size_t size,
+                   const AudioProperties properties)
             : mBuffer(std::move(data))
             , mBufferSize(size)
             , mProperties(properties) {
     }
+
+    static long getFileSize(const char *fileName);
 
     const std::unique_ptr<float[]> mBuffer;
     const int64_t mBufferSize;

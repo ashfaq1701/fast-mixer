@@ -1,6 +1,5 @@
 package com.bluehub.fastmixer.common.audio
 
-import android.content.res.AssetManager
 
 class AudioEngine {
     companion object {
@@ -8,7 +7,7 @@ class AudioEngine {
             System.loadLibrary("audioEngine")
         }
 
-        @JvmStatic external fun create(assetManager: AssetManager, appPathStr: String, recordingSessionIdStr: String): Boolean
+        @JvmStatic external fun create(appPathStr: String, recordingSessionIdStr: String): Boolean
 
         @JvmStatic external fun delete()
 

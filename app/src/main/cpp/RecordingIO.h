@@ -6,7 +6,7 @@
 #define FAST_MIXER_RECORDINGIO_H
 
 #include<TaskQueue.h>
-#include <AAssetDataSource.h>
+#include <FileDataSource.h>
 #include <sndfile.hh>
 #include <Player.h>
 
@@ -16,7 +16,7 @@
 
 class RecordingIO {
 public:
-    RecordingIO(AAssetManager &assetManager) : mAssetManager(assetManager) {
+    RecordingIO() {
         taskQueue = new TaskQueue();
     }
 
@@ -37,14 +37,6 @@ public:
         mRecordingFilePath = recordingFilePath;
     }
 
-    void set_channel_count(int32_t channelCount) {
-        mChannelCount = channelCount;
-    }
-
-    void set_sample_rate(int32_t sampleRate) {
-        mSampleRate = sampleRate;
-    }
-
     bool setup_audio_source();
     void pause_audio_source();
     void stop_audio_source();
@@ -57,9 +49,6 @@ private:
     int32_t mTotalReadPlayback = 0;
 
     std::unique_ptr<Player> mRecordedTrack;
-
-    int32_t mChannelCount = 0;
-    int32_t mSampleRate = 0;
 
     std::unique_ptr<float[]> mConversionBuffer { nullptr };
 
@@ -83,8 +72,6 @@ private:
     bool validate_audio_file();
 
     void perform_flush(int flushIndex);
-
-    AAssetManager& mAssetManager;
 
     static std::mutex mtx;
     static std::condition_variable reallocated;

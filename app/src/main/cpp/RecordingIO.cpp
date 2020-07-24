@@ -28,17 +28,13 @@ bool RecordingIO::setup_audio_source() {
         return false;
     }
 
-    if (mChannelCount == 0 || mSampleRate == 0) {
-        return false;
-    }
-
     AudioProperties targetProperties {
-            .channelCount = mChannelCount,
-            .sampleRate = mSampleRate
+            .channelCount = AudioEngine::mOutputChannelCount,
+            .sampleRate = AudioEngine::mSampleRate
     };
 
-    std::shared_ptr<AAssetDataSource> audioSource {
-            AAssetDataSource::newFromCompressedAsset(mAssetManager, mRecordingFilePath.c_str(), targetProperties)
+    std::shared_ptr<FileDataSource> audioSource {
+            FileDataSource::newFromCompressedFile(mRecordingFilePath.c_str(), targetProperties)
     };
 
     if (audioSource == nullptr) {

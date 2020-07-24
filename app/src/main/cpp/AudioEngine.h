@@ -19,7 +19,7 @@
 
 class AudioEngine {
 public:
-    AudioEngine(AAssetManager& assetManager, char* appDir, char* mRecordingSessionId);
+    AudioEngine(char* appDir, char* mRecordingSessionId);
     ~AudioEngine();
 
     RecordingCallback recordingCallback;
@@ -62,8 +62,6 @@ private:
 
     int32_t mRecordingFramesPerCallback = 24;
     int32_t mLivePlaybackFramesPerCallback = mRecordingFramesPerCallback;
-
-    AAssetManager& mAssetManager;
 
     RecordingIO mRecordingIO;
 

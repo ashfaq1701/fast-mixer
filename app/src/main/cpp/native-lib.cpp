@@ -13,18 +13,12 @@ static AudioEngine *audioEngine = nullptr;
 
 extern "C" {
     JNIEXPORT jboolean JNICALL
-    Java_com_bluehub_fastmixer_common_audio_AudioEngine_create(JNIEnv *env, jclass, jobject jAssetManager, jstring appDirStr, jstring recordingSessionIdStr) {
+    Java_com_bluehub_fastmixer_common_audio_AudioEngine_create(JNIEnv *env, jclass, jstring appDirStr, jstring recordingSessionIdStr) {
         if (audioEngine == nullptr) {
             char* appDir = const_cast<char *>(env->GetStringUTFChars(appDirStr, NULL));
             char* recordingSessionId = const_cast<char *>(env->GetStringUTFChars(
                     recordingSessionIdStr, NULL));
-
-            AAssetManager *assetManager = AAssetManager_fromJava(env, jAssetManager);
-            if (assetManager == nullptr) {
-                LOGE("Could not obtain the AAssetManager");
-                audioEngine = nullptr;
-            }
-            audioEngine = new AudioEngine(*assetManager, appDir, recordingSessionId);
+            audioEngine = new AudioEngine(appDir, recordingSessionId);
         }
         return (audioEngine != nullptr);
     }

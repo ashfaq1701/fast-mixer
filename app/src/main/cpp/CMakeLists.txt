@@ -24,7 +24,7 @@ add_library( # Sets the name of the library.
         RecordingIO.cpp
         AudioEngine.cpp
 
-        audio/AAssetDataSource.cpp
+        audio/FileDataSource.cpp
         audio/Player.cpp
         audio/FFMpegExtractor.cpp
 
