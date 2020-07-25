@@ -48,8 +48,6 @@ private:
 
     std::unique_ptr<Player> mRecordedTrack;
 
-    std::unique_ptr<float[]> mConversionBuffer { nullptr };
-
     std::unique_ptr<SndfileHandle> mRecordingFile {nullptr};
 
     int32_t mTotalSamples = 0;
