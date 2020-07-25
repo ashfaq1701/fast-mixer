@@ -46,8 +46,6 @@ private:
 
     std::string mRecordingFilePath;
 
-    int32_t mTotalReadPlayback = 0;
-
     std::unique_ptr<Player> mRecordedTrack;
 
     std::unique_ptr<float[]> mConversionBuffer { nullptr };

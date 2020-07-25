@@ -1,8 +1,6 @@
 package com.bluehub.fastmixer.screens.recording
 
 import android.content.Context
-import android.media.AudioManager
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.bluehub.fastmixer.common.audio.AudioDeviceChangeListener
@@ -12,6 +10,7 @@ import com.bluehub.fastmixer.common.utils.PermissionManager
 import com.bluehub.fastmixer.common.utils.ScreenConstants
 import kotlinx.coroutines.*
 import java.io.File
+import java.io.FileOutputStream
 import java.util.*
 import javax.inject.Inject
 
@@ -60,6 +59,23 @@ class RecordingScreenViewModel(override val context: Context?, val audioEnginePr
         audioDeviceChangeListener.setRestartOutputCallback {
             restartOutputStreams()
         }
+
+        val cacheDir = createCacheDirectory()
+
+        val inStr = context!!.assets.open("example.wav")
+        val outFile = File(cacheDir, "example.wav")
+        val out = FileOutputStream(outFile)
+
+        var read: Int = 0
+        val bytes = ByteArray(1024)
+
+        while (inStr.read(bytes).also({ read = it }) != -1) {
+            out.write(bytes, 0, read)
+        }
+
+        inStr.close()
+        out.flush()
+        out.close()
     }
 
     private fun restartInputStreams() {

@@ -23,31 +23,29 @@
 constexpr int kInternalBufferSize = 1152; // Use MP3 block size. https://wiki.hydrogenaud.io/index.php?title=MP3
 
 int read(void *opaque, uint8_t *buf, int buf_size) {
-
     auto asset = (FILE *) opaque;
-    int bytesRead = fread(buf, (size_t) buf_size, (size_t) buf_size, asset);
+    int bytesRead = fread(buf, sizeof(*buf), (size_t) buf_size, asset);
     return bytesRead;
 }
 
 long getFileSize(FILE *fp) {
-    FILE *fp2 = fdopen (dup(fileno (fp)), "r");
-    fseek(fp2, 0L, SEEK_END);
-    long res = ftell(fp2);
-    fclose(fp2);
+    fpos_t pos;
+    fgetpos(fp, &pos);
+    fseek(fp, 0L, SEEK_END);
+    long res = ftell(fp);
+    fseek(fp, 0L, pos);
     return res;
 }
 
 int64_t seek(void *opaque, int64_t offset, int whence){
-
     auto asset = (FILE*)opaque;
-
-    // See https://www.ffmpeg.org/doxygen/3.0/avio_8h.html#a427ff2a881637b47ee7d7f9e368be63f
     if (whence == AVSEEK_SIZE) return getFileSize(asset);
-    if (fseek(asset, offset, whence) == -1){
+    int rs = fseek(asset, (long)offset, whence);
+    if (rs != 0) {
         return -1;
-    } else {
-        return 0;
     }
+    long fpos = ftell(asset);
+    return (int64_t)fpos;
 }
 
 bool FFMpegExtractor::createAVIOContext(FILE *asset, uint8_t *buffer, uint32_t bufferSize,
@@ -144,12 +142,14 @@ int64_t FFMpegExtractor::decode(
             }
     };
     {
+        LOGD("1. CREATING AVIO CONTEXT");
         AVIOContext *tmp = nullptr;
         if (!createAVIOContext(fl, buffer, kInternalBufferSize, &tmp)){
             LOGE("Could not create an AVIOContext");
             return returnValue;
         }
         ioContext.reset(tmp);
+        LOGD("1. CREATED AVIO CONTEXT");
     }
 
     // Create an AVFormatContext using the avformat_free_context as the deleter function
@@ -158,31 +158,46 @@ int64_t FFMpegExtractor::decode(
             &avformat_free_context
     };
     {
+        LOGD("2. CREATING AVFormat CONTEXT");
         AVFormatContext *tmp;
         if (!createAVFormatContext(ioContext.get(), &tmp)) return returnValue;
         formatContext.reset(tmp);
+        LOGD("2. CREATED AVFormat CONTEXT");
     }
 
-    if (!openAVFormatContext(formatContext.get())) return returnValue;
+    if (!openAVFormatContext(formatContext.get())) {
+        LOGD("3. AVFormat Context empty, returning");
+        return returnValue;
+    }
 
-    if (!getStreamInfo(formatContext.get())) return returnValue;
+    if (!getStreamInfo(formatContext.get())) {
+        LOGD("4. Get StreamInfo empty, returning");
+        return returnValue;
+    }
 
+    LOGD("5. Getting Audio Stream");
     // Obtain the best audio stream to decode
     AVStream *stream = getBestAudioStream(formatContext.get());
     if (stream == nullptr || stream->codecpar == nullptr){
         LOGE("Could not find a suitable audio stream to decode");
         return returnValue;
     }
+    LOGD("5. Got Audio Stream");
 
+    LOGD("6. Printing Codec");
     printCodecParameters(stream->codecpar);
+    LOGD("6. Printed Codec");
 
+    LOGD("7. Finding Decoder");
     // Find the codec to decode this stream
     AVCodec *codec = avcodec_find_decoder(stream->codecpar->codec_id);
     if (!codec){
         LOGE("Could not find codec with ID: %d", stream->codecpar->codec_id);
         return returnValue;
     }
+    LOGD("7. Found Codec");
 
+    LOGD("8. Creating Codec Context");
     // Create the codec context, specifying the deleter function
     std::unique_ptr<AVCodecContext, void(*)(AVCodecContext *)> codecContext {
             nullptr,
@@ -196,23 +211,31 @@ int64_t FFMpegExtractor::decode(
         }
         codecContext.reset(tmp);
     }
+    LOGD("8. Created Codec Context");
 
+    LOGD("9. Creating Codec Context");
     // Copy the codec parameters into the context
     if (avcodec_parameters_to_context(codecContext.get(), stream->codecpar) < 0){
         LOGE("Failed to copy codec parameters to codec context");
         return returnValue;
     }
+    LOGD("9. Created Codec Context");
 
+    LOGD("8. Opening Codec");
     // Open the codec
     if (avcodec_open2(codecContext.get(), codec, nullptr) < 0){
         LOGE("Could not open codec");
         return returnValue;
     }
+    LOGD("8. Opened Codec");
 
+    LOGD("9. Preparing Resampler");
     // prepare resampler
     int32_t outChannelLayout = (1 << targetProperties.channelCount) - 1;
     LOGD("Channel layout %d", outChannelLayout);
+    LOGD("9. Prepared Resampler");
 
+    LOGD("10. Preparing Resampler");
     SwrContext *swr = swr_alloc();
     av_opt_set_int(swr, "in_channel_count", stream->codecpar->channels, 0);
     av_opt_set_int(swr, "out_channel_count", targetProperties.channelCount, 0);
@@ -223,6 +246,7 @@ int64_t FFMpegExtractor::decode(
     av_opt_set_int(swr, "in_sample_fmt", stream->codecpar->format, 0);
     av_opt_set_sample_fmt(swr, "out_sample_fmt", AV_SAMPLE_FMT_FLT, 0);
     av_opt_set_int(swr, "force_resampling", 1, 0);
+    LOGD("10. Prepared Resampler");
 
     // Check that resampler has been inited
     int result = swr_init(swr);

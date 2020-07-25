@@ -74,7 +74,7 @@ void RecordingIO::read_playback(float *targetData, int32_t numSamples) {
         return;
     }
 
-    if (this->mTotalReadPlayback < mTotalSamples) {
+    if (mTotalSamples > 0) {
         mRecordedTrack->renderAudio(targetData, numSamples);
     }
 }
