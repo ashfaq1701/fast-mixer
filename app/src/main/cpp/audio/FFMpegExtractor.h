@@ -38,7 +38,7 @@ private:
 
     static bool createAVFormatContext(AVIOContext *avioContext, AVFormatContext **avFormatContext);
 
-    static bool openAVFormatContext(AVFormatContext *avFormatContext);
+    static bool openAVFormatContext(AVFormatContext *avFormatContext, FILE* fl);
 
     static int32_t cleanup(AVIOContext *avioContext, AVFormatContext *avFormatContext);
 

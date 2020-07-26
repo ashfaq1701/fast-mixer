@@ -31,17 +31,14 @@ FileDataSource* FileDataSource::newFromCompressedFile(
         const char *filename,
         const AudioProperties targetProperties) {
 
-    std::string strName(filename);
-    strName = std::regex_replace(strName, std::regex("recording.wav"), "example.wav");
-
-    FILE* fl = fopen(strName.c_str(), "r");
+    FILE* fl = fopen(filename, "r");
     if (!fl) {
-        LOGE("Failed to open asset %s", strName.c_str());
+        LOGE("Failed to open asset %s", filename);
         return nullptr;
     }
 
-    off_t assetSize = getFileSize(strName.c_str());
-    LOGD("Opened %s, size %ld", strName.c_str(), assetSize);
+    off_t assetSize = getFileSize(filename);
+    LOGD("Opened %s, size %ld", filename, assetSize);
 
     // Allocate memory to store the decompressed audio. We don't know the exact
     // size of the decoded data until after decoding so we make an assumption about the
