@@ -23,6 +23,11 @@
 
 constexpr int kInternalBufferSize = 32 * 1024; // Use MP3 block size. https://wiki.hydrogenaud.io/index.php?title=MP3
 
+FFMpegExtractor::FFMpegExtractor(const std::string &filePath, const AudioProperties targetProperties) {
+    mFilePath = filePath.c_str();
+    mTargetProperties = targetProperties;
+}
+
 int read(void *opaque, uint8_t *buf, int buf_size) {
     auto asset = (FILE *) opaque;
     int bytesRead = fread(buf, sizeof(*buf), (size_t) buf_size, asset);
@@ -127,7 +132,7 @@ bool FFMpegExtractor::getStreamInfo(AVFormatContext *avFormatContext) {
 }
 
 AVStream *FFMpegExtractor::getBestAudioStream(AVFormatContext *avFormatContext) {
-    
+
     int streamIndex = av_find_best_stream(avFormatContext, AVMEDIA_TYPE_AUDIO, -1, -1, nullptr, 0);
 
     if (streamIndex < 0){
@@ -139,11 +144,11 @@ AVStream *FFMpegExtractor::getBestAudioStream(AVFormatContext *avFormatContext) 
 }
 
 int64_t FFMpegExtractor::decode(
-        FILE *fl,
-        uint8_t *targetData,
-        AudioProperties targetProperties) {
+        uint8_t *targetData) {
 
     int returnValue = -1; // -1 indicates error
+
+    fp = fopen(mFilePath, "rb");
 
     // Create a buffer for FFmpeg to use for decoding (freed in the custom deleter below)
     auto buffer = reinterpret_cast<uint8_t*>(av_malloc(kInternalBufferSize));
@@ -158,7 +163,7 @@ int64_t FFMpegExtractor::decode(
     };
     {
         AVIOContext *tmp = nullptr;
-        if (!createAVIOContext(fl, buffer, kInternalBufferSize, &tmp)){
+        if (!createAVIOContext(fp, buffer, kInternalBufferSize, &tmp)){
             LOGE("Could not create an AVIOContext");
             return returnValue;
         }
@@ -176,7 +181,7 @@ int64_t FFMpegExtractor::decode(
         formatContext.reset(tmp);
     }
 
-    if (!openAVFormatContext(formatContext.get(), fl)) {
+    if (!openAVFormatContext(formatContext.get(), fp)) {
         return returnValue;
     }
 
@@ -227,16 +232,16 @@ int64_t FFMpegExtractor::decode(
     }
 
     // prepare resampler
-    int32_t outChannelLayout = (1 << targetProperties.channelCount) - 1;
+    int32_t outChannelLayout = (1 << mTargetProperties.channelCount) - 1;
     LOGD("Channel layout %d", outChannelLayout);
 
     SwrContext *swr = swr_alloc();
     av_opt_set_int(swr, "in_channel_count", stream->codecpar->channels, 0);
-    av_opt_set_int(swr, "out_channel_count", targetProperties.channelCount, 0);
+    av_opt_set_int(swr, "out_channel_count", mTargetProperties.channelCount, 0);
     av_opt_set_int(swr, "in_channel_layout", stream->codecpar->channel_layout, 0);
     av_opt_set_int(swr, "out_channel_layout", outChannelLayout, 0);
     av_opt_set_int(swr, "in_sample_rate", stream->codecpar->sample_rate, 0);
-    av_opt_set_int(swr, "out_sample_rate", targetProperties.sampleRate, 0);
+    av_opt_set_int(swr, "out_sample_rate", mTargetProperties.sampleRate, 0);
     av_opt_set_int(swr, "in_sample_fmt", stream->codecpar->format, 0);
     av_opt_set_sample_fmt(swr, "out_sample_fmt", AV_SAMPLE_FMT_FLT, 0);
     av_opt_set_int(swr, "force_resampling", 1, 0);
@@ -289,7 +294,7 @@ int64_t FFMpegExtractor::decode(
             // DO RESAMPLING
             auto dst_nb_samples = (int32_t) av_rescale_rnd(
                     swr_get_delay(swr, decodedFrame->sample_rate) + decodedFrame->nb_samples,
-                    targetProperties.sampleRate,
+                    mTargetProperties.sampleRate,
                     decodedFrame->sample_rate,
                     AV_ROUND_UP);
 
@@ -297,7 +302,7 @@ int64_t FFMpegExtractor::decode(
             av_samples_alloc(
                     (uint8_t **) &buffer1,
                     nullptr,
-                    targetProperties.channelCount,
+                    mTargetProperties.channelCount,
                     dst_nb_samples,
                     AV_SAMPLE_FMT_FLT,
                     0);
@@ -308,7 +313,7 @@ int64_t FFMpegExtractor::decode(
                     (const uint8_t **) decodedFrame->data,
                     decodedFrame->nb_samples);
 
-            int64_t bytesToWrite = frame_count * sizeof(float) * targetProperties.channelCount;
+            int64_t bytesToWrite = frame_count * sizeof(float) * mTargetProperties.channelCount;
             memcpy(targetData + bytesWritten, buffer1, (size_t)bytesToWrite);
             bytesWritten += bytesToWrite;
             av_freep(&buffer1);
@@ -335,7 +340,3 @@ void FFMpegExtractor::printCodecParameters(AVCodecParameters *params) {
     LOGD("Format: %s", av_get_sample_fmt_name((AVSampleFormat)params->format));
     LOGD("Frame size: %d", params->frame_size);
 }
-
-
-
-

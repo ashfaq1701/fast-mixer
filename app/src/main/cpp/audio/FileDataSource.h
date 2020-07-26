@@ -20,6 +20,7 @@
 #include <android/asset_manager.h>
 #include "../Constants.h"
 #include "DataSource.h"
+#include "../Utils.h"
 
 class FileDataSource : public DataSource {
 

@@ -30,25 +30,31 @@ extern "C" {
 
 class FFMpegExtractor {
 public:
-    static int64_t decode(FILE *asset, uint8_t *targetData, AudioProperties targetProperties);
+    FFMpegExtractor(const std::string &filePath, const AudioProperties targetProperties);
+
+    int64_t decode(uint8_t *targetData);
 
 private:
-    static bool createAVIOContext(FILE *asset, uint8_t *buffer, uint32_t bufferSize,
+    const char *mFilePath;
+    AudioProperties mTargetProperties;
+    FILE* fp = nullptr;
+
+    bool createAVIOContext(FILE *asset, uint8_t *buffer, uint32_t bufferSize,
                                   AVIOContext **avioContext);
 
-    static bool createAVFormatContext(AVIOContext *avioContext, AVFormatContext **avFormatContext);
+    bool createAVFormatContext(AVIOContext *avioContext, AVFormatContext **avFormatContext);
 
-    static bool openAVFormatContext(AVFormatContext *avFormatContext, FILE* fl);
+    bool openAVFormatContext(AVFormatContext *avFormatContext, FILE* fl);
 
-    static int32_t cleanup(AVIOContext *avioContext, AVFormatContext *avFormatContext);
+    int32_t cleanup(AVIOContext *avioContext, AVFormatContext *avFormatContext);
 
-    static bool getStreamInfo(AVFormatContext *avFormatContext);
+    bool getStreamInfo(AVFormatContext *avFormatContext);
 
-    static AVStream *getBestAudioStream(AVFormatContext *avFormatContext);
+    AVStream *getBestAudioStream(AVFormatContext *avFormatContext);
 
-    static AVCodec *findCodec(AVCodecID id);
+    AVCodec *findCodec(AVCodecID id);
 
-    static void printCodecParameters(AVCodecParameters *params);
+    void printCodecParameters(AVCodecParameters *params);
 };
 
 

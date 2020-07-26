@@ -30,6 +30,7 @@ constexpr int kMaxCompressionRatio { 12 };
 FileDataSource* FileDataSource::newFromCompressedFile(
         const char *filename,
         const AudioProperties targetProperties) {
+    std::string filenameStr(filename);
 
     FILE* fl = fopen(filename, "r");
     if (!fl) {
@@ -43,10 +44,19 @@ FileDataSource* FileDataSource::newFromCompressedFile(
     // Allocate memory to store the decompressed audio. We don't know the exact
     // size of the decoded data until after decoding so we make an assumption about the
     // maximum compression ratio and the decoded sample format (float for FFmpeg, int16 for NDK).
-    const long maximumDataSizeInBytes = kMaxCompressionRatio * assetSize * sizeof(float);
+    long maximumDataSizeInBytes = 0;
+    maximumDataSizeInBytes = assetSize;
+    if (!strEndedWith(filenameStr, ".wav")) {
+        maximumDataSizeInBytes = kMaxCompressionRatio * maximumDataSizeInBytes;
+    }
+
+    LOGD("Asset Size: %ld", assetSize);
+    LOGD("Maximum Data Size: %ld", maximumDataSizeInBytes);
+
     auto decodedData = new uint8_t[maximumDataSizeInBytes];
 
-    int64_t bytesDecoded = FFMpegExtractor::decode(fl, decodedData, targetProperties);
+    auto ffmpegExtractor = FFMpegExtractor(filenameStr, targetProperties);
+    int64_t bytesDecoded = ffmpegExtractor.decode(decodedData);
     auto numSamples = bytesDecoded / sizeof(float);
 
     // Now we know the exact number of samples we can create a float array to hold the audio data

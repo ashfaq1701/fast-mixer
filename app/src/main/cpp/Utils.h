@@ -3,7 +3,7 @@
 #define FAST_MIXER_UTILS_H
 
 #ifndef MODULE_NAME
-#define MODULE_NAME  "Utils"
+#define MODULE_NAME  "RecordingIO"
 #endif
 
 #include <cstdint>
@@ -19,6 +19,14 @@ void fillArrayWithZeros(K *data, int32_t length) {
 
     size_t bufferSize = length * sizeof(K);
     memset(data, 0, bufferSize);
+}
+
+inline bool strEndedWith(std::string const &fullString, std::string const &ending) {
+    if (fullString.length() >= ending.length()) {
+        return (0 == fullString.compare (fullString.length() - ending.length(), ending.length(), ending));
+    } else {
+        return false;
+    }
 }
 
 #endif //FAST_MIXER_UTILS_H

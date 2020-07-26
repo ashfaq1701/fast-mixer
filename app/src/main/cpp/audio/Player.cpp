@@ -42,7 +42,7 @@ void Player::renderAudio(float *targetData, int32_t numFrames){
             if (++mReadFrameIndex >= totalSourceFrames) mReadFrameIndex = 0;
         }
 
-        if (framesToRenderFromData < numFrames){
+        if (framesToRenderFromData < numFrames) {
             // fill the rest of the buffer with silence
             renderSilence(&targetData[framesToRenderFromData], numFrames * properties.channelCount);
         }
