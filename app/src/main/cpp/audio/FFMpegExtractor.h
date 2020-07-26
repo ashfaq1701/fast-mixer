@@ -34,12 +34,13 @@ public:
 
     int64_t decode(uint8_t *targetData);
 
-private:
     const char *mFilePath;
-    AudioProperties mTargetProperties;
     FILE* fp = nullptr;
 
-    bool createAVIOContext(FILE *asset, uint8_t *buffer, uint32_t bufferSize,
+private:
+    AudioProperties mTargetProperties;
+
+    bool createAVIOContext(uint8_t *buffer, uint32_t bufferSize,
                                   AVIOContext **avioContext);
 
     bool createAVFormatContext(AVIOContext *avioContext, AVFormatContext **avFormatContext);

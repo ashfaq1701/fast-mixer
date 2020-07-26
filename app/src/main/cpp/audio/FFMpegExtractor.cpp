@@ -20,6 +20,7 @@
 #include <unistd.h>
 #include "FFMpegExtractor.h"
 #include "../logging_macros.h"
+#include "../Utils.h"
 
 constexpr int kInternalBufferSize = 32 * 1024; // Use MP3 block size. https://wiki.hydrogenaud.io/index.php?title=MP3
 
@@ -28,10 +29,14 @@ FFMpegExtractor::FFMpegExtractor(const std::string &filePath, const AudioPropert
     mTargetProperties = targetProperties;
 }
 
-int read(void *opaque, uint8_t *buf, int buf_size) {
-    auto asset = (FILE *) opaque;
-    int bytesRead = fread(buf, sizeof(*buf), (size_t) buf_size, asset);
-    return bytesRead;
+int read(void *data, uint8_t *buf, int buf_size) {
+    FFMpegExtractor *hctx = (FFMpegExtractor*)data;
+    size_t len = fread(buf, 1, buf_size, hctx->fp);
+    if (len == 0) {
+        // Let FFmpeg know that we have reached EOF, or do something else
+        return AVERROR_EOF;
+    }
+    return (int)len;
 }
 
 long getFileSize(FILE *fp) {
@@ -43,18 +48,20 @@ long getFileSize(FILE *fp) {
     return res;
 }
 
-int64_t seek(void *opaque, int64_t offset, int whence){
-    auto asset = (FILE*)opaque;
-    if (whence == AVSEEK_SIZE) return getFileSize(asset);
-    int rs = fseek(asset, (long)offset, whence);
+int64_t seek(void *data, int64_t pos, int whence) {
+    FFMpegExtractor *hctx = (FFMpegExtractor*)data;
+    if (whence == AVSEEK_SIZE) {
+        return getSizeOfFile(hctx->mFilePath);
+    }
+    int rs = fseek(hctx->fp, (long)pos, whence);
     if (rs != 0) {
         return -1;
     }
-    long fpos = ftell(asset);
+    long fpos = ftell(hctx->fp); // int64_t is usually long long
     return (int64_t)fpos;
 }
 
-bool FFMpegExtractor::createAVIOContext(FILE *asset, uint8_t *buffer, uint32_t bufferSize,
+bool FFMpegExtractor::createAVIOContext(uint8_t *buffer, uint32_t bufferSize,
                                         AVIOContext **avioContext) {
 
     constexpr int isBufferWriteable = 0;
@@ -63,7 +70,7 @@ bool FFMpegExtractor::createAVIOContext(FILE *asset, uint8_t *buffer, uint32_t b
             buffer, // internal buffer for FFmpeg to use
             bufferSize, // For optimal decoding speed this should be the protocol block size
             isBufferWriteable,
-            asset, // Will be passed to our callback functions as a (void *)
+            (void*)this, // Will be passed to our callback functions as a (void *)
             read, // Read callback function
             nullptr, // Write callback function (not used)
             seek); // Seek callback function
@@ -163,7 +170,7 @@ int64_t FFMpegExtractor::decode(
     };
     {
         AVIOContext *tmp = nullptr;
-        if (!createAVIOContext(fp, buffer, kInternalBufferSize, &tmp)){
+        if (!createAVIOContext(buffer, kInternalBufferSize, &tmp)){
             LOGE("Could not create an AVIOContext");
             return returnValue;
         }

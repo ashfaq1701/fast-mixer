@@ -8,6 +8,7 @@
 
 #include <cstdint>
 #include <cmath>
+#include <sys/stat.h>
 #include <cstring>
 #include <string>
 #include <sstream>
@@ -27,6 +28,14 @@ inline bool strEndedWith(std::string const &fullString, std::string const &endin
     } else {
         return false;
     }
+}
+
+inline long getSizeOfFile(const char *fileName) {
+    struct stat st;
+    if(stat(fileName,&st)==0)
+        return (static_cast<long>(st.st_size));
+    else
+        return -1;
 }
 
 #endif //FAST_MIXER_UTILS_H
