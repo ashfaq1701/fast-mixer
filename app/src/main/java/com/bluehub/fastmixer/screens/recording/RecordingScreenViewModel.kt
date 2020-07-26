@@ -59,6 +59,23 @@ class RecordingScreenViewModel(override val context: Context?, val audioEnginePr
         audioDeviceChangeListener.setRestartOutputCallback {
             restartOutputStreams()
         }
+
+        val cacheDir = createCacheDirectory()
+
+        val inStr = context!!.assets.open("example.mp3")
+        val outFile = File(cacheDir, "example.mp3")
+        val out = FileOutputStream(outFile)
+
+        var read: Int = 0
+        val bytes = ByteArray(1024)
+
+        while (inStr.read(bytes).also({ read = it }) != -1) {
+            out.write(bytes, 0, read)
+        }
+
+        inStr.close()
+        out.flush()
+        out.close()
     }
 
     private fun restartInputStreams() {
