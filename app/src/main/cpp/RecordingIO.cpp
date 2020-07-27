@@ -62,10 +62,7 @@ bool RecordingIO::validate_audio_file() {
     return !(mRecordingFilePath.empty() || (access(mRecordingFilePath.c_str(), F_OK) == -1));
 }
 
-void RecordingIO::read_playback(float *targetData, int32_t numSamples) {
-    LOGD(TAG, "read(): ");
-    LOGD(TAG, std::to_string(numSamples).c_str());
-
+void RecordingIO::read_playback(float *targetData, int32_t numFrames, int32_t channelCount) {
     if (!validate_audio_file()) {
         return;
     }
@@ -75,7 +72,9 @@ void RecordingIO::read_playback(float *targetData, int32_t numSamples) {
     }
 
     if (mTotalSamples > 0) {
-        mRecordedTrack->renderAudio(targetData, numSamples);
+        for (int i = 0; i < numFrames; ++i) {
+            mRecordedTrack->renderAudio(targetData + (channelCount * i), 1);
+        }
     }
 }
 

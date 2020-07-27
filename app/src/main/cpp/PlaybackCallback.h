@@ -31,7 +31,7 @@ public:
     onAudioReady(oboe::AudioStream *audioStream, void *audioData, int32_t numFrames);
 
     oboe::DataCallbackResult
-    processPlaybackFrame(oboe::AudioStream *audioStream, float *audioData, int32_t numFrames);
+    processPlaybackFrame(oboe::AudioStream *audioStream, float *audioData, int32_t numFrames, int32_t channelCount);
 };
 
 

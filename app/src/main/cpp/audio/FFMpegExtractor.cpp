@@ -22,7 +22,7 @@
 #include "../logging_macros.h"
 #include "../Utils.h"
 
-constexpr int kInternalBufferSize = 32 * 1024; // Use MP3 block size. https://wiki.hydrogenaud.io/index.php?title=MP3
+constexpr int kInternalBufferSize = 1152; // Use MP3 block size. https://wiki.hydrogenaud.io/index.php?title=MP3
 
 FFMpegExtractor::FFMpegExtractor(const std::string &filePath, const AudioProperties targetProperties) {
     mFilePath = filePath.c_str();

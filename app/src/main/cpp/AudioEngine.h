@@ -39,6 +39,7 @@ public:
     void pausePlayback();
 
     static int32_t mSampleRate;
+    static int32_t mPlaybackSampleRate;
     static int32_t mInputChannelCount;
     static int32_t mOutputChannelCount;
 
