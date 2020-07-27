@@ -31,7 +31,7 @@ FileDataSource* FileDataSource::newFromCompressedFile(
         const char *filename,
         const AudioProperties targetProperties) {
     std::string filenameStr(filename);
-    filenameStr = std::regex_replace(filenameStr, std::regex("recording.wav"), "example.mp3");
+    //filenameStr = std::regex_replace(filenameStr, std::regex("recording.wav"), "example.mp3");
 
     FILE* fl = fopen(filenameStr.c_str(), "r");
     if (!fl) {

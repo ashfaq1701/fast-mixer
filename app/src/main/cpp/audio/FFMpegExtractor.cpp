@@ -98,24 +98,9 @@ FFMpegExtractor::createAVFormatContext(AVIOContext *avioContext, AVFormatContext
 }
 
 bool FFMpegExtractor::openAVFormatContext(AVFormatContext *avFormatContext, FILE* fl) {
-    fpos_t pos;
-    fgetpos(fl, &pos);
-
-    auto* temp = new uint8_t[kInternalBufferSize]{0};
-    auto ret = fread(temp, sizeof(uint8_t), kInternalBufferSize, fl);
-    fseek(fl, 0, pos);
-
-    AVProbeData prbData;
-    prbData.buf_size = ret;
-    prbData.buf = temp;
-    prbData.filename = "";
-    auto inputFmt = av_probe_input_format(&prbData, 1);
-
-    LOGD("Format: %s", inputFmt->name);
-
     int result = avformat_open_input(&avFormatContext,
                                      "", /* URL is left empty because we're providing our own I/O */
-                                     inputFmt /* AVInputFormat *fmt */,
+                                     nullptr /* AVInputFormat *fmt */,
                                      nullptr /* AVDictionary **options */
     );
 

@@ -6,7 +6,7 @@
 #include "AudioEngine.h"
 #include "logging_macros.h"
 
-int32_t AudioEngine::mSampleRate = 44100;
+int32_t AudioEngine::mSampleRate = oboe::DefaultStreamValues::SampleRate;
 int32_t AudioEngine::mPlaybackSampleRate = mSampleRate;
 int32_t AudioEngine::mInputChannelCount = oboe::ChannelCount::Stereo;
 int32_t AudioEngine::mOutputChannelCount = oboe::ChannelCount::Stereo;
