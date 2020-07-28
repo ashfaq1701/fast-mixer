@@ -39,6 +39,10 @@ public:
     const char *mFilePath;
     FILE* fp = nullptr;
 
+    int mSampleRate = 0;
+    int mChannelCount = 0;
+    int mAudioFormat = 0;
+
 private:
     AudioProperties mTargetProperties;
 

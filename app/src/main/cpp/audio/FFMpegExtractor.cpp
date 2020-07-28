@@ -222,6 +222,11 @@ bool FFMpegExtractor::decode() {
     }
 
     decodedSuccessfully = true;
+
+    mSampleRate = mStream->codecpar->sample_rate;
+    mChannelCount = mStream->codecpar->channels;
+    mAudioFormat = mStream->codecpar->format;
+
     return decodedSuccessfully;
 }
 

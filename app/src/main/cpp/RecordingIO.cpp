@@ -89,22 +89,23 @@ void RecordingIO::flush_to_file(int16_t* buffer, int32_t length, const std::stri
 
     std::unique_lock<std::mutex> lck(mtx);
     reallocated.wait(lck, check_if_reallocated);
+    LOGD("DELETING");
     delete[] buffer;
     is_reallocated = false;
+    lck.unlock();
 }
 
 void RecordingIO::perform_flush(int flushIndex) {
     int16_t* oldBuffer = mData;
     is_reallocated = false;
-    LOGD("FLUSH CALLING");
-    std::thread flushThread([&]() {
+    taskQueue->enqueue([&]() {
         flush_to_file(oldBuffer, flushIndex, mRecordingFilePath, mRecordingFile);
     });
-
     auto * newData = new int16_t[kMaxSamples]{0};
     std::copy(mData + flushIndex, mData + mWriteIndex, newData);
     mData = newData;
     is_reallocated = true;
+    reallocated.notify_all();
     mWriteIndex -= flushIndex;
     mLivePlaybackReadIndex -= flushIndex;
     readyToFlush = false;
@@ -161,16 +162,15 @@ void RecordingIO::flush_buffer() {
         int16_t* oldBuffer = mData;
         is_reallocated = false;
         int32_t flushIndex = mWriteIndex;
-        LOGD("FLUSH CALLING");
-        std::thread flushThread([&]() {
+        taskQueue->enqueue([&]() {
             flush_to_file(oldBuffer, flushIndex, mRecordingFilePath, mRecordingFile);
         });
-
         mIteration = 1;
         mWriteIndex = 0;
         mLivePlaybackReadIndex = 0;
         mData = new int16_t[kMaxSamples]{0};
         is_reallocated = true;
+        reallocated.notify_all();
         readyToFlush = false;
         toFlush = false;
     }

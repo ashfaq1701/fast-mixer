@@ -8,7 +8,7 @@
 #include <FileDataSource.h>
 #include <sndfile.hh>
 #include <Player.h>
-#include <thread>
+#include "taskqueue/TaskQueue.h"
 #include <oboe/Definitions.h>
 
 #ifndef MODULE_NAME
@@ -19,7 +19,13 @@ const int kMaxSamples = 60 * oboe::DefaultStreamValues::SampleRate * oboe::Chann
 
 class RecordingIO {
 public:
-    RecordingIO() = default;
+    RecordingIO() {
+        taskQueue = new TaskQueue();
+    }
+
+    ~RecordingIO() {
+        taskQueue->stop_queue();
+    }
     int32_t write(const int16_t *sourceData, int32_t numSamples);
     int32_t read_live_playback(int16_t *targetData, int32_t numSamples);
     void read_playback(float *targetData, int32_t numSamples, int32_t channelCount);
@@ -37,6 +43,8 @@ public:
 
 private:
     const char* TAG = "RecordingIO:: %s";
+
+    TaskQueue *taskQueue;
 
     std::string mRecordingFilePath;
 

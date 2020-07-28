@@ -105,12 +105,12 @@ class RecordingScreenViewModel(override val context: Context?, val audioEnginePr
             }
         } else {
             uiScope.launch {
-                pauseRecording()
                 _eventLivePlaybackSet.value?.let {
                     if (it) {
                         pauseLivePlayback()
                     }
                 }
+                pauseRecording()
             }
         }
     }
