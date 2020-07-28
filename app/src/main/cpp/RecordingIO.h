@@ -8,15 +8,18 @@
 #include <FileDataSource.h>
 #include <sndfile.hh>
 #include <Player.h>
-#include "AudioEngine.h"
 #include <thread>
+#include <oboe/Definitions.h>
 
 #ifndef MODULE_NAME
 #define MODULE_NAME  "RecordingIO"
 #endif
 
+const int kMaxSamples = 60 * oboe::DefaultStreamValues::SampleRate * oboe::ChannelCount::Stereo;
+
 class RecordingIO {
 public:
+    RecordingIO() = default;
     int32_t write(const int16_t *sourceData, int32_t numSamples);
     int32_t read_live_playback(int16_t *targetData, int32_t numSamples);
     void read_playback(float *targetData, int32_t numSamples, int32_t channelCount);
@@ -45,7 +48,6 @@ private:
     int32_t mIteration = 1;
     int32_t mWriteIndex = 0;
     int32_t mLivePlaybackReadIndex = 0;
-    const int kMaxSamples = 60 * AudioEngine::mSampleRate * AudioEngine::mInputChannelCount; // 10s of audio data @ 48kHz
     const int16_t gain_factor = 2;
 
     bool livePlaybackEnabled = true;

@@ -32,13 +32,22 @@ class FFMpegExtractor {
 public:
     FFMpegExtractor(const std::string &filePath, const AudioProperties targetProperties);
 
-    int64_t decode(uint8_t *targetData);
+    bool decode();
+
+    int64_t readData(uint8_t *targetData);
 
     const char *mFilePath;
     FILE* fp = nullptr;
 
 private:
     AudioProperties mTargetProperties;
+
+    bool decodedSuccessfully = false;
+
+    AVStream *mStream;
+
+    std::unique_ptr<AVFormatContext, decltype(&avformat_free_context)> mFormatContext {nullptr,nullptr};
+    std::unique_ptr<AVCodecContext, void(*)(AVCodecContext *)> mCodecContext {nullptr, nullptr};
 
     bool createAVIOContext(uint8_t *buffer, uint32_t bufferSize,
                                   AVIOContext **avioContext);

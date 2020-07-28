@@ -135,10 +135,8 @@ AVStream *FFMpegExtractor::getBestAudioStream(AVFormatContext *avFormatContext) 
     }
 }
 
-int64_t FFMpegExtractor::decode(
-        uint8_t *targetData) {
-
-    int returnValue = -1; // -1 indicates error
+bool FFMpegExtractor::decode() {
+    decodedSuccessfully = false;
 
     fp = fopen(mFilePath, "rb");
 
@@ -157,48 +155,48 @@ int64_t FFMpegExtractor::decode(
         AVIOContext *tmp = nullptr;
         if (!createAVIOContext(buffer, kInternalBufferSize, &tmp)){
             LOGE("Could not create an AVIOContext");
-            return returnValue;
+            return decodedSuccessfully;
         }
         ioContext.reset(tmp);
     }
 
     // Create an AVFormatContext using the avformat_free_context as the deleter function
-    std::unique_ptr<AVFormatContext, decltype(&avformat_free_context)> formatContext {
+    mFormatContext = std::unique_ptr<AVFormatContext, decltype(&avformat_free_context)> {
             nullptr,
             &avformat_free_context
     };
     {
         AVFormatContext *tmp;
-        if (!createAVFormatContext(ioContext.get(), &tmp)) return returnValue;
-        formatContext.reset(tmp);
+        if (!createAVFormatContext(ioContext.get(), &tmp)) return decodedSuccessfully;
+        mFormatContext.reset(tmp);
     }
 
-    if (!openAVFormatContext(formatContext.get(), fp)) {
-        return returnValue;
+    if (!openAVFormatContext(mFormatContext.get(), fp)) {
+        return decodedSuccessfully;
     }
 
-    if (!getStreamInfo(formatContext.get())) {
-        return returnValue;
+    if (!getStreamInfo(mFormatContext.get())) {
+        return decodedSuccessfully;
     }
 
     // Obtain the best audio stream to decode
-    AVStream *stream = getBestAudioStream(formatContext.get());
-    if (stream == nullptr || stream->codecpar == nullptr){
+    mStream = getBestAudioStream(mFormatContext.get());
+    if (mStream == nullptr || mStream->codecpar == nullptr){
         LOGE("Could not find a suitable audio stream to decode");
-        return returnValue;
+        return decodedSuccessfully;
     }
 
-    printCodecParameters(stream->codecpar);
+    printCodecParameters(mStream->codecpar);
 
     // Find the codec to decode this stream
-    AVCodec *codec = avcodec_find_decoder(stream->codecpar->codec_id);
+    AVCodec *codec = avcodec_find_decoder(mStream->codecpar->codec_id);
     if (!codec){
-        LOGE("Could not find codec with ID: %d", stream->codecpar->codec_id);
-        return returnValue;
+        LOGE("Could not find codec with ID: %d", mStream->codecpar->codec_id);
+        return decodedSuccessfully;
     }
 
     // Create the codec context, specifying the deleter function
-    std::unique_ptr<AVCodecContext, void(*)(AVCodecContext *)> codecContext {
+    mCodecContext = std::unique_ptr<AVCodecContext, void(*)(AVCodecContext *)> {
             nullptr,
             [](AVCodecContext *c) { avcodec_free_context(&c); }
     };
@@ -206,35 +204,46 @@ int64_t FFMpegExtractor::decode(
         AVCodecContext *tmp = avcodec_alloc_context3(codec);
         if (!tmp){
             LOGE("Failed to allocate codec context");
-            return returnValue;
+            return decodedSuccessfully;
         }
-        codecContext.reset(tmp);
+        mCodecContext.reset(tmp);
     }
 
     // Copy the codec parameters into the context
-    if (avcodec_parameters_to_context(codecContext.get(), stream->codecpar) < 0){
+    if (avcodec_parameters_to_context(mCodecContext.get(), mStream->codecpar) < 0){
         LOGE("Failed to copy codec parameters to codec context");
-        return returnValue;
+        return decodedSuccessfully;
     }
 
     // Open the codec
-    if (avcodec_open2(codecContext.get(), codec, nullptr) < 0){
+    if (avcodec_open2(mCodecContext.get(), codec, nullptr) < 0){
         LOGE("Could not open codec");
+        return decodedSuccessfully;
+    }
+
+    decodedSuccessfully = true;
+    return decodedSuccessfully;
+}
+
+int64_t FFMpegExtractor::readData(
+        uint8_t *targetData) {
+    int returnValue = -1;
+
+    if (!decodedSuccessfully) {
         return returnValue;
     }
 
-    // prepare resampler
     int32_t outChannelLayout = (1 << mTargetProperties.channelCount) - 1;
     LOGD("Channel layout %d", outChannelLayout);
 
     SwrContext *swr = swr_alloc();
-    av_opt_set_int(swr, "in_channel_count", stream->codecpar->channels, 0);
+    av_opt_set_int(swr, "in_channel_count", mStream->codecpar->channels, 0);
     av_opt_set_int(swr, "out_channel_count", mTargetProperties.channelCount, 0);
-    av_opt_set_int(swr, "in_channel_layout", stream->codecpar->channel_layout, 0);
+    av_opt_set_int(swr, "in_channel_layout", mStream->codecpar->channel_layout, 0);
     av_opt_set_int(swr, "out_channel_layout", outChannelLayout, 0);
-    av_opt_set_int(swr, "in_sample_rate", stream->codecpar->sample_rate, 0);
+    av_opt_set_int(swr, "in_sample_rate", mStream->codecpar->sample_rate, 0);
     av_opt_set_int(swr, "out_sample_rate", mTargetProperties.sampleRate, 0);
-    av_opt_set_int(swr, "in_sample_fmt", stream->codecpar->format, 0);
+    av_opt_set_int(swr, "in_sample_fmt", mStream->codecpar->format, 0);
     av_opt_set_sample_fmt(swr, "out_sample_fmt", AV_SAMPLE_FMT_FLT, 0);
     av_opt_set_int(swr, "force_resampling", 1, 0);
 
@@ -254,24 +263,24 @@ int64_t FFMpegExtractor::decode(
     AVPacket avPacket; // Stores compressed audio data
     av_init_packet(&avPacket);
     AVFrame *decodedFrame = av_frame_alloc(); // Stores raw audio data
-    int bytesPerSample = av_get_bytes_per_sample((AVSampleFormat)stream->codecpar->format);
+    int bytesPerSample = av_get_bytes_per_sample((AVSampleFormat)mStream->codecpar->format);
 
     LOGD("Bytes per sample %d", bytesPerSample);
 
     // While there is more data to read, read it into the avPacket
-    while (av_read_frame(formatContext.get(), &avPacket) == 0){
+    while (av_read_frame(mFormatContext.get(), &avPacket) == 0){
 
-        if (avPacket.stream_index == stream->index && avPacket.size > 0) {
+        if (avPacket.stream_index == mStream->index && avPacket.size > 0) {
 
             // Pass our compressed data into the codec
-            result = avcodec_send_packet(codecContext.get(), &avPacket);
+            result = avcodec_send_packet(mCodecContext.get(), &avPacket);
             if (result != 0) {
                 LOGE("avcodec_send_packet error: %s", av_err2str(result));
                 goto cleanup;
             }
 
             // Retrieve our raw data from the codec
-            result = avcodec_receive_frame(codecContext.get(), decodedFrame);
+            result = avcodec_receive_frame(mCodecContext.get(), decodedFrame);
             if (result == AVERROR(EAGAIN)) {
                 // The codec needs more data before it can decode
                 LOGI("avcodec_receive_frame returned EAGAIN");

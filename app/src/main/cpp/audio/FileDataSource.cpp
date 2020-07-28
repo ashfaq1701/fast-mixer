@@ -45,8 +45,12 @@ FileDataSource* FileDataSource::newFromCompressedFile(
     // Allocate memory to store the decompressed audio. We don't know the exact
     // size of the decoded data until after decoding so we make an assumption about the
     // maximum compression ratio and the decoded sample format (float for FFmpeg, int16 for NDK).
+
+    auto ffmpegExtractor = FFMpegExtractor(filenameStr, targetProperties);
+    ffmpegExtractor.decode();
+
     long maximumDataSizeInBytes = 0;
-    maximumDataSizeInBytes = assetSize * 10;
+    maximumDataSizeInBytes = assetSize * oboe::ChannelCount::Stereo * (sizeof(float_t) / sizeof(int16_t));
     if (!strEndedWith(filenameStr, ".wav")) {
         maximumDataSizeInBytes = kMaxCompressionRatio * maximumDataSizeInBytes;
     }
@@ -56,8 +60,7 @@ FileDataSource* FileDataSource::newFromCompressedFile(
 
     auto decodedData = new uint8_t[maximumDataSizeInBytes];
 
-    auto ffmpegExtractor = FFMpegExtractor(filenameStr, targetProperties);
-    int64_t bytesDecoded = ffmpegExtractor.decode(decodedData);
+    int64_t bytesDecoded = ffmpegExtractor.readData(decodedData);
     auto numSamples = bytesDecoded / sizeof(float);
 
     // Now we know the exact number of samples we can create a float array to hold the audio data
