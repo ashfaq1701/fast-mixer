@@ -46,7 +46,7 @@ FileDataSource* FileDataSource::newFromCompressedFile(
     // size of the decoded data until after decoding so we make an assumption about the
     // maximum compression ratio and the decoded sample format (float for FFmpeg, int16 for NDK).
     long maximumDataSizeInBytes = 0;
-    maximumDataSizeInBytes = assetSize;
+    maximumDataSizeInBytes = assetSize * 10;
     if (!strEndedWith(filenameStr, ".wav")) {
         maximumDataSizeInBytes = kMaxCompressionRatio * maximumDataSizeInBytes;
     }

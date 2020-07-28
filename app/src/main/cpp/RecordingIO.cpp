@@ -78,12 +78,13 @@ void RecordingIO::read_playback(float *targetData, int32_t numFrames, int32_t ch
     }
 }
 
-void RecordingIO::flush_to_file(int16_t* buffer, int length, const std::string& recordingFilePath, std::unique_ptr<SndfileHandle>& recordingFile) {
+void RecordingIO::flush_to_file(int16_t* buffer, int32_t length, const std::string& recordingFilePath, std::unique_ptr<SndfileHandle>& recordingFile) {
     if (recordingFile == nullptr) {
         int format = SF_FORMAT_WAV | SF_FORMAT_PCM_16;
         SndfileHandle file = SndfileHandle(recordingFilePath, SFM_WRITE, format, AudioEngine::mInputChannelCount, AudioEngine::mSampleRate);
         recordingFile = std::make_unique<SndfileHandle>(file);
     }
+    LOGD("FLUSHING %d bytes", length);
     recordingFile->write(buffer, length);
 
     std::unique_lock<std::mutex> lck(mtx);
@@ -95,7 +96,8 @@ void RecordingIO::flush_to_file(int16_t* buffer, int length, const std::string& 
 void RecordingIO::perform_flush(int flushIndex) {
     int16_t* oldBuffer = mData;
     is_reallocated = false;
-    taskQueue->enqueue([&]() {
+    LOGD("FLUSH CALLING");
+    std::thread flushThread([&]() {
         flush_to_file(oldBuffer, flushIndex, mRecordingFilePath, mRecordingFile);
     });
 
@@ -111,8 +113,6 @@ void RecordingIO::perform_flush(int flushIndex) {
 }
 
 int32_t RecordingIO::write(const int16_t *sourceData, int32_t numSamples) {
-    LOGD(TAG, "write(): ");
-
     if (mWriteIndex + numSamples > kMaxSamples) {
         readyToFlush = true;
     }
@@ -160,8 +160,10 @@ void RecordingIO::flush_buffer() {
     if (mWriteIndex > 0) {
         int16_t* oldBuffer = mData;
         is_reallocated = false;
-        taskQueue->enqueue([&]() {
-            flush_to_file(oldBuffer, static_cast<int>(mWriteIndex), mRecordingFilePath, mRecordingFile);
+        int32_t flushIndex = mWriteIndex;
+        LOGD("FLUSH CALLING");
+        std::thread flushThread([&]() {
+            flush_to_file(oldBuffer, flushIndex, mRecordingFilePath, mRecordingFile);
         });
 
         mIteration = 1;
