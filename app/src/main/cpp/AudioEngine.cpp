@@ -54,7 +54,7 @@ void AudioEngine::stopLivePlayback() {
 }
 
 void AudioEngine::pauseLivePlayback() {
-    LOGD(TAG, "pauseLivePlayback(): ");;
+    LOGD(TAG, "pauseLivePlayback(): ");
     stopStream(mLivePlaybackStream);
 }
 

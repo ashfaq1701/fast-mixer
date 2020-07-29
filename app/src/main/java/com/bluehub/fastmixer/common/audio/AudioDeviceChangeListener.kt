@@ -21,7 +21,6 @@ class AudioDeviceChangeListener: BroadcastReceiver() {
         when(p1?.action) {
             AudioManager.ACTION_HEADSET_PLUG -> {
                 val hasMicrophone = p1.getIntExtra("action", 0)
-                mRestartOutputCallback()
                 if (hasMicrophone == 1) {
                     mRestartInputCallback()
                 }

@@ -1,11 +1,15 @@
 package com.bluehub.fastmixer.screens.recording
 
+import android.content.IntentFilter
+import android.media.AudioManager
+import android.os.Build
 import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.RequiresApi
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
@@ -75,10 +79,20 @@ class RecordingScreen : PermissionFragment() {
         audioDeviceChangeListener.setRestartOutputCallback {
             localViewModel.restartOutputStreams()
         }
+
+        val filter = IntentFilter().apply {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                addAction(AudioManager.ACTION_HEADSET_PLUG)
+            }
+            addAction(AudioManager.ACTION_SCO_AUDIO_STATE_UPDATED)
+            addAction(AudioManager.ACTION_AUDIO_BECOMING_NOISY)
+        }
+        context?.registerReceiver(audioDeviceChangeListener, filter)
     }
 
     override fun onPause() {
         super.onPause()
+        context?.unregisterReceiver(audioDeviceChangeListener)
     }
 
     fun initUI() {

@@ -1,6 +1,7 @@
 package com.bluehub.fastmixer.screens.recording
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.bluehub.fastmixer.common.audio.AudioDeviceChangeListener
@@ -55,11 +56,21 @@ class RecordingScreenViewModel(override val context: Context?, override val tag:
     }
 
     fun restartInputStreams() {
+        if (_eventIsRecording.value == true) {
+            uiScope.launch {
 
+            }
+        }
     }
 
     fun restartOutputStreams() {
+        uiScope.launch {
+            if (_eventIsRecording.value == true && _eventLivePlaybackSet.value == true) {
 
+            } else if (_eventIsPlaying.value == true) {
+
+            }
+        }
     }
 
     fun toggleRecording() {
