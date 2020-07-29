@@ -10,6 +10,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.bluehub.fastmixer.R
+import com.bluehub.fastmixer.common.audio.AudioDeviceChangeListener
 import com.bluehub.fastmixer.common.permissions.PermissionFragment
 import com.bluehub.fastmixer.common.permissions.PermissionViewModel
 import com.bluehub.fastmixer.common.utils.DialogManager
@@ -30,6 +31,9 @@ class RecordingScreen : PermissionFragment() {
     @Inject
     override lateinit var dialogManager: DialogManager
 
+    @Inject
+    lateinit var audioDeviceChangeListener: AudioDeviceChangeListener
+
     override lateinit var viewModel: PermissionViewModel
     private lateinit var viewModelFactory: RecordingScreenViewModelFactory
 
@@ -45,7 +49,7 @@ class RecordingScreen : PermissionFragment() {
         dataBinding = DataBindingUtil
             .inflate(inflater, R.layout.recording_screen, container, false)
 
-        viewModelFactory = RecordingScreenViewModelFactory(context, audioEngine, TAG)
+        viewModelFactory = RecordingScreenViewModelFactory(context, TAG)
         viewModel = ViewModelProviders.of(this, viewModelFactory)
             .get(RecordingScreenViewModel::class.java)
 
@@ -57,6 +61,24 @@ class RecordingScreen : PermissionFragment() {
         initUI()
 
         return dataBinding.root
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        val localViewModel = viewModel as RecordingScreenViewModel
+
+        audioDeviceChangeListener.setRestartInputCallback {
+            localViewModel.restartInputStreams()
+        }
+
+        audioDeviceChangeListener.setRestartOutputCallback {
+            localViewModel.restartOutputStreams()
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
     }
 
     fun initUI() {

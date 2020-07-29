@@ -10,7 +10,7 @@ import com.bluehub.fastmixer.common.utils.PermissionManager
 import com.bluehub.fastmixer.common.utils.ScreenConstants
 import javax.inject.Inject
 
-class MixingScreenViewModel(override val context: Context?, val audioEngine: AudioEngineProxy, override val tag: String): PermissionViewModel(context, tag) {
+class MixingScreenViewModel(override val context: Context?, override val tag: String): PermissionViewModel(context, tag) {
     override var TAG: String = javaClass.simpleName
 
     init {
@@ -19,6 +19,9 @@ class MixingScreenViewModel(override val context: Context?, val audioEngine: Aud
 
     @Inject
     override lateinit var permissionManager: PermissionManager
+
+    @Inject
+    lateinit var mixingRepository: MixingRepository
 
     private val _eventRecord = MutableLiveData<Boolean>()
     val eventRecord: LiveData<Boolean>

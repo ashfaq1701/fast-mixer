@@ -14,10 +14,6 @@ abstract class BaseFragment: Fragment() {
     abstract var TAG: String
 
     private var mIsInjectorUsed = false
-    val audioEngine: AudioEngineProxy
-        get() {
-            return (activity!!.getApplication() as MixerApplication).getAudioEngine()
-        }
     @UiThread
     fun getPresentationComponent(): PresentationComponent {
         if (mIsInjectorUsed) {
