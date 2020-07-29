@@ -13,6 +13,7 @@
 #include <atomic>
 #include <thread>
 #include <functional>
+#include <chrono>
 
 using namespace std;
 
@@ -20,6 +21,8 @@ class TaskQueue {
 
 public:
     TaskQueue() {
+        queue<std::function<void()>> qu;
+        q = std::make_unique<queue<std::function<void()>>>(qu);
         start_queue();
     }
 
@@ -27,16 +30,13 @@ public:
         is_running = false;
     }
 
-    template<class F, class... Args>
-    auto enqueue(F&& f, Args&&... args) {
-        auto task = std::bind(std::forward<F>(f), std::forward<Args>(args)...);
-        auto func = [task](){ task(); };
-        q.push(func);
+    void enqueue(std::function<void()> f) {
+        q->push(f);
     }
 
 private:
     const char* TAG = "TaskQueue:: %d";
-    queue<std::function<void()>> q;
+    std::unique_ptr<queue<std::function<void()>>> q;
     atomic<bool> is_running;
     thread t;
 
@@ -49,12 +49,12 @@ private:
     }
 
     void executor_loop() {
-        int i = 0;
         while (is_running) {
-            if (!q.empty()) {
-                auto f = q.front();
+            if (!q->empty()) {
+                auto f = q->front();
                 f();
-                q.pop();
+                q->pop();
+                std::this_thread::sleep_for(std::chrono::microseconds (200));
             }
         }
     }

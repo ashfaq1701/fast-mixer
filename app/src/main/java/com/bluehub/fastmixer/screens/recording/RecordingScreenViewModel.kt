@@ -1,8 +1,6 @@
 package com.bluehub.fastmixer.screens.recording
 
 import android.content.Context
-import android.media.AudioManager
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.bluehub.fastmixer.common.audio.AudioDeviceChangeListener
@@ -12,6 +10,7 @@ import com.bluehub.fastmixer.common.utils.PermissionManager
 import com.bluehub.fastmixer.common.utils.ScreenConstants
 import kotlinx.coroutines.*
 import java.io.File
+import java.io.FileOutputStream
 import java.util.*
 import javax.inject.Inject
 
@@ -48,8 +47,10 @@ class RecordingScreenViewModel(override val context: Context?, val audioEnginePr
         getViewModelComponent().inject(this)
         uiScope.launch {
             withContext(Dispatchers.IO) {
-                val cacheDir = createCacheDirectory()
-                audioEngineProxy.create(cacheDir, recordingSessionId)
+                context?.let {
+                    val cacheDir = createCacheDirectory()
+                    audioEngineProxy.create(cacheDir, recordingSessionId)
+                }
             }
         }
         audioDeviceChangeListener.setRestartInputCallback {
@@ -87,12 +88,12 @@ class RecordingScreenViewModel(override val context: Context?, val audioEnginePr
             }
         } else {
             uiScope.launch {
-                pauseRecording()
                 _eventLivePlaybackSet.value?.let {
                     if (it) {
                         pauseLivePlayback()
                     }
                 }
+                pauseRecording()
             }
         }
     }

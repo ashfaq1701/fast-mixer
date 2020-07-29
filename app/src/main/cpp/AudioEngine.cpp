@@ -6,17 +6,22 @@
 #include "AudioEngine.h"
 #include "logging_macros.h"
 
+int32_t AudioEngine::mSampleRate = oboe::DefaultStreamValues::SampleRate;
+int32_t AudioEngine::mPlaybackSampleRate = mSampleRate;
+int32_t AudioEngine::mInputChannelCount = oboe::ChannelCount::Stereo;
+int32_t AudioEngine::mOutputChannelCount = oboe::ChannelCount::Stereo;
+
 AudioEngine::AudioEngine(char* appDir, char* recordingSessionId) {
     assert(mInputChannelCount == mOutputChannelCount);
     mAppDir = appDir;
     mRecordingSessionId = recordingSessionId;
 
-    char* recordingFilePath = strcat(mAppDir, "/recording");
-    mSoundIO.setRecordingFilePath(recordingFilePath);
+    char* recordingFilePath = strcat(mAppDir, "/recording.wav");
+    mRecordingIO.setRecordingFilePath(recordingFilePath);
 
-    recordingCallback = RecordingCallback(&mSoundIO);
-    livePlaybackCallback = LivePlaybackCallback(&mSoundIO);
-    playbackCallback = PlaybackCallback(&mSoundIO);
+    recordingCallback = RecordingCallback(&mRecordingIO);
+    livePlaybackCallback = LivePlaybackCallback(&mRecordingIO);
+    playbackCallback = PlaybackCallback(&mRecordingIO);
 }
 
 AudioEngine::~AudioEngine() {
@@ -49,7 +54,7 @@ void AudioEngine::stopLivePlayback() {
 }
 
 void AudioEngine::pauseLivePlayback() {
-    LOGD(TAG, "pauseLivePlayback(): ");
+    LOGD(TAG, "pauseLivePlayback(): ");;
     stopStream(mLivePlaybackStream);
 }
 
@@ -57,8 +62,12 @@ void AudioEngine::startPlayback() {
     LOGD(TAG, "startPlayback(): ");
     openPlaybackStream();
     if (mPlaybackStream) {
-        mSoundIO.openPlaybackFp();
-        startStream(mPlaybackStream);
+        if(mRecordingIO.setup_audio_source()) {
+            startStream(mPlaybackStream);
+        } else {
+            LOGD(TAG, "Could not open recorded file");
+            closeStream(mPlaybackStream);
+        }
     } else {
         LOGE(TAG, "startPlayback(): Failed to create playback (%p) stream", mPlaybackStream);
         closeStream(mPlaybackStream);
@@ -67,22 +76,21 @@ void AudioEngine::startPlayback() {
 
 void AudioEngine::stopPlayback() {
     LOGD(TAG, "stopPlayback(): %d");
-
     if (!mPlaybackStream) {
+        mRecordingIO.stop_audio_source();
         return;
     }
 
     if (mPlaybackStream->getState() != oboe::StreamState::Closed) {
         stopStream(mPlaybackStream);
         closeStream(mPlaybackStream);
-        mSoundIO.closePlaybackFp();
     }
 }
 
 void AudioEngine::pausePlayback() {
     LOGD(TAG, "pausePlayback(): ");
+    mRecordingIO.pause_audio_source();
     stopStream(mPlaybackStream);
-    mSoundIO.closePlaybackFp();
 }
 
 void AudioEngine::startRecording() {
@@ -106,14 +114,14 @@ void AudioEngine::stopRecording() {
     if (mRecordingStream->getState() != oboe::StreamState::Closed) {
         stopStream(mRecordingStream);
         closeStream(mRecordingStream);
-        mSoundIO.flush_buffer();
+        mRecordingIO.flush_buffer();
     }
 }
 
 void AudioEngine::pauseRecording() {
     LOGD(TAG, "pauseRecording(): ");
     stopStream(mRecordingStream);
-    mSoundIO.flush_buffer();
+    mRecordingIO.flush_buffer();
 }
 
 void AudioEngine::openRecordingStream() {
@@ -124,13 +132,13 @@ void AudioEngine::openRecordingStream() {
 
     if (result == oboe::Result::OK && mRecordingStream) {
         assert(mRecordingStream->getChannelCount() == mInputChannelCount);
-        mSampleRate = mRecordingStream->getSampleRate();
-        mFormat = mRecordingStream->getFormat();
+        auto sampleRate = mRecordingStream->getSampleRate();
+        auto format = mRecordingStream->getFormat();
         LOGV(TAG, "openRecordingStream(): mSampleRate = ");
-        LOGV(TAG, std::to_string(mSampleRate).c_str());
+        LOGV(TAG, std::to_string(sampleRate).c_str());
 
         LOGV(TAG, "openRecordingStream(): mFormat = ");
-        LOGV(TAG, oboe::convertToText(mFormat));
+        LOGV(TAG, oboe::convertToText(format));
     } else {
         LOGE(TAG, "Failed to create recording stream. Error: %s", oboe::convertToText(result));
     }
@@ -147,9 +155,9 @@ void AudioEngine::openLivePlaybackStream() {
 //        assert(mLivePlaybackStream->getSampleRate() == mSampleRate);
         assert(mLivePlaybackStream->getFormat() == mFormat);
 
-        mSampleRate = mLivePlaybackStream->getSampleRate();
+        auto sampleRate = mLivePlaybackStream->getSampleRate();
         LOGV(TAG, "openLivePlaybackStream(): mSampleRate = ");
-        LOGV(TAG, std::to_string(mSampleRate).c_str());
+        LOGV(TAG, std::to_string(sampleRate).c_str());
 
         mFramesPerBurst = mLivePlaybackStream->getFramesPerBurst();
         LOGV(TAG, "openLivePlaybackStream(): mFramesPerBurst = ");
@@ -166,17 +174,17 @@ void AudioEngine::openLivePlaybackStream() {
 void AudioEngine::openPlaybackStream() {
     LOGD(TAG, "openLivePlaybackStream(): ");
     oboe::AudioStreamBuilder builder;
-    setupLivePlaybackStreamParameters(&builder, mAudioApi, mFormat, &playbackCallback,
-                                      mPlaybackDeviceId, mSampleRate, mOutputChannelCount);
+    setupPlaybackStreamParameters(&builder, mAudioApi, mPlaybackFormat, &playbackCallback,
+                                      mPlaybackDeviceId, mPlaybackSampleRate, mOutputChannelCount);
     oboe::Result result = builder.openStream(&mPlaybackStream);
     if (result == oboe::Result::OK && mPlaybackStream) {
         assert(mPlaybackStream->getChannelCount() == mOutputChannelCount);
 //        assert(mPlaybackStream->getSampleRate() == mSampleRate);
-        assert(mPlaybackStream->getFormat() == mFormat);
+        assert(mPlaybackStream->getFormat() == mPlaybackFormat);
 
-        mSampleRate = mPlaybackStream->getSampleRate();
+        auto sampleRate = mPlaybackStream->getSampleRate();
         LOGV(TAG, "openPlaybackStream(): mSampleRate = ");
-        LOGV(TAG, std::to_string(mSampleRate).c_str());
+        LOGV(TAG, std::to_string(sampleRate).c_str());
 
         mFramesPerBurst = mPlaybackStream->getFramesPerBurst();
         LOGV(TAG, "openPlaybackStream(): mFramesPerBurst = ");
@@ -205,14 +213,14 @@ void AudioEngine::startStream(oboe::AudioStream *stream) {
 
 void AudioEngine::stopStream(oboe::AudioStream *stream) {
     LOGD("stopStream(): ");
-    if (stream) {
+    if (stream && stream->getState() != oboe::StreamState::Closed) {
         oboe::Result result = stream->stop(0L);
         if (result != oboe::Result::OK) {
             LOGE(TAG, "Error stopping the stream: %s");
             LOGE(TAG, oboe::convertToText(result));
         }
         LOGW(TAG, "stopStream(): Total samples = ");
-        LOGW(TAG, std::to_string(mSoundIO.getTotalSamples()).c_str());
+        LOGW(TAG, std::to_string(mRecordingIO.getTotalSamples()).c_str());
     }
 }
 
@@ -228,7 +236,7 @@ void AudioEngine::closeStream(oboe::AudioStream *stream) {
         }
 
         LOGW(TAG, "closeStream(): mTotalSamples = ");
-        LOGW(TAG, std::to_string(mSoundIO.getTotalSamples()).c_str());
+        LOGW(TAG, std::to_string(mRecordingIO.getTotalSamples()).c_str());
     }
 }
 
@@ -265,7 +273,7 @@ AudioEngine::setupLivePlaybackStreamParameters(oboe::AudioStreamBuilder *builder
             ->setDirection(oboe::Direction::Output)
             ->setSampleRate(sampleRate)
             ->setChannelCount(channelCount)
-            ->setFramesPerCallback(mRecordingFramesPerCallback);;
+            ->setFramesPerCallback(mLivePlaybackFramesPerCallback);
     return builder;
 }
 

@@ -13,7 +13,7 @@
 #include <oboe/AudioStream.h>
 #include "logging_macros.h"
 #include "RecordingCallback.h"
-#include "SoundIO.h"
+#include "RecordingIO.h"
 #include "LivePlaybackCallback.h"
 #include "PlaybackCallback.h"
 
@@ -38,6 +38,11 @@ public:
     void stopPlayback();
     void pausePlayback();
 
+    static int32_t mSampleRate;
+    static int32_t mPlaybackSampleRate;
+    static int32_t mInputChannelCount;
+    static int32_t mOutputChannelCount;
+
 private:
     const char* TAG = "Audio Engine:: %s";
 
@@ -48,11 +53,8 @@ private:
     int32_t mRecordingDeviceId = oboe::Unprocessed;
     int32_t mPlaybackDeviceId = oboe::kUnspecified;
     oboe::AudioFormat mFormat = oboe::AudioFormat::I16;
-    int32_t mSampleRate = oboe::kUnspecified;
+    oboe::AudioFormat mPlaybackFormat = oboe::AudioFormat::Float;
     int32_t mFramesPerBurst{};
-
-    int32_t mInputChannelCount = oboe::ChannelCount::Stereo;
-    int32_t mOutputChannelCount = oboe::ChannelCount::Stereo;
 
     oboe::AudioApi mAudioApi = oboe::AudioApi::AAudio;
     oboe::AudioStream *mRecordingStream = nullptr;
@@ -62,7 +64,7 @@ private:
     int32_t mRecordingFramesPerCallback = 24;
     int32_t mLivePlaybackFramesPerCallback = mRecordingFramesPerCallback;
 
-    SoundIO mSoundIO;
+    RecordingIO mRecordingIO;
 
     void openRecordingStream();
     void openLivePlaybackStream();

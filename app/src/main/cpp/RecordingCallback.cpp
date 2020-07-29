@@ -12,6 +12,6 @@ RecordingCallback::onAudioReady(oboe::AudioStream *audioStream, void *audioData,
 oboe::DataCallbackResult
 RecordingCallback::processRecordingFrames(oboe::AudioStream *audioStream, int16_t *audioData,
                                           int32_t numFrames) {
-    int32_t framesWritten = mSoundIO->write(audioData, numFrames);
+    int32_t framesWritten = mRecordingIO->write(audioData, numFrames);
     return oboe::DataCallbackResult::Continue;
 }
