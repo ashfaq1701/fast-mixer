@@ -25,9 +25,6 @@ void Player::renderAudio(float *targetData, int32_t numFrames){
 
         int64_t framesToRenderFromData = numFrames;
         int64_t totalSourceFrames = mSource->getSize() / properties.channelCount;
-
-        LOGD("READ INDEX: %d", mReadFrameIndex);
-        LOGD("TOTAL SOURCE FRAMES: %lld", totalSourceFrames);
         const float *data = mSource->getData();
 
         // Check whether we're about to reach the end of the recording
@@ -36,11 +33,10 @@ void Player::renderAudio(float *targetData, int32_t numFrames){
             mIsPlaying = false;
         }
 
-        for (int i = 0; i < framesToRenderFromData; ++i) {
-            for (int j = 0; j < properties.channelCount; ++j) {
-                targetData[(i*properties.channelCount)+j] = data[(mReadFrameIndex*properties.channelCount)+j];
-            }
+        memcpy(targetData, data + mReadFrameIndex * properties.channelCount, framesToRenderFromData * properties.channelCount *
+                sizeof(float));
 
+        for (int i = 0; i < framesToRenderFromData; ++i) {
             // Increment and handle wraparound
             if (++mReadFrameIndex >= totalSourceFrames) mReadFrameIndex = 0;
         }

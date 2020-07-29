@@ -71,11 +71,7 @@ void RecordingIO::read_playback(float *targetData, int32_t numFrames, int32_t ch
         return;
     }
 
-    if (mTotalSamples > 0) {
-        for (int i = 0; i < numFrames; ++i) {
-            mRecordedTrack->renderAudio(targetData + (channelCount * i), 1);
-        }
-    }
+    mRecordedTrack->renderAudio(targetData, numFrames);
 }
 
 void RecordingIO::flush_to_file(int16_t* buffer, int32_t length, const std::string& recordingFilePath, std::unique_ptr<SndfileHandle>& recordingFile) {
