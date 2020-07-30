@@ -7,7 +7,7 @@
 
 #include "BaseStream.h"
 
-class RecordingStream: public BaseStream {
+class RecordingStream: public BaseStream, public oboe::AudioStreamCallback {
 public:
     RecordingStream(RecordingIO* recordingIO);
 
@@ -15,6 +15,12 @@ public:
 
     void openRecordingStream();
     oboe::AudioStreamBuilder* setupRecordingStreamParameters(oboe::AudioStreamBuilder *builder);
+
+    oboe::DataCallbackResult
+    onAudioReady(oboe::AudioStream *audioStream, void *audioData, int32_t numFrames);
+
+    oboe::DataCallbackResult
+    processRecordingFrames(oboe::AudioStream *audioStream, int16_t *audioData, int32_t numFrames);
 
 private:
     const char* TAG = "Recording Stream:: %s";

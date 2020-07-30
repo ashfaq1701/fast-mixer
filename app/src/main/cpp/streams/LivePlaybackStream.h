@@ -7,7 +7,7 @@
 
 #include "BaseStream.h"
 
-class LivePlaybackStream: public BaseStream {
+class LivePlaybackStream: public BaseStream, public oboe::AudioStreamCallback {
 public:
     LivePlaybackStream(RecordingIO* recordingIO);
 
@@ -21,6 +21,12 @@ public:
                                                                 oboe::AudioStreamCallback *audioStreamCallback,
                                                                 int32_t deviceId, int32_t sampleRate,
                                                                 int channelCount);
+
+    oboe::DataCallbackResult
+    onAudioReady(oboe::AudioStream *audioStream, void *audioData, int32_t numFrames);
+
+    oboe::DataCallbackResult
+    processLivePlaybackFrame(oboe::AudioStream *audioStream, int16_t *audioData, int32_t numFrames);
 
 private:
     const char* TAG = "Live Playback Stream:: %s";

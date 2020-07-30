@@ -33,9 +33,6 @@ add_library( # Sets the name of the library.
         audio/Player.cpp
         audio/FFMpegExtractor.cpp
 
-        RecordingCallback.cpp
-        LivePlaybackCallback.cpp
-        PlaybackCallback.cpp
         native-lib.cpp )
 
 # Build the Oboe library

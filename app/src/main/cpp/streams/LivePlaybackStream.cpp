@@ -10,7 +10,7 @@ LivePlaybackStream::LivePlaybackStream(RecordingIO *recordingIO): BaseStream(rec
 void LivePlaybackStream::openLivePlaybackStream() {
     LOGD(TAG, "openLivePlaybackStream(): ");
     oboe::AudioStreamBuilder builder;
-    setupLivePlaybackStreamParameters(&builder, StreamConstants::mAudioApi, StreamConstants::mFormat, &livePlaybackCallback,
+    setupLivePlaybackStreamParameters(&builder, StreamConstants::mAudioApi, StreamConstants::mFormat, this,
                                       StreamConstants::mPlaybackDeviceId, StreamConstants::mSampleRate, StreamConstants::mOutputChannelCount);
     oboe::Result result = builder.openStream(&mLivePlaybackStream);
     if (result == oboe::Result::OK && mLivePlaybackStream) {
@@ -53,4 +53,18 @@ LivePlaybackStream::setupLivePlaybackStreamParameters(oboe::AudioStreamBuilder *
             ->setChannelCount(channelCount)
             ->setFramesPerCallback(StreamConstants::mLivePlaybackFramesPerCallback);
     return builder;
+}
+
+oboe::DataCallbackResult
+LivePlaybackStream::onAudioReady(oboe::AudioStream *audioStream, void *audioData,
+                                   int32_t numFrames) {
+    return processLivePlaybackFrame(audioStream, static_cast<int16_t *>(audioData), numFrames * audioStream->getChannelCount());
+}
+
+oboe::DataCallbackResult
+LivePlaybackStream::processLivePlaybackFrame(oboe::AudioStream *audioStream, int16_t *audioData,
+                                               int32_t numFrames) {
+    fillArrayWithZeros(audioData, numFrames);
+    int64_t framesWritten = mRecordingIO->read_live_playback(audioData, numFrames);
+    return oboe::DataCallbackResult::Continue;
 }

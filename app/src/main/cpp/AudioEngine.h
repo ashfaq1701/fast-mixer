@@ -12,10 +12,7 @@
 #include <oboe/Definitions.h>
 #include <oboe/AudioStream.h>
 #include "logging_macros.h"
-#include "RecordingCallback.h"
 #include "RecordingIO.h"
-#include "LivePlaybackCallback.h"
-#include "PlaybackCallback.h"
 #include "streams/BaseStream.h"
 #include "streams/RecordingStream.h"
 #include "streams/LivePlaybackStream.h"
@@ -46,7 +43,6 @@ private:
     bool mPlayback = true;
 
     RecordingIO mRecordingIO;
-    BaseStream streamProcessor = BaseStream(&mRecordingIO);
     RecordingStream recordingStream = RecordingStream(&mRecordingIO);
     LivePlaybackStream livePlaybackStream = LivePlaybackStream(&mRecordingIO);
     PlaybackStream playbackStream = PlaybackStream(&mRecordingIO);

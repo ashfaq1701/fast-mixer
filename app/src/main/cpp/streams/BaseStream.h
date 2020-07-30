@@ -16,13 +16,14 @@ class BaseStream {
 public:
     BaseStream(RecordingIO* recordingIO);
 
+    RecordingIO* mRecordingIO;
+
     void startStream(oboe::AudioStream *stream);
     void stopStream(oboe::AudioStream *stream);
     void closeStream(oboe::AudioStream *stream);
 
 private:
     const char* TAG = "Stream Processor:: %s";
-    RecordingIO* mRecordingIO;
 };
 
 

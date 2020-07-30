@@ -35,11 +35,23 @@ RecordingStream::setupRecordingStreamParameters(oboe::AudioStreamBuilder *builde
             ->setFormat(StreamConstants::mFormat)
             ->setSharingMode(oboe::SharingMode::Exclusive)
             ->setPerformanceMode(oboe::PerformanceMode::LowLatency)
-            ->setCallback(&recordingCallback)
+            ->setCallback(this)
             ->setDeviceId(StreamConstants::mRecordingDeviceId)
             ->setDirection(oboe::Direction::Input)
             ->setChannelCount(StreamConstants::mInputChannelCount)
             ->setFramesPerCallback(StreamConstants::mRecordingFramesPerCallback);
 
     return builder;
+}
+
+oboe::DataCallbackResult
+RecordingStream::onAudioReady(oboe::AudioStream *audioStream, void *audioData, int32_t numFrames) {
+    return processRecordingFrames(audioStream, static_cast<int16_t *>(audioData), numFrames * audioStream->getChannelCount());
+}
+
+oboe::DataCallbackResult
+RecordingStream::processRecordingFrames(oboe::AudioStream *audioStream, int16_t *audioData,
+                                          int32_t numFrames) {
+    int32_t framesWritten = mRecordingIO->write(audioData, numFrames);
+    return oboe::DataCallbackResult::Continue;
 }
