@@ -30,7 +30,6 @@ public:
 
 private:
     const char* TAG = "Live Playback Stream:: %s";
-    RecordingIO* mRecordingIO;
 };
 
 
