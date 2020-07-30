@@ -1,6 +1,5 @@
 package com.bluehub.fastmixer.common.dependencyinjection.viewmodel
 
-import com.bluehub.fastmixer.common.audio.AudioDeviceChangeListener
 import com.bluehub.fastmixer.common.audio.AudioEngineProxy
 import com.bluehub.fastmixer.common.utils.PermissionManager
 import com.bluehub.fastmixer.screens.mixing.MixingRepository

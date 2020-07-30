@@ -1,18 +1,12 @@
 package com.bluehub.fastmixer.screens.recording
 
 import android.content.Context
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.bluehub.fastmixer.common.audio.AudioDeviceChangeListener
-import com.bluehub.fastmixer.common.audio.AudioEngineProxy
 import com.bluehub.fastmixer.common.permissions.PermissionViewModel
 import com.bluehub.fastmixer.common.utils.PermissionManager
 import com.bluehub.fastmixer.common.utils.ScreenConstants
 import kotlinx.coroutines.*
-import java.io.File
-import java.io.FileOutputStream
-import java.util.*
 import javax.inject.Inject
 
 class RecordingScreenViewModel(override val context: Context?, override val tag: String) : PermissionViewModel(context, tag) {
@@ -51,24 +45,6 @@ class RecordingScreenViewModel(override val context: Context?, override val tag:
                     val cacheDir = repository.createCacheDirectory(context!!.cacheDir.absolutePath)
                     repository.createAudioEngine(cacheDir)
                 }
-            }
-        }
-    }
-
-    fun restartInputStreams() {
-        if (_eventIsRecording.value == true) {
-            uiScope.launch {
-
-            }
-        }
-    }
-
-    fun restartOutputStreams() {
-        uiScope.launch {
-            if (_eventIsRecording.value == true && _eventLivePlaybackSet.value == true) {
-
-            } else if (_eventIsPlaying.value == true) {
-
             }
         }
     }

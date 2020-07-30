@@ -29,8 +29,8 @@ bool RecordingIO::setup_audio_source() {
     }
 
     AudioProperties targetProperties {
-            .channelCount = AudioEngine::mOutputChannelCount,
-            .sampleRate = AudioEngine::mSampleRate
+            .channelCount = StreamProcessor::mOutputChannelCount,
+            .sampleRate = StreamProcessor::mSampleRate
     };
 
     std::shared_ptr<FileDataSource> audioSource {
@@ -77,7 +77,7 @@ void RecordingIO::read_playback(float *targetData, int32_t numFrames, int32_t ch
 void RecordingIO::flush_to_file(int16_t* buffer, int32_t length, const std::string& recordingFilePath, std::unique_ptr<SndfileHandle>& recordingFile) {
     if (recordingFile == nullptr) {
         int format = SF_FORMAT_WAV | SF_FORMAT_PCM_16;
-        SndfileHandle file = SndfileHandle(recordingFilePath, SFM_WRITE, format, AudioEngine::mInputChannelCount, AudioEngine::mSampleRate);
+        SndfileHandle file = SndfileHandle(recordingFilePath, SFM_WRITE, format, StreamProcessor::mInputChannelCount, StreamProcessor::mSampleRate);
         recordingFile = std::make_unique<SndfileHandle>(file);
     }
     LOGD("FLUSHING %d bytes", length);
