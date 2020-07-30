@@ -10,6 +10,7 @@
 #include <Player.h>
 #include "taskqueue/TaskQueue.h"
 #include <oboe/Definitions.h>
+#include "streams/StreamConstants.h"
 
 #ifndef MODULE_NAME
 #define MODULE_NAME  "RecordingIO"

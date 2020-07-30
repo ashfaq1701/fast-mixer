@@ -16,7 +16,10 @@
 #include "RecordingIO.h"
 #include "LivePlaybackCallback.h"
 #include "PlaybackCallback.h"
-#include "StreamProcessor.h"
+#include "streams/BaseStream.h"
+#include "streams/RecordingStream.h"
+#include "streams/LivePlaybackStream.h"
+#include "streams/PlaybackStream.h"
 
 class AudioEngine {
 public:
@@ -43,7 +46,10 @@ private:
     bool mPlayback = true;
 
     RecordingIO mRecordingIO;
-    StreamProcessor streamProcessor = StreamProcessor(&mRecordingIO);
+    BaseStream streamProcessor = BaseStream(&mRecordingIO);
+    RecordingStream recordingStream = RecordingStream(&mRecordingIO);
+    LivePlaybackStream livePlaybackStream = LivePlaybackStream(&mRecordingIO);
+    PlaybackStream playbackStream = PlaybackStream(&mRecordingIO);
 };
 
 

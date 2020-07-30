@@ -23,7 +23,11 @@ add_library( # Sets the name of the library.
         # Provides a relative path to your source file(s).
         RecordingIO.cpp
         AudioEngine.cpp
-        StreamProcessor.cpp
+        streams/StreamConstants.cpp
+        streams/RecordingStream.cpp
+        streams/LivePlaybackStream.cpp
+        streams/PlaybackStream.cpp
+        streams/BaseStream.cpp
 
         audio/FileDataSource.cpp
         audio/Player.cpp
