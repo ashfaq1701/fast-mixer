@@ -9,6 +9,13 @@ int32_t StreamProcessor::mPlaybackSampleRate = mSampleRate;
 int32_t StreamProcessor::mInputChannelCount = oboe::ChannelCount::Stereo;
 int32_t StreamProcessor::mOutputChannelCount = oboe::ChannelCount::Stereo;
 
+StreamProcessor::StreamProcessor(RecordingIO* recordingIO) {
+    mRecordingIO = recordingIO;
+    recordingCallback = RecordingCallback(mRecordingIO);
+    livePlaybackCallback = LivePlaybackCallback(mRecordingIO);
+    playbackCallback = PlaybackCallback(mRecordingIO);
+}
+
 void StreamProcessor::openRecordingStream() {
     LOGD(TAG, "openRecordingStream(): ");
     oboe::AudioStreamBuilder builder;

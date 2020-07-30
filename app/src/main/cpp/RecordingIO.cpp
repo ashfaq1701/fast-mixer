@@ -173,9 +173,15 @@ void RecordingIO::flush_buffer() {
 }
 
 int32_t RecordingIO::read_live_playback(int16_t *targetData, int32_t numSamples) {
-    int32_t framesRead = 0;
-    while (framesRead < numSamples && mLivePlaybackReadIndex < mTotalSamples) {
-        targetData[framesRead++] = mData[mLivePlaybackReadIndex++];
+    if (mLivePlaybackReadIndex > mWriteIndex) {
+        return 0;
     }
+    int32_t framesRead = 0;
+    auto framesToCopy = numSamples;
+    if (mLivePlaybackReadIndex + numSamples > mTotalSamples) {
+        framesToCopy = mTotalSamples - mLivePlaybackReadIndex;
+    }
+    memcpy(targetData, mData + mLivePlaybackReadIndex, framesToCopy * sizeof(int16_t));
+    mLivePlaybackReadIndex += framesToCopy;
     return framesRead;
 }

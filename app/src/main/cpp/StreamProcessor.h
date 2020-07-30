@@ -15,9 +15,7 @@
 
 class StreamProcessor {
 public:
-    StreamProcessor(RecordingIO* recordingIo) {
-        mRecordingIO = recordingIo;
-    }
+    StreamProcessor(RecordingIO* recordingIO);
 
     oboe::AudioStream *mRecordingStream = nullptr;
     oboe::AudioStream *mLivePlaybackStream = nullptr;
