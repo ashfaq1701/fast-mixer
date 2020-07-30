@@ -1,8 +1,10 @@
 package com.bluehub.fastmixer.screens.recording
 
+import android.content.IntentFilter
+import android.media.AudioManager
+import android.os.Build
 import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -45,7 +47,7 @@ class RecordingScreen : PermissionFragment() {
         dataBinding = DataBindingUtil
             .inflate(inflater, R.layout.recording_screen, container, false)
 
-        viewModelFactory = RecordingScreenViewModelFactory(context, audioEngine, TAG)
+        viewModelFactory = RecordingScreenViewModelFactory(context, TAG)
         viewModel = ViewModelProviders.of(this, viewModelFactory)
             .get(RecordingScreenViewModel::class.java)
 

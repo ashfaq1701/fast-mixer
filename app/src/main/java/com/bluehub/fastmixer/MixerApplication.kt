@@ -11,9 +11,6 @@ import javax.inject.Inject
 class MixerApplication: Application() {
     private lateinit var mApplicationComponent: ApplicationComponent
 
-    @Inject
-    lateinit var mAudioEngine: AudioEngineProxy
-
     override fun onCreate() {
         super.onCreate()
         mApplicationComponent = DaggerApplicationComponent.builder()
@@ -27,6 +24,4 @@ class MixerApplication: Application() {
     }
 
     fun getApplicationComponent(): ApplicationComponent = mApplicationComponent
-
-    fun getAudioEngine(): AudioEngineProxy = mAudioEngine
 }

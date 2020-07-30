@@ -12,19 +12,16 @@
 #include <oboe/Definitions.h>
 #include <oboe/AudioStream.h>
 #include "logging_macros.h"
-#include "RecordingCallback.h"
 #include "RecordingIO.h"
-#include "LivePlaybackCallback.h"
-#include "PlaybackCallback.h"
+#include "streams/BaseStream.h"
+#include "streams/RecordingStream.h"
+#include "streams/LivePlaybackStream.h"
+#include "streams/PlaybackStream.h"
 
 class AudioEngine {
 public:
     AudioEngine(char* appDir, char* mRecordingSessionId);
     ~AudioEngine();
-
-    RecordingCallback recordingCallback;
-    LivePlaybackCallback livePlaybackCallback;
-    PlaybackCallback playbackCallback;
 
     void startRecording();
     void stopRecording();
@@ -38,11 +35,6 @@ public:
     void stopPlayback();
     void pausePlayback();
 
-    static int32_t mSampleRate;
-    static int32_t mPlaybackSampleRate;
-    static int32_t mInputChannelCount;
-    static int32_t mOutputChannelCount;
-
 private:
     const char* TAG = "Audio Engine:: %s";
 
@@ -50,37 +42,10 @@ private:
     char* mAppDir = nullptr;
     bool mPlayback = true;
 
-    int32_t mRecordingDeviceId = oboe::Unprocessed;
-    int32_t mPlaybackDeviceId = oboe::kUnspecified;
-    oboe::AudioFormat mFormat = oboe::AudioFormat::I16;
-    oboe::AudioFormat mPlaybackFormat = oboe::AudioFormat::Float;
-    int32_t mFramesPerBurst{};
-
-    oboe::AudioApi mAudioApi = oboe::AudioApi::AAudio;
-    oboe::AudioStream *mRecordingStream = nullptr;
-    oboe::AudioStream *mLivePlaybackStream = nullptr;
-    oboe::AudioStream *mPlaybackStream = nullptr;
-
-    int32_t mRecordingFramesPerCallback = 24;
-    int32_t mLivePlaybackFramesPerCallback = mRecordingFramesPerCallback;
-
     RecordingIO mRecordingIO;
-
-    void openRecordingStream();
-    void openLivePlaybackStream();
-    void openPlaybackStream();
-
-    void startStream(oboe::AudioStream *stream);
-    void stopStream(oboe::AudioStream *stream);
-    void closeStream(oboe::AudioStream *stream);
-
-    oboe::AudioStreamBuilder* setupRecordingStreamParameters(oboe::AudioStreamBuilder* builder);
-    oboe::AudioStreamBuilder* setupLivePlaybackStreamParameters(oboe::AudioStreamBuilder* builder, oboe::AudioApi audioApi,
-            oboe::AudioFormat audioFormat, oboe::AudioStreamCallback *audioStreamCallback, int32_t deviceId,
-            int32_t sampleRate, int channelCount);
-    oboe::AudioStreamBuilder* setupPlaybackStreamParameters(oboe::AudioStreamBuilder* builder, oboe::AudioApi audioApi,
-            oboe::AudioFormat audioFormat, oboe::AudioStreamCallback *audioStreamCallback, int32_t deviceId,
-            int32_t sampleRate, int channelCount);
+    RecordingStream recordingStream = RecordingStream(&mRecordingIO);
+    LivePlaybackStream livePlaybackStream = LivePlaybackStream(&mRecordingIO);
+    PlaybackStream playbackStream = PlaybackStream(&mRecordingIO);
 };
 
 

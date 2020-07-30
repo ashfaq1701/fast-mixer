@@ -1,8 +1,14 @@
 package com.bluehub.fastmixer.common.audio
 
-import android.content.res.AssetManager
-
 class AudioEngineProxy {
+    companion object {
+        private val instance: AudioEngineProxy = AudioEngineProxy()
+
+        public fun getInstance(): AudioEngineProxy {
+            return instance
+        }
+    }
+
     fun create(appPathStr: String, recordingSessionIdStr: String): Boolean =
         AudioEngine.create(appPathStr, recordingSessionIdStr)
 

@@ -10,7 +10,7 @@ import dagger.Provides
 @Module
 class ApplicationModule(var mApplication: Application) {
     @Provides
-    fun getAudioEngine(): AudioEngineProxy = AudioEngineProxy()
+    fun getAudioEngine(): AudioEngineProxy = AudioEngineProxy.getInstance()
 
     @Provides
     fun getAudioManager(): Any? = mApplication.applicationContext.getSystemService(Context.AUDIO_SERVICE)

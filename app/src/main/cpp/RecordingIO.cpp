@@ -29,8 +29,8 @@ bool RecordingIO::setup_audio_source() {
     }
 
     AudioProperties targetProperties {
-            .channelCount = AudioEngine::mOutputChannelCount,
-            .sampleRate = AudioEngine::mSampleRate
+            .channelCount = StreamConstants::mOutputChannelCount,
+            .sampleRate = StreamConstants::mSampleRate
     };
 
     std::shared_ptr<FileDataSource> audioSource {
@@ -77,7 +77,7 @@ void RecordingIO::read_playback(float *targetData, int32_t numFrames, int32_t ch
 void RecordingIO::flush_to_file(int16_t* buffer, int32_t length, const std::string& recordingFilePath, std::unique_ptr<SndfileHandle>& recordingFile) {
     if (recordingFile == nullptr) {
         int format = SF_FORMAT_WAV | SF_FORMAT_PCM_16;
-        SndfileHandle file = SndfileHandle(recordingFilePath, SFM_WRITE, format, AudioEngine::mInputChannelCount, AudioEngine::mSampleRate);
+        SndfileHandle file = SndfileHandle(recordingFilePath, SFM_WRITE, format, StreamConstants::mInputChannelCount, StreamConstants::mSampleRate);
         recordingFile = std::make_unique<SndfileHandle>(file);
     }
     LOGD("FLUSHING %d bytes", length);
@@ -173,9 +173,15 @@ void RecordingIO::flush_buffer() {
 }
 
 int32_t RecordingIO::read_live_playback(int16_t *targetData, int32_t numSamples) {
-    int32_t framesRead = 0;
-    while (framesRead < numSamples && mLivePlaybackReadIndex < mTotalSamples) {
-        targetData[framesRead++] = mData[mLivePlaybackReadIndex++];
+    if (mLivePlaybackReadIndex > mWriteIndex) {
+        return 0;
     }
+    int32_t framesRead = 0;
+    auto framesToCopy = numSamples;
+    if (mLivePlaybackReadIndex + numSamples > mTotalSamples) {
+        framesToCopy = mTotalSamples - mLivePlaybackReadIndex;
+    }
+    memcpy(targetData, mData + mLivePlaybackReadIndex, framesToCopy * sizeof(int16_t));
+    mLivePlaybackReadIndex += framesToCopy;
     return framesRead;
 }
