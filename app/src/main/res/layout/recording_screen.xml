@@ -23,6 +23,15 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
 
+        <CheckBox
+            android:id="@+id/live_playback_enabled"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="@={viewModel.livePlaybackEnabled}"
+            android:text="@string/live_playback_enabled"
+            app:layout_constraintTop_toBottomOf="@id/recording_visualizer"
+            app:layout_constraintStart_toStartOf="parent" />
+
         <Button
             android:id="@+id/toggle_record"
             android:layout_width="@dimen/record_button_width"
@@ -31,7 +40,7 @@
             android:onClick="@{() -> viewModel.toggleRecording()}"
             android:text="@string/start_recording_label"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/recording_visualizer" />
+            app:layout_constraintTop_toBottomOf="@id/live_playback_enabled" />
 
         <Button
             android:id="@+id/toggle_play"
@@ -42,7 +51,7 @@
             android:text="@string/play_label"
             app:layout_constraintStart_toEndOf="@id/toggle_record"
             app:layout_constraintEnd_toStartOf="@+id/reset"
-            app:layout_constraintTop_toBottomOf="@id/recording_visualizer" />
+            app:layout_constraintTop_toBottomOf="@id/live_playback_enabled" />
 
         <Button
             android:id="@+id/reset"
@@ -52,7 +61,7 @@
             android:onClick="@{() -> viewModel.reset()}"
             android:text="@string/reset"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/recording_visualizer" />
+            app:layout_constraintTop_toBottomOf="@id/live_playback_enabled" />
 
         <Button
             android:id="@+id/go_back"
