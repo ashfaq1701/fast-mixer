@@ -68,3 +68,14 @@ LivePlaybackStream::processLivePlaybackFrame(oboe::AudioStream *audioStream, int
     int64_t framesWritten = mRecordingIO->read_live_playback(audioData, numFrames);
     return oboe::DataCallbackResult::Continue;
 }
+
+void LivePlaybackStream::onErrorAfterClose(oboe::AudioStream *audioStream, oboe::Result result) {
+    mLivePlaybackStream = nullptr;
+    switch(result) {
+        case oboe::Result::ErrorDisconnected:
+            openLivePlaybackStream();
+            startStream(mLivePlaybackStream);
+            break;
+        default: ;
+    }
+}

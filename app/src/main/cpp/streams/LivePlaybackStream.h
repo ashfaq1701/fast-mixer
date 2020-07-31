@@ -30,6 +30,8 @@ public:
 
 private:
     const char* TAG = "Live Playback Stream:: %s";
+
+    void onErrorAfterClose(oboe::AudioStream* audioStream, oboe::Result result);
 };
 
 

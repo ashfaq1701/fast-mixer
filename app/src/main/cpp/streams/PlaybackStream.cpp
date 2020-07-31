@@ -68,3 +68,14 @@ PlaybackStream::processPlaybackFrame(oboe::AudioStream *audioStream, float *audi
     mRecordingIO->read_playback(audioData, numFrames, channelCount);
     return oboe::DataCallbackResult::Continue;
 }
+
+void PlaybackStream::onErrorAfterClose(oboe::AudioStream *audioStream, oboe::Result result) {
+    mPlaybackStream = nullptr;
+    switch(result) {
+        case oboe::Result::ErrorDisconnected:
+            openPlaybackStream();
+            startStream(mPlaybackStream);
+            break;
+        default: ;
+    }
+}
