@@ -14,6 +14,7 @@ public:
     oboe::AudioStream *mRecordingStream = nullptr;
 
     void openRecordingStream();
+
     oboe::AudioStreamBuilder* setupRecordingStreamParameters(oboe::AudioStreamBuilder *builder);
 
     oboe::DataCallbackResult
@@ -24,6 +25,8 @@ public:
 
 private:
     const char* TAG = "Recording Stream:: %s";
+
+    void onErrorAfterClose(oboe::AudioStream *audioStream, oboe::Result result);
 };
 
 

@@ -1,12 +1,15 @@
 package com.bluehub.fastmixer.screens.recording
 
 import android.content.Context
+import androidx.databinding.Bindable
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.bluehub.fastmixer.BR
 import com.bluehub.fastmixer.common.permissions.PermissionViewModel
 import com.bluehub.fastmixer.common.utils.PermissionManager
 import com.bluehub.fastmixer.common.utils.ScreenConstants
 import kotlinx.coroutines.*
+import timber.log.Timber
 import javax.inject.Inject
 
 class RecordingScreenViewModel(override val context: Context?, override val tag: String) : PermissionViewModel(context, tag) {
@@ -49,6 +52,37 @@ class RecordingScreenViewModel(override val context: Context?, override val tag:
         }
     }
 
+    @Bindable
+    fun getLivePlaybackEnabled(): Boolean {
+        return _eventLivePlaybackSet.value!!
+    }
+
+    fun setLivePlaybackEnabled(value: Boolean) {
+        if (_eventLivePlaybackSet.value != value) {
+            if (!value || _eventIsRecording.value == true) {
+                _eventLivePlaybackSet.value = value
+            }
+            notifyPropertyChanged(BR.livePlaybackEnabled)
+        }
+    }
+
+    val handleInputStreamDisconnection: () -> Unit = {
+        if (_eventIsRecording.value == true) {
+            uiScope.launch {
+                repository.flushWriteBuffer()
+                _eventIsRecording.value = false
+            }
+        }
+    }
+
+    val restartOutputStreamDisconnection: () -> Unit = {
+        if (_eventIsPlaying.value == true) {
+            uiScope.launch {
+                repository.restartPlayback()
+            }
+        }
+    }
+
     fun toggleRecording() {
         if (!checkRecordingPermission()) {
             setRequestRecordPermission(ScreenConstants.TOGGLE_RECORDING)
@@ -76,6 +110,10 @@ class RecordingScreenViewModel(override val context: Context?, override val tag:
                 repository.pauseRecording()
             }
         }
+    }
+
+    fun toggleLivePlayback() {
+        Timber.d("Toggling Live Playback")
     }
 
     fun togglePlay() {

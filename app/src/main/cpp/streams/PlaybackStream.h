@@ -27,6 +27,8 @@ public:
     processPlaybackFrame(oboe::AudioStream *audioStream, float *audioData, int32_t numFrames, int32_t channelCount);
 private:
     const char* TAG = "Playback Stream:: %s";
+
+    void onErrorAfterClose(oboe::AudioStream* audioStream, oboe::Result result);
 };
 
 

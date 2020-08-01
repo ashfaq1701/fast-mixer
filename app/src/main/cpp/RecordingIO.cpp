@@ -28,12 +28,12 @@ bool RecordingIO::setup_audio_source() {
         return false;
     }
 
-    AudioProperties targetProperties {
+    AudioProperties targetProperties{
             .channelCount = StreamConstants::mOutputChannelCount,
             .sampleRate = StreamConstants::mSampleRate
     };
 
-    std::shared_ptr<FileDataSource> audioSource {
+    std::shared_ptr<FileDataSource> audioSource{
             FileDataSource::newFromCompressedFile(mRecordingFilePath.c_str(), targetProperties)
     };
 
@@ -41,8 +41,15 @@ bool RecordingIO::setup_audio_source() {
         return false;
     }
 
+    int32_t playHead = 0;
+    if (mRecordedTrack != nullptr) {
+        playHead = mRecordedTrack->getPlayHead();
+    }
+
     mRecordedTrack = std::make_unique<Player>(audioSource);
+    mRecordedTrack->setPlayHead(playHead);
     mRecordedTrack->setPlaying(true);
+
     return true;
 }
 
@@ -184,4 +191,8 @@ int32_t RecordingIO::read_live_playback(int16_t *targetData, int32_t numSamples)
     memcpy(targetData, mData + mLivePlaybackReadIndex, framesToCopy * sizeof(int16_t));
     mLivePlaybackReadIndex += framesToCopy;
     return framesRead;
+}
+
+void RecordingIO::sync_live_playback() {
+    mLivePlaybackReadIndex = mWriteIndex;
 }

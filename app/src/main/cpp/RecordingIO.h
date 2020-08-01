@@ -42,6 +42,8 @@ public:
     void pause_audio_source();
     void stop_audio_source();
 
+    void sync_live_playback();
+
 private:
     const char* TAG = "RecordingIO:: %s";
 
@@ -49,7 +51,7 @@ private:
 
     std::string mRecordingFilePath;
 
-    std::unique_ptr<Player> mRecordedTrack;
+    std::unique_ptr<Player> mRecordedTrack {nullptr};
 
     std::unique_ptr<SndfileHandle> mRecordingFile {nullptr};
 

@@ -45,7 +45,9 @@ public:
 
     void renderAudio(float *targetData, int32_t numFrames);
     void resetPlayHead() { mReadFrameIndex = 0; };
-    void setPlaying(bool isPlaying) { mIsPlaying = isPlaying; resetPlayHead(); };
+    int32_t getPlayHead() { return mReadFrameIndex; }
+    void setPlayHead(int32_t playHead);
+    void setPlaying(bool isPlaying) { mIsPlaying = isPlaying; };
     void setLooping(bool isLooping) { mIsLooping = isLooping; };
 
 private:

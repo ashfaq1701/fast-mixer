@@ -35,7 +35,6 @@ void PlaybackStream::openPlaybackStream() {
         LOGE(TAG, "openPlaybackStream(): Failed to create playback stream. Error: %s",
              oboe::convertToText(result));
     }
-
 }
 
 oboe::AudioStreamBuilder *
@@ -67,4 +66,8 @@ PlaybackStream::processPlaybackFrame(oboe::AudioStream *audioStream, float *audi
                                        int32_t numFrames, int32_t channelCount) {
     mRecordingIO->read_playback(audioData, numFrames, channelCount);
     return oboe::DataCallbackResult::Continue;
+}
+
+void PlaybackStream::onErrorAfterClose(oboe::AudioStream *audioStream, oboe::Result result) {
+    mPlaybackStream = nullptr;
 }

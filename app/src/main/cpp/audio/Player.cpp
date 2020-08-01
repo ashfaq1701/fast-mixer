@@ -56,3 +56,11 @@ void Player::renderSilence(float *start, int32_t numSamples){
         start[i] = 0;
     }
 }
+
+void Player::setPlayHead(int32_t playHead) {
+    const AudioProperties properties = mSource->getProperties();
+    int64_t totalSourceFrames = mSource->getSize() / properties.channelCount;
+    if (playHead < totalSourceFrames) {
+        mReadFrameIndex = playHead;
+    }
+}
