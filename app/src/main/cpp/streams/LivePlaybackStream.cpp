@@ -71,11 +71,4 @@ LivePlaybackStream::processLivePlaybackFrame(oboe::AudioStream *audioStream, int
 
 void LivePlaybackStream::onErrorAfterClose(oboe::AudioStream *audioStream, oboe::Result result) {
     mLivePlaybackStream = nullptr;
-    switch(result) {
-        case oboe::Result::ErrorDisconnected:
-            openLivePlaybackStream();
-            startStream(mLivePlaybackStream);
-            break;
-        default: ;
-    }
 }

@@ -60,10 +60,21 @@ class RecordingScreenViewModel(override val context: Context?, override val tag:
     fun setLivePlaybackEnabled(value: Boolean) {
         if (_eventLivePlaybackSet.value != value) {
             if (!value || _eventIsRecording.value == true) {
-                Timber.d("SETTING $value")
                 _eventLivePlaybackSet.value = value
             }
             notifyPropertyChanged(BR.livePlaybackEnabled)
+        }
+    }
+
+    val restartInputStreams: () -> Unit = {
+        Timber.d("Restarting input streams")
+        if (_eventIsRecording.value == true) {
+        }
+    }
+
+    val restartOutputStreams: () -> Unit = {
+        Timber.d("Restarting output streams")
+        uiScope.launch {
         }
     }
 

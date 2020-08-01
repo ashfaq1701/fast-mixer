@@ -1,23 +1,26 @@
 package com.bluehub.fastmixer.screens.recording
 
+import android.content.Intent
 import android.content.IntentFilter
 import android.media.AudioManager
-import android.os.Build
-import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import com.bluehub.fastmixer.R
+import com.bluehub.fastmixer.broadcastReceivers.AudioDeviceChangeListener
 import com.bluehub.fastmixer.common.permissions.PermissionFragment
 import com.bluehub.fastmixer.common.permissions.PermissionViewModel
 import com.bluehub.fastmixer.common.utils.DialogManager
 import com.bluehub.fastmixer.common.utils.ScreenConstants
 import com.bluehub.fastmixer.databinding.RecordingScreenBinding
+import timber.log.Timber
 import javax.inject.Inject
+
 
 class RecordingScreen : PermissionFragment() {
 
@@ -31,6 +34,9 @@ class RecordingScreen : PermissionFragment() {
 
     @Inject
     override lateinit var dialogManager: DialogManager
+
+    @Inject
+    lateinit var audioDeviceChangeListener: AudioDeviceChangeListener
 
     override lateinit var viewModel: PermissionViewModel
     private lateinit var viewModelFactory: RecordingScreenViewModelFactory
@@ -59,6 +65,27 @@ class RecordingScreen : PermissionFragment() {
         initUI()
 
         return dataBinding.root
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        val localViewModel = viewModel as RecordingScreenViewModel
+
+        audioDeviceChangeListener.setRestartInputCallback(localViewModel.restartInputStreams)
+
+        audioDeviceChangeListener.setRestartOutputCallback(localViewModel.restartOutputStreams)
+
+        val filter = IntentFilter().apply {
+            addAction(AudioManager.ACTION_HEADSET_PLUG)
+            addAction(AudioManager.ACTION_SCO_AUDIO_STATE_UPDATED)
+        }
+        context?.registerReceiver(audioDeviceChangeListener, filter)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        context?.unregisterReceiver(audioDeviceChangeListener)
     }
 
     fun initUI() {

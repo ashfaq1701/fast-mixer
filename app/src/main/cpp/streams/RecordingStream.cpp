@@ -58,11 +58,4 @@ RecordingStream::processRecordingFrames(oboe::AudioStream *audioStream, int16_t 
 
 void RecordingStream::onErrorAfterClose(oboe::AudioStream *audioStream, oboe::Result result) {
     mRecordingStream = nullptr;
-    switch(result) {
-        case oboe::Result::ErrorDisconnected:
-            openRecordingStream();
-            startStream(mRecordingStream);
-            break;
-        default: ;
-    }
 }
