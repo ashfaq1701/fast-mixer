@@ -1,11 +1,13 @@
 package com.bluehub.fastmixer.screens.recording
 
 import android.content.Context
+import android.media.AudioManager
 import androidx.databinding.Bindable
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.bluehub.fastmixer.BR
 import com.bluehub.fastmixer.common.permissions.PermissionViewModel
+import com.bluehub.fastmixer.common.repositories.AudioRepository
 import com.bluehub.fastmixer.common.utils.PermissionManager
 import com.bluehub.fastmixer.common.utils.ScreenConstants
 import kotlinx.coroutines.*
@@ -22,7 +24,10 @@ class RecordingScreenViewModel(override val context: Context?, override val tag:
     override lateinit var permissionManager: PermissionManager
 
     @Inject
-    lateinit var repository: RecordingRepository;
+    lateinit var repository: RecordingRepository
+
+    @Inject
+    lateinit var audioRepository: AudioRepository
 
     private val _eventIsRecording = MutableLiveData<Boolean>(false)
     val eventIsRecording: LiveData<Boolean>
@@ -40,6 +45,8 @@ class RecordingScreenViewModel(override val context: Context?, override val tag:
     val eventGoBack: LiveData<Boolean>
         get() = _eventGoBack
 
+    private val _livePlaybackPermitted = MutableLiveData<Boolean>(false)
+
     init {
         getViewModelComponent().inject(this)
         uiScope.launch {
@@ -47,6 +54,8 @@ class RecordingScreenViewModel(override val context: Context?, override val tag:
                 context?.let {
                     val cacheDir = repository.createCacheDirectory(context!!.cacheDir.absolutePath)
                     repository.createAudioEngine(cacheDir)
+                    audioRepository.audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+                    _livePlaybackPermitted.value = audioRepository.isHeadphoneConnected()
                 }
             }
         }
@@ -59,11 +68,15 @@ class RecordingScreenViewModel(override val context: Context?, override val tag:
 
     fun setLivePlaybackEnabled(value: Boolean) {
         if (_eventLivePlaybackSet.value != value) {
-            if (!value || _eventIsRecording.value == true) {
+            if (!value || (_eventIsRecording.value == true && _livePlaybackPermitted.value == true)) {
                 _eventLivePlaybackSet.value = value
             }
             notifyPropertyChanged(BR.livePlaybackEnabled)
         }
+    }
+
+    val headphoneConnectedCallback: () -> Unit = {
+        _livePlaybackPermitted.value = audioRepository.isHeadphoneConnected()
     }
 
     val handleInputStreamDisconnection: () -> Unit = {
@@ -75,7 +88,7 @@ class RecordingScreenViewModel(override val context: Context?, override val tag:
         }
     }
 
-    val restartOutputStreamDisconnection: () -> Unit = {
+    val handleOutputStreamDisconnection: () -> Unit = {
         if (_eventIsPlaying.value == true) {
             uiScope.launch {
                 repository.restartPlayback()
