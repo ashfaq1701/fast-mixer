@@ -63,6 +63,18 @@ class RecordingRepository(val audioEngineProxy: AudioEngineProxy) {
         }
     }
 
+    suspend fun flushWriteBuffer() {
+        withContext(Dispatchers.IO) {
+            audioEngineProxy.flushWriteBuffer()
+        }
+    }
+
+    suspend fun restartPlayback() {
+        withContext(Dispatchers.IO) {
+            audioEngineProxy.restartPlayback()
+        }
+    }
+
     fun deleteAudioEngine() {
         audioEngineProxy.delete()
     }

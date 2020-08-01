@@ -31,4 +31,8 @@ class AudioEngineProxy {
     fun stopPlayback() = AudioEngine.stopPlayback()
 
     fun pausePlayback() = AudioEngine.pausePlayback()
+
+    fun flushWriteBuffer() = AudioEngine.flushWriteBuffer()
+
+    fun restartPlayback() = AudioEngine.restartPlayback()
 }

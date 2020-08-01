@@ -14,6 +14,7 @@ public:
     oboe::AudioStream *mRecordingStream = nullptr;
 
     void openRecordingStream();
+
     oboe::AudioStreamBuilder* setupRecordingStreamParameters(oboe::AudioStreamBuilder *builder);
 
     oboe::DataCallbackResult

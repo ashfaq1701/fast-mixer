@@ -28,5 +28,9 @@ class AudioEngine {
         @JvmStatic external fun stopPlayback()
 
         @JvmStatic external fun pausePlayback()
+
+        @JvmStatic external fun flushWriteBuffer()
+
+        @JvmStatic external fun restartPlayback()
     }
 }

@@ -1,6 +1,5 @@
 package com.bluehub.fastmixer.screens.recording
 
-import android.content.Intent
 import android.content.IntentFilter
 import android.media.AudioManager
 import android.os.Bundle
@@ -18,7 +17,6 @@ import com.bluehub.fastmixer.common.permissions.PermissionViewModel
 import com.bluehub.fastmixer.common.utils.DialogManager
 import com.bluehub.fastmixer.common.utils.ScreenConstants
 import com.bluehub.fastmixer.databinding.RecordingScreenBinding
-import timber.log.Timber
 import javax.inject.Inject
 
 
@@ -72,9 +70,9 @@ class RecordingScreen : PermissionFragment() {
 
         val localViewModel = viewModel as RecordingScreenViewModel
 
-        audioDeviceChangeListener.setRestartInputCallback(localViewModel.restartInputStreams)
+        audioDeviceChangeListener.setHandleInputCallback(localViewModel.handleInputStreamDisconnection)
 
-        audioDeviceChangeListener.setRestartOutputCallback(localViewModel.restartOutputStreams)
+        audioDeviceChangeListener.setHandleOutputCallback(localViewModel.restartOutputStreamDisconnection)
 
         val filter = IntentFilter().apply {
             addAction(AudioManager.ACTION_HEADSET_PLUG)

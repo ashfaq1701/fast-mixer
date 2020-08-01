@@ -32,8 +32,11 @@ public:
     void pauseLivePlayback();
 
     void startPlayback();
-    void stopPlayback();
+    void stopAndResetPlayback();
     void pausePlayback();
+
+    void flushWriteBuffer();
+    void restartPlayback();
 
 private:
     const char* TAG = "Audio Engine:: %s";
@@ -46,6 +49,10 @@ private:
     RecordingStream recordingStream = RecordingStream(&mRecordingIO);
     LivePlaybackStream livePlaybackStream = LivePlaybackStream(&mRecordingIO);
     PlaybackStream playbackStream = PlaybackStream(&mRecordingIO);
+
+    void closePlaybackStream();
+
+    void stopPlayback();
 };
 
 

@@ -35,7 +35,6 @@ void PlaybackStream::openPlaybackStream() {
         LOGE(TAG, "openPlaybackStream(): Failed to create playback stream. Error: %s",
              oboe::convertToText(result));
     }
-
 }
 
 oboe::AudioStreamBuilder *

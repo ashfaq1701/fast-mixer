@@ -32,7 +32,7 @@ class RecordingScreenViewModel(override val context: Context?, override val tag:
     val eventIsPlaying: LiveData<Boolean>
         get() = _eventIsPlaying
 
-    private val _eventLivePlaybackSet = MutableLiveData<Boolean>(false)
+    private val _eventLivePlaybackSet = MutableLiveData<Boolean>(true)
     val eventLivePlayback: LiveData<Boolean>
         get() = _eventLivePlaybackSet
 
@@ -66,15 +66,20 @@ class RecordingScreenViewModel(override val context: Context?, override val tag:
         }
     }
 
-    val restartInputStreams: () -> Unit = {
-        Timber.d("Restarting input streams")
+    val handleInputStreamDisconnection: () -> Unit = {
         if (_eventIsRecording.value == true) {
+            uiScope.launch {
+                repository.flushWriteBuffer()
+                _eventIsRecording.value = false
+            }
         }
     }
 
-    val restartOutputStreams: () -> Unit = {
-        Timber.d("Restarting output streams")
-        uiScope.launch {
+    val restartOutputStreamDisconnection: () -> Unit = {
+        if (_eventIsPlaying.value == true) {
+            uiScope.launch {
+                repository.restartPlayback()
+            }
         }
     }
 

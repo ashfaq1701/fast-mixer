@@ -7,26 +7,26 @@ import android.media.AudioManager
 
 
 class AudioDeviceChangeListener : BroadcastReceiver() {
-    private lateinit var mRestartInputCallback: () -> Unit
-    private lateinit var mRestartOutputCallback: () -> Unit
+    private lateinit var mHandleInputCallback: () -> Unit
+    private lateinit var mHandleOutputCallback: () -> Unit
 
-    public fun setRestartInputCallback(restartInputCallback: () -> Unit) {
-        mRestartInputCallback = restartInputCallback
+    public fun setHandleInputCallback(restartInputCallback: () -> Unit) {
+        mHandleInputCallback = restartInputCallback
     }
 
-    public fun setRestartOutputCallback(restartOutputCallback: () -> Unit) {
-        mRestartOutputCallback = restartOutputCallback
+    public fun setHandleOutputCallback(restartOutputCallback: () -> Unit) {
+        mHandleOutputCallback = restartOutputCallback
     }
 
     override fun onReceive(context: Context?, intent: Intent?) {
         when(intent?.action) {
             AudioManager.ACTION_HEADSET_PLUG -> {
-                mRestartOutputCallback()
-                mRestartInputCallback()
+                mHandleOutputCallback()
+                mHandleInputCallback()
             }
             AudioManager.ACTION_SCO_AUDIO_STATE_UPDATED -> {
-                mRestartOutputCallback()
-                mRestartInputCallback()
+                mHandleOutputCallback()
+                mHandleInputCallback()
             }
         }
     }
