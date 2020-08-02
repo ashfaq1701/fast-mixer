@@ -37,7 +37,7 @@ class RecordingScreenViewModel(override val context: Context?, override val tag:
     val eventIsPlaying: LiveData<Boolean>
         get() = _eventIsPlaying
 
-    private val _eventLivePlaybackSet = MutableLiveData<Boolean>(true)
+    private val _eventLivePlaybackSet = MutableLiveData<Boolean>(false)
     val eventLivePlayback: LiveData<Boolean>
         get() = _eventLivePlaybackSet
 
@@ -54,9 +54,11 @@ class RecordingScreenViewModel(override val context: Context?, override val tag:
                 context?.let {
                     val cacheDir = repository.createCacheDirectory(context!!.cacheDir.absolutePath)
                     repository.createAudioEngine(cacheDir)
-                    audioRepository.audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
-                    _livePlaybackPermitted.value = audioRepository.isHeadphoneConnected()
                 }
+            }
+            context?.let {
+                audioRepository.audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+                _livePlaybackPermitted.value = audioRepository.isHeadphoneConnected()
             }
         }
     }
@@ -70,6 +72,7 @@ class RecordingScreenViewModel(override val context: Context?, override val tag:
         if (_eventLivePlaybackSet.value != value) {
             if (!value || (_eventIsRecording.value == true && _livePlaybackPermitted.value == true)) {
                 _eventLivePlaybackSet.value = value
+                toggleLivePlayback()
             }
             notifyPropertyChanged(BR.livePlaybackEnabled)
         }
@@ -126,7 +129,15 @@ class RecordingScreenViewModel(override val context: Context?, override val tag:
     }
 
     fun toggleLivePlayback() {
-        Timber.d("Toggling Live Playback")
+        if (_eventLivePlaybackSet.value == true) {
+            uiScope.launch {
+                repository.startLivePlayback()
+            }
+        } else {
+            uiScope.launch {
+                repository.stopLivePlayback()
+            }
+        }
     }
 
     fun togglePlay() {

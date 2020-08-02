@@ -29,7 +29,7 @@ class RecordingRepository(val audioEngineProxy: AudioEngineProxy) {
 
     suspend fun stopLivePlayback() {
         withContext(Dispatchers.IO) {
-            audioEngineProxy.stopRecording()
+            audioEngineProxy.stopLivePlayback()
         }
     }
 

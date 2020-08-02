@@ -44,6 +44,8 @@ public:
 
     void sync_live_playback();
 
+    void setLivePlaybackEnabled(bool livePlaybackEnabled);
+
 private:
     const char* TAG = "RecordingIO:: %s";
 
@@ -61,7 +63,7 @@ private:
     int32_t mLivePlaybackReadIndex = 0;
     const int16_t gain_factor = 2;
 
-    bool livePlaybackEnabled = true;
+    bool mLivePlaybackEnabled = true;
     bool readyToFlush = false;
     bool toFlush = false;
 
