@@ -6,6 +6,7 @@ import androidx.databinding.Bindable
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.bluehub.fastmixer.BR
+import com.bluehub.fastmixer.R
 import com.bluehub.fastmixer.common.permissions.PermissionViewModel
 import com.bluehub.fastmixer.common.repositories.AudioRepository
 import com.bluehub.fastmixer.common.utils.PermissionManager
@@ -96,6 +97,14 @@ class RecordingScreenViewModel(override val context: Context?, override val tag:
             uiScope.launch {
                 repository.restartPlayback()
             }
+        }
+    }
+
+    fun getRecordingLabel(): String {
+        return if (_eventIsRecording.value == true) {
+            context!!.getString(R.string.start_recording_label)
+        } else {
+            context!!.getString(R.string.stop_recording_label)
         }
     }
 
