@@ -71,8 +71,8 @@ class RecordingScreen : PermissionFragment() {
         val localViewModel = viewModel as RecordingScreenViewModel
 
         audioDeviceChangeListener.setHandleInputCallback(localViewModel.handleInputStreamDisconnection)
-
-        audioDeviceChangeListener.setHandleOutputCallback(localViewModel.restartOutputStreamDisconnection)
+        audioDeviceChangeListener.setHandleOutputCallback(localViewModel.handleOutputStreamDisconnection)
+        audioDeviceChangeListener.setHeadphoneConnectedCallback(localViewModel.headphoneConnectedCallback)
 
         val filter = IntentFilter().apply {
             addAction(AudioManager.ACTION_HEADSET_PLUG)

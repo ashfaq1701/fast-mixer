@@ -129,10 +129,10 @@ int32_t RecordingIO::write(const int16_t *sourceData, int32_t numSamples) {
         } else {
             upperBound = kMaxSamples;
         }
-        if (livePlaybackEnabled && mLivePlaybackReadIndex >= upperBound) {
+        if (mLivePlaybackEnabled && mLivePlaybackReadIndex >= upperBound) {
             flushIndex = upperBound;
             toFlush = true;
-        } else if (!livePlaybackEnabled) {
+        } else if (!mLivePlaybackEnabled) {
             flushIndex = mWriteIndex;
             toFlush = true;
         }
@@ -195,4 +195,8 @@ int32_t RecordingIO::read_live_playback(int16_t *targetData, int32_t numSamples)
 
 void RecordingIO::sync_live_playback() {
     mLivePlaybackReadIndex = mWriteIndex;
+}
+
+void RecordingIO::setLivePlaybackEnabled(bool livePlaybackEnabled) {
+    mLivePlaybackEnabled = livePlaybackEnabled;
 }
