@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.media.AudioManager
+import timber.log.Timber
 
 
 class AudioDeviceChangeListener : BroadcastReceiver() {
@@ -26,11 +27,15 @@ class AudioDeviceChangeListener : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {
         when(intent?.action) {
             AudioManager.ACTION_HEADSET_PLUG -> {
+                Timber.d("Has State: ${intent.hasExtra("state")}")
+
                 mHeadphoneConnectedCallback()
                 mHandleOutputCallback()
                 mHandleInputCallback()
             }
             AudioManager.ACTION_SCO_AUDIO_STATE_UPDATED -> {
+                Timber.d("Has SCO State: ${intent.hasExtra(AudioManager.EXTRA_SCO_AUDIO_STATE)}")
+
                 mHeadphoneConnectedCallback()
                 mHandleOutputCallback()
                 mHandleInputCallback()

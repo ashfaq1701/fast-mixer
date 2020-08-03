@@ -23,7 +23,7 @@ AudioEngine::~AudioEngine() {
 void AudioEngine::startLivePlayback() {
     LOGD(TAG, "startLivePlayback(): ");
     livePlaybackStream.openLivePlaybackStream();
-    if (livePlaybackStream.mLivePlaybackStream) {
+    if (livePlaybackStream.mLivePlaybackStream != nullptr) {
         mRecordingIO.sync_live_playback();
         livePlaybackStream.startStream(livePlaybackStream.mLivePlaybackStream);
     } else {
@@ -35,7 +35,7 @@ void AudioEngine::startLivePlayback() {
 void AudioEngine::stopLivePlayback() {
     LOGD(TAG, "stopLivePlayback(): %d");
 
-    if (!livePlaybackStream.mLivePlaybackStream) {
+    if (livePlaybackStream.mLivePlaybackStream == nullptr) {
         return;
     }
 
