@@ -67,7 +67,7 @@ void AudioEngine::startPlayback() {
 }
 
 void AudioEngine::stopAndResetPlayback() {
-    LOGD(TAG, "stopAndResetPlayback(): %d");
+    LOGD(TAG, "stopAndResetPlayback()");
     if (playbackStream.mPlaybackStream == nullptr) {
         mRecordingIO.stop_audio_source();
         return;

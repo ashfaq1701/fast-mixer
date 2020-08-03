@@ -39,7 +39,6 @@ FileDataSource* FileDataSource::newFromCompressedFile(
     }
 
     off_t assetSize = getFileSize(filenameStr.c_str());
-    LOGD("Opened %s, size %ld", filenameStr.c_str(), assetSize);
 
     // Allocate memory to store the decompressed audio. We don't know the exact
     // size of the decoded data until after decoding so we make an assumption about the
@@ -79,9 +78,6 @@ FileDataSource* FileDataSource::newFromCompressedFile(
     if (!strEndedWith(filenameStr, ".wav")) {
         maximumDataSizeInBytes = kMaxCompressionRatio * maximumDataSizeInBytes;
     }
-
-    LOGD("Asset Size: %ld", assetSize);
-    LOGD("Maximum Data Size: %ld", maximumDataSizeInBytes);
 
     auto decodedData = new uint8_t[maximumDataSizeInBytes];
 
