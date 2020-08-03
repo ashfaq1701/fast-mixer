@@ -14,6 +14,7 @@ import com.bluehub.fastmixer.R
 import com.bluehub.fastmixer.broadcastReceivers.AudioDeviceChangeListener
 import com.bluehub.fastmixer.common.permissions.PermissionFragment
 import com.bluehub.fastmixer.common.permissions.PermissionViewModel
+import com.bluehub.fastmixer.common.repositories.AudioRepository
 import com.bluehub.fastmixer.common.utils.DialogManager
 import com.bluehub.fastmixer.common.utils.ScreenConstants
 import com.bluehub.fastmixer.databinding.RecordingScreenBinding
@@ -34,6 +35,9 @@ class RecordingScreen : PermissionFragment() {
     override lateinit var dialogManager: DialogManager
 
     @Inject
+    lateinit var audioRepository: AudioRepository
+
+    @Inject
     lateinit var audioDeviceChangeListener: AudioDeviceChangeListener
 
     override lateinit var viewModel: PermissionViewModel
@@ -51,7 +55,7 @@ class RecordingScreen : PermissionFragment() {
         dataBinding = DataBindingUtil
             .inflate(inflater, R.layout.recording_screen, container, false)
 
-        viewModelFactory = RecordingScreenViewModelFactory(context, TAG)
+        viewModelFactory = RecordingScreenViewModelFactory(context, audioRepository, TAG)
         viewModel = ViewModelProviders.of(this, viewModelFactory)
             .get(RecordingScreenViewModel::class.java)
 

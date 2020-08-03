@@ -28,14 +28,14 @@ class AudioRepository {
         return false
     }
 
-    fun isBluetoothHeadsetsConnected(): Boolean {
+    fun isBluetoothHeadsetConnected(): Boolean {
         audioManager?.let { manager ->
             val devices = manager.getDevices(AudioManager.GET_DEVICES_OUTPUTS)
             val deviceTypes = arrayOf(AudioDeviceInfo.TYPE_BLUETOOTH_A2DP,
                 AudioDeviceInfo.TYPE_BLUETOOTH_SCO)
             devices.forEach {
                 when(it.type) {
-                    in deviceTypes -> return@isBluetoothHeadsetsConnected true
+                    in deviceTypes -> return@isBluetoothHeadsetConnected true
                 }
             }
         }

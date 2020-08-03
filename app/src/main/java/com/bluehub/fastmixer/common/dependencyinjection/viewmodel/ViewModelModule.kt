@@ -21,7 +21,4 @@ class ViewModelModule {
 
     @Provides
     fun getMixingRepository(audioEngineProxy: AudioEngineProxy): MixingRepository = MixingRepository(audioEngineProxy)
-
-    @Provides
-    fun getAudioRepository(): AudioRepository = AudioRepository()
 }

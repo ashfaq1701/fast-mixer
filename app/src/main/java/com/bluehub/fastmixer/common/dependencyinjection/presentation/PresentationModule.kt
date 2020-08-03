@@ -1,6 +1,7 @@
 package com.bluehub.fastmixer.common.dependencyinjection.presentation
 
 import com.bluehub.fastmixer.broadcastReceivers.AudioDeviceChangeListener
+import com.bluehub.fastmixer.common.repositories.AudioRepository
 import com.bluehub.fastmixer.common.utils.DialogManager
 import dagger.Module
 import dagger.Provides
@@ -11,5 +12,8 @@ class PresentationModule {
     fun dialogManager(): DialogManager = DialogManager.create()
 
     @Provides
-    fun audioDeviceChangeListener(): AudioDeviceChangeListener = AudioDeviceChangeListener()
+    fun getAudioRepository(): AudioRepository = AudioRepository()
+
+    @Provides
+    fun audioDeviceChangeListener(audioRepository: AudioRepository): AudioDeviceChangeListener = AudioDeviceChangeListener(audioRepository)
 }
