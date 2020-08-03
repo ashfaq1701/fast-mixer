@@ -6,15 +6,15 @@ import androidx.databinding.Bindable
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.bluehub.fastmixer.BR
+import com.bluehub.fastmixer.R
 import com.bluehub.fastmixer.common.permissions.PermissionViewModel
 import com.bluehub.fastmixer.common.repositories.AudioRepository
 import com.bluehub.fastmixer.common.utils.PermissionManager
 import com.bluehub.fastmixer.common.utils.ScreenConstants
 import kotlinx.coroutines.*
-import timber.log.Timber
 import javax.inject.Inject
 
-class RecordingScreenViewModel(override val context: Context?, override val tag: String) : PermissionViewModel(context, tag) {
+class RecordingScreenViewModel(override val context: Context?, val audioRepository: AudioRepository, override val tag: String) : PermissionViewModel(context, tag) {
     override var TAG: String = javaClass.simpleName
 
     private var viewModelJob = Job()
@@ -25,9 +25,6 @@ class RecordingScreenViewModel(override val context: Context?, override val tag:
 
     @Inject
     lateinit var repository: RecordingRepository
-
-    @Inject
-    lateinit var audioRepository: AudioRepository
 
     private val _eventIsRecording = MutableLiveData<Boolean>(false)
     val eventIsRecording: LiveData<Boolean>
@@ -79,6 +76,10 @@ class RecordingScreenViewModel(override val context: Context?, override val tag:
     }
 
     val headphoneConnectedCallback: () -> Unit = {
+        if (_eventLivePlaybackSet.value == true) {
+            _eventLivePlaybackSet.value = audioRepository.isHeadphoneConnected()
+            notifyPropertyChanged(BR.livePlaybackEnabled)
+        }
         _livePlaybackPermitted.value = audioRepository.isHeadphoneConnected()
     }
 
@@ -96,6 +97,14 @@ class RecordingScreenViewModel(override val context: Context?, override val tag:
             uiScope.launch {
                 repository.restartPlayback()
             }
+        }
+    }
+
+    fun getRecordingLabel(): String {
+        return if (_eventIsRecording.value == true) {
+            context!!.getString(R.string.start_recording_label)
+        } else {
+            context!!.getString(R.string.stop_recording_label)
         }
     }
 

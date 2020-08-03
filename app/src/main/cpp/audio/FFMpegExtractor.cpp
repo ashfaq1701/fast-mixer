@@ -186,7 +186,7 @@ bool FFMpegExtractor::decode() {
         return decodedSuccessfully;
     }
 
-    printCodecParameters(mStream->codecpar);
+    //printCodecParameters(mStream->codecpar);
 
     // Find the codec to decode this stream
     AVCodec *codec = avcodec_find_decoder(mStream->codecpar->codec_id);
@@ -239,7 +239,6 @@ int64_t FFMpegExtractor::readData(
     }
 
     int32_t outChannelLayout = (1 << mTargetProperties.channelCount) - 1;
-    LOGD("Channel layout %d", outChannelLayout);
 
     SwrContext *swr = swr_alloc();
     av_opt_set_int(swr, "in_channel_count", mStream->codecpar->channels, 0);
@@ -269,8 +268,6 @@ int64_t FFMpegExtractor::readData(
     av_init_packet(&avPacket);
     AVFrame *decodedFrame = av_frame_alloc(); // Stores raw audio data
     int bytesPerSample = av_get_bytes_per_sample((AVSampleFormat)mStream->codecpar->format);
-
-    LOGD("Bytes per sample %d", bytesPerSample);
 
     // While there is more data to read, read it into the avPacket
     while (av_read_frame(mFormatContext.get(), &avPacket) == 0){

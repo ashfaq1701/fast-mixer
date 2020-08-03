@@ -9,7 +9,6 @@ RecordingStream::RecordingStream(RecordingIO* recordingIO): BaseStream(recording
 }
 
 void RecordingStream::openRecordingStream() {
-    LOGD(TAG, "openRecordingStream(): ");
     oboe::AudioStreamBuilder builder;
     setupRecordingStreamParameters(&builder);
     oboe::Result result = builder.openStream(&mRecordingStream);
@@ -30,7 +29,6 @@ void RecordingStream::openRecordingStream() {
 
 oboe::AudioStreamBuilder *
 RecordingStream::setupRecordingStreamParameters(oboe::AudioStreamBuilder *builder) {
-    LOGD(TAG, "setUpRecordingStreamParameters(): ");
     builder->setAudioApi(StreamConstants::mAudioApi)
             ->setFormat(StreamConstants::mFormat)
             ->setSharingMode(oboe::SharingMode::Exclusive)

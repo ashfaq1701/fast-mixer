@@ -22,9 +22,6 @@ class DialogManager private constructor() {
     }
 
     fun showPermissionsErrorDialog(context: Context, permission: String, neverAskAgain: Boolean) {
-
-        Log.d(tag, "showPermissionsErrorDialog(): ")
-
         if (!((context as AppCompatActivity).isFinishing)) {
 
             var dialogTheme = android.R.style.Theme_Holo_Light_Dialog
@@ -49,14 +46,12 @@ class DialogManager private constructor() {
 
             if (neverAskAgain) {
                 builder.setPositiveButton("Go to Settings") { dialog, _ ->
-                    Log.d(tag, "positiveButton::onClick: ")
                     dialog.dismiss()
                     openAppSettingsPage(context)
                 }
             }
 
             builder.setNegativeButton("Cancel") { dialog, _ ->
-                Log.d(tag, "negativeButton::onClick: ")
                 dialog.dismiss()
             }
 

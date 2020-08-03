@@ -38,7 +38,7 @@
             android:layout_height="@dimen/record_button_height"
             android:textSize="@dimen/button_text_size"
             android:onClick="@{() -> viewModel.toggleRecording()}"
-            android:text="@string/start_recording_label"
+            android:text="@{viewModel.recordingLabel}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/live_playback_enabled" />
 
