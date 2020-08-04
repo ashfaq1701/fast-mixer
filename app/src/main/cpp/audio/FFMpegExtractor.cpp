@@ -186,7 +186,7 @@ bool FFMpegExtractor::decode() {
         return decodedSuccessfully;
     }
 
-    //printCodecParameters(mStream->codecpar);
+    printCodecParameters(mStream->codecpar);
 
     // Find the codec to decode this stream
     AVCodec *codec = avcodec_find_decoder(mStream->codecpar->codec_id);
