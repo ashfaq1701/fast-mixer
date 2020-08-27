@@ -2,6 +2,8 @@ package com.bluehub.fastmixer.screens.recording
 
 import android.content.Context
 import android.media.AudioManager
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.databinding.Bindable
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -12,6 +14,8 @@ import com.bluehub.fastmixer.common.repositories.AudioRepository
 import com.bluehub.fastmixer.common.utils.PermissionManager
 import com.bluehub.fastmixer.common.utils.ScreenConstants
 import kotlinx.coroutines.*
+import timber.log.Timber
+import java.nio.file.Files
 import javax.inject.Inject
 
 class RecordingScreenViewModel(override val context: Context?, val audioRepository: AudioRepository, override val tag: String) : PermissionViewModel(context, tag) {
@@ -49,8 +53,8 @@ class RecordingScreenViewModel(override val context: Context?, val audioReposito
         uiScope.launch {
             withContext(Dispatchers.IO) {
                 context?.let {
-                    val cacheDir = repository.createCacheDirectory(context!!.cacheDir.absolutePath)
-                    repository.createAudioEngine(cacheDir)
+                    repository.createCacheDirectory(context!!.cacheDir.absolutePath)
+                    repository.createAudioEngine()
                 }
             }
             context?.let {
@@ -186,6 +190,7 @@ class RecordingScreenViewModel(override val context: Context?, val audioReposito
                     repository.stopPlaying()
                 }
             }
+            repository.copyRecordedFile(context!!)
             _eventGoBack.value = true
         }
     }

@@ -1,13 +1,21 @@
 package com.bluehub.fastmixer.screens.recording
 
+import android.content.Context
+import android.os.Build
+import android.os.Environment
 import com.bluehub.fastmixer.common.audio.AudioEngineProxy
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import java.io.File
+import java.nio.file.Files
+import java.nio.file.Paths
+import java.nio.file.StandardCopyOption
 import java.util.*
 
 class RecordingRepository(val audioEngineProxy: AudioEngineProxy) {
     private val recordingSessionId = UUID.randomUUID().toString()
+    private lateinit var cacheDir: String
 
     suspend fun stopRecording() {
         withContext(Dispatchers.IO) {
@@ -80,7 +88,7 @@ class RecordingRepository(val audioEngineProxy: AudioEngineProxy) {
     }
 
     fun createCacheDirectory(cacheDirPath: String): String {
-        val cacheDir = "$cacheDirPath/$recordingSessionId"
+        cacheDir = "$cacheDirPath/$recordingSessionId"
         val cacheDirFile = File(cacheDir)
         if (!cacheDirFile.exists()) {
             cacheDirFile.mkdir()
@@ -88,7 +96,14 @@ class RecordingRepository(val audioEngineProxy: AudioEngineProxy) {
         return cacheDir
     }
 
-    fun createAudioEngine(cacheDir: String) {
+    fun createAudioEngine() {
         audioEngineProxy.create(cacheDir, recordingSessionId)
+    }
+
+    fun copyRecordedFile(context: Context) {
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.O) {
+            val externalPath = context.getExternalFilesDir(Environment.DIRECTORY_MUSIC)
+            Files.copy(Paths.get("$cacheDir/recording.wav"), Paths.get(externalPath!!.path + "/$recordingSessionId.wav"), StandardCopyOption.REPLACE_EXISTING)
+        }
     }
 }
