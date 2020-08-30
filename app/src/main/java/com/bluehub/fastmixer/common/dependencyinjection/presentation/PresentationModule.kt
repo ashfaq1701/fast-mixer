@@ -5,15 +5,10 @@ import com.bluehub.fastmixer.common.repositories.AudioRepository
 import com.bluehub.fastmixer.common.utils.DialogManager
 import dagger.Module
 import dagger.Provides
+import javax.inject.Singleton
 
 @Module
 class PresentationModule {
     @Provides
     fun dialogManager(): DialogManager = DialogManager.create()
-
-    @Provides
-    fun getAudioRepository(): AudioRepository = AudioRepository()
-
-    @Provides
-    fun audioDeviceChangeListener(audioRepository: AudioRepository): AudioDeviceChangeListener = AudioDeviceChangeListener(audioRepository)
 }

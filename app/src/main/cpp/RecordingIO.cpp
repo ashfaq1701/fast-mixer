@@ -183,11 +183,13 @@ int32_t RecordingIO::read_live_playback(int16_t *targetData, int32_t numSamples)
     }
     int32_t framesRead = 0;
     auto framesToCopy = numSamples;
-    if (mLivePlaybackReadIndex + numSamples > mTotalSamples) {
+    if (mLivePlaybackReadIndex + numSamples >= mTotalSamples) {
         framesToCopy = mTotalSamples - mLivePlaybackReadIndex;
     }
-    memcpy(targetData, mData + mLivePlaybackReadIndex, framesToCopy * sizeof(int16_t));
-    mLivePlaybackReadIndex += framesToCopy;
+    if (framesToCopy > 0) {
+        memcpy(targetData, mData + mLivePlaybackReadIndex, framesToCopy * sizeof(int16_t));
+        mLivePlaybackReadIndex += framesToCopy;
+    }
     return framesRead;
 }
 

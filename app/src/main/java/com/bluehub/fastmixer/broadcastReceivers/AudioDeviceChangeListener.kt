@@ -37,6 +37,8 @@ class AudioDeviceChangeListener(val audioRepository: AudioRepository) : Broadcas
                         mHandleOutputCallback()
                         mHandleInputCallback()
 
+                        Timber.d("ABCDEF " + isConnected + "  " + isHeadphoneConnected)
+
                         isHeadphoneConnected = isConnected
                     }
                 }
@@ -52,6 +54,8 @@ class AudioDeviceChangeListener(val audioRepository: AudioRepository) : Broadcas
                         mHeadphoneConnectedCallback()
                         mHandleOutputCallback()
                         mHandleInputCallback()
+
+                        Timber.d("GHIJKL " + isConnected + "  " + isBluetoothHeadsetConnected)
 
                         isBluetoothHeadsetConnected = isConnected
                     }

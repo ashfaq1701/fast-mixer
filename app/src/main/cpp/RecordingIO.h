@@ -61,7 +61,7 @@ private:
     int32_t mIteration = 1;
     int32_t mWriteIndex = 0;
     int32_t mLivePlaybackReadIndex = 0;
-    const int16_t gain_factor = 2;
+    const int16_t gain_factor = 1;
 
     bool mLivePlaybackEnabled = true;
     bool readyToFlush = false;

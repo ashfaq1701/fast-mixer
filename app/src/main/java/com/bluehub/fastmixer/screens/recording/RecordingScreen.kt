@@ -34,12 +34,6 @@ class RecordingScreen : PermissionFragment() {
     @Inject
     override lateinit var dialogManager: DialogManager
 
-    @Inject
-    lateinit var audioRepository: AudioRepository
-
-    @Inject
-    lateinit var audioDeviceChangeListener: AudioDeviceChangeListener
-
     override lateinit var viewModel: PermissionViewModel
     private lateinit var viewModelFactory: RecordingScreenViewModelFactory
 
@@ -55,7 +49,7 @@ class RecordingScreen : PermissionFragment() {
         dataBinding = DataBindingUtil
             .inflate(inflater, R.layout.recording_screen, container, false)
 
-        viewModelFactory = RecordingScreenViewModelFactory(context, audioRepository, TAG)
+        viewModelFactory = RecordingScreenViewModelFactory(context, TAG)
         viewModel = ViewModelProviders.of(this, viewModelFactory)
             .get(RecordingScreenViewModel::class.java)
 
@@ -69,37 +63,8 @@ class RecordingScreen : PermissionFragment() {
         return dataBinding.root
     }
 
-    override fun onResume() {
-        super.onResume()
-
-        val localViewModel = viewModel as RecordingScreenViewModel
-
-        audioDeviceChangeListener.setHandleInputCallback(localViewModel.handleInputStreamDisconnection)
-        audioDeviceChangeListener.setHandleOutputCallback(localViewModel.handleOutputStreamDisconnection)
-        audioDeviceChangeListener.setHeadphoneConnectedCallback(localViewModel.headphoneConnectedCallback)
-
-        val filter = IntentFilter().apply {
-            addAction(AudioManager.ACTION_HEADSET_PLUG)
-            addAction(AudioManager.ACTION_SCO_AUDIO_STATE_UPDATED)
-        }
-        context?.registerReceiver(audioDeviceChangeListener, filter)
-    }
-
-    override fun onPause() {
-        super.onPause()
-        context?.unregisterReceiver(audioDeviceChangeListener)
-    }
-
     fun initUI() {
         val localViewModel = viewModel as RecordingScreenViewModel
-
-        localViewModel.eventIsRecording.observe(viewLifecycleOwner, Observer { isRecording ->
-            if (isRecording) {
-                dataBinding.toggleRecord.text = getString(R.string.stop_recording_label)
-            } else {
-                dataBinding.toggleRecord.text = getString(R.string.start_recording_label)
-            }
-        })
 
         localViewModel.eventIsPlaying.observe(viewLifecycleOwner, Observer { isPlaying ->
             if (!isPlaying) {
