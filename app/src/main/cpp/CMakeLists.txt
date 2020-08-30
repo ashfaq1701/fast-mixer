@@ -29,6 +29,10 @@ add_library( # Sets the name of the library.
         streams/PlaybackStream.cpp
         streams/BaseStream.cpp
 
+        synthesizers/BaseSynthesizer.h
+        synthesizers/HighPassFilter.cpp
+        synthesizers/LowPassFilter.cpp
+
         audio/FileDataSource.cpp
         audio/Player.cpp
         audio/FFMpegExtractor.cpp
@@ -46,6 +50,9 @@ include_directories (${OBOE_DIR}/include)
 set(LIB_SND_FILE_DIR ../../../../cpp_dependencies/libsndfile)
 add_subdirectory(${LIB_SND_FILE_DIR} ./sndfile)
 include_directories(${LIB_SND_FILE_DIR}/src)
+
+set(KISS_FFT_DIR ../../../../cpp_dependencies/kissfft)
+add_subdirectory(${KISS_FFT_DIR} ./kissfft)
 
 # Searches for a specified prebuilt library and stores the path as a
 # variable. Because CMake includes system libraries in the search path by
@@ -93,6 +100,7 @@ target_link_libraries(
         oboe
         android
         sndfile
+        kissfft
         avformat
         avutil
         avcodec

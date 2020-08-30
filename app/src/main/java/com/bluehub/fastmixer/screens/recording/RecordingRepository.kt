@@ -6,7 +6,6 @@ import android.os.Environment
 import com.bluehub.fastmixer.common.audio.AudioEngineProxy
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Paths
@@ -103,7 +102,14 @@ class RecordingRepository(val audioEngineProxy: AudioEngineProxy) {
     fun copyRecordedFile(context: Context) {
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.O) {
             val externalPath = context.getExternalFilesDir(Environment.DIRECTORY_MUSIC)
-            Files.copy(Paths.get("$cacheDir/recording.wav"), Paths.get(externalPath!!.path + "/$recordingSessionId.wav"), StandardCopyOption.REPLACE_EXISTING)
+            val cacheFile = File("$cacheDir/recording.wav")
+            if (cacheFile.exists()) {
+                Files.copy(
+                    Paths.get("$cacheDir/recording.wav"),
+                    Paths.get(externalPath!!.path + "/$recordingSessionId.wav"),
+                    StandardCopyOption.REPLACE_EXISTING
+                )
+            }
         }
     }
 }

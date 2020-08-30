@@ -12,7 +12,7 @@ oboe::AudioApi  StreamConstants::mAudioApi = oboe::AudioApi::AAudio;
 oboe::AudioFormat StreamConstants::mFormat = oboe::AudioFormat::I16;
 int32_t StreamConstants::mPlaybackDeviceId = oboe::kUnspecified;
 int32_t StreamConstants::mFramesPerBurst{};
-int32_t StreamConstants::mRecordingDeviceId = oboe::Unprocessed;
+int32_t StreamConstants::mRecordingDeviceId = oboe::VoiceRecognition;
 oboe::AudioFormat StreamConstants::mPlaybackFormat = oboe::AudioFormat::Float;
 int32_t StreamConstants::mRecordingFramesPerCallback = 24;
 int32_t StreamConstants::mLivePlaybackFramesPerCallback = StreamConstants::mRecordingFramesPerCallback;

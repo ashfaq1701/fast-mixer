@@ -4,3 +4,6 @@
 [submodule "cpp_dependencies/libsndfile"]
 	path = cpp_dependencies/libsndfile
 	url = git@github.com:erikd/libsndfile.git
+[submodule "cpp_dependencies/kissfft"]
+	path = cpp_dependencies/kissfft
+	url = https://github.com/mborgerding/kissfft.git
