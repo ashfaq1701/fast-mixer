@@ -13,9 +13,9 @@ public:
 
     oboe::AudioStream *mRecordingStream = nullptr;
 
-    void openRecordingStream(int audioSessionId);
+    int openRecordingStream();
 
-    oboe::AudioStreamBuilder* setupRecordingStreamParameters(oboe::AudioStreamBuilder *builder, int audioSessionId);
+    oboe::AudioStreamBuilder* setupRecordingStreamParameters(oboe::AudioStreamBuilder *builder);
 
     oboe::DataCallbackResult
     onAudioReady(oboe::AudioStream *audioStream, void *audioData, int32_t numFrames);

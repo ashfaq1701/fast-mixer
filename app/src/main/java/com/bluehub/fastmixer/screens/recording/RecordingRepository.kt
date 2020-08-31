@@ -22,22 +22,16 @@ class RecordingRepository(val audioEngineProxy: AudioEngineProxy) {
         }
     }
 
-    suspend fun startLivePlayback() {
-        withContext(Dispatchers.IO) {
-            audioEngineProxy.startLivePlayback()
-        }
+    fun startLivePlayback() {
+        audioEngineProxy.startLivePlayback()
     }
 
-    suspend fun pauseLivePlayback() {
-        withContext(Dispatchers.IO) {
-            audioEngineProxy.pauseLivePlayback()
-        }
+    fun pauseLivePlayback() {
+        audioEngineProxy.pauseLivePlayback()
     }
 
-    suspend fun stopLivePlayback() {
-        withContext(Dispatchers.IO) {
-            audioEngineProxy.stopLivePlayback()
-        }
+    fun stopLivePlayback() {
+        audioEngineProxy.stopLivePlayback()
     }
 
     suspend fun startPlaying() {
@@ -58,10 +52,8 @@ class RecordingRepository(val audioEngineProxy: AudioEngineProxy) {
         }
     }
 
-    suspend fun startRecording(audioSessionId: Int) {
-        withContext(Dispatchers.IO) {
-            audioEngineProxy.startRecording(audioSessionId)
-        }
+    fun startRecording(): Int {
+        return audioEngineProxy.startRecording()
     }
 
     suspend fun pauseRecording() {

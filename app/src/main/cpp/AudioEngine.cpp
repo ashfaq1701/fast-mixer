@@ -96,15 +96,16 @@ void AudioEngine::pausePlayback() {
     playbackStream.stopStream(playbackStream.mPlaybackStream);
 }
 
-void AudioEngine::startRecording(int audioSessionId) {
+int AudioEngine::startRecording() {
     LOGD(TAG, "startRecording(): ");
-    recordingStream.openRecordingStream(audioSessionId);
+    int sessionId = recordingStream.openRecordingStream();
     if (recordingStream.mRecordingStream) {
         recordingStream.startStream(recordingStream.mRecordingStream);
     } else {
         LOGE(TAG, "startRecording(): Failed to create recording (%p) stream", recordingStream.mRecordingStream);
         recordingStream.closeStream(recordingStream.mRecordingStream);
     }
+    return sessionId;
 }
 
 void AudioEngine::stopRecording() {

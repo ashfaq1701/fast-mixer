@@ -8,9 +8,9 @@
 RecordingStream::RecordingStream(RecordingIO* recordingIO): BaseStream(recordingIO) {
 }
 
-void RecordingStream::openRecordingStream(int audioSessionId) {
+int RecordingStream::openRecordingStream() {
     oboe::AudioStreamBuilder builder;
-    setupRecordingStreamParameters(&builder, audioSessionId);
+    setupRecordingStreamParameters(&builder);
     oboe::Result result = builder.openStream(&mRecordingStream);
 
     if (result == oboe::Result::OK && mRecordingStream) {
@@ -22,17 +22,19 @@ void RecordingStream::openRecordingStream(int audioSessionId) {
 
         LOGV(TAG, "openRecordingStream(): mFormat = ");
         LOGV(TAG, oboe::convertToText(format));
+        return mRecordingStream->getSessionId();
     } else {
         LOGE(TAG, "Failed to create recording stream. Error: %s", oboe::convertToText(result));
+        return -1;
     }
 }
 
 oboe::AudioStreamBuilder *
-RecordingStream::setupRecordingStreamParameters(oboe::AudioStreamBuilder *builder, int audioSessionId) {
+RecordingStream::setupRecordingStreamParameters(oboe::AudioStreamBuilder *builder) {
     builder->setAudioApi(StreamConstants::mAudioApi)
             ->setFormat(StreamConstants::mFormat)
             ->setSharingMode(oboe::SharingMode::Exclusive)
-            ->setSessionId(static_cast<oboe::SessionId>(audioSessionId))
+            ->setSessionId(oboe::SessionId::Allocate)
             ->setPerformanceMode(oboe::PerformanceMode::LowLatency)
             ->setCallback(this)
             ->setDeviceId(StreamConstants::mRecordingDeviceId)
