@@ -38,6 +38,10 @@ public:
     void flushWriteBuffer();
     void restartPlayback();
 
+    int getCurrentMax();
+
+    void resetCurrentMax();
+
 private:
     const char* TAG = "Audio Engine:: %s";
 

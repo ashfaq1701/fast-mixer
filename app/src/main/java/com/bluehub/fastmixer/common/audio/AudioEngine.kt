@@ -32,5 +32,9 @@ class AudioEngine {
         @JvmStatic external fun flushWriteBuffer()
 
         @JvmStatic external fun restartPlayback()
+
+        @JvmStatic external fun getCurrentMax(): Int
+
+        @JvmStatic external fun resetCurrentMax()
     }
 }

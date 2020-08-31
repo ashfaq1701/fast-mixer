@@ -46,6 +46,9 @@ public:
 
     void setLivePlaybackEnabled(bool livePlaybackEnabled);
 
+    int getCurrentMax();
+
+    void resetCurrentMax();
 private:
     const char* TAG = "RecordingIO:: %d";
 
@@ -62,6 +65,8 @@ private:
     int32_t mWriteIndex = 0;
     int32_t mLivePlaybackReadIndex = 0;
     const int16_t gain_factor = 1;
+
+    int16_t currentMax = 0;
 
     bool mLivePlaybackEnabled = true;
     bool readyToFlush = false;

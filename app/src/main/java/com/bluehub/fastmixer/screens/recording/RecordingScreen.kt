@@ -67,6 +67,8 @@ class RecordingScreen : PermissionFragment() {
     fun initUI() {
         val localViewModel = viewModel as RecordingScreenViewModel
 
+        val audioRecordView = dataBinding.recordingVisualizer
+
         localViewModel.eventIsPlaying.observe(viewLifecycleOwner, Observer { isPlaying ->
             if (!isPlaying) {
                 dataBinding.togglePlay.text = getString(R.string.play_label)

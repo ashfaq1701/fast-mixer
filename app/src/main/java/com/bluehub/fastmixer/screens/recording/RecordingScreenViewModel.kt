@@ -216,10 +216,14 @@ class RecordingScreenViewModel(override val context: Context?, override val tag:
         super.onCleared()
         viewModelJob.cancel()
         repository.deleteAudioEngine()
+        context?.unregisterReceiver(audioDeviceChangeListener)
     }
 
     fun resetGoBack() {
         _eventGoBack.value = false
-        _eventGoBack.value = false
     }
+
+    fun getCurrentMax() = repository.getCurrentMax()
+
+    fun resetCurrentMax() = repository.resetCurrentMax()
 }

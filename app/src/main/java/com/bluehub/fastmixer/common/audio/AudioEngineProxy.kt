@@ -35,4 +35,8 @@ class AudioEngineProxy {
     fun flushWriteBuffer() = AudioEngine.flushWriteBuffer()
 
     fun restartPlayback() = AudioEngine.restartPlayback()
+
+    fun getCurrentMax(): Int = AudioEngine.getCurrentMax()
+
+    fun resetCurrentMax() = AudioEngine.resetCurrentMax()
 }

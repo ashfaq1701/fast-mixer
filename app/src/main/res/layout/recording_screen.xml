@@ -27,7 +27,7 @@
             app:chunkWidth="2dp"
             app:chunkMaxHeight="160dp"
             app:chunkMinHeight="20dp"
-            app:layout_constaintTop_toTopOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
 
         <CheckBox

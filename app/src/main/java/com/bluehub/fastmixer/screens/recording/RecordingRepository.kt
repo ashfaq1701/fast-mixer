@@ -104,4 +104,8 @@ class RecordingRepository(val audioEngineProxy: AudioEngineProxy) {
             }
         }
     }
+
+    fun getCurrentMax() = audioEngineProxy.getCurrentMax()
+
+    fun resetCurrentMax() = audioEngineProxy.resetCurrentMax()
 }

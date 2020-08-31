@@ -126,4 +126,22 @@ extern "C" {
         }
         audioEngine->restartPlayback();
     }
+
+    JNIEXPORT jint JNICALL
+    Java_com_bluehub_fastmixer_common_audio_AudioEngine_getCurrentMax(JNIEnv *env, jclass) {
+        if (audioEngine == nullptr) {
+            LOGE("audioEngine is null, you must call create() method before calling this method");
+            return 0;
+        }
+        audioEngine->getCurrentMax();
+    }
+
+    JNIEXPORT void JNICALL
+    Java_com_bluehub_fastmixer_common_audio_AudioEngine_resetCurrentMax(JNIEnv *env, jclass) {
+        if (audioEngine == nullptr) {
+            LOGE("audioEngine is null, you must call create() method before calling this method");
+            return;
+        }
+        audioEngine->resetCurrentMax();
+    }
 }

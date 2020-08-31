@@ -135,3 +135,13 @@ void AudioEngine::restartPlayback() {
 void AudioEngine::flushWriteBuffer() {
     mRecordingIO.flush_buffer();
 }
+
+int AudioEngine::getCurrentMax() {
+    return mRecordingIO.getCurrentMax();
+}
+
+void AudioEngine::resetCurrentMax() {
+    mRecordingIO.resetCurrentMax();
+}
+
+
