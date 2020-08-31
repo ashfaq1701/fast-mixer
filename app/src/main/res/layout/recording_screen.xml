@@ -15,11 +15,10 @@
         android:layout_height="match_parent"
         tools:context=".screens.mixing.MixingScreen">
 
-        <fragment
+        <com.chibde.visualizer.LineVisualizer
             android:id="@+id/recording_visualizer"
-            android:name="com.bluehub.fastmixer.fragments.recording.VisualizerFragment"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="250dp"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
 

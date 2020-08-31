@@ -58,9 +58,9 @@ class RecordingRepository(val audioEngineProxy: AudioEngineProxy) {
         }
     }
 
-    suspend fun startRecording() {
+    suspend fun startRecording(audioSessionId: Int) {
         withContext(Dispatchers.IO) {
-            audioEngineProxy.startRecording()
+            audioEngineProxy.startRecording(audioSessionId)
         }
     }
 

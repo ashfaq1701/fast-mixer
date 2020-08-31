@@ -47,7 +47,7 @@ public:
     void setLivePlaybackEnabled(bool livePlaybackEnabled);
 
 private:
-    const char* TAG = "RecordingIO:: %s";
+    const char* TAG = "RecordingIO:: %d";
 
     TaskQueue *taskQueue;
 

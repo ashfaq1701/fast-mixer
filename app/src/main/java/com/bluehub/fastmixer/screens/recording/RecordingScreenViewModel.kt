@@ -39,6 +39,9 @@ class RecordingScreenViewModel(override val context: Context?, override val tag:
     @Inject
     lateinit var audioDeviceChangeListener: AudioDeviceChangeListener
 
+    var audioManager: AudioManager
+    var audioSessionId: MutableLiveData<Int> = MutableLiveData(0)
+
     private val _eventIsRecording = MutableLiveData<Boolean>(false)
     val eventIsRecording: LiveData<Boolean>
         get() = _eventIsRecording
@@ -113,6 +116,8 @@ class RecordingScreenViewModel(override val context: Context?, override val tag:
             addAction(AudioManager.ACTION_SCO_AUDIO_STATE_UPDATED)
         }
         context?.registerReceiver(audioDeviceChangeListener, filter)
+
+        audioManager = context!!.getSystemService(Context.AUDIO_SERVICE) as AudioManager
     }
 
     @Bindable
@@ -136,26 +141,26 @@ class RecordingScreenViewModel(override val context: Context?, override val tag:
             return
         }
 
-        _eventIsRecording.value = !_eventIsRecording.value!!
-
-        if (_eventIsRecording.value == true) {
-            uiScope.launch {
-                repository.startRecording()
-                _eventLivePlaybackSet.value?.let {
-                    if (it) {
-                        repository.startLivePlayback()
+        uiScope.launch {
+            audioSessionId.value = audioManager.generateAudioSessionId()
+            withContext(Dispatchers.IO) {
+                if (_eventIsRecording.value == false) {
+                    repository.startRecording(audioSessionId.value!!)
+                    _eventLivePlaybackSet.value?.let {
+                        if (it) {
+                            repository.startLivePlayback()
+                        }
                     }
+                } else {
+                    _eventLivePlaybackSet.value?.let {
+                        if (it) {
+                            repository.pauseLivePlayback()
+                        }
+                    }
+                    repository.pauseRecording()
                 }
             }
-        } else {
-            uiScope.launch {
-                _eventLivePlaybackSet.value?.let {
-                    if (it) {
-                        repository.pauseLivePlayback()
-                    }
-                }
-                repository.pauseRecording()
-            }
+            _eventIsRecording.value = !_eventIsRecording.value!!
         }
     }
 

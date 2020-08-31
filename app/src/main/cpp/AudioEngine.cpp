@@ -96,9 +96,9 @@ void AudioEngine::pausePlayback() {
     playbackStream.stopStream(playbackStream.mPlaybackStream);
 }
 
-void AudioEngine::startRecording() {
+void AudioEngine::startRecording(int audioSessionId) {
     LOGD(TAG, "startRecording(): ");
-    recordingStream.openRecordingStream();
+    recordingStream.openRecordingStream(audioSessionId);
     if (recordingStream.mRecordingStream) {
         recordingStream.startStream(recordingStream.mRecordingStream);
     } else {

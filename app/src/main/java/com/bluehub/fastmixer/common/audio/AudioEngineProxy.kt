@@ -14,7 +14,7 @@ class AudioEngineProxy {
 
     fun delete() = AudioEngine.delete()
 
-    fun startRecording() = AudioEngine.startRecording()
+    fun startRecording(audioSessionId: Int) = AudioEngine.startRecording(audioSessionId)
 
     fun stopRecording() = AudioEngine.stopRecording()
 

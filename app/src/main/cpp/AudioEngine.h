@@ -23,7 +23,7 @@ public:
     AudioEngine(char* appDir, char* mRecordingSessionId);
     ~AudioEngine();
 
-    void startRecording();
+    void startRecording(int audioSessionId);
     void stopRecording();
     void pauseRecording();
 

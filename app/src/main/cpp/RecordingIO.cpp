@@ -119,6 +119,8 @@ int32_t RecordingIO::write(const int16_t *sourceData, int32_t numSamples) {
         readyToFlush = true;
     }
 
+    std::vector<int16_t> v;
+
     int flushIndex = 0;
     if (readyToFlush) {
         int upperBound  = 0;
@@ -152,8 +154,11 @@ int32_t RecordingIO::write(const int16_t *sourceData, int32_t numSamples) {
 
     for(int i = 0; i < numSamples; i++) {
         mData[mWriteIndex++] = sourceData[i] * gain_factor;
+        v.push_back(sourceData[i]);
     }
     mTotalSamples += numSamples;
+
+    LOGD(TAG, v.size());
 
     return numSamples;
 }
