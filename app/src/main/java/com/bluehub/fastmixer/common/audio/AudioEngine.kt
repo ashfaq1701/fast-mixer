@@ -11,7 +11,7 @@ class AudioEngine {
 
         @JvmStatic external fun delete()
 
-        @JvmStatic external fun startRecording(): Int
+        @JvmStatic external fun startRecording()
 
         @JvmStatic external fun stopRecording()
 

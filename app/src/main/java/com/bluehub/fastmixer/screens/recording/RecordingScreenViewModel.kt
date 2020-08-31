@@ -39,8 +39,6 @@ class RecordingScreenViewModel(override val context: Context?, override val tag:
     @Inject
     lateinit var audioDeviceChangeListener: AudioDeviceChangeListener
 
-    var audioSessionId: MutableLiveData<Int> = MutableLiveData(0)
-
     private val _eventIsRecording = MutableLiveData<Boolean>(false)
     val eventIsRecording: LiveData<Boolean>
         get() = _eventIsRecording
@@ -139,10 +137,9 @@ class RecordingScreenViewModel(override val context: Context?, override val tag:
         }
 
         uiScope.launch {
-            var recordingSessionId = 0;
             withContext(Dispatchers.IO) {
                 if (_eventIsRecording.value == false) {
-                    recordingSessionId = repository.startRecording()
+                     repository.startRecording()
                     _eventLivePlaybackSet.value?.let {
                         if (it) {
                             repository.startLivePlayback()
@@ -157,9 +154,7 @@ class RecordingScreenViewModel(override val context: Context?, override val tag:
                     repository.pauseRecording()
                 }
             }
-            audioSessionId.value = recordingSessionId
             _eventIsRecording.value = !_eventIsRecording.value!!
-            Timber.d("ABCD " + recordingSessionId)
         }
     }
 

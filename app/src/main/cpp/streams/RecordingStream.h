@@ -13,7 +13,7 @@ public:
 
     oboe::AudioStream *mRecordingStream = nullptr;
 
-    int openRecordingStream();
+    void openRecordingStream();
 
     oboe::AudioStreamBuilder* setupRecordingStreamParameters(oboe::AudioStreamBuilder *builder);
 

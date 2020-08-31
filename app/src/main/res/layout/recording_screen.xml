@@ -15,11 +15,19 @@
         android:layout_height="match_parent"
         tools:context=".screens.mixing.MixingScreen">
 
-        <com.chibde.visualizer.LineVisualizer
+        <com.visualizer.amplitude.AudioRecordView
             android:id="@+id/recording_visualizer"
-            android:layout_width="match_parent"
-            android:layout_height="250dp"
-            app:layout_constraintTop_toTopOf="parent"
+            android:layout_width="wrap_content"
+            android:layout_height="200dp"
+            app:chunkAlignTo="bottom"
+            app:chunkRoundedCorners="true"
+            app:chunkSoftTransition="true"
+            app:chunkColor="@color/visualizer"
+            app:chunkSpace="1dp"
+            app:chunkWidth="2dp"
+            app:chunkMaxHeight="160dp"
+            app:chunkMinHeight="20dp"
+            app:layout_constaintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
 
         <CheckBox

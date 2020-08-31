@@ -29,13 +29,12 @@ extern "C" {
         audioEngine = nullptr;
     }
 
-    JNIEXPORT jint JNICALL
+    JNIEXPORT void JNICALL
     Java_com_bluehub_fastmixer_common_audio_AudioEngine_startRecording(JNIEnv *env, jclass) {
         if (audioEngine == nullptr) {
             LOGE("audioEngine is null, you must call create() method before calling this method");
-            return -1;
         }
-        return audioEngine->startRecording();
+        audioEngine->startRecording();
     }
 
     JNIEXPORT void JNICALL

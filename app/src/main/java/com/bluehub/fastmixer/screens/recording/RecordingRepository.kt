@@ -52,8 +52,8 @@ class RecordingRepository(val audioEngineProxy: AudioEngineProxy) {
         }
     }
 
-    fun startRecording(): Int {
-        return audioEngineProxy.startRecording()
+    fun startRecording() {
+        audioEngineProxy.startRecording()
     }
 
     suspend fun pauseRecording() {

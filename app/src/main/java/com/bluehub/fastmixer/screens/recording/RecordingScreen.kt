@@ -67,10 +67,6 @@ class RecordingScreen : PermissionFragment() {
     fun initUI() {
         val localViewModel = viewModel as RecordingScreenViewModel
 
-        val lineVisualizer = dataBinding.recordingVisualizer
-        lineVisualizer.setColor(context!!.getColor(R.color.visualizer))
-        lineVisualizer.setStrokeWidth(1)
-
         localViewModel.eventIsPlaying.observe(viewLifecycleOwner, Observer { isPlaying ->
             if (!isPlaying) {
                 dataBinding.togglePlay.text = getString(R.string.play_label)
@@ -83,16 +79,6 @@ class RecordingScreen : PermissionFragment() {
             if (goBack) {
                 findNavController().navigate(RecordingScreenDirections.actionRecordingScreenToMixingScreen())
                 localViewModel.resetGoBack()
-            }
-        })
-
-        localViewModel.eventIsRecording.observe(viewLifecycleOwner, Observer { isRecording ->
-            if(isRecording) {
-                lineVisualizer.setPlayer(localViewModel.audioSessionId.value!!)
-            } else {
-                if (localViewModel.audioSessionId.value != 0) {
-                    lineVisualizer.release()
-                }
             }
         })
 
