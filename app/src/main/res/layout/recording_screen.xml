@@ -46,7 +46,7 @@
             android:checked="@={viewModel.livePlaybackEnabled}"
             android:text="@string/live_playback_enabled"
             app:layout_constraintTop_toBottomOf="@id/recording_seekbar"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toStartOf="@id/recording_seekbar" />
 
         <Button
             android:id="@+id/toggle_record"

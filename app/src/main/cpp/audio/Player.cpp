@@ -64,3 +64,9 @@ void Player::setPlayHead(int32_t playHead) {
         mReadFrameIndex = playHead;
     }
 }
+
+int64_t Player::getTotalSampleFrames() {
+    const AudioProperties properties = mSource->getProperties();
+    int64_t totalSourceFrames = mSource->getSize() / properties.channelCount;
+    return totalSourceFrames;
+}

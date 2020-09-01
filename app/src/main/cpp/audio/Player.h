@@ -49,6 +49,7 @@ public:
     void setPlayHead(int32_t playHead);
     void setPlaying(bool isPlaying) { mIsPlaying = isPlaying; };
     void setLooping(bool isLooping) { mIsLooping = isLooping; };
+    int64_t getTotalSampleFrames();
 
 private:
     int32_t mReadFrameIndex = 0;

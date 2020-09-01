@@ -44,6 +44,9 @@ bool RecordingIO::setup_audio_source() {
     int32_t playHead = 0;
     if (mRecordedTrack != nullptr) {
         playHead = mRecordedTrack->getPlayHead();
+        if (playHead >= mRecordedTrack->getTotalSampleFrames()) {
+            playHead = 0;
+        }
     }
 
     mRecordedTrack = std::make_unique<Player>(audioSource);
