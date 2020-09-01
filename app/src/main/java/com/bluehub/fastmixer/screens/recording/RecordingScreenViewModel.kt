@@ -16,12 +16,14 @@ import com.bluehub.fastmixer.common.permissions.PermissionViewModel
 import com.bluehub.fastmixer.common.repositories.AudioRepository
 import com.bluehub.fastmixer.common.utils.PermissionManager
 import com.bluehub.fastmixer.common.utils.ScreenConstants
+import com.visualizer.amplitude.AudioRecordView
 import kotlinx.coroutines.*
 import timber.log.Timber
 import java.nio.file.Files
+import java.util.*
 import javax.inject.Inject
 
-class RecordingScreenViewModel(override val context: Context?, override val tag: String) : PermissionViewModel(context, tag) {
+class RecordingScreenViewModel(override val context: Context?, private val audioRecordView: AudioRecordView, override val tag: String) : PermissionViewModel(context, tag) {
     override var TAG: String = javaClass.simpleName
 
     private var viewModelJob = Job()
@@ -38,6 +40,8 @@ class RecordingScreenViewModel(override val context: Context?, override val tag:
 
     @Inject
     lateinit var audioDeviceChangeListener: AudioDeviceChangeListener
+
+    private var timer: Timer? = null
 
     private val _eventIsRecording = MutableLiveData<Boolean>(false)
     val eventIsRecording: LiveData<Boolean>
@@ -197,14 +201,17 @@ class RecordingScreenViewModel(override val context: Context?, override val tag:
     fun setGoBack() {
         uiScope.launch {
             repository.stopRecording()
+            _eventIsRecording.value = false
             _eventLivePlaybackSet.value?.let {
                 if (it) {
                     repository.stopLivePlayback()
+                    _eventLivePlaybackSet.value = false
                 }
             }
             _eventIsPlaying.value?.let {
                 if (it) {
                     repository.stopPlaying()
+                    _eventIsPlaying.value = false
                 }
             }
             repository.copyRecordedFile(context!!)
@@ -223,7 +230,21 @@ class RecordingScreenViewModel(override val context: Context?, override val tag:
         _eventGoBack.value = false
     }
 
-    fun getCurrentMax() = repository.getCurrentMax()
+    fun startDrawingVisualizer() {
+        timer = Timer()
+        timer?.schedule(object : TimerTask() {
+            override fun run() {
+                val currentMaxAmplitude = repository.getCurrentMax()
+                audioRecordView.update(currentMaxAmplitude)
+            }
+        }, 0, 50)
+    }
 
-    fun resetCurrentMax() = repository.resetCurrentMax()
+    fun stopDrawingVisualizer() {
+        timer?.let {
+            it.cancel()
+            audioRecordView.recreate()
+            repository.resetCurrentMax()
+        }
+    }
 }

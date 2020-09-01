@@ -133,7 +133,8 @@ extern "C" {
             LOGE("audioEngine is null, you must call create() method before calling this method");
             return 0;
         }
-        audioEngine->getCurrentMax();
+        int currentMax = audioEngine->getCurrentMax();
+        return currentMax;
     }
 
     JNIEXPORT void JNICALL

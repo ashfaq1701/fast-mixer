@@ -50,7 +50,10 @@ class RecordingScreen : PermissionFragment() {
         dataBinding = DataBindingUtil
             .inflate(inflater, R.layout.recording_screen, container, false)
 
-        viewModelFactory = RecordingScreenViewModelFactory(context, TAG)
+        val audioRecordView = dataBinding.recordingVisualizer
+
+        viewModelFactory = RecordingScreenViewModelFactory(context, audioRecordView, TAG)
+
         viewModel = ViewModelProviders.of(this, viewModelFactory)
             .get(RecordingScreenViewModel::class.java)
 
@@ -67,7 +70,13 @@ class RecordingScreen : PermissionFragment() {
     fun initUI() {
         val localViewModel = viewModel as RecordingScreenViewModel
 
-        val audioRecordView = dataBinding.recordingVisualizer
+        localViewModel.eventIsRecording.observe(viewLifecycleOwner, Observer { isRecording ->
+            if (isRecording) {
+                localViewModel.startDrawingVisualizer()
+            } else {
+                localViewModel.stopDrawingVisualizer()
+            }
+        })
 
         localViewModel.eventIsPlaying.observe(viewLifecycleOwner, Observer { isPlaying ->
             if (!isPlaying) {

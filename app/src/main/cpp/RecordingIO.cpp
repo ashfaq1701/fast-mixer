@@ -150,10 +150,11 @@ int32_t RecordingIO::write(const int16_t *sourceData, int32_t numSamples) {
         mData = newData;
     }
 
+    currentMax = 0;
     for(int i = 0; i < numSamples; i++) {
         mData[mWriteIndex++] = sourceData[i] * gain_factor;
-        if (currentMax < sourceData[i]) {
-            currentMax = sourceData[i];
+        if (currentMax < abs(sourceData[i])) {
+            currentMax = abs(sourceData[i]);
         }
     }
     mTotalSamples += numSamples;

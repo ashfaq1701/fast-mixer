@@ -66,7 +66,7 @@ private:
     int32_t mLivePlaybackReadIndex = 0;
     const int16_t gain_factor = 1;
 
-    int16_t currentMax = 0;
+    int currentMax = 0;
 
     bool mLivePlaybackEnabled = true;
     bool readyToFlush = false;
