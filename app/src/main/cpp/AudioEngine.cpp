@@ -5,15 +5,13 @@
 #include <oboe/Oboe.h>
 
 #include <utility>
+#include "jni_env.h"
 #include "AudioEngine.h"
 #include "logging_macros.h"
 
 AudioEngine::AudioEngine(
         char* appDir,
         char* recordingSessionId,
-        JNIEnv* env,
-        shared_ptr<jobject> recordingScreenViewModel,
-        shared_ptr<method_ids> viewModelMethodIds,
         bool recordingScreenViewModelPassed) {
     assert(StreamConstants::mInputChannelCount == StreamConstants::mOutputChannelCount);
     mAppDir = appDir;
@@ -24,10 +22,6 @@ AudioEngine::AudioEngine(
     mRecordingIO.setTogglePlaybackCallback([&] () {
         togglePlayback();
     });
-
-    mEnv = env;
-    mRecordingScreenViewModel = std::move(recordingScreenViewModel);
-    mViewModelMethodIds = std::move(viewModelMethodIds);
     mRecordingScreenViewModelPassed = recordingScreenViewModelPassed;
 }
 
@@ -100,7 +94,7 @@ void AudioEngine::stopPlayback() {
 }
 
 void AudioEngine::closePlaybackStream() {
-    if (playbackStream.mPlaybackStream->getState() != oboe::StreamState::Closed) {
+    if (playbackStream.mPlaybackStream != nullptr && playbackStream.mPlaybackStream->getState() != oboe::StreamState::Closed) {
         playbackStream.stopStream(playbackStream.mPlaybackStream);
         playbackStream.closeStream(playbackStream.mPlaybackStream);
     }
@@ -161,11 +155,11 @@ void AudioEngine::resetCurrentMax() {
 }
 
 void AudioEngine::togglePlayback() {
-    if (mEnv != nullptr) {
-        if (mRecordingScreenViewModelPassed && mRecordingScreenViewModel != nullptr) {
-            mEnv->CallVoidMethod(*mRecordingScreenViewModel, mViewModelMethodIds->recordingScreenVMTogglePlay);
+    call_in_attached_thread([&](auto env) {
+        if (mRecordingScreenViewModelPassed && kotlinMethodIdsPtr != nullptr) {
+            env->CallStaticVoidMethod(kotlinMethodIdsPtr->recordingScreenVM, kotlinMethodIdsPtr->recordingScreenVMTogglePlay);
         }
-    }
+    });
 }
 
 

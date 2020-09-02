@@ -6,39 +6,56 @@
 #include <string>
 #include "AudioEngine.h"
 #include "logging_macros.h"
+#include "jni_env.h"
 #include <android/asset_manager_jni.h>
 
 const char *TAG = "native-lib: %s";
 static AudioEngine *audioEngine = nullptr;
 
 extern "C" {
-    method_ids prepate_kotlin_method_ids(JNIEnv *env) {
+    method_ids prepare_kotlin_method_ids(JNIEnv *env) {
         jclass recordingVMClass = env->FindClass("com/bluehub/fastmixer/screens/recording/RecordingScreenViewModel");
+        auto recordingVmGlobal = env->NewGlobalRef(recordingVMClass);
+        jmethodID togglePlay = env->GetStaticMethodID(static_cast<jclass>(recordingVmGlobal), "setStopPlay", "()V");
+
         method_ids kotlinMethodIds {
-            .recordingScreenVMTogglePlay = env->GetMethodID(recordingVMClass, "togglePlay", "()V")
+            .recordingScreenVM = static_cast<jclass>(env->NewGlobalRef(recordingVmGlobal)),
+            .recordingScreenVMTogglePlay = togglePlay
         };
         return kotlinMethodIds;
     }
 
+    void delete_kotlin_global_refs(JNIEnv *env, std::shared_ptr<method_ids> kotlinMethodIds) {
+        if (kotlinMethodIds != nullptr && kotlinMethodIdsPtr->recordingScreenVM != nullptr) {
+            env->DeleteGlobalRef(kotlinMethodIds->recordingScreenVM);
+            kotlinMethodIds.reset();
+        }
+    }
+
+    extern "C" JNIEXPORT jint JNI_OnLoad(JavaVM* vm, void* reserved) {
+        java_machine = vm;
+        return  JNI_VERSION_1_6;
+    }
+
     JNIEXPORT jboolean JNICALL
-    Java_com_bluehub_fastmixer_common_audio_AudioEngine_create(JNIEnv *env, jclass, jstring appDirStr, jstring recordingSessionIdStr, jboolean  recordingScreenViewModelPassed, jobject recordingScreenViewModel) {
+    Java_com_bluehub_fastmixer_common_audio_AudioEngine_create(JNIEnv *env, jclass, jstring appDirStr, jstring recordingSessionIdStr, jboolean  recordingScreenViewModelPassed) {
         if (audioEngine == nullptr) {
             char* appDir = const_cast<char *>(env->GetStringUTFChars(appDirStr, NULL));
             char* recordingSessionId = const_cast<char *>(env->GetStringUTFChars(
                     recordingSessionIdStr, NULL));
 
-            method_ids kotlinMethodIds = prepate_kotlin_method_ids(env);
+            method_ids kotlinMethodIds = prepare_kotlin_method_ids(env);
 
-            auto recordingScreenViewModelPtr = make_shared<jobject>(recordingScreenViewModel);
-            auto methodIdsPtr = make_shared<method_ids>(kotlinMethodIds);
+            kotlinMethodIdsPtr = make_shared<method_ids>(kotlinMethodIds);
 
-            audioEngine = new AudioEngine(appDir, recordingSessionId, env, recordingScreenViewModelPtr, methodIdsPtr, recordingScreenViewModelPassed);
+            audioEngine = new AudioEngine(appDir, recordingSessionId, recordingScreenViewModelPassed);
         }
         return (audioEngine != nullptr);
     }
 
     JNIEXPORT void JNICALL
     Java_com_bluehub_fastmixer_common_audio_AudioEngine_delete(JNIEnv *env, jclass) {
+        delete_kotlin_global_refs(env, kotlinMethodIdsPtr);
         delete audioEngine;
         audioEngine = nullptr;
     }

@@ -13,9 +13,8 @@ class AudioEngineProxy {
 
     fun create(appPathStr: String,
                recordingSessionIdStr: String,
-               recordingScreenViewModelPassed: Boolean = false,
-               viewModel: RecordingScreenViewModel? = null): Boolean =
-        AudioEngine.create(appPathStr, recordingSessionIdStr, recordingScreenViewModelPassed, viewModel)
+               recordingScreenViewModelPassed: Boolean = false): Boolean =
+        AudioEngine.create(appPathStr, recordingSessionIdStr, recordingScreenViewModelPassed)
 
     fun delete() = AudioEngine.delete()
 

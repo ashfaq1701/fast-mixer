@@ -12,8 +12,7 @@ class AudioEngine {
         @JvmStatic external fun create(
             appPathStr: String,
             recordingSessionIdStr: String,
-            recordingScreenViewModelPassed: Boolean = false,
-            viewModel: RecordingScreenViewModel? = null): Boolean
+            recordingScreenViewModelPassed: Boolean = false): Boolean
 
         @JvmStatic external fun delete()
 

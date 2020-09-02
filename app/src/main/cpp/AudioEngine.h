@@ -20,7 +20,7 @@
 
 class AudioEngine {
 public:
-    AudioEngine(char* appDir, char* mRecordingSessionId, JNIEnv* env, shared_ptr<jobject> recordingScreenViewModel, shared_ptr<method_ids> kotlinMethodIds, bool recordingScreenViewModelPassed);
+    AudioEngine(char* appDir, char* mRecordingSessionId, bool recordingScreenViewModelPassed);
     ~AudioEngine();
 
     void startRecording();
@@ -51,15 +51,10 @@ private:
     char* mAppDir = nullptr;
     bool mPlayback = true;
 
-    JNIEnv* mEnv = nullptr;
-
     RecordingIO mRecordingIO;
     RecordingStream recordingStream = RecordingStream(&mRecordingIO);
     LivePlaybackStream livePlaybackStream = LivePlaybackStream(&mRecordingIO);
     PlaybackStream playbackStream = PlaybackStream(&mRecordingIO);
-
-    shared_ptr<jobject> mRecordingScreenViewModel;
-    shared_ptr<method_ids> mViewModelMethodIds;
     bool mRecordingScreenViewModelPassed = false;
 
     void closePlaybackStream();

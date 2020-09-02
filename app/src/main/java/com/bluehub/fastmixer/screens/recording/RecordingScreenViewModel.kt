@@ -24,6 +24,21 @@ import java.util.*
 import javax.inject.Inject
 
 class RecordingScreenViewModel(override val context: Context?, private val audioRecordView: AudioRecordView, override val tag: String) : PermissionViewModel(context, tag) {
+    companion object {
+        private lateinit var instance: RecordingScreenViewModel
+
+        public fun setInstance(vmInstance: RecordingScreenViewModel) {
+            instance = vmInstance
+        }
+
+        @JvmStatic
+        public fun setStopPlay() {
+            if (::instance.isInitialized) {
+                instance.stopPlay()
+            }
+        }
+    }
+
     override var TAG: String = javaClass.simpleName
 
     private var viewModelJob = Job()
@@ -99,7 +114,7 @@ class RecordingScreenViewModel(override val context: Context?, private val audio
             withContext(Dispatchers.IO) {
                 context?.let {
                     repository.createCacheDirectory(context!!.cacheDir.absolutePath)
-                    repository.createAudioEngine(this@RecordingScreenViewModel)
+                    repository.createAudioEngine()
                 }
             }
             context?.let {
@@ -188,6 +203,13 @@ class RecordingScreenViewModel(override val context: Context?, private val audio
         }
     }
 
+    fun stopPlay() {
+        _eventIsPlaying.postValue(false)
+        uiScope.launch {
+            repository.stopPlaying()
+        }
+    }
+
     fun reset() {
         uiScope.launch {
             repository.stopRecording()
@@ -220,13 +242,6 @@ class RecordingScreenViewModel(override val context: Context?, private val audio
         }
     }
 
-    override fun onCleared() {
-        super.onCleared()
-        viewModelJob.cancel()
-        repository.deleteAudioEngine()
-        context?.unregisterReceiver(audioDeviceChangeListener)
-    }
-
     fun resetGoBack() {
         _eventGoBack.value = false
     }
@@ -246,5 +261,12 @@ class RecordingScreenViewModel(override val context: Context?, private val audio
             it.cancel()
             audioRecordView.recreate()
         }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        viewModelJob.cancel()
+        repository.deleteAudioEngine()
+        context?.unregisterReceiver(audioDeviceChangeListener)
     }
 }

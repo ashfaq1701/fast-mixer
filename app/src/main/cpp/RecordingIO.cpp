@@ -25,6 +25,7 @@ bool RecordingIO::check_if_reallocated() {
 
 bool RecordingIO::setup_audio_source() {
     if (!validate_audio_file()) {
+        mStopPlaybackCallback();
         return false;
     }
 

@@ -18,6 +18,7 @@ struct buffer_data {
 };
 
 struct method_ids {
+    jclass recordingScreenVM;
     jmethodID recordingScreenVMTogglePlay;
 };
 

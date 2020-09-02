@@ -57,6 +57,8 @@ class RecordingScreen : PermissionFragment() {
         viewModel = ViewModelProviders.of(this, viewModelFactory)
             .get(RecordingScreenViewModel::class.java)
 
+        RecordingScreenViewModel.setInstance(viewModel as RecordingScreenViewModel)
+
         dataBinding.viewModel = viewModel as RecordingScreenViewModel
 
         dataBinding.lifecycleOwner = viewLifecycleOwner
