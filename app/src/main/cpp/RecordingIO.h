@@ -74,7 +74,7 @@ private:
     bool readyToFlush = false;
     bool toFlush = false;
 
-    std::function<void(void)> mStopPlaybackCallback = nullptr;
+    std::function<void()> mStopPlaybackCallback = nullptr;
 
     int16_t* mData = new int16_t[kMaxSamples]{0};
 

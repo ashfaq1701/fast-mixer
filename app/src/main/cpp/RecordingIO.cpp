@@ -49,7 +49,7 @@ bool RecordingIO::setup_audio_source() {
         }
     }
 
-    mRecordedTrack = std::make_unique<Player>(audioSource);
+    mRecordedTrack = std::make_unique<Player>(audioSource, mStopPlaybackCallback);
     mRecordedTrack->setPlayHead(playHead);
     mRecordedTrack->setPlaying(true);
 
@@ -217,6 +217,6 @@ void RecordingIO::resetCurrentMax() {
     currentMax = 0;
 }
 
-void RecordingIO::setTogglePlaybackCallback(std::function<void(void)> stopPlaybackCallback) {
+void RecordingIO::setTogglePlaybackCallback(std::function<void()> stopPlaybackCallback) {
     mStopPlaybackCallback = stopPlaybackCallback;
 }

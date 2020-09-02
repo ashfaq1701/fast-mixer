@@ -39,9 +39,11 @@ public:
      *
      * @param source
      */
-    Player(std::shared_ptr<DataSource> source)
+    Player(std::shared_ptr<DataSource> source, std::function<void(void)> stopPlaybackCallback)
         : mSource(source)
-    {};
+    {
+        mStopPlaybackCallback = stopPlaybackCallback;
+    };
 
     void renderAudio(float *targetData, int32_t numFrames);
     void resetPlayHead() { mReadFrameIndex = 0; };
@@ -55,6 +57,7 @@ private:
     int32_t mReadFrameIndex = 0;
     std::atomic<bool> mIsPlaying { false };
     std::atomic<bool> mIsLooping { false };
+    std::function<void(void)> mStopPlaybackCallback = nullptr;
     std::shared_ptr<DataSource> mSource;
 
     void renderSilence(float*, int32_t);
