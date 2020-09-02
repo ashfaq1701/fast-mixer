@@ -20,7 +20,7 @@
 
 class AudioEngine {
 public:
-    AudioEngine(char* appDir, char* mRecordingSessionId);
+    AudioEngine(char* appDir, char* mRecordingSessionId, shared_ptr<jobject> recordingScreenViewModel, shared_ptr<method_ids> kotlinMethodIds, bool recordingScreenViewModelPassed);
     ~AudioEngine();
 
     void startRecording();
