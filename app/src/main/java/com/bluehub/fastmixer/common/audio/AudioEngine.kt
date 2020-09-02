@@ -1,5 +1,7 @@
 package com.bluehub.fastmixer.common.audio
 
+import com.bluehub.fastmixer.screens.recording.RecordingScreenViewModel
+
 
 class AudioEngine {
     companion object {
@@ -7,7 +9,11 @@ class AudioEngine {
             System.loadLibrary("audioEngine")
         }
 
-        @JvmStatic external fun create(appPathStr: String, recordingSessionIdStr: String): Boolean
+        @JvmStatic external fun create(
+            appPathStr: String,
+            recordingSessionIdStr: String,
+            recordingScreenViewModelPassed: Boolean = false,
+            viewModel: RecordingScreenViewModel? = null): Boolean
 
         @JvmStatic external fun delete()
 

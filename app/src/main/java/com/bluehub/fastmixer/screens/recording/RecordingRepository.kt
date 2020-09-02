@@ -87,8 +87,8 @@ class RecordingRepository(val audioEngineProxy: AudioEngineProxy) {
         return cacheDir
     }
 
-    fun createAudioEngine() {
-        audioEngineProxy.create(cacheDir, recordingSessionId)
+    fun createAudioEngine(recordingScreenViewModel: RecordingScreenViewModel) {
+        audioEngineProxy.create(cacheDir, recordingSessionId, true, recordingScreenViewModel)
     }
 
     fun copyRecordedFile(context: Context) {

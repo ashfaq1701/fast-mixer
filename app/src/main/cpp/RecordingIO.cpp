@@ -153,7 +153,6 @@ int32_t RecordingIO::write(const int16_t *sourceData, int32_t numSamples) {
         mData = newData;
     }
 
-    currentMax = 0;
     for(int i = 0; i < numSamples; i++) {
         mData[mWriteIndex++] = sourceData[i] * gain_factor;
         if (currentMax < abs(sourceData[i])) {
@@ -209,7 +208,9 @@ void RecordingIO::setLivePlaybackEnabled(bool livePlaybackEnabled) {
 }
 
 int RecordingIO::getCurrentMax() {
-    return currentMax;
+    int temp = currentMax;
+    currentMax = 0;
+    return temp;
 }
 
 void RecordingIO::resetCurrentMax() {

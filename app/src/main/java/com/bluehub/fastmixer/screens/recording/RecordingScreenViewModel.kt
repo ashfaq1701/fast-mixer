@@ -99,7 +99,7 @@ class RecordingScreenViewModel(override val context: Context?, private val audio
             withContext(Dispatchers.IO) {
                 context?.let {
                     repository.createCacheDirectory(context!!.cacheDir.absolutePath)
-                    repository.createAudioEngine()
+                    repository.createAudioEngine(this@RecordingScreenViewModel)
                 }
             }
             context?.let {
@@ -143,7 +143,8 @@ class RecordingScreenViewModel(override val context: Context?, private val audio
         uiScope.launch {
             withContext(Dispatchers.IO) {
                 if (_eventIsRecording.value == false) {
-                     repository.startRecording()
+                    repository.resetCurrentMax()
+                    repository.startRecording()
                     _eventLivePlaybackSet.value?.let {
                         if (it) {
                             repository.startLivePlayback()
@@ -244,7 +245,6 @@ class RecordingScreenViewModel(override val context: Context?, private val audio
         timer?.let {
             it.cancel()
             audioRecordView.recreate()
-            repository.resetCurrentMax()
         }
     }
 }

@@ -1,5 +1,7 @@
 package com.bluehub.fastmixer.common.audio
 
+import com.bluehub.fastmixer.screens.recording.RecordingScreenViewModel
+
 class AudioEngineProxy {
     companion object {
         private val instance: AudioEngineProxy = AudioEngineProxy()
@@ -9,8 +11,11 @@ class AudioEngineProxy {
         }
     }
 
-    fun create(appPathStr: String, recordingSessionIdStr: String): Boolean =
-        AudioEngine.create(appPathStr, recordingSessionIdStr)
+    fun create(appPathStr: String,
+               recordingSessionIdStr: String,
+               recordingScreenViewModelPassed: Boolean = false,
+               viewModel: RecordingScreenViewModel? = null): Boolean =
+        AudioEngine.create(appPathStr, recordingSessionIdStr, recordingScreenViewModelPassed, viewModel)
 
     fun delete() = AudioEngine.delete()
 
