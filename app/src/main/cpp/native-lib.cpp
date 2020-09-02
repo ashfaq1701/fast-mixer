@@ -12,12 +12,22 @@ const char *TAG = "native-lib: %s";
 static AudioEngine *audioEngine = nullptr;
 
 extern "C" {
+    method_ids prepate_kotlin_method_ids(JNIEnv *env) {
+        jclass recordingVMClass = env->FindClass("com/bluehub/fastmixer/screens/recording/RecordingScreenViewModel");
+        method_ids kotlinMethodIds {
+            .recordingScreenVMTogglePlay = env->GetMethodID(recordingVMClass, "togglePlay", "()V")
+        };
+        return kotlinMethodIds;
+    }
+
     JNIEXPORT jboolean JNICALL
     Java_com_bluehub_fastmixer_common_audio_AudioEngine_create(JNIEnv *env, jclass, jstring appDirStr, jstring recordingSessionIdStr, jboolean  recordingScreenViewModelPassed, jobject viewModel) {
         if (audioEngine == nullptr) {
             char* appDir = const_cast<char *>(env->GetStringUTFChars(appDirStr, NULL));
             char* recordingSessionId = const_cast<char *>(env->GetStringUTFChars(
                     recordingSessionIdStr, NULL));
+
+            method_ids kotlinMethodIds = prepate_kotlin_method_ids(env);
             audioEngine = new AudioEngine(appDir, recordingSessionId);
         }
         return (audioEngine != nullptr);
