@@ -3,19 +3,32 @@
 //
 
 #include <oboe/Oboe.h>
+
+#include <utility>
 #include "AudioEngine.h"
 #include "logging_macros.h"
 
-AudioEngine::AudioEngine(char* appDir, char* recordingSessionId, shared_ptr<jobject> recordingScreenViewModel, shared_ptr<method_ids> kotlinMethodIds, bool recordingScreenViewModelPassed) {
+AudioEngine::AudioEngine(
+        char* appDir,
+        char* recordingSessionId,
+        JNIEnv* env,
+        shared_ptr<jobject> recordingScreenViewModel,
+        shared_ptr<method_ids> viewModelMethodIds,
+        bool recordingScreenViewModelPassed) {
     assert(StreamConstants::mInputChannelCount == StreamConstants::mOutputChannelCount);
     mAppDir = appDir;
     mRecordingSessionId = recordingSessionId;
 
     char* recordingFilePath = strcat(mAppDir, "/recording.wav");
     mRecordingIO.setRecordingFilePath(recordingFilePath);
-    mRecordingIO.setRecordingScreenViewModel(recordingScreenViewModel);
-    mRecordingIO.setViewModelMethodIds(kotlinMethodIds);
-    mRecordingIO.setIsRecordingScreenViewModelPassed(recordingScreenViewModelPassed);
+    mRecordingIO.setTogglePlaybackCallback([&] () {
+        togglePlayback();
+    });
+
+    mEnv = env;
+    mRecordingScreenViewModel = std::move(recordingScreenViewModel);
+    mViewModelMethodIds = std::move(viewModelMethodIds);
+    mRecordingScreenViewModelPassed = recordingScreenViewModelPassed;
 }
 
 AudioEngine::~AudioEngine() {
@@ -145,6 +158,14 @@ int AudioEngine::getCurrentMax() {
 
 void AudioEngine::resetCurrentMax() {
     mRecordingIO.resetCurrentMax();
+}
+
+void AudioEngine::togglePlayback() {
+    if (mEnv != nullptr) {
+        if (mRecordingScreenViewModelPassed && mRecordingScreenViewModel != nullptr) {
+            mEnv->CallVoidMethod(*mRecordingScreenViewModel, mViewModelMethodIds->recordingScreenVMTogglePlay);
+        }
+    }
 }
 
 

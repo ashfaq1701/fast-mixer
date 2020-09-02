@@ -217,14 +217,6 @@ void RecordingIO::resetCurrentMax() {
     currentMax = 0;
 }
 
-void RecordingIO::setRecordingScreenViewModel(std::shared_ptr<jobject> recordingScreenViewModel) {
-    mRecordingScreenViewModel = recordingScreenViewModel;
-}
-
-void RecordingIO::setViewModelMethodIds(std::shared_ptr<method_ids> methodIds) {
-    mMethodIds = methodIds;
-}
-
-void RecordingIO::setIsRecordingScreenViewModelPassed(bool recordingScreenViewModelPassed) {
-    mRecordingScreenViewModelPassed = recordingScreenViewModelPassed;
+void RecordingIO::setTogglePlaybackCallback(std::function<void(void)> stopPlaybackCallback) {
+    mStopPlaybackCallback = stopPlaybackCallback;
 }

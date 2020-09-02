@@ -50,9 +50,7 @@ public:
 
     void resetCurrentMax();
 
-    void setRecordingScreenViewModel(std::shared_ptr<jobject> recordingScreenViewModel);
-    void setViewModelMethodIds(std::shared_ptr<method_ids> methodIds);
-    void setIsRecordingScreenViewModelPassed(bool recordingScreenViewModelPassed);
+    void setTogglePlaybackCallback(std::function<void(void)> stopPlaybackCallback);
 private:
     const char* TAG = "RecordingIO:: %d";
 
@@ -61,10 +59,6 @@ private:
     std::string mRecordingFilePath;
 
     std::unique_ptr<Player> mRecordedTrack {nullptr};
-
-    std::shared_ptr<jobject> mRecordingScreenViewModel { nullptr };
-    std::shared_ptr<method_ids> mMethodIds { nullptr };
-    bool mRecordingScreenViewModelPassed = false;
 
     std::unique_ptr<SndfileHandle> mRecordingFile {nullptr};
 
@@ -79,6 +73,8 @@ private:
     bool mLivePlaybackEnabled = true;
     bool readyToFlush = false;
     bool toFlush = false;
+
+    std::function<void(void)> mStopPlaybackCallback = nullptr;
 
     int16_t* mData = new int16_t[kMaxSamples]{0};
 

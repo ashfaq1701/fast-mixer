@@ -32,7 +32,7 @@ extern "C" {
             auto recordingScreenViewModelPtr = make_shared<jobject>(recordingScreenViewModel);
             auto methodIdsPtr = make_shared<method_ids>(kotlinMethodIds);
 
-            audioEngine = new AudioEngine(appDir, recordingSessionId, recordingScreenViewModelPtr, methodIdsPtr, recordingScreenViewModelPassed);
+            audioEngine = new AudioEngine(appDir, recordingSessionId, env, recordingScreenViewModelPtr, methodIdsPtr, recordingScreenViewModelPassed);
         }
         return (audioEngine != nullptr);
     }
