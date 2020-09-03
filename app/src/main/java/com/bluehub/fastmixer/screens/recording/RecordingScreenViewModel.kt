@@ -226,6 +226,22 @@ class RecordingScreenViewModel(override val context: Context?, override val tag:
 
     }
 
+    fun startPlayback() {
+        uiScope.launch {
+            withContext(Dispatchers.IO) {
+                repository.startPlaying()
+            }
+        }
+    }
+
+    fun pausePlayback() {
+        uiScope.launch {
+            withContext(Dispatchers.IO) {
+                repository.pausePlaying()
+            }
+        }
+    }
+
     fun stopPlay() {
         _eventIsPlaying.postValue(false)
         uiScope.launch {

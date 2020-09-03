@@ -141,9 +141,17 @@ class RecordingScreen : PermissionFragment() {
                 }
             }
 
-            override fun onStartTrackingTouch(seekBar: SeekBar) {}
+            override fun onStartTrackingTouch(seekBar: SeekBar) {
+                if (localViewModel.eventIsPlaying.value == true) {
+                    localViewModel.pausePlayback()
+                }
+            }
 
-            override fun onStopTrackingTouch(seekBar: SeekBar) {}
+            override fun onStopTrackingTouch(seekBar: SeekBar) {
+                if (localViewModel.eventIsPlaying.value == true) {
+                    localViewModel.startPlayback()
+                }
+            }
         })
     }
 }
