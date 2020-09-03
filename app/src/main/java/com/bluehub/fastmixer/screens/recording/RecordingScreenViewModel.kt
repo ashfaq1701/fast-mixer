@@ -301,5 +301,13 @@ class RecordingScreenViewModel(override val context: Context?, override val tag:
         viewModelJob.cancel()
         repository.deleteAudioEngine()
         context?.unregisterReceiver(audioDeviceChangeListener)
+
+        visualizerTimer?.let {
+            it.cancel()
+        }
+
+        seekbarTimer?.let {
+            it.cancel()
+        }
     }
 }
