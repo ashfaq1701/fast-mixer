@@ -162,4 +162,20 @@ void AudioEngine::togglePlayback() {
     });
 }
 
+int AudioEngine::getTotalRecordedFrames() {
+    return mRecordingIO.getTotalRecordedFrames();
+}
+
+int AudioEngine::getCurrentPlaybackProgress() {
+    return mRecordingIO.getCurrentPlaybackProgress();
+}
+
+void AudioEngine::setPlayHead(int position) {
+    mRecordingIO.setPlayHead(position);
+}
+
+int AudioEngine::getDurationInSeconds() {
+    return mRecordingIO.getDurationInSeconds();
+}
+
 

@@ -176,4 +176,40 @@ extern "C" {
         }
         audioEngine->resetCurrentMax();
     }
+
+    JNIEXPORT jint JNICALL
+    Java_com_bluehub_fastmixer_common_audio_AudioEngine_getTotalRecordedFrames(JNIEnv *env, jclass) {
+        if (audioEngine == nullptr) {
+            LOGE("audioEngine is null, you must call create() method before calling this method");
+            return 0;
+        }
+        return audioEngine->getTotalRecordedFrames();
+    }
+
+    JNIEXPORT jint JNICALL
+    Java_com_bluehub_fastmixer_common_audio_AudioEngine_getCurrentPlaybackProgress(JNIEnv *env, jclass) {
+        if (audioEngine == nullptr) {
+            LOGE("audioEngine is null, you must call create() method before calling this method");
+            return 0;
+        }
+        return audioEngine->getCurrentPlaybackProgress();
+    }
+
+    JNIEXPORT void JNICALL
+    Java_com_bluehub_fastmixer_common_audio_AudioEngine_setPlayHead(JNIEnv *env, jclass, jint position) {
+        if (audioEngine == nullptr) {
+            LOGE("audioEngine is null, you must call create() method before calling this method");
+            return;
+        }
+        audioEngine->setPlayHead(position);
+    }
+
+    JNIEXPORT jint JNICALL
+    Java_com_bluehub_fastmixer_common_audio_AudioEngine_getDurationInSeconds(JNIEnv *env, jclass) {
+        if (audioEngine == nullptr) {
+            LOGE("audioEngine is null, you must call create() method before calling this method");
+            return 0;
+        }
+        return audioEngine->getDurationInSeconds();
+    }
 }

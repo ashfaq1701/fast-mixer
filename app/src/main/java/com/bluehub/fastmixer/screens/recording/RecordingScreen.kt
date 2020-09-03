@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.SeekBar
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -18,6 +19,7 @@ import com.bluehub.fastmixer.common.repositories.AudioRepository
 import com.bluehub.fastmixer.common.utils.DialogManager
 import com.bluehub.fastmixer.common.utils.ScreenConstants
 import com.bluehub.fastmixer.databinding.RecordingScreenBinding
+import com.visualizer.amplitude.AudioRecordView
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -38,6 +40,10 @@ class RecordingScreen : PermissionFragment() {
     override lateinit var viewModel: PermissionViewModel
     private lateinit var viewModelFactory: RecordingScreenViewModelFactory
 
+    private lateinit var recordingSeekbar: SeekBar
+
+    private lateinit var audioRecordView: AudioRecordView
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         getPresentationComponent().inject(this)
@@ -50,9 +56,11 @@ class RecordingScreen : PermissionFragment() {
         dataBinding = DataBindingUtil
             .inflate(inflater, R.layout.recording_screen, container, false)
 
-        val audioRecordView = dataBinding.recordingVisualizer
+        audioRecordView = dataBinding.recordingVisualizer
 
-        viewModelFactory = RecordingScreenViewModelFactory(context, audioRecordView, TAG)
+        recordingSeekbar = dataBinding.recordingSeekbar
+
+        viewModelFactory = RecordingScreenViewModelFactory(context, TAG)
 
         viewModel = ViewModelProviders.of(this, viewModelFactory)
             .get(RecordingScreenViewModel::class.java)
@@ -75,16 +83,20 @@ class RecordingScreen : PermissionFragment() {
         localViewModel.eventIsRecording.observe(viewLifecycleOwner, Observer { isRecording ->
             if (isRecording) {
                 localViewModel.startDrawingVisualizer()
+                localViewModel.startUpdatingTimer()
             } else {
                 localViewModel.stopDrawingVisualizer()
+                localViewModel.startUpdatingTimer()
             }
         })
 
         localViewModel.eventIsPlaying.observe(viewLifecycleOwner, Observer { isPlaying ->
             if (!isPlaying) {
                 dataBinding.togglePlay.text = getString(R.string.play_label)
+                localViewModel.stopTrackingSeekbar()
             } else {
                 dataBinding.togglePlay.text = getString(R.string.pause_label)
+                localViewModel.startTrackingSeekbar()
             }
         })
 
@@ -102,6 +114,36 @@ class RecordingScreen : PermissionFragment() {
                     ScreenConstants.STOP_RECORDING -> localViewModel.reset()
                 }
             }
+        })
+
+        localViewModel.audioVisualizerMaxAmplitude.observe(viewLifecycleOwner, Observer {
+            if (localViewModel.audioVisualizerRunning.value == true) {
+                audioRecordView.update(it)
+            }
+        })
+
+        localViewModel.audioVisualizerRunning.observe(viewLifecycleOwner, Observer {
+            audioRecordView.recreate()
+        })
+
+        localViewModel.seekbarMaxValue.observe(viewLifecycleOwner, Observer {
+            recordingSeekbar.max = it
+        })
+
+        localViewModel.seekbarProgress.observe(viewLifecycleOwner, Observer {
+            recordingSeekbar.progress = it
+        })
+
+        recordingSeekbar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
+                if (fromUser) {
+                    localViewModel.setPlayHead(progress)
+                }
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar) {}
+
+            override fun onStopTrackingTouch(seekBar: SeekBar) {}
         })
     }
 }

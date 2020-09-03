@@ -34,16 +34,12 @@ class RecordingRepository(val audioEngineProxy: AudioEngineProxy) {
         audioEngineProxy.stopLivePlayback()
     }
 
-    suspend fun startPlaying() {
-        withContext(Dispatchers.IO) {
-            audioEngineProxy.startPlayback()
-        }
+    fun startPlaying() {
+        audioEngineProxy.startPlayback()
     }
 
-    suspend fun pausePlaying() {
-        withContext(Dispatchers.IO) {
-            audioEngineProxy.pausePlayback()
-        }
+    fun pausePlaying() {
+        audioEngineProxy.pausePlayback()
     }
 
     suspend fun stopPlaying() {
@@ -112,4 +108,12 @@ class RecordingRepository(val audioEngineProxy: AudioEngineProxy) {
     fun getCurrentMax() = audioEngineProxy.getCurrentMax()
 
     fun resetCurrentMax() = audioEngineProxy.resetCurrentMax()
+
+    fun getTotalRecordedFrames() = audioEngineProxy.getTotalRecordedFrames()
+
+    fun getCurrentPlaybackProgress() = audioEngineProxy.getCurrentPlaybackProgress()
+
+    fun setPlayHead(position: Int) = audioEngineProxy.setPlayHead(position)
+
+    fun getDurationInSeconds() = audioEngineProxy.getDurationInSeconds()
 }

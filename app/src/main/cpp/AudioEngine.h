@@ -44,6 +44,14 @@ public:
 
     void togglePlayback();
 
+    int getTotalRecordedFrames();
+
+    int getCurrentPlaybackProgress();
+
+    void setPlayHead(int position);
+
+    int getDurationInSeconds();
+
 private:
     const char* TAG = "Audio Engine:: %s";
 

@@ -16,14 +16,13 @@ import com.bluehub.fastmixer.common.permissions.PermissionViewModel
 import com.bluehub.fastmixer.common.repositories.AudioRepository
 import com.bluehub.fastmixer.common.utils.PermissionManager
 import com.bluehub.fastmixer.common.utils.ScreenConstants
-import com.visualizer.amplitude.AudioRecordView
 import kotlinx.coroutines.*
 import timber.log.Timber
 import java.nio.file.Files
 import java.util.*
 import javax.inject.Inject
 
-class RecordingScreenViewModel(override val context: Context?, private val audioRecordView: AudioRecordView, override val tag: String) : PermissionViewModel(context, tag) {
+class RecordingScreenViewModel(override val context: Context?, override val tag: String) : PermissionViewModel(context, tag) {
     companion object {
         private lateinit var instance: RecordingScreenViewModel
 
@@ -35,6 +34,7 @@ class RecordingScreenViewModel(override val context: Context?, private val audio
         public fun setStopPlay() {
             if (::instance.isInitialized) {
                 instance.stopPlay()
+                instance.stopTrackingSeekbar()
             }
         }
     }
@@ -56,7 +56,9 @@ class RecordingScreenViewModel(override val context: Context?, private val audio
     @Inject
     lateinit var audioDeviceChangeListener: AudioDeviceChangeListener
 
-    private var timer: Timer? = null
+    private var visualizerTimer: Timer? = null
+    private var seekbarTimer: Timer? = null
+    private var recordingTimer: Timer?  = null
 
     private val _eventIsRecording = MutableLiveData<Boolean>(false)
     val eventIsRecording: LiveData<Boolean>
@@ -80,6 +82,26 @@ class RecordingScreenViewModel(override val context: Context?, private val audio
         else
             context!!.getString(R.string.start_recording_label)
     }
+
+    private val _seekbarProgress = MutableLiveData<Int>(0)
+    val seekbarProgress: LiveData<Int>
+        get() = _seekbarProgress
+
+    private val _seekbarMaxValue = MutableLiveData<Int>(0)
+    val seekbarMaxValue: LiveData<Int>
+        get() = _seekbarMaxValue
+
+    private val _audioVisualizerMaxAmplitude = MutableLiveData<Int>(0)
+    val audioVisualizerMaxAmplitude: LiveData<Int>
+        get() = _audioVisualizerMaxAmplitude
+
+    private val _audioVisualizerRunning = MutableLiveData<Boolean>(false)
+    val audioVisualizerRunning: LiveData<Boolean>
+        get() = _audioVisualizerRunning
+
+    private val _recordingTimerText = MutableLiveData<String>("00:00")
+    val recordingTimerText: LiveData<String>
+        get() = _recordingTimerText
 
     private val _livePlaybackPermitted = MutableLiveData<Boolean>(false)
 
@@ -191,16 +213,17 @@ class RecordingScreenViewModel(override val context: Context?, private val audio
     }
 
     fun togglePlay() {
-        _eventIsPlaying.value = !_eventIsPlaying.value!!
-        if(_eventIsPlaying.value == true) {
-            uiScope.launch {
-                repository.startPlaying()
+        uiScope.launch {
+            withContext(Dispatchers.IO) {
+                if(_eventIsPlaying.value == false) {
+                    repository.startPlaying()
+                } else {
+                    repository.pausePlaying()
+                }
             }
-        } else {
-            uiScope.launch {
-                repository.pausePlaying()
-            }
+            _eventIsPlaying.value = !_eventIsPlaying.value!!
         }
+
     }
 
     fun stopPlay() {
@@ -238,6 +261,7 @@ class RecordingScreenViewModel(override val context: Context?, private val audio
                 }
             }
             repository.copyRecordedFile(context!!)
+            endUpdatingTimer()
             _eventGoBack.value = true
         }
     }
@@ -247,20 +271,39 @@ class RecordingScreenViewModel(override val context: Context?, private val audio
     }
 
     fun startDrawingVisualizer() {
-        timer = Timer()
-        timer?.schedule(object : TimerTask() {
+        _audioVisualizerRunning.value = true
+        visualizerTimer = Timer()
+        visualizerTimer?.schedule(object : TimerTask() {
             override fun run() {
-                val currentMaxAmplitude = repository.getCurrentMax()
-                audioRecordView.update(currentMaxAmplitude)
+                _audioVisualizerMaxAmplitude.postValue(repository.getCurrentMax())
             }
         }, 0, 50)
     }
 
     fun stopDrawingVisualizer() {
-        timer?.let {
+        visualizerTimer?.let {
             it.cancel()
-            audioRecordView.recreate()
+            _audioVisualizerRunning.value = false
         }
+    }
+
+    fun startTrackingSeekbar() {
+        _seekbarProgress.value = 0
+        _seekbarMaxValue.value = repository.getTotalRecordedFrames()
+        seekbarTimer = Timer()
+        seekbarTimer?.schedule(object: TimerTask() {
+            override fun run() {
+                _seekbarProgress.postValue(repository.getCurrentPlaybackProgress())
+            }
+        }, 0, 10)
+    }
+
+    fun stopTrackingSeekbar() {
+        seekbarTimer?.cancel()
+    }
+
+    fun setPlayHead(position: Int) {
+        repository.setPlayHead(position)
     }
 
     override fun onCleared() {
@@ -268,5 +311,43 @@ class RecordingScreenViewModel(override val context: Context?, private val audio
         viewModelJob.cancel()
         repository.deleteAudioEngine()
         context?.unregisterReceiver(audioDeviceChangeListener)
+
+        visualizerTimer?.cancel()
+
+        seekbarTimer?.cancel()
+
+        recordingTimer?.cancel()
+    }
+
+    fun startUpdatingTimer() {
+        recordingTimer = Timer()
+        recordingTimer?.schedule(object: TimerTask() {
+            override fun run() {
+                val durationInSeconds = repository.getDurationInSeconds()
+                val minutes = durationInSeconds / 60
+                val seconds = durationInSeconds % 60
+
+                val minutesStr = if (minutes < 10) {
+                    "0$minutes"
+                } else {
+                    minutes.toString()
+                }
+
+                val secondsStr = if (seconds < 10) {
+                    "0$seconds"
+                } else {
+                    seconds.toString()
+                }
+
+                val timeStr = "$minutesStr:$secondsStr"
+
+                _recordingTimerText.postValue(timeStr)
+            }
+        }, 0, 1000)
+    }
+
+    fun endUpdatingTimer() {
+        recordingTimer?.cancel()
+        recordingTimer = null
     }
 }
