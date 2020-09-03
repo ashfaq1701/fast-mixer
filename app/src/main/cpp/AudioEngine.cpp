@@ -170,4 +170,8 @@ int AudioEngine::getCurrentPlaybackProgress() {
     return mRecordingIO.getCurrentPlaybackProgress();
 }
 
+void AudioEngine::setPlayHead(int position) {
+    mRecordingIO.setPlayHead(position);
+}
+
 

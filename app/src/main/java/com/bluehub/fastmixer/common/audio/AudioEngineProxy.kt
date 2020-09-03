@@ -47,4 +47,6 @@ class AudioEngineProxy {
     fun getTotalRecordedFrames() = AudioEngine.getTotalRecordedFrames()
 
     fun getCurrentPlaybackProgress() = AudioEngine.getCurrentPlaybackProgress()
+
+    fun setPlayHead(position: Int) = AudioEngine.setPlayHead(position)
 }

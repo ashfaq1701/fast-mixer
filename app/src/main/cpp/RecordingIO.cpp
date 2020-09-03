@@ -235,3 +235,9 @@ int32_t RecordingIO::getCurrentPlaybackProgress() {
     }
     return 0;
 }
+
+void RecordingIO::setPlayHead(int position) {
+    if (mRecordedTrack != nullptr) {
+        mRecordedTrack->setPlayHead(position);
+    }
+}

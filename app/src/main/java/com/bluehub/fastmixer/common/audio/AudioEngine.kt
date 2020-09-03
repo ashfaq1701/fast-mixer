@@ -45,5 +45,7 @@ class AudioEngine {
         @JvmStatic external fun getTotalRecordedFrames(): Int
 
         @JvmStatic external fun getCurrentPlaybackProgress(): Int
+
+        @JvmStatic external fun setPlayHead(position: Int)
     }
 }

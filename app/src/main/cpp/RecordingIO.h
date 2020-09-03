@@ -55,6 +55,8 @@ public:
     int getTotalRecordedFrames();
 
     int getCurrentPlaybackProgress();
+
+    void setPlayHead(int position);
 private:
     const char* TAG = "RecordingIO:: %d";
 

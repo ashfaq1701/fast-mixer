@@ -34,6 +34,7 @@ class RecordingScreenViewModel(override val context: Context?, override val tag:
         public fun setStopPlay() {
             if (::instance.isInitialized) {
                 instance.stopPlay()
+                instance.stopTrackingSeekbar()
             }
         }
     }
@@ -207,16 +208,17 @@ class RecordingScreenViewModel(override val context: Context?, override val tag:
     }
 
     fun togglePlay() {
-        _eventIsPlaying.value = !_eventIsPlaying.value!!
-        if(_eventIsPlaying.value == true) {
-            uiScope.launch {
-                repository.startPlaying()
+        uiScope.launch {
+            withContext(Dispatchers.IO) {
+                if(_eventIsPlaying.value == false) {
+                    repository.startPlaying()
+                } else {
+                    repository.pausePlaying()
+                }
             }
-        } else {
-            uiScope.launch {
-                repository.pausePlaying()
-            }
+            _eventIsPlaying.value = !_eventIsPlaying.value!!
         }
+
     }
 
     fun stopPlay() {
@@ -281,19 +283,21 @@ class RecordingScreenViewModel(override val context: Context?, override val tag:
 
     fun startTrackingSeekbar() {
         _seekbarProgress.value = 0
+        _seekbarMaxValue.value = repository.getTotalRecordedFrames()
         seekbarTimer = Timer()
         seekbarTimer?.schedule(object: TimerTask() {
             override fun run() {
-
+                _seekbarProgress.postValue(repository.getCurrentPlaybackProgress())
             }
-        }, 0, 100)
+        }, 0, 10)
     }
 
     fun stopTrackingSeekbar() {
-        seekbarTimer?.let {
-            it.cancel()
-            _seekbarProgress.value = 0
-        }
+        seekbarTimer?.cancel()
+    }
+
+    fun setPlayHead(position: Int) {
+        repository.setPlayHead(position)
     }
 
     override fun onCleared() {

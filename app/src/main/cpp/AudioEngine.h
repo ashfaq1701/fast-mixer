@@ -48,6 +48,8 @@ public:
 
     int getCurrentPlaybackProgress();
 
+    void setPlayHead(int position);
+
 private:
     const char* TAG = "Audio Engine:: %s";
 

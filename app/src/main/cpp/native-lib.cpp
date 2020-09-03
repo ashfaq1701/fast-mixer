@@ -194,4 +194,13 @@ extern "C" {
         }
         return audioEngine->getCurrentPlaybackProgress();
     }
+
+    JNIEXPORT void JNICALL
+    Java_com_bluehub_fastmixer_common_audio_AudioEngine_setPlayHead(JNIEnv *env, jclass, jint position) {
+        if (audioEngine == nullptr) {
+            LOGE("audioEngine is null, you must call create() method before calling this method");
+            return;
+        }
+        audioEngine->setPlayHead(position);
+    }
 }

@@ -91,11 +91,10 @@ class RecordingScreen : PermissionFragment() {
         localViewModel.eventIsPlaying.observe(viewLifecycleOwner, Observer { isPlaying ->
             if (!isPlaying) {
                 dataBinding.togglePlay.text = getString(R.string.play_label)
-
-
+                localViewModel.stopTrackingSeekbar()
             } else {
-
                 dataBinding.togglePlay.text = getString(R.string.pause_label)
+                localViewModel.startTrackingSeekbar()
             }
         })
 
@@ -123,6 +122,26 @@ class RecordingScreen : PermissionFragment() {
 
         localViewModel.audioVisualizerRunning.observe(viewLifecycleOwner, Observer {
             audioRecordView.recreate()
+        })
+
+        localViewModel.seekbarMaxValue.observe(viewLifecycleOwner, Observer {
+            recordingSeekbar.max = it
+        })
+
+        localViewModel.seekbarProgress.observe(viewLifecycleOwner, Observer {
+            recordingSeekbar.progress = it
+        })
+
+        recordingSeekbar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
+                if (fromUser) {
+                    localViewModel.setPlayHead(progress)
+                }
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar) {}
+
+            override fun onStopTrackingTouch(seekBar: SeekBar) {}
         })
     }
 }
