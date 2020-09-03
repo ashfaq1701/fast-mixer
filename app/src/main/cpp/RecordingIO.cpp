@@ -221,3 +221,17 @@ void RecordingIO::resetCurrentMax() {
 void RecordingIO::setTogglePlaybackCallback(std::function<void()> stopPlaybackCallback) {
     mStopPlaybackCallback = stopPlaybackCallback;
 }
+
+int RecordingIO::getTotalRecordedFrames() {
+    if (mRecordedTrack != nullptr) {
+        return mRecordedTrack->getTotalSampleFrames();
+    }
+    return 0;
+}
+
+int32_t RecordingIO::getCurrentPlaybackProgress() {
+    if (mRecordedTrack != nullptr) {
+        return mRecordedTrack->getPlayHead();
+    }
+    return 0;
+}

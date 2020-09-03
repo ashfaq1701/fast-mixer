@@ -41,5 +41,9 @@ class AudioEngine {
         @JvmStatic external fun getCurrentMax(): Int
 
         @JvmStatic external fun resetCurrentMax()
+
+        @JvmStatic external fun getTotalRecordedFrames(): Int
+
+        @JvmStatic external fun getCurrentPlaybackProgress(): Int
     }
 }

@@ -16,14 +16,13 @@ import com.bluehub.fastmixer.common.permissions.PermissionViewModel
 import com.bluehub.fastmixer.common.repositories.AudioRepository
 import com.bluehub.fastmixer.common.utils.PermissionManager
 import com.bluehub.fastmixer.common.utils.ScreenConstants
-import com.visualizer.amplitude.AudioRecordView
 import kotlinx.coroutines.*
 import timber.log.Timber
 import java.nio.file.Files
 import java.util.*
 import javax.inject.Inject
 
-class RecordingScreenViewModel(override val context: Context?, private val audioRecordView: AudioRecordView, override val tag: String) : PermissionViewModel(context, tag) {
+class RecordingScreenViewModel(override val context: Context?, override val tag: String) : PermissionViewModel(context, tag) {
     companion object {
         private lateinit var instance: RecordingScreenViewModel
 
@@ -56,7 +55,8 @@ class RecordingScreenViewModel(override val context: Context?, private val audio
     @Inject
     lateinit var audioDeviceChangeListener: AudioDeviceChangeListener
 
-    private var timer: Timer? = null
+    private var visualizerTimer: Timer? = null
+    private var seekbarTimer: Timer? = null
 
     private val _eventIsRecording = MutableLiveData<Boolean>(false)
     val eventIsRecording: LiveData<Boolean>
@@ -80,6 +80,22 @@ class RecordingScreenViewModel(override val context: Context?, private val audio
         else
             context!!.getString(R.string.start_recording_label)
     }
+
+    private val _seekbarProgress = MutableLiveData<Int>(0)
+    val seekbarProgress: LiveData<Int>
+        get() = _seekbarProgress
+
+    private val _seekbarMaxValue = MutableLiveData<Int>(0)
+    val seekbarMaxValue: LiveData<Int>
+        get() = _seekbarMaxValue
+
+    private val _audioVisualizerMaxAmplitude = MutableLiveData<Int>(0)
+    val audioVisualizerMaxAmplitude: LiveData<Int>
+        get() = _audioVisualizerMaxAmplitude
+
+    private val _audioVisualizerRunning = MutableLiveData<Boolean>(false)
+    val audioVisualizerRunning: LiveData<Boolean>
+        get() = _audioVisualizerRunning
 
     private val _livePlaybackPermitted = MutableLiveData<Boolean>(false)
 
@@ -247,19 +263,36 @@ class RecordingScreenViewModel(override val context: Context?, private val audio
     }
 
     fun startDrawingVisualizer() {
-        timer = Timer()
-        timer?.schedule(object : TimerTask() {
+        _audioVisualizerRunning.value = true
+        visualizerTimer = Timer()
+        visualizerTimer?.schedule(object : TimerTask() {
             override fun run() {
-                val currentMaxAmplitude = repository.getCurrentMax()
-                audioRecordView.update(currentMaxAmplitude)
+                _audioVisualizerMaxAmplitude.postValue(repository.getCurrentMax())
             }
         }, 0, 50)
     }
 
     fun stopDrawingVisualizer() {
-        timer?.let {
+        visualizerTimer?.let {
             it.cancel()
-            audioRecordView.recreate()
+            _audioVisualizerRunning.value = false
+        }
+    }
+
+    fun startTrackingSeekbar() {
+        _seekbarProgress.value = 0
+        seekbarTimer = Timer()
+        seekbarTimer?.schedule(object: TimerTask() {
+            override fun run() {
+
+            }
+        }, 0, 100)
+    }
+
+    fun stopTrackingSeekbar() {
+        seekbarTimer?.let {
+            it.cancel()
+            _seekbarProgress.value = 0
         }
     }
 

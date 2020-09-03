@@ -51,6 +51,10 @@ public:
     void resetCurrentMax();
 
     void setTogglePlaybackCallback(std::function<void(void)> stopPlaybackCallback);
+
+    int getTotalRecordedFrames();
+
+    int getCurrentPlaybackProgress();
 private:
     const char* TAG = "RecordingIO:: %d";
 

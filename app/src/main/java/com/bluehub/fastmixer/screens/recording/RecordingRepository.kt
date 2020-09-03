@@ -112,4 +112,8 @@ class RecordingRepository(val audioEngineProxy: AudioEngineProxy) {
     fun getCurrentMax() = audioEngineProxy.getCurrentMax()
 
     fun resetCurrentMax() = audioEngineProxy.resetCurrentMax()
+
+    fun getTotalRecordedFrames() = audioEngineProxy.getTotalRecordedFrames()
+
+    fun getCurrentPlaybackProgress() = audioEngineProxy.getCurrentPlaybackProgress()
 }
