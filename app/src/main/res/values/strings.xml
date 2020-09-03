@@ -13,4 +13,5 @@
     <string name="play_label">Play</string>
     <string name="pause_label">Pause</string>
     <string name="live_playback_enabled">Live Playback Enabled</string>
+    <string name="recording_time">00:00</string>
 </resources>

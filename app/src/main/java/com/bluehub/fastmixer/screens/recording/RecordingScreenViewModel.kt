@@ -58,6 +58,7 @@ class RecordingScreenViewModel(override val context: Context?, override val tag:
 
     private var visualizerTimer: Timer? = null
     private var seekbarTimer: Timer? = null
+    private var recordingTimer: Timer?  = null
 
     private val _eventIsRecording = MutableLiveData<Boolean>(false)
     val eventIsRecording: LiveData<Boolean>
@@ -97,6 +98,10 @@ class RecordingScreenViewModel(override val context: Context?, override val tag:
     private val _audioVisualizerRunning = MutableLiveData<Boolean>(false)
     val audioVisualizerRunning: LiveData<Boolean>
         get() = _audioVisualizerRunning
+
+    private val _recordingTimerText = MutableLiveData<String>("00:00")
+    val recordingTimerText: LiveData<String>
+        get() = _recordingTimerText
 
     private val _livePlaybackPermitted = MutableLiveData<Boolean>(false)
 
@@ -256,6 +261,7 @@ class RecordingScreenViewModel(override val context: Context?, override val tag:
                 }
             }
             repository.copyRecordedFile(context!!)
+            endUpdatingTimer()
             _eventGoBack.value = true
         }
     }
@@ -306,12 +312,42 @@ class RecordingScreenViewModel(override val context: Context?, override val tag:
         repository.deleteAudioEngine()
         context?.unregisterReceiver(audioDeviceChangeListener)
 
-        visualizerTimer?.let {
-            it.cancel()
-        }
+        visualizerTimer?.cancel()
 
-        seekbarTimer?.let {
-            it.cancel()
-        }
+        seekbarTimer?.cancel()
+
+        recordingTimer?.cancel()
+    }
+
+    fun startUpdatingTimer() {
+        recordingTimer = Timer()
+        recordingTimer?.schedule(object: TimerTask() {
+            override fun run() {
+                val durationInSeconds = repository.getDurationInSeconds()
+                val minutes = durationInSeconds / 60
+                val seconds = durationInSeconds % 60
+
+                val minutesStr = if (minutes < 10) {
+                    "0$minutes"
+                } else {
+                    minutes.toString()
+                }
+
+                val secondsStr = if (seconds < 10) {
+                    "0$seconds"
+                } else {
+                    seconds.toString()
+                }
+
+                val timeStr = "$minutesStr:$secondsStr"
+
+                _recordingTimerText.postValue(timeStr)
+            }
+        }, 0, 1000)
+    }
+
+    fun endUpdatingTimer() {
+        recordingTimer?.cancel()
+        recordingTimer = null
     }
 }

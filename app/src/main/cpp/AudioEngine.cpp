@@ -174,4 +174,8 @@ void AudioEngine::setPlayHead(int position) {
     mRecordingIO.setPlayHead(position);
 }
 
+int AudioEngine::getDurationInSeconds() {
+    return mRecordingIO.getDurationInSeconds();
+}
+
 

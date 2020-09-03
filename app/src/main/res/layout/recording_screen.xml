@@ -90,5 +90,18 @@
             app:layout_constraintStart_toStartOf="@+id/toggle_record"
             app:layout_constraintBottom_toBottomOf="parent"
             android:layout_marginBottom="20dp" />
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@{viewModel.recordingTimerText}"
+            tools:text="@string/recording_time"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:gravity="center"
+            android:textSize="@dimen/recording_timer_text_size" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

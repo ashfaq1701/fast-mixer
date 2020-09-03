@@ -203,4 +203,13 @@ extern "C" {
         }
         audioEngine->setPlayHead(position);
     }
+
+    JNIEXPORT jint JNICALL
+    Java_com_bluehub_fastmixer_common_audio_AudioEngine_getDurationInSeconds(JNIEnv *env, jclass) {
+        if (audioEngine == nullptr) {
+            LOGE("audioEngine is null, you must call create() method before calling this method");
+            return 0;
+        }
+        return audioEngine->getDurationInSeconds();
+    }
 }

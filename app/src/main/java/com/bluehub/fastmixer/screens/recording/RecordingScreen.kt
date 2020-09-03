@@ -83,8 +83,10 @@ class RecordingScreen : PermissionFragment() {
         localViewModel.eventIsRecording.observe(viewLifecycleOwner, Observer { isRecording ->
             if (isRecording) {
                 localViewModel.startDrawingVisualizer()
+                localViewModel.startUpdatingTimer()
             } else {
                 localViewModel.stopDrawingVisualizer()
+                localViewModel.startUpdatingTimer()
             }
         })
 

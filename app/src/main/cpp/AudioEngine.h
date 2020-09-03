@@ -50,6 +50,8 @@ public:
 
     void setPlayHead(int position);
 
+    int getDurationInSeconds();
+
 private:
     const char* TAG = "Audio Engine:: %s";
 

@@ -241,3 +241,9 @@ void RecordingIO::setPlayHead(int position) {
         mRecordedTrack->setPlayHead(position);
     }
 }
+
+int RecordingIO::getDurationInSeconds() {
+    return (int) mTotalSamples / (StreamConstants::mInputChannelCount * StreamConstants::mSampleRate);
+}
+
+
