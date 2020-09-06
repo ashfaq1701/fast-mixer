@@ -62,6 +62,8 @@ class MixingScreen : PermissionFragment() {
 
         dataBinding.lifecycleOwner = viewLifecycleOwner
 
+        localViewModel.reinitRecordedFiles()
+
         navArguments.recordedFilePath?.let {
             if (it.isNotEmpty()) localViewModel.addRecordedFilePath(it)
         }

@@ -8,13 +8,14 @@ import com.bluehub.fastmixer.common.constants.BundleKeys
 import com.bluehub.fastmixer.common.permissions.PermissionViewModel
 import com.bluehub.fastmixer.common.utils.PermissionManager
 import com.bluehub.fastmixer.common.utils.ScreenConstants
+import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 
 class MixingScreenViewModel(override val context: Context?, override val tag: String): PermissionViewModel(context, tag) {
     override var TAG: String = javaClass.simpleName
 
-    private val audioFiles: MutableList<AudioFile>
+    private var audioFiles: MutableList<AudioFile>
     val audioFilesLiveData = MutableLiveData<MutableList<AudioFile>>(mutableListOf())
 
     init {
@@ -64,5 +65,12 @@ class MixingScreenViewModel(override val context: Context?, override val tag: St
             audioFiles.add(AudioFile(filePath, AudioFileType.RECORDED, false))
             audioFilesLiveData.value = audioFiles
         }
+    }
+
+    fun reinitRecordedFiles() {
+        audioFiles = audioFiles.map {
+            it.copy(rendered = false)
+        } as MutableList<AudioFile>
+        audioFilesLiveData.value = audioFiles
     }
 }
