@@ -6,9 +6,12 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
+import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import androidx.navigation.navGraphViewModels
 import com.bluehub.fastmixer.R
 import com.bluehub.fastmixer.common.permissions.PermissionFragment
 import com.bluehub.fastmixer.common.permissions.PermissionViewModel
@@ -49,8 +52,10 @@ class MixingScreen : PermissionFragment() {
             .inflate(inflater, R.layout.mixing_screen, container, false)
 
         viewModelFactory = MixingScreenViewModelFactory(context, TAG)
-        viewModel = ViewModelProviders.of(this, viewModelFactory)
-            .get(MixingScreenViewModel::class.java)
+
+       val scopedViewModel: MixingScreenViewModel by navGraphViewModels(R.id.nav_graph) { viewModelFactory }
+
+        viewModel = scopedViewModel
 
         val localViewModel = viewModel as MixingScreenViewModel
         dataBinding.mixingScreenViewModel = localViewModel
