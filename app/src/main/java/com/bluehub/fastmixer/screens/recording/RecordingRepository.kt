@@ -116,4 +116,6 @@ class RecordingRepository(val audioEngineProxy: AudioEngineProxy) {
     fun setPlayHead(position: Int) = audioEngineProxy.setPlayHead(position)
 
     fun getDurationInSeconds() = audioEngineProxy.getDurationInSeconds()
+
+    fun getRecordedFilePath(): String = "$cacheDir/recording.wav"
 }

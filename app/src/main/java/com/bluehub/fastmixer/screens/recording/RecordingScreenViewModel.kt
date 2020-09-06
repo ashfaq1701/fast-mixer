@@ -277,7 +277,7 @@ class RecordingScreenViewModel(override val context: Context?, override val tag:
                 }
             }
             repository.copyRecordedFile(context!!)
-            endUpdatingTimer()
+            stopUpdatingTimer()
             _eventGoBack.value = true
         }
     }
@@ -362,7 +362,7 @@ class RecordingScreenViewModel(override val context: Context?, override val tag:
         }, 0, 1000)
     }
 
-    fun endUpdatingTimer() {
+    fun stopUpdatingTimer() {
         recordingTimer?.cancel()
         recordingTimer = null
     }

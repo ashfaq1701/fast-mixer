@@ -63,7 +63,7 @@ extern "C" {
     JNIEXPORT void JNICALL
     Java_com_bluehub_fastmixer_common_audio_AudioEngine_startRecording(JNIEnv *env, jclass) {
         if (audioEngine == nullptr) {
-            LOGE("audioEngine is null, you must call create() method before calling this method");
+            LOGE("startRecording: audioEngine is null, you must call create() method before calling this method");
         }
         audioEngine->startRecording();
     }
@@ -71,7 +71,7 @@ extern "C" {
     JNIEXPORT void JNICALL
     Java_com_bluehub_fastmixer_common_audio_AudioEngine_stopRecording(JNIEnv *env, jclass) {
         if (audioEngine == nullptr) {
-            LOGE("audioEngine is null, you must call create() method before calling this method");
+            LOGE("stopRecording: audioEngine is null, you must call create() method before calling this method");
             return;
         }
         audioEngine->stopRecording();
@@ -80,7 +80,7 @@ extern "C" {
     JNIEXPORT void JNICALL
     Java_com_bluehub_fastmixer_common_audio_AudioEngine_pauseRecording(JNIEnv *env, jclass) {
         if (audioEngine == nullptr) {
-            LOGE("audioEngine is null, you must call create() method before calling this method");
+            LOGE("pauseRecording: audioEngine is null, you must call create() method before calling this method");
             return;
         }
         audioEngine->pauseRecording();
@@ -89,7 +89,7 @@ extern "C" {
     JNIEXPORT void JNICALL
     Java_com_bluehub_fastmixer_common_audio_AudioEngine_startPlayback(JNIEnv *env, jclass) {
         if (audioEngine == nullptr) {
-            LOGE("audioEngine is null, you must call create() method before calling this method");
+            LOGE("startPlayback: audioEngine is null, you must call create() method before calling this method");
             return;
         }
         audioEngine->startPlayback();
@@ -98,7 +98,7 @@ extern "C" {
     JNIEXPORT void JNICALL
     Java_com_bluehub_fastmixer_common_audio_AudioEngine_stopPlayback(JNIEnv *env, jclass) {
         if (audioEngine == nullptr) {
-            LOGE("audioEngine is null, you must call create() method before calling this method");
+            LOGE("stopPlayback: audioEngine is null, you must call create() method before calling this method");
             return;
         }
         audioEngine->stopAndResetPlayback();
@@ -107,7 +107,7 @@ extern "C" {
     JNIEXPORT void JNICALL
     Java_com_bluehub_fastmixer_common_audio_AudioEngine_pausePlayback(JNIEnv *env, jclass) {
         if (audioEngine == nullptr) {
-            LOGE("audioEngine is null, you must call create() method before calling this method");
+            LOGE("pausePlayback: audioEngine is null, you must call create() method before calling this method");
             return;
         }
         audioEngine->pausePlayback();
@@ -116,7 +116,7 @@ extern "C" {
     JNIEXPORT void JNICALL
     Java_com_bluehub_fastmixer_common_audio_AudioEngine_startLivePlayback(JNIEnv *env, jclass) {
         if (audioEngine == nullptr) {
-            LOGE("audioEngine is null, you must call create() method before calling this method");
+            LOGE("startLivePlayback: audioEngine is null, you must call create() method before calling this method");
             return;
         }
         audioEngine->startLivePlayback();
@@ -125,7 +125,7 @@ extern "C" {
     JNIEXPORT void JNICALL
     Java_com_bluehub_fastmixer_common_audio_AudioEngine_stopLivePlayback(JNIEnv *env, jclass) {
         if (audioEngine == nullptr) {
-            LOGE("audioEngine is null, you must call create() method before calling this method");
+            LOGE("stopLivePlayback: audioEngine is null, you must call create() method before calling this method");
             return;
         }
         audioEngine->stopLivePlayback();
@@ -134,7 +134,7 @@ extern "C" {
     JNIEXPORT void JNICALL
     Java_com_bluehub_fastmixer_common_audio_AudioEngine_pauseLivePlayback(JNIEnv *env, jclass) {
         if (audioEngine == nullptr) {
-            LOGE("audioEngine is null, you must call create() method before calling this method");
+            LOGE("pauseLivePlayback: audioEngine is null, you must call create() method before calling this method");
             return;
         }
         audioEngine->pauseLivePlayback();
@@ -143,7 +143,7 @@ extern "C" {
     JNIEXPORT void JNICALL
     Java_com_bluehub_fastmixer_common_audio_AudioEngine_flushWriteBuffer(JNIEnv *env, jclass) {
         if (audioEngine == nullptr) {
-            LOGE("audioEngine is null, you must call create() method before calling this method");
+            LOGE("flushWriteBuffer: audioEngine is null, you must call create() method before calling this method");
             return;
         }
         audioEngine->flushWriteBuffer();
@@ -152,7 +152,7 @@ extern "C" {
     JNIEXPORT void JNICALL
     Java_com_bluehub_fastmixer_common_audio_AudioEngine_restartPlayback(JNIEnv *env, jclass) {
         if (audioEngine == nullptr) {
-            LOGE("audioEngine is null, you must call create() method before calling this method");
+            LOGE("restartPlayback: audioEngine is null, you must call create() method before calling this method");
             return;
         }
         audioEngine->restartPlayback();
@@ -161,7 +161,7 @@ extern "C" {
     JNIEXPORT jint JNICALL
     Java_com_bluehub_fastmixer_common_audio_AudioEngine_getCurrentMax(JNIEnv *env, jclass) {
         if (audioEngine == nullptr) {
-            LOGE("audioEngine is null, you must call create() method before calling this method");
+            LOGE("getCurrentMax: audioEngine is null, you must call create() method before calling this method");
             return 0;
         }
         int currentMax = audioEngine->getCurrentMax();
@@ -171,7 +171,7 @@ extern "C" {
     JNIEXPORT void JNICALL
     Java_com_bluehub_fastmixer_common_audio_AudioEngine_resetCurrentMax(JNIEnv *env, jclass) {
         if (audioEngine == nullptr) {
-            LOGE("audioEngine is null, you must call create() method before calling this method");
+            LOGE("resetCurrentMax: audioEngine is null, you must call create() method before calling this method");
             return;
         }
         audioEngine->resetCurrentMax();
@@ -180,7 +180,7 @@ extern "C" {
     JNIEXPORT jint JNICALL
     Java_com_bluehub_fastmixer_common_audio_AudioEngine_getTotalRecordedFrames(JNIEnv *env, jclass) {
         if (audioEngine == nullptr) {
-            LOGE("audioEngine is null, you must call create() method before calling this method");
+            LOGE("getTotalRecordedFrames: audioEngine is null, you must call create() method before calling this method");
             return 0;
         }
         return audioEngine->getTotalRecordedFrames();
@@ -189,7 +189,7 @@ extern "C" {
     JNIEXPORT jint JNICALL
     Java_com_bluehub_fastmixer_common_audio_AudioEngine_getCurrentPlaybackProgress(JNIEnv *env, jclass) {
         if (audioEngine == nullptr) {
-            LOGE("audioEngine is null, you must call create() method before calling this method");
+            LOGE("getCurrentPlaybackProgress: audioEngine is null, you must call create() method before calling this method");
             return 0;
         }
         return audioEngine->getCurrentPlaybackProgress();
@@ -198,7 +198,7 @@ extern "C" {
     JNIEXPORT void JNICALL
     Java_com_bluehub_fastmixer_common_audio_AudioEngine_setPlayHead(JNIEnv *env, jclass, jint position) {
         if (audioEngine == nullptr) {
-            LOGE("audioEngine is null, you must call create() method before calling this method");
+            LOGE("setPlayHead: audioEngine is null, you must call create() method before calling this method");
             return;
         }
         audioEngine->setPlayHead(position);
@@ -207,7 +207,7 @@ extern "C" {
     JNIEXPORT jint JNICALL
     Java_com_bluehub_fastmixer_common_audio_AudioEngine_getDurationInSeconds(JNIEnv *env, jclass) {
         if (audioEngine == nullptr) {
-            LOGE("audioEngine is null, you must call create() method before calling this method");
+            LOGE("getDurationInSeconds: audioEngine is null, you must call create() method before calling this method");
             return 0;
         }
         return audioEngine->getDurationInSeconds();

@@ -13,6 +13,11 @@
         <action
             android:id="@+id/action_mixingScreen_to_recordingScreen"
             app:destination="@id/recordingScreen" />
+        <argument
+            android:name="recordedFilePath"
+            app:argType="string"
+            app:nullable="true"
+            android:defaultValue="" />
     </fragment>
     <fragment
         android:id="@+id/recordingScreen"

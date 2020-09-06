@@ -3,8 +3,6 @@ package com.bluehub.fastmixer.screens.mixing
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import com.bluehub.fastmixer.common.audio.AudioEngineProxy
 import com.bluehub.fastmixer.common.permissions.PermissionViewModel
 import com.bluehub.fastmixer.common.utils.PermissionManager
 import com.bluehub.fastmixer.common.utils.ScreenConstants
@@ -51,5 +49,9 @@ class MixingScreenViewModel(override val context: Context?, override val tag: St
 
     fun onRecordNavigated() {
         _eventRecord.value = false
+    }
+
+    fun addRecordedFilePath(filePath: String) {
+
     }
 }

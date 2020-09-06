@@ -1,7 +1,5 @@
 package com.bluehub.fastmixer.screens.recording
 
-import android.content.IntentFilter
-import android.media.AudioManager
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -12,15 +10,12 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import com.bluehub.fastmixer.R
-import com.bluehub.fastmixer.broadcastReceivers.AudioDeviceChangeListener
 import com.bluehub.fastmixer.common.permissions.PermissionFragment
 import com.bluehub.fastmixer.common.permissions.PermissionViewModel
-import com.bluehub.fastmixer.common.repositories.AudioRepository
 import com.bluehub.fastmixer.common.utils.DialogManager
 import com.bluehub.fastmixer.common.utils.ScreenConstants
 import com.bluehub.fastmixer.databinding.RecordingScreenBinding
 import com.visualizer.amplitude.AudioRecordView
-import timber.log.Timber
 import javax.inject.Inject
 
 
@@ -86,7 +81,7 @@ class RecordingScreen : PermissionFragment() {
                 localViewModel.startUpdatingTimer()
             } else {
                 localViewModel.stopDrawingVisualizer()
-                localViewModel.startUpdatingTimer()
+                localViewModel.stopUpdatingTimer()
             }
         })
 
@@ -102,7 +97,9 @@ class RecordingScreen : PermissionFragment() {
 
         localViewModel.eventGoBack.observe(viewLifecycleOwner, Observer { goBack ->
             if (goBack) {
-                findNavController().navigate(RecordingScreenDirections.actionRecordingScreenToMixingScreen())
+                val action = RecordingScreenDirections.actionRecordingScreenToMixingScreen()
+                action.recordedFilePath = localViewModel.repository.getRecordedFilePath()
+                findNavController().navigate(action)
                 localViewModel.resetGoBack()
             }
         })
