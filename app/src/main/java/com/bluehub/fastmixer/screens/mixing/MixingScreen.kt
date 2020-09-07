@@ -6,9 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
-import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.navigation.navGraphViewModels
@@ -18,7 +15,6 @@ import com.bluehub.fastmixer.common.permissions.PermissionViewModel
 import com.bluehub.fastmixer.common.utils.DialogManager
 import com.bluehub.fastmixer.common.utils.ScreenConstants
 import com.bluehub.fastmixer.databinding.MixingScreenBinding
-import timber.log.Timber
 import javax.inject.Inject
 
 class MixingScreen : PermissionFragment() {
@@ -62,7 +58,7 @@ class MixingScreen : PermissionFragment() {
 
         dataBinding.lifecycleOwner = viewLifecycleOwner
 
-        localViewModel.reinitRecordedFiles()
+        localViewModel.reInitRecordedFiles()
 
         navArguments.recordedFilePath?.let {
             if (it.isNotEmpty()) localViewModel.addRecordedFilePath(it)
@@ -98,6 +94,10 @@ class MixingScreen : PermissionFragment() {
                     ScreenConstants.READ_FROM_FILE -> localViewModel.onReadFromDisk()
                 }
             }
+        })
+
+        localViewModel.audioFilesLiveData.observe(viewLifecycleOwner, Observer {
+            localViewModel.renderAudioFiles()
         })
     }
 }

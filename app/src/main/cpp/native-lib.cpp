@@ -86,13 +86,13 @@ extern "C" {
         audioEngine->pauseRecording();
     }
 
-    JNIEXPORT void JNICALL
+    JNIEXPORT jboolean JNICALL
     Java_com_bluehub_fastmixer_common_audio_AudioEngine_startPlayback(JNIEnv *env, jclass) {
         if (audioEngine == nullptr) {
             LOGE("startPlayback: audioEngine is null, you must call create() method before calling this method");
-            return;
+            return false;
         }
-        audioEngine->startPlayback();
+        return audioEngine->startPlayback();
     }
 
     JNIEXPORT void JNICALL
@@ -211,5 +211,14 @@ extern "C" {
             return 0;
         }
         return audioEngine->getDurationInSeconds();
+    }
+
+    JNIEXPORT void JNICALL
+    Java_com_bluehub_fastmixer_common_audio_AudioEngine_resetAudioEngine(JNIEnv *env, jclass) {
+        if (audioEngine == nullptr) {
+            LOGE("resetAudioEngine: audioEngine is null, you must call create() method before calling this method");
+            return;
+        }
+        return audioEngine->resetAudioEngine();
     }
 }

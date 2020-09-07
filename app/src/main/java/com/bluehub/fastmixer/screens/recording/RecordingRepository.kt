@@ -34,8 +34,8 @@ class RecordingRepository(val audioEngineProxy: AudioEngineProxy) {
         audioEngineProxy.stopLivePlayback()
     }
 
-    fun startPlaying() {
-        audioEngineProxy.startPlayback()
+    fun startPlaying(): Boolean {
+        return audioEngineProxy.startPlayback()
     }
 
     fun pausePlaying() {
@@ -116,6 +116,8 @@ class RecordingRepository(val audioEngineProxy: AudioEngineProxy) {
     fun setPlayHead(position: Int) = audioEngineProxy.setPlayHead(position)
 
     fun getDurationInSeconds() = audioEngineProxy.getDurationInSeconds()
+
+    fun resetAudioEngine() = audioEngineProxy.resetAudioEngine()
 
     fun getRecordedFilePath(): String = "$cacheDir/recording.wav"
 }

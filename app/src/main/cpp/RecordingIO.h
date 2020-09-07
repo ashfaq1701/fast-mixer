@@ -59,6 +59,8 @@ public:
     void setPlayHead(int position);
 
     int getDurationInSeconds();
+
+    void resetProperties();
 private:
     const char* TAG = "RecordingIO:: %d";
 
@@ -66,9 +68,9 @@ private:
 
     std::string mRecordingFilePath;
 
-    std::unique_ptr<Player> mRecordedTrack {nullptr};
+    std::shared_ptr<Player> mRecordedTrack {nullptr};
 
-    std::unique_ptr<SndfileHandle> mRecordingFile {nullptr};
+    std::shared_ptr<SndfileHandle> mRecordingFile {nullptr};
 
     int32_t mTotalSamples = 0;
     int32_t mIteration = 1;
@@ -86,7 +88,7 @@ private:
 
     int16_t* mData = new int16_t[kMaxSamples]{0};
 
-    static void flush_to_file(int16_t* buffer, int length, const std::string& recordingFilePath, std::unique_ptr<SndfileHandle>& recordingFile);
+    static void flush_to_file(int16_t* buffer, int length, const std::string& recordingFilePath, std::shared_ptr<SndfileHandle>& recordingFile);
 
     bool validate_audio_file();
 

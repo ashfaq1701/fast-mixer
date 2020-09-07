@@ -50,7 +50,7 @@ bool RecordingIO::setup_audio_source() {
         }
     }
 
-    mRecordedTrack = std::make_unique<Player>(audioSource, mStopPlaybackCallback);
+    mRecordedTrack = std::make_shared<Player>(audioSource, mStopPlaybackCallback);
     mRecordedTrack->setPlayHead(playHead);
     mRecordedTrack->setPlaying(true);
 
@@ -75,21 +75,23 @@ bool RecordingIO::validate_audio_file() {
 
 void RecordingIO::read_playback(float *targetData, int32_t numFrames, int32_t channelCount) {
     if (!validate_audio_file()) {
+        mStopPlaybackCallback();
         return;
     }
 
     if (mRecordedTrack == nullptr) {
+        mStopPlaybackCallback();
         return;
     }
 
     mRecordedTrack->renderAudio(targetData, numFrames);
 }
 
-void RecordingIO::flush_to_file(int16_t* buffer, int32_t length, const std::string& recordingFilePath, std::unique_ptr<SndfileHandle>& recordingFile) {
+void RecordingIO::flush_to_file(int16_t* buffer, int32_t length, const std::string& recordingFilePath, std::shared_ptr<SndfileHandle>& recordingFile) {
     if (recordingFile == nullptr) {
         int format = SF_FORMAT_WAV | SF_FORMAT_PCM_16;
         SndfileHandle file = SndfileHandle(recordingFilePath, SFM_WRITE, format, StreamConstants::mInputChannelCount, StreamConstants::mSampleRate);
-        recordingFile = std::make_unique<SndfileHandle>(file);
+        recordingFile = std::make_shared<SndfileHandle>(file);
     }
     recordingFile->write(buffer, length);
 
@@ -168,6 +170,9 @@ int32_t RecordingIO::write(const int16_t *sourceData, int32_t numSamples) {
 void RecordingIO::flush_buffer() {
     if (mWriteIndex > 0) {
         int16_t* oldBuffer = mData;
+        if (oldBuffer == nullptr) {
+            return;
+        }
         is_reallocated = false;
         int32_t flushIndex = mWriteIndex;
         taskQueue->enqueue([&]() {
@@ -244,6 +249,22 @@ void RecordingIO::setPlayHead(int position) {
 
 int RecordingIO::getDurationInSeconds() {
     return (int) mTotalSamples / (StreamConstants::mInputChannelCount * StreamConstants::mSampleRate);
+}
+
+void RecordingIO::resetProperties() {
+    taskQueue->stop_queue();
+    taskQueue = new TaskQueue();
+    mRecordedTrack.reset();
+    mRecordedTrack = nullptr;
+    mRecordingFile = nullptr;
+    mTotalSamples = 0;
+    mIteration = 1;
+    mWriteIndex = 0;
+    mLivePlaybackReadIndex = 0;
+    readyToFlush = false;
+    toFlush = false;
+
+    unlink(mRecordingFilePath.c_str());
 }
 
 

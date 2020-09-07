@@ -31,7 +31,7 @@ public:
     void stopLivePlayback();
     void pauseLivePlayback();
 
-    void startPlayback();
+    bool startPlayback();
     void stopAndResetPlayback();
     void pausePlayback();
 
@@ -51,6 +51,8 @@ public:
     void setPlayHead(int position);
 
     int getDurationInSeconds();
+
+    void resetAudioEngine();
 
 private:
     const char* TAG = "Audio Engine:: %s";

@@ -67,10 +67,14 @@ class MixingScreenViewModel(override val context: Context?, override val tag: St
         }
     }
 
-    fun reinitRecordedFiles() {
+    fun reInitRecordedFiles() {
         audioFiles = audioFiles.map {
             it.copy(rendered = false)
         } as MutableList<AudioFile>
         audioFilesLiveData.value = audioFiles
+    }
+
+    fun renderAudioFiles() {
+        Timber.d("Rendering audio files ${audioFiles.size}")
     }
 }

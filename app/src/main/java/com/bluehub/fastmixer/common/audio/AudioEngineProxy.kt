@@ -30,7 +30,7 @@ class AudioEngineProxy {
 
     fun pauseLivePlayback() = AudioEngine.pauseLivePlayback()
 
-    fun startPlayback() = AudioEngine.startPlayback()
+    fun startPlayback(): Boolean = AudioEngine.startPlayback()
 
     fun stopPlayback() = AudioEngine.stopPlayback()
 
@@ -51,4 +51,6 @@ class AudioEngineProxy {
     fun setPlayHead(position: Int) = AudioEngine.setPlayHead(position)
 
     fun getDurationInSeconds(): Int = AudioEngine.getDurationInSeconds()
+
+    fun resetAudioEngine() = AudioEngine.resetAudioEngine()
 }

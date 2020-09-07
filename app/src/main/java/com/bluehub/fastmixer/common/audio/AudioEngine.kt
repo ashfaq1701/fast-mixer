@@ -28,7 +28,7 @@ class AudioEngine {
 
         @JvmStatic external fun pauseLivePlayback()
 
-        @JvmStatic external fun startPlayback()
+        @JvmStatic external fun startPlayback(): Boolean
 
         @JvmStatic external fun stopPlayback()
 
@@ -49,5 +49,7 @@ class AudioEngine {
         @JvmStatic external fun setPlayHead(position: Int)
 
         @JvmStatic external fun getDurationInSeconds(): Int
+
+        @JvmStatic external fun resetAudioEngine()
     }
 }

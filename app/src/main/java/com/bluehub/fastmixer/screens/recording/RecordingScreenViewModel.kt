@@ -216,14 +216,15 @@ class RecordingScreenViewModel(override val context: Context?, override val tag:
         uiScope.launch {
             withContext(Dispatchers.IO) {
                 if(_eventIsPlaying.value == false) {
-                    repository.startPlaying()
+                    if (repository.startPlaying()) {
+                        _eventIsPlaying.postValue(true)
+                    }
                 } else {
                     repository.pausePlaying()
+                    _eventIsPlaying.postValue(false)
                 }
             }
-            _eventIsPlaying.value = !_eventIsPlaying.value!!
         }
-
     }
 
     fun startPlayback() {
@@ -257,6 +258,11 @@ class RecordingScreenViewModel(override val context: Context?, override val tag:
                     repository.stopLivePlayback()
                 }
             }
+            repository.resetAudioEngine()
+            _seekbarProgress.value = 0
+            _seekbarMaxValue.value = 0
+            _audioVisualizerMaxAmplitude.value = 0
+            _recordingTimerText.value = "00:00"
         }
     }
 

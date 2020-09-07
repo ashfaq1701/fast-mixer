@@ -60,19 +60,21 @@ void AudioEngine::pauseLivePlayback() {
     livePlaybackStream.stopStream(livePlaybackStream.mLivePlaybackStream);
 }
 
-void AudioEngine::startPlayback() {
+bool AudioEngine::startPlayback() {
     LOGD(TAG, "startPlayback(): ");
     playbackStream.openPlaybackStream();
     if (playbackStream.mPlaybackStream) {
         if(mRecordingIO.setup_audio_source()) {
             playbackStream.startStream(playbackStream.mPlaybackStream);
+            return true;
         } else {
-            LOGD(TAG, "Could not open recorded file");
             playbackStream.closeStream(playbackStream.mPlaybackStream);
+            return false;
         }
     } else {
         LOGE(TAG, "startPlayback(): Failed to create playback (%p) stream", playbackStream.mPlaybackStream);
         playbackStream.closeStream(playbackStream.mPlaybackStream);
+        return false;
     }
 }
 
@@ -176,6 +178,10 @@ void AudioEngine::setPlayHead(int position) {
 
 int AudioEngine::getDurationInSeconds() {
     return mRecordingIO.getDurationInSeconds();
+}
+
+void AudioEngine::resetAudioEngine() {
+    return mRecordingIO.resetProperties();
 }
 
 
