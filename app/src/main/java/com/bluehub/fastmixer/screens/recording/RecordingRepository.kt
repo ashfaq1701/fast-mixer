@@ -11,70 +11,70 @@ import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
 import java.util.*
 
-class RecordingRepository(val audioEngineProxy: AudioEngineProxy) {
+class RecordingRepository(val recordingEngineProxy: RecordingEngineProxy) {
     private val recordingSessionId = UUID.randomUUID().toString()
     private lateinit var cacheDir: String
 
     suspend fun stopRecording() {
         withContext(Dispatchers.IO) {
-            audioEngineProxy.stopRecording()
+            recordingEngineProxy.stopRecording()
         }
     }
 
     fun startLivePlayback() {
-        audioEngineProxy.startLivePlayback()
+        recordingEngineProxy.startLivePlayback()
     }
 
     fun pauseLivePlayback() {
-        audioEngineProxy.pauseLivePlayback()
+        recordingEngineProxy.pauseLivePlayback()
     }
 
     fun stopLivePlayback() {
-        audioEngineProxy.stopLivePlayback()
+        recordingEngineProxy.stopLivePlayback()
     }
 
     fun startPlaying(): Boolean {
-        return audioEngineProxy.startPlayback()
+        return recordingEngineProxy.startPlayback()
     }
 
     fun pausePlaying() {
-        audioEngineProxy.pausePlayback()
+        recordingEngineProxy.pausePlayback()
     }
 
     suspend fun stopPlaying() {
         withContext(Dispatchers.IO) {
-            audioEngineProxy.stopPlayback()
+            recordingEngineProxy.stopPlayback()
         }
     }
 
     fun stopPlayingSync() {
-        audioEngineProxy.stopPlayback()
+        recordingEngineProxy.stopPlayback()
     }
 
     fun startRecording() {
-        audioEngineProxy.startRecording()
+        recordingEngineProxy.startRecording()
     }
 
     suspend fun pauseRecording() {
         withContext(Dispatchers.IO) {
-            audioEngineProxy.pauseRecording()
+            recordingEngineProxy.pauseRecording()
         }
     }
 
     suspend fun flushWriteBuffer() {
         withContext(Dispatchers.IO) {
-            audioEngineProxy.flushWriteBuffer()
+            recordingEngineProxy.flushWriteBuffer()
         }
     }
 
     suspend fun restartPlayback() {
         withContext(Dispatchers.IO) {
-            audioEngineProxy.restartPlayback()
+            recordingEngineProxy.restartPlayback()
         }
     }
 
     fun deleteAudioEngine() {
-        audioEngineProxy.delete()
+        recordingEngineProxy.delete()
     }
 
     fun createCacheDirectory(cacheDirPath: String): String {
@@ -87,7 +87,7 @@ class RecordingRepository(val audioEngineProxy: AudioEngineProxy) {
     }
 
     fun createAudioEngine() {
-        audioEngineProxy.create(cacheDir, recordingSessionId, true)
+        recordingEngineProxy.create(cacheDir, recordingSessionId, true)
     }
 
     fun copyRecordedFile(context: Context) {
@@ -104,19 +104,19 @@ class RecordingRepository(val audioEngineProxy: AudioEngineProxy) {
         }
     }
 
-    fun getCurrentMax() = audioEngineProxy.getCurrentMax()
+    fun getCurrentMax() = recordingEngineProxy.getCurrentMax()
 
-    fun resetCurrentMax() = audioEngineProxy.resetCurrentMax()
+    fun resetCurrentMax() = recordingEngineProxy.resetCurrentMax()
 
-    fun getTotalRecordedFrames() = audioEngineProxy.getTotalRecordedFrames()
+    fun getTotalRecordedFrames() = recordingEngineProxy.getTotalRecordedFrames()
 
-    fun getCurrentPlaybackProgress() = audioEngineProxy.getCurrentPlaybackProgress()
+    fun getCurrentPlaybackProgress() = recordingEngineProxy.getCurrentPlaybackProgress()
 
-    fun setPlayHead(position: Int) = audioEngineProxy.setPlayHead(position)
+    fun setPlayHead(position: Int) = recordingEngineProxy.setPlayHead(position)
 
-    fun getDurationInSeconds() = audioEngineProxy.getDurationInSeconds()
+    fun getDurationInSeconds() = recordingEngineProxy.getDurationInSeconds()
 
-    fun resetAudioEngine() = audioEngineProxy.resetAudioEngine()
+    fun resetAudioEngine() = recordingEngineProxy.resetAudioEngine()
 
     fun getRecordedFilePath(): String = "$cacheDir/recording.wav"
 }

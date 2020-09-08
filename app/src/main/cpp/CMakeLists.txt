@@ -36,7 +36,7 @@ add_library( # Sets the name of the library.
         audio/FileDataSource.cpp
         audio/Player.cpp
         audio/FFMpegExtractor.cpp
-        recording/native-lib.cpp)
+        recording/recording-lib.cpp)
 
 # Build the Oboe library
 set (OBOE_DIR ../../../../cpp_dependencies/oboe)

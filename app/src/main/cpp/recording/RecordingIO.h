@@ -22,10 +22,13 @@ class RecordingIO {
 public:
     RecordingIO() {
         taskQueue = new TaskQueue();
+        taskQueue->start_queue();
     }
 
     ~RecordingIO() {
-        taskQueue->stop_queue();
+        if (taskQueue->isRunning()) {
+            taskQueue->stop_queue();
+        }
     }
     int32_t write(const int16_t *sourceData, int32_t numSamples);
     int32_t read_live_playback(int16_t *targetData, int32_t numSamples);

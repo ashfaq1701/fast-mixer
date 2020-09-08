@@ -3,7 +3,7 @@ package com.bluehub.fastmixer.screens.recording
 import com.bluehub.fastmixer.screens.recording.RecordingScreenViewModel
 
 
-class AudioEngine {
+class RecordingEngine {
     companion object {
         init {
             System.loadLibrary("audioEngine")

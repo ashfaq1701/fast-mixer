@@ -1,6 +1,6 @@
 package com.bluehub.fastmixer.screens.mixing
 
-import com.bluehub.fastmixer.screens.recording.AudioEngineProxy
+import com.bluehub.fastmixer.screens.recording.RecordingEngineProxy
 
-class MixingRepository(val audioEngineProxy: AudioEngineProxy) {
+class MixingRepository(val recordingEngineProxy: RecordingEngineProxy) {
 }

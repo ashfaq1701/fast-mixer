@@ -1,7 +1,7 @@
 package com.bluehub.fastmixer.common.dependencyinjection.viewmodel
 
 import com.bluehub.fastmixer.broadcastReceivers.AudioDeviceChangeListener
-import com.bluehub.fastmixer.screens.recording.AudioEngineProxy
+import com.bluehub.fastmixer.screens.recording.RecordingEngineProxy
 import com.bluehub.fastmixer.common.repositories.AudioRepository
 import com.bluehub.fastmixer.common.utils.PermissionManager
 import com.bluehub.fastmixer.screens.mixing.MixingRepository
@@ -15,13 +15,13 @@ class ViewModelModule {
     fun permissionManager(): PermissionManager = PermissionManager.create()
 
     @Provides
-    fun getAudioEngine(): AudioEngineProxy = AudioEngineProxy.getInstance()
+    fun getAudioEngine(): RecordingEngineProxy = RecordingEngineProxy.getInstance()
 
     @Provides
-    fun getRecordingRepository(audioEngineProxy: AudioEngineProxy): RecordingRepository = RecordingRepository(audioEngineProxy)
+    fun getRecordingRepository(recordingEngineProxy: RecordingEngineProxy): RecordingRepository = RecordingRepository(recordingEngineProxy)
 
     @Provides
-    fun getMixingRepository(audioEngineProxy: AudioEngineProxy): MixingRepository = MixingRepository(audioEngineProxy)
+    fun getMixingRepository(recordingEngineProxy: RecordingEngineProxy): MixingRepository = MixingRepository(recordingEngineProxy)
 
     @Provides
     fun getAudioRepository(): AudioRepository = AudioRepository()
