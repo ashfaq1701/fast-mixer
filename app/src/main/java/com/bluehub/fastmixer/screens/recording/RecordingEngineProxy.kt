@@ -51,5 +51,5 @@ class RecordingEngineProxy {
 
     fun getDurationInSeconds(): Int = RecordingEngine.getDurationInSeconds()
 
-    fun resetAudioEngine() = RecordingEngine.resetAudioEngine()
+    fun resetRecordingEngine() = RecordingEngine.resetRecordingEngine()
 }

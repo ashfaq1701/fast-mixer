@@ -116,7 +116,7 @@ class RecordingRepository(val recordingEngineProxy: RecordingEngineProxy) {
 
     fun getDurationInSeconds() = recordingEngineProxy.getDurationInSeconds()
 
-    fun resetAudioEngine() = recordingEngineProxy.resetAudioEngine()
+    fun resetRecordingEngine() = recordingEngineProxy.resetRecordingEngine()
 
     fun getRecordedFilePath(): String = "$cacheDir/recording.wav"
 }

@@ -93,6 +93,9 @@ void RecordingIO::flush_to_file(int16_t* buffer, int32_t length, const std::stri
         SndfileHandle file = SndfileHandle(recordingFilePath, SFM_WRITE, format, StreamConstants::mInputChannelCount, StreamConstants::mSampleRate);
         recordingFile = std::make_shared<SndfileHandle>(file);
     }
+    if (buffer == nullptr) {
+        return;
+    }
     recordingFile->write(buffer, length);
 
     std::unique_lock<std::mutex> lck(mtx);

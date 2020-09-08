@@ -258,7 +258,7 @@ class RecordingScreenViewModel(override val context: Context?, override val tag:
                     repository.stopLivePlayback()
                 }
             }
-            repository.resetAudioEngine()
+            repository.resetRecordingEngine()
             _seekbarProgress.value = 0
             _seekbarMaxValue.value = 0
             _audioVisualizerMaxAmplitude.value = 0

@@ -212,7 +212,7 @@ extern "C" {
     }
 
     JNIEXPORT void JNICALL
-    Java_com_bluehub_fastmixer_screens_recording_RecordingEngine_resetAudioEngine(JNIEnv *env, jclass) {
+    Java_com_bluehub_fastmixer_screens_recording_RecordingEngine_resetRecordingEngine(JNIEnv *env, jclass) {
         if (recordingEngine == nullptr) {
             LOGE("resetAudioEngine: recordingEngine is null, you must call create() method before calling this method");
             return;

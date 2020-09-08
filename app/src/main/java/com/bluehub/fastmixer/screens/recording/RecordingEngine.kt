@@ -50,6 +50,6 @@ class RecordingEngine {
 
         @JvmStatic external fun getDurationInSeconds(): Int
 
-        @JvmStatic external fun resetAudioEngine()
+        @JvmStatic external fun resetRecordingEngine()
     }
 }

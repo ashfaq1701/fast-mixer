@@ -104,8 +104,8 @@ class RecordingScreen : PermissionFragment() {
             if (goBack) {
                 val action = RecordingScreenDirections.actionRecordingScreenToMixingScreen()
                 action.recordedFilePath = localViewModel.repository.getRecordedFilePath()
-                findNavController().navigate(action)
                 localViewModel.resetGoBack()
+                findNavController().navigate(action)
             }
         })
 
