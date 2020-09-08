@@ -21,8 +21,8 @@ add_library( # Sets the name of the library.
         SHARED
 
         # Provides a relative path to your source file(s).
-        RecordingIO.cpp
-        AudioEngine.cpp
+        recording/RecordingIO.cpp
+        recording/RecordingEngine.cpp
         streams/StreamConstants.cpp
         streams/RecordingStream.cpp
         streams/LivePlaybackStream.cpp
@@ -36,7 +36,7 @@ add_library( # Sets the name of the library.
         audio/FileDataSource.cpp
         audio/Player.cpp
         audio/FFMpegExtractor.cpp
-        native-lib.cpp )
+        recording/native-lib.cpp)
 
 # Build the Oboe library
 set (OBOE_DIR ../../../../cpp_dependencies/oboe)

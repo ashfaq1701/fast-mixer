@@ -5,11 +5,11 @@
 #include <oboe/Oboe.h>
 
 #include <utility>
-#include "jni_env.h"
-#include "AudioEngine.h"
-#include "logging_macros.h"
+#include "../jni_env.h"
+#include "RecordingEngine.h"
+#include "../logging_macros.h"
 
-AudioEngine::AudioEngine(
+RecordingEngine::RecordingEngine(
         char* appDir,
         char* recordingSessionId,
         bool recordingScreenViewModelPassed) {
@@ -19,18 +19,18 @@ AudioEngine::AudioEngine(
 
     char* recordingFilePath = strcat(mAppDir, "/recording.wav");
     mRecordingIO.setRecordingFilePath(recordingFilePath);
-    mRecordingIO.setTogglePlaybackCallback([&] () {
-        togglePlayback();
+    mRecordingIO.setStopPlaybackCallback([&] () {
+        setStopPlayback();
     });
     mRecordingScreenViewModelPassed = recordingScreenViewModelPassed;
 }
 
-AudioEngine::~AudioEngine() {
+RecordingEngine::~RecordingEngine() {
     stopRecording();
     stopLivePlayback();
 }
 
-void AudioEngine::startLivePlayback() {
+void RecordingEngine::startLivePlayback() {
     LOGD(TAG, "startLivePlayback(): ");
     livePlaybackStream.openLivePlaybackStream();
     if (livePlaybackStream.mLivePlaybackStream != nullptr) {
@@ -42,7 +42,7 @@ void AudioEngine::startLivePlayback() {
     }
 }
 
-void AudioEngine::stopLivePlayback() {
+void RecordingEngine::stopLivePlayback() {
     LOGD(TAG, "stopLivePlayback(): %d");
 
     if (livePlaybackStream.mLivePlaybackStream == nullptr) {
@@ -55,12 +55,12 @@ void AudioEngine::stopLivePlayback() {
     }
 }
 
-void AudioEngine::pauseLivePlayback() {
+void RecordingEngine::pauseLivePlayback() {
     LOGD(TAG, "pauseLivePlayback(): ");
     livePlaybackStream.stopStream(livePlaybackStream.mLivePlaybackStream);
 }
 
-bool AudioEngine::startPlayback() {
+bool RecordingEngine::startPlayback() {
     LOGD(TAG, "startPlayback(): ");
     playbackStream.openPlaybackStream();
     if (playbackStream.mPlaybackStream) {
@@ -78,7 +78,7 @@ bool AudioEngine::startPlayback() {
     }
 }
 
-void AudioEngine::stopAndResetPlayback() {
+void RecordingEngine::stopAndResetPlayback() {
     LOGD(TAG, "stopAndResetPlayback()");
     if (playbackStream.mPlaybackStream == nullptr) {
         mRecordingIO.stop_audio_source();
@@ -88,27 +88,27 @@ void AudioEngine::stopAndResetPlayback() {
     closePlaybackStream();
 }
 
-void AudioEngine::stopPlayback() {
+void RecordingEngine::stopPlayback() {
     if (playbackStream.mPlaybackStream == nullptr) {
         return;
     }
     closePlaybackStream();
 }
 
-void AudioEngine::closePlaybackStream() {
+void RecordingEngine::closePlaybackStream() {
     if (playbackStream.mPlaybackStream != nullptr && playbackStream.mPlaybackStream->getState() != oboe::StreamState::Closed) {
         playbackStream.stopStream(playbackStream.mPlaybackStream);
         playbackStream.closeStream(playbackStream.mPlaybackStream);
     }
 }
 
-void AudioEngine::pausePlayback() {
+void RecordingEngine::pausePlayback() {
     LOGD(TAG, "pausePlayback(): ");
     mRecordingIO.pause_audio_source();
     playbackStream.stopStream(playbackStream.mPlaybackStream);
 }
 
-void AudioEngine::startRecording() {
+void RecordingEngine::startRecording() {
     LOGD(TAG, "startRecording(): ");
     recordingStream.openRecordingStream();
     if (recordingStream.mRecordingStream) {
@@ -119,7 +119,7 @@ void AudioEngine::startRecording() {
     }
 }
 
-void AudioEngine::stopRecording() {
+void RecordingEngine::stopRecording() {
     LOGD(TAG, "stopRecording(): %d");
 
     if (!recordingStream.mRecordingStream) {
@@ -133,30 +133,30 @@ void AudioEngine::stopRecording() {
     }
 }
 
-void AudioEngine::pauseRecording() {
+void RecordingEngine::pauseRecording() {
     LOGD(TAG, "pauseRecording(): ");
     recordingStream.stopStream(recordingStream.mRecordingStream);
     flushWriteBuffer();
 }
 
-void AudioEngine::restartPlayback() {
+void RecordingEngine::restartPlayback() {
     stopPlayback();
     startPlayback();
 }
 
-void AudioEngine::flushWriteBuffer() {
+void RecordingEngine::flushWriteBuffer() {
     mRecordingIO.flush_buffer();
 }
 
-int AudioEngine::getCurrentMax() {
+int RecordingEngine::getCurrentMax() {
     return mRecordingIO.getCurrentMax();
 }
 
-void AudioEngine::resetCurrentMax() {
+void RecordingEngine::resetCurrentMax() {
     mRecordingIO.resetCurrentMax();
 }
 
-void AudioEngine::togglePlayback() {
+void RecordingEngine::setStopPlayback() {
     call_in_attached_thread([&](auto env) {
         if (mRecordingScreenViewModelPassed && kotlinMethodIdsPtr != nullptr) {
             env->CallStaticVoidMethod(kotlinMethodIdsPtr->recordingScreenVM, kotlinMethodIdsPtr->recordingScreenVMTogglePlay);
@@ -164,23 +164,23 @@ void AudioEngine::togglePlayback() {
     });
 }
 
-int AudioEngine::getTotalRecordedFrames() {
+int RecordingEngine::getTotalRecordedFrames() {
     return mRecordingIO.getTotalRecordedFrames();
 }
 
-int AudioEngine::getCurrentPlaybackProgress() {
+int RecordingEngine::getCurrentPlaybackProgress() {
     return mRecordingIO.getCurrentPlaybackProgress();
 }
 
-void AudioEngine::setPlayHead(int position) {
+void RecordingEngine::setPlayHead(int position) {
     mRecordingIO.setPlayHead(position);
 }
 
-int AudioEngine::getDurationInSeconds() {
+int RecordingEngine::getDurationInSeconds() {
     return mRecordingIO.getDurationInSeconds();
 }
 
-void AudioEngine::resetAudioEngine() {
+void RecordingEngine::resetAudioEngine() {
     return mRecordingIO.resetProperties();
 }
 

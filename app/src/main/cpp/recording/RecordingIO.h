@@ -5,12 +5,12 @@
 #ifndef FAST_MIXER_RECORDINGIO_H
 #define FAST_MIXER_RECORDINGIO_H
 
-#include <FileDataSource.h>
-#include <sndfile.hh>
-#include <Player.h>
-#include "taskqueue/TaskQueue.h"
-#include <oboe/Definitions.h>
-#include "streams/StreamConstants.h"
+#include "../audio/FileDataSource.h"
+#include "../../../../../cpp_dependencies/libsndfile/src/sndfile.hh"
+#include "../audio/Player.h"
+#include "../taskqueue/TaskQueue.h"
+#include "../../../../../cpp_dependencies/oboe/include/oboe/Definitions.h"
+#include "../streams/StreamConstants.h"
 
 #ifndef MODULE_NAME
 #define MODULE_NAME  "RecordingIO"
@@ -50,7 +50,7 @@ public:
 
     void resetCurrentMax();
 
-    void setTogglePlaybackCallback(std::function<void(void)> stopPlaybackCallback);
+    void setStopPlaybackCallback(std::function<void(void)> stopPlaybackCallback);
 
     int getTotalRecordedFrames();
 

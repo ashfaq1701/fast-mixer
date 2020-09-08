@@ -10,7 +10,7 @@
 #include "oboe/AudioStream.h"
 #include "StreamConstants.h"
 #include "../logging_macros.h"
-#include "../RecordingIO.h"
+#include "../recording/RecordingIO.h"
 
 class BaseStream {
 public:

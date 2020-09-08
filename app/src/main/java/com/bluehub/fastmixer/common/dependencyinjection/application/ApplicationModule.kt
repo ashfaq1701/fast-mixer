@@ -2,8 +2,7 @@ package com.bluehub.fastmixer.common.dependencyinjection.application
 
 import android.app.Application
 import android.content.Context
-import android.media.AudioManager
-import com.bluehub.fastmixer.common.audio.AudioEngineProxy
+import com.bluehub.fastmixer.screens.recording.AudioEngineProxy
 import dagger.Module
 import dagger.Provides
 

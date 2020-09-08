@@ -1,10 +1,9 @@
-package com.bluehub.fastmixer.common.audio
-
-import com.bluehub.fastmixer.screens.recording.RecordingScreenViewModel
+package com.bluehub.fastmixer.screens.recording
 
 class AudioEngineProxy {
     companion object {
-        private val instance: AudioEngineProxy = AudioEngineProxy()
+        private val instance: AudioEngineProxy =
+            AudioEngineProxy()
 
         public fun getInstance(): AudioEngineProxy {
             return instance

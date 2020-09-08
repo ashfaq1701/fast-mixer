@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.SeekBar
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.NavController
@@ -59,8 +60,10 @@ class RecordingScreen : PermissionFragment() {
 
         viewModelFactory = RecordingScreenViewModelFactory(context, TAG)
 
-        viewModel = ViewModelProviders.of(this, viewModelFactory)
-            .get(RecordingScreenViewModel::class.java)
+        val localViewModel: RecordingScreenViewModel by viewModels { viewModelFactory }
+
+        RecordingScreenViewModel.setInstance(localViewModel)
+        viewModel = localViewModel
 
         RecordingScreenViewModel.setInstance(viewModel as RecordingScreenViewModel)
 

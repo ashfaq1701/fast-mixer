@@ -7,13 +7,13 @@
 #include <string>
 #include <unistd.h>
 #include "RecordingIO.h"
-#include "logging_macros.h"
-#include "Utils.h"
+#include "../logging_macros.h"
+#include "../Utils.h"
 #include <mutex>
 #include <condition_variable>
 #include <sys/stat.h>
-#include "Constants.h"
-#include "AudioEngine.h"
+#include "../Constants.h"
+#include "RecordingEngine.h"
 
 std::mutex RecordingIO::mtx;
 std::condition_variable RecordingIO::reallocated;
@@ -223,7 +223,7 @@ void RecordingIO::resetCurrentMax() {
     currentMax = 0;
 }
 
-void RecordingIO::setTogglePlaybackCallback(std::function<void()> stopPlaybackCallback) {
+void RecordingIO::setStopPlaybackCallback(std::function<void()> stopPlaybackCallback) {
     mStopPlaybackCallback = stopPlaybackCallback;
 }
 
