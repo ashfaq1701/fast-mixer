@@ -255,8 +255,7 @@ int RecordingIO::getDurationInSeconds() {
 }
 
 void RecordingIO::resetProperties() {
-    taskQueue->stop_queue();
-    taskQueue = new TaskQueue();
+    taskQueue->clear_queue();
     mRecordedTrack.reset();
     mRecordedTrack = nullptr;
     mRecordingFile = nullptr;

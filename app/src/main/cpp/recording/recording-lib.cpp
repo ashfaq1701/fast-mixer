@@ -29,6 +29,7 @@ extern "C" {
         if (kotlinMethodIdsPtr != nullptr && kotlinMethodIdsPtr->recordingScreenVM != nullptr) {
             env->DeleteGlobalRef(kotlinMethodIdsPtr->recordingScreenVM);
             kotlinMethodIdsPtr.reset();
+            kotlinMethodIdsPtr = nullptr;
         }
     }
 

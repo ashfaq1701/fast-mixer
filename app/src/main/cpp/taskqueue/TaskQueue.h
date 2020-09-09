@@ -20,9 +20,9 @@ using namespace std;
 class TaskQueue {
 
 public:
-    TaskQueue() {
-        queue<std::function<void()>> qu;
-        q = std::make_unique<queue<std::function<void()>>>(qu);
+    ~TaskQueue() {
+        t.join();
+        q.clear();
     }
 
     void start_queue() {
@@ -32,12 +32,16 @@ public:
         }));
     }
 
+    void clear_queue() {
+        q.clear();
+    }
+
     void stop_queue() {
         is_running = false;
     }
 
     void enqueue(std::function<void()> f) {
-        q->push(f);
+        q.push_back(f);
     }
 
     bool isRunning() {
@@ -48,19 +52,24 @@ public:
 
 private:
     const char* TAG = "TaskQueue:: %d";
-    std::unique_ptr<queue<std::function<void()>>> q { nullptr };
+    deque<std::function<void()>> q;
     atomic<bool> is_running;
+    std::mutex access;
+    std::condition_variable cond;
 
     void executor_loop() {
         while (is_running) {
-            if (q && !q->empty()) {
-                auto f = q->front();
-                if (f != nullptr) {
-                    f();
+            std::function<void()> task;
+            {
+                std::unique_lock<std::mutex> lock(access);
+                if(q.empty()) {
+                    cond.wait_for(lock, std::chrono::duration<int, std::milli>(3));
+                    continue;
                 }
-                q->pop();
+                task = std::move(q.front());
+                q.pop_front();
             }
-            std::this_thread::sleep_for(std::chrono::microseconds (200));
+            task();
         }
     }
 };
