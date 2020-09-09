@@ -2,9 +2,6 @@
 // Created by asalehin on 7/18/20.
 //
 
-#ifndef FAST_MIXER_TASKQUEUE_H
-#define FAST_MIXER_TASKQUEUE_H
-
 #ifndef MODULE_NAME
 #define MODULE_NAME "ThreadPool"
 #endif
