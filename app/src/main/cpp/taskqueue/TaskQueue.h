@@ -54,7 +54,7 @@ private:
                 auto f = q->front();
                 f();
                 q->pop();
-                std::this_thread::sleep_for(std::chrono::microseconds (200));
+                std::this_thread::sleep_for(std::chrono::microseconds (1000));
             }
         }
     }
