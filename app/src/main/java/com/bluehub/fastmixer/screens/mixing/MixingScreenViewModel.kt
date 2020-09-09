@@ -18,11 +18,6 @@ class MixingScreenViewModel(override val context: Context?, override val tag: St
     private var audioFiles: MutableList<AudioFile>
     val audioFilesLiveData = MutableLiveData<MutableList<AudioFile>>(mutableListOf())
 
-    init {
-        getViewModelComponent().inject(this)
-        audioFiles = mutableListOf()
-    }
-
     @Inject
     override lateinit var permissionManager: PermissionManager
 
@@ -36,6 +31,12 @@ class MixingScreenViewModel(override val context: Context?, override val tag: St
     val _eventRead = MutableLiveData<Boolean>()
         val eventRead: LiveData<Boolean>
         get() = _eventRead
+
+    init {
+        getViewModelComponent().inject(this)
+        audioFiles = mutableListOf()
+        mixingRepository.createMixingEngine()
+    }
 
     fun onRecord() {
         _eventRecord.value = true

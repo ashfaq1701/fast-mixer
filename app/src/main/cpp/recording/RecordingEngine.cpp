@@ -5,7 +5,7 @@
 #include <oboe/Oboe.h>
 
 #include <utility>
-#include "../jni_env.h"
+#include "../jvm_env.h"
 #include "RecordingEngine.h"
 #include "../logging_macros.h"
 

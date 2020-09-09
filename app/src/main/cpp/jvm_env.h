@@ -2,10 +2,10 @@
 // Created by asalehin on 9/2/20.
 //
 
-#ifndef FAST_MIXER_JNI_ENV_H
-#define FAST_MIXER_JNI_ENV_H
+#ifndef FAST_MIXER_JVM_ENV_H
+#define FAST_MIXER_JVM_ENV_H
 
-#include <jni.h>
+#include "../../../../../../Android/Sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/jni.h"
 #include "logging_macros.h"
 #include "Constants.h"
 
@@ -24,16 +24,16 @@ inline int get_env(JNIEnv **g_env) {
     return 0;//Already attached
 }
 
-class jni_env {
+class jvm_env {
 public:
-    jni_env() {
+    jvm_env() {
         auto resCode = get_env(&mEnv);
         if (resCode == 2)
             throw std::runtime_error("Cannot retrieve JNI environment");
         needDetach = (resCode == 1);
     }
 
-    ~jni_env() {
+    ~jvm_env() {
         if (needDetach) {
             java_machine->DetachCurrentThread();
         }
@@ -50,8 +50,8 @@ private:
 
 template<typename Callable>
 auto call_in_attached_thread(Callable func) {
-    jni_env env;
+    jvm_env env;
     return func(env.env());
 }
 
-#endif //FAST_MIXER_JNI_ENV_H
+#endif //FAST_MIXER_JVM_ENV_H

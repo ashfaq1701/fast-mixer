@@ -8,7 +8,7 @@
 #include "oboe/Definitions.h"
 #include "oboe/Utilities.h"
 #include "oboe/AudioStream.h"
-#include "StreamConstants.h"
+#include "../recording/streams/StreamConstants.h"
 #include "../logging_macros.h"
 #include "../recording/RecordingIO.h"
 

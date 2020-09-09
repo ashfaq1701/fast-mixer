@@ -3,7 +3,7 @@
 //
 
 #include "PlaybackStream.h"
-#include "BaseStream.h"
+#include "../../streams/BaseStream.h"
 
 PlaybackStream::PlaybackStream(RecordingIO* recordingIO): BaseStream(recordingIO) {
     mRecordingIO = recordingIO;

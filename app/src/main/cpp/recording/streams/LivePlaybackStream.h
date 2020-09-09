@@ -5,7 +5,7 @@
 #ifndef FAST_MIXER_LIVEPLAYBACKSTREAM_H
 #define FAST_MIXER_LIVEPLAYBACKSTREAM_H
 
-#include "BaseStream.h"
+#include "../../streams/BaseStream.h"
 
 class LivePlaybackStream: public BaseStream, public oboe::AudioStreamCallback {
 public:

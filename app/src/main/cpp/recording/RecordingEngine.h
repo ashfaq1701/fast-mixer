@@ -14,9 +14,9 @@
 #include "../logging_macros.h"
 #include "RecordingIO.h"
 #include "../streams/BaseStream.h"
-#include "../streams/RecordingStream.h"
-#include "../streams/LivePlaybackStream.h"
-#include "../streams/PlaybackStream.h"
+#include "streams/RecordingStream.h"
+#include "streams/LivePlaybackStream.h"
+#include "streams/PlaybackStream.h"
 
 class RecordingEngine {
 public:

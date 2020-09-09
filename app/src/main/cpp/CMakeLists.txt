@@ -15,7 +15,7 @@ include_directories(audio)
 # Gradle automatically packages shared libraries with your APK.
 
 add_library( # Sets the name of the library.
-        audioEngine
+        recordingEngine
 
         # Sets the library as a shared library.
         SHARED
@@ -23,10 +23,10 @@ add_library( # Sets the name of the library.
         # Provides a relative path to your source file(s).
         recording/RecordingIO.cpp
         recording/RecordingEngine.cpp
-        streams/StreamConstants.cpp
-        streams/RecordingStream.cpp
-        streams/LivePlaybackStream.cpp
-        streams/PlaybackStream.cpp
+        recording/streams/StreamConstants.cpp
+        recording/streams/RecordingStream.cpp
+        recording/streams/LivePlaybackStream.cpp
+        recording/streams/PlaybackStream.cpp
         streams/BaseStream.cpp
 
         synthesizers/BaseSynthesizer.h
@@ -37,6 +37,21 @@ add_library( # Sets the name of the library.
         audio/Player.cpp
         audio/FFMpegExtractor.cpp
         recording/recording-lib.cpp)
+
+add_library( # Sets the name of the library.
+        mixingEngine
+
+        #Sets the library as a shared library.
+        SHARED
+
+        # Provides a relative path to your source file(s).
+        mixing/MixingIO.cpp
+        mixing/MixingEngine.cpp
+
+        audio/FileDataSource.cpp
+        audio/Player.cpp
+        audio/FFMpegExtractor.cpp
+        mixing/mixing-lib.cpp)
 
 # Build the Oboe library
 set (OBOE_DIR ../../../../cpp_dependencies/oboe)
@@ -94,7 +109,21 @@ set_target_properties(avfilter PROPERTIES IMPORTED_LOCATION
 # build script, prebuilt third-party libraries, or system libraries.
 
 target_link_libraries(
-        audioEngine
+        recordingEngine
+        ${log-lib}
+        oboe
+        android
+        sndfile
+        kissfft
+        avformat
+        avutil
+        avcodec
+        swresample
+        avfilter
+)
+
+target_link_libraries(
+        mixingEngine
         ${log-lib}
         oboe
         android

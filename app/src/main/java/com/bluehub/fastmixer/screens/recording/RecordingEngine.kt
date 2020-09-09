@@ -6,7 +6,7 @@ import com.bluehub.fastmixer.screens.recording.RecordingScreenViewModel
 class RecordingEngine {
     companion object {
         init {
-            System.loadLibrary("audioEngine")
+            System.loadLibrary("recordingEngine")
         }
 
         @JvmStatic external fun create(

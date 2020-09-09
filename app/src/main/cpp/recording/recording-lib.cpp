@@ -6,7 +6,7 @@
 #include <string>
 #include "RecordingEngine.h"
 #include "../logging_macros.h"
-#include "../jni_env.h"
+#include "../jvm_env.h"
 #include <android/asset_manager_jni.h>
 
 const char *TAG = "native-lib: %s";
