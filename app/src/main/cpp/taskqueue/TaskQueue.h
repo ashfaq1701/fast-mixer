@@ -20,6 +20,11 @@ using namespace std;
 class TaskQueue {
 
 public:
+    TaskQueue() {
+        queue<std::function<void()>> qu;
+        q = std::make_unique<queue<std::function<void()>>>(qu);
+    }
+
     void start_queue() {
         is_running = true;
         t = std::move(std::thread([=]() {
@@ -32,7 +37,7 @@ public:
     }
 
     void enqueue(std::function<void()> f) {
-        q.push(f);
+        q->push(f);
     }
 
     bool isRunning() {
@@ -43,17 +48,17 @@ public:
 
 private:
     const char* TAG = "TaskQueue:: %d";
-    std::queue<std::function<void()>> q;
+    std::unique_ptr<queue<std::function<void()>>> q { nullptr };
     atomic<bool> is_running;
 
     void executor_loop() {
         while (is_running) {
-            if (!q.empty()) {
-                auto f = q.front();
+            if (q && !q->empty()) {
+                auto f = q->front();
                 if (f != nullptr) {
                     f();
                 }
-                q.pop();
+                q->pop();
             }
             std::this_thread::sleep_for(std::chrono::microseconds (200));
         }
