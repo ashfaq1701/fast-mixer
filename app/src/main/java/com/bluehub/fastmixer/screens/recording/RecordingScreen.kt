@@ -12,6 +12,7 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.fragment.findNavController
+import com.bluehub.fastmixer.MixerApplication
 import com.bluehub.fastmixer.R
 import com.bluehub.fastmixer.common.permissions.PermissionFragment
 import com.bluehub.fastmixer.common.permissions.PermissionViewModel
@@ -58,7 +59,9 @@ class RecordingScreen : PermissionFragment() {
 
         recordingSeekbar = dataBinding.recordingSeekbar
 
-        viewModelFactory = RecordingScreenViewModelFactory(context, TAG)
+        val mixerApplication = requireContext().applicationContext as MixerApplication
+
+        viewModelFactory = RecordingScreenViewModelFactory(requireContext(), mixerApplication, TAG)
 
         val localViewModel: RecordingScreenViewModel by viewModels { viewModelFactory }
 

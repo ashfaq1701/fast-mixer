@@ -1,10 +1,9 @@
 package com.bluehub.fastmixer.screens.mixing
 
 import android.content.Context
-import android.os.Bundle
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.bluehub.fastmixer.common.constants.BundleKeys
+import com.bluehub.fastmixer.MixerApplication
 import com.bluehub.fastmixer.common.permissions.PermissionViewModel
 import com.bluehub.fastmixer.common.utils.PermissionManager
 import com.bluehub.fastmixer.common.utils.ScreenConstants
@@ -12,7 +11,7 @@ import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 
-class MixingScreenViewModel(override val context: Context?, override val tag: String): PermissionViewModel(context, tag) {
+class MixingScreenViewModel(override val context: Context, mixerApplication: MixerApplication, override val tag: String): PermissionViewModel(context, mixerApplication, tag) {
     override var TAG: String = javaClass.simpleName
 
     private var audioFiles: MutableList<AudioFile>

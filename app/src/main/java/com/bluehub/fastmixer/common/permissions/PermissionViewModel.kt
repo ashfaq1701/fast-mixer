@@ -4,11 +4,12 @@ import android.Manifest
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.bluehub.fastmixer.MixerApplication
 import com.bluehub.fastmixer.common.utils.PermissionManager
 import com.bluehub.fastmixer.common.viewmodel.BaseViewModel
 import javax.inject.Inject
 
-abstract class PermissionViewModel(open val context: Context?, open val tag: String): BaseViewModel() {
+abstract class PermissionViewModel(open val context: Context?, mixerApplication: MixerApplication, open val tag: String): BaseViewModel(mixerApplication) {
     abstract var permissionManager: PermissionManager
 
     private val _eventRecordPermission = MutableLiveData<PermissionHolder>(PermissionHolder(hasPermission = false))

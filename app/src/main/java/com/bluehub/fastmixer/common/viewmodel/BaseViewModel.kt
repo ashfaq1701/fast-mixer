@@ -2,12 +2,14 @@ package com.bluehub.fastmixer.common.viewmodel
 
 import androidx.databinding.Observable
 import androidx.databinding.PropertyChangeRegistry
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
+import com.bluehub.fastmixer.MixerApplication
 import com.bluehub.fastmixer.common.dependencyinjection.viewmodel.DaggerViewModelComponent
 import com.bluehub.fastmixer.common.dependencyinjection.viewmodel.ViewModelComponent
 import com.bluehub.fastmixer.common.dependencyinjection.viewmodel.ViewModelModule
 
-open class BaseViewModel: ViewModel(), Observable {
+open class BaseViewModel(mixerApplication: MixerApplication): AndroidViewModel(mixerApplication), Observable {
     open var TAG: String = ""
 
     private lateinit var mViewModelComponent: ViewModelComponent

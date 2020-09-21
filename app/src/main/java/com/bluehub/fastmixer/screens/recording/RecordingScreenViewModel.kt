@@ -3,26 +3,26 @@ package com.bluehub.fastmixer.screens.recording
 import android.content.Context
 import android.content.IntentFilter
 import android.media.AudioManager
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.databinding.Bindable
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
+import androidx.lifecycle.viewModelScope
 import com.bluehub.fastmixer.BR
+import com.bluehub.fastmixer.MixerApplication
 import com.bluehub.fastmixer.R
 import com.bluehub.fastmixer.broadcastReceivers.AudioDeviceChangeListener
 import com.bluehub.fastmixer.common.permissions.PermissionViewModel
 import com.bluehub.fastmixer.common.repositories.AudioRepository
 import com.bluehub.fastmixer.common.utils.PermissionManager
 import com.bluehub.fastmixer.common.utils.ScreenConstants
-import kotlinx.coroutines.*
-import timber.log.Timber
-import java.nio.file.Files
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.*
 import javax.inject.Inject
 
-class RecordingScreenViewModel(override val context: Context?, override val tag: String) : PermissionViewModel(context, tag) {
+class RecordingScreenViewModel(override val context: Context, mixerApplication: MixerApplication, override val tag: String) : PermissionViewModel(context, mixerApplication, tag) {
     companion object {
         private lateinit var instance: RecordingScreenViewModel
 
@@ -40,9 +40,6 @@ class RecordingScreenViewModel(override val context: Context?, override val tag:
     }
 
     override var TAG: String = javaClass.simpleName
-
-    private var viewModelJob = Job()
-    private val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
 
     @Inject
     override lateinit var permissionManager: PermissionManager
@@ -78,9 +75,9 @@ class RecordingScreenViewModel(override val context: Context?, override val tag:
 
     val recordingLabel = Transformations.map(_eventIsRecording) {
         if (it)
-            context!!.getString(R.string.stop_recording_label)
+            context.getString(R.string.stop_recording_label)
         else
-            context!!.getString(R.string.start_recording_label)
+            context.getString(R.string.start_recording_label)
     }
 
     private val _seekbarProgress = MutableLiveData<Int>(0)
@@ -115,7 +112,7 @@ class RecordingScreenViewModel(override val context: Context?, override val tag:
 
     val handleInputStreamDisconnection: () -> Unit = {
         if (_eventIsRecording.value == true) {
-            uiScope.launch {
+            viewModelScope.launch {
                 repository.flushWriteBuffer()
                 _eventIsRecording.value = false
             }
@@ -124,7 +121,7 @@ class RecordingScreenViewModel(override val context: Context?, override val tag:
 
     val handleOutputStreamDisconnection: () -> Unit = {
         if (_eventIsPlaying.value == true) {
-            uiScope.launch {
+            viewModelScope.launch {
                 repository.restartPlayback()
             }
         }
@@ -132,17 +129,14 @@ class RecordingScreenViewModel(override val context: Context?, override val tag:
 
     init {
         getViewModelComponent().inject(this)
-        uiScope.launch {
+        viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                context?.let {
-                    repository.createCacheDirectory(context!!.cacheDir.absolutePath)
-                    repository.createAudioEngine()
-                }
+                repository.createCacheDirectory(context.cacheDir.absolutePath)
+                repository.createAudioEngine()
             }
-            context?.let {
-                audioRepository.audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
-                _livePlaybackPermitted.value = audioRepository.isHeadphoneConnected()
-            }
+
+            audioRepository.audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+            _livePlaybackPermitted.value = audioRepository.isHeadphoneConnected()
         }
 
         audioDeviceChangeListener.setHandleInputCallback(handleInputStreamDisconnection)
@@ -153,7 +147,7 @@ class RecordingScreenViewModel(override val context: Context?, override val tag:
             addAction(AudioManager.ACTION_HEADSET_PLUG)
             addAction(AudioManager.ACTION_SCO_AUDIO_STATE_UPDATED)
         }
-        context?.registerReceiver(audioDeviceChangeListener, filter)
+        context.registerReceiver(audioDeviceChangeListener, filter)
     }
 
     @Bindable
@@ -177,7 +171,7 @@ class RecordingScreenViewModel(override val context: Context?, override val tag:
             return
         }
 
-        uiScope.launch {
+        viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 if (_eventIsRecording.value == false) {
                     repository.resetCurrentMax()
@@ -202,18 +196,18 @@ class RecordingScreenViewModel(override val context: Context?, override val tag:
 
     fun toggleLivePlayback() {
         if (_eventLivePlaybackSet.value == true) {
-            uiScope.launch {
+            viewModelScope.launch {
                 repository.startLivePlayback()
             }
         } else {
-            uiScope.launch {
+            viewModelScope.launch {
                 repository.stopLivePlayback()
             }
         }
     }
 
     fun togglePlay() {
-        uiScope.launch {
+        viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 if(_eventIsPlaying.value == false) {
                     if (repository.startPlaying()) {
@@ -228,7 +222,7 @@ class RecordingScreenViewModel(override val context: Context?, override val tag:
     }
 
     fun startPlayback() {
-        uiScope.launch {
+        viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 repository.startPlaying()
             }
@@ -236,7 +230,7 @@ class RecordingScreenViewModel(override val context: Context?, override val tag:
     }
 
     fun pausePlayback() {
-        uiScope.launch {
+        viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 repository.pausePlaying()
             }
@@ -245,13 +239,13 @@ class RecordingScreenViewModel(override val context: Context?, override val tag:
 
     fun stopPlay() {
         _eventIsPlaying.postValue(false)
-        uiScope.launch {
+        viewModelScope.launch {
             repository.stopPlaying()
         }
     }
 
     fun reset() {
-        uiScope.launch {
+        viewModelScope.launch {
             repository.stopRecording()
             _eventLivePlaybackSet.value?.let {
                 if (it) {
@@ -267,7 +261,7 @@ class RecordingScreenViewModel(override val context: Context?, override val tag:
     }
 
     fun setGoBack() {
-        uiScope.launch {
+        viewModelScope.launch {
             repository.stopRecording()
             _eventIsRecording.value = false
             _eventLivePlaybackSet.value?.let {
@@ -282,7 +276,7 @@ class RecordingScreenViewModel(override val context: Context?, override val tag:
                     _eventIsPlaying.value = false
                 }
             }
-            repository.copyRecordedFile(context!!)
+            repository.copyRecordedFile(context)
             stopUpdatingTimer()
             _eventGoBack.value = true
         }
@@ -328,19 +322,6 @@ class RecordingScreenViewModel(override val context: Context?, override val tag:
         repository.setPlayHead(position)
     }
 
-    override fun onCleared() {
-        super.onCleared()
-        viewModelJob.cancel()
-        repository.deleteAudioEngine()
-        context?.unregisterReceiver(audioDeviceChangeListener)
-
-        visualizerTimer?.cancel()
-
-        seekbarTimer?.cancel()
-
-        recordingTimer?.cancel()
-    }
-
     fun startUpdatingTimer() {
         recordingTimer = Timer()
         recordingTimer?.schedule(object: TimerTask() {
@@ -371,5 +352,14 @@ class RecordingScreenViewModel(override val context: Context?, override val tag:
     fun stopUpdatingTimer() {
         recordingTimer?.cancel()
         recordingTimer = null
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        repository.deleteAudioEngine()
+        context.unregisterReceiver(audioDeviceChangeListener)
+        visualizerTimer?.cancel()
+        seekbarTimer?.cancel()
+        recordingTimer?.cancel()
     }
 }
