@@ -5,7 +5,7 @@
 #ifndef FAST_MIXER_JVM_ENV_H
 #define FAST_MIXER_JVM_ENV_H
 
-#include "../../../../../../Android/Sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/jni.h"
+#include <jni.h>
 #include "logging_macros.h"
 #include "Constants.h"
 
