@@ -18,8 +18,8 @@ class TaskQueue {
 
 public:
     TaskQueue() {
-        deque<std::function<void()>> qu;
-        q = std::make_unique<deque<std::function<void()>>>(qu);
+        deque<function<void()>> qu;
+        q = make_unique<deque<function<void()>>>(qu);
         start_queue();
     }
 
@@ -27,7 +27,7 @@ public:
         is_running = false;
     }
 
-    void enqueue(std::function<void()> f) {
+    void enqueue(function<void()> f) {
         q->push_back(f);
     }
 
@@ -38,7 +38,7 @@ public:
     }
 private:
     const char* TAG = "TaskQueue:: %d";
-    std::unique_ptr<deque<std::function<void()>>> q;
+    unique_ptr<deque<function<void()>>> q;
     atomic<bool> is_running;
     thread t;
 
@@ -56,7 +56,7 @@ private:
                 auto f = q->front();
                 f();
                 q->pop_front();
-                std::this_thread::sleep_for(std::chrono::microseconds (1000));
+                this_thread::sleep_for(chrono::microseconds (1000));
             }
         }
     }

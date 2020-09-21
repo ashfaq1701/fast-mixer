@@ -12,6 +12,8 @@
 #include "../logging_macros.h"
 #include "../recording/RecordingIO.h"
 
+using namespace std;
+
 class BaseStream {
 public:
     BaseStream(RecordingIO* recordingIO);

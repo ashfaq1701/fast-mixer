@@ -9,8 +9,10 @@
 #include "logging_macros.h"
 #include "Constants.h"
 
+using namespace std;
+
 inline JavaVM *java_machine;
-inline std::shared_ptr<method_ids> kotlinMethodIdsPtr {nullptr};
+inline shared_ptr<method_ids> kotlinMethodIdsPtr {nullptr};
 
 inline int get_env(JNIEnv **g_env) {
     int getEnvStat = java_machine->GetEnv((void **) g_env, JNI_VERSION_1_6);
@@ -29,7 +31,7 @@ public:
     jvm_env() {
         auto resCode = get_env(&mEnv);
         if (resCode == 2)
-            throw std::runtime_error("Cannot retrieve JNI environment");
+            throw runtime_error("Cannot retrieve JNI environment");
         needDetach = (resCode == 1);
     }
 

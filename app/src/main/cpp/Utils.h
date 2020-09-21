@@ -15,6 +15,8 @@
 #include <ios>
 #include "logging_macros.h"
 
+using namespace std;
+
 template <typename K>
 void fillArrayWithZeros(K *data, int32_t length) {
 
@@ -22,7 +24,7 @@ void fillArrayWithZeros(K *data, int32_t length) {
     memset(data, 0, bufferSize);
 }
 
-inline bool strEndedWith(std::string const &fullString, std::string const &ending) {
+inline bool strEndedWith(string const &fullString, string const &ending) {
     if (fullString.length() >= ending.length()) {
         return (0 == fullString.compare (fullString.length() - ending.length(), ending.length(), ending));
     } else {

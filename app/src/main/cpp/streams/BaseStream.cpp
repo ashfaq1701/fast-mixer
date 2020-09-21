@@ -28,7 +28,7 @@ void BaseStream::stopStream(oboe::AudioStream *stream) {
             LOGE(TAG, oboe::convertToText(result));
         }
         LOGW(TAG, "stopStream(): Total samples = ");
-        LOGW(TAG, std::to_string(mRecordingIO->getTotalSamples()).c_str());
+        LOGW(TAG, to_string(mRecordingIO->getTotalSamples()).c_str());
     }
 }
 
@@ -44,6 +44,6 @@ void BaseStream::closeStream(oboe::AudioStream *stream) {
         }
 
         LOGW(TAG, "closeStream(): mTotalSamples = ");
-        LOGW(TAG, std::to_string(mRecordingIO->getTotalSamples()).c_str());
+        LOGW(TAG, to_string(mRecordingIO->getTotalSamples()).c_str());
     }
 }

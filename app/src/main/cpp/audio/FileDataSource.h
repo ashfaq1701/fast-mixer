@@ -22,6 +22,8 @@
 #include "DataSource.h"
 #include "../Utils.h"
 
+using namespace std;
+
 class FileDataSource : public DataSource {
 
 public:
@@ -35,16 +37,16 @@ public:
 
 private:
 
-    FileDataSource(std::unique_ptr<float[]> data, size_t size,
+    FileDataSource(unique_ptr<float[]> data, size_t size,
                    const AudioProperties properties)
-            : mBuffer(std::move(data))
+            : mBuffer(move(data))
             , mBufferSize(size)
             , mProperties(properties) {
     }
 
     static long getFileSize(const char *fileName);
 
-    const std::unique_ptr<float[]> mBuffer;
+    const unique_ptr<float[]> mBuffer;
     const int64_t mBufferSize;
     const AudioProperties mProperties;
 

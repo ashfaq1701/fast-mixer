@@ -3,3 +3,7 @@
 //
 
 #include "MixingIO.h"
+
+shared_ptr<FileDataSource> MixingIO::readFile(string filename) {
+    return shared_ptr<FileDataSource>();
+}

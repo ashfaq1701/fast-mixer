@@ -20,11 +20,11 @@ void LivePlaybackStream::openLivePlaybackStream() {
 
         auto sampleRate = mLivePlaybackStream->getSampleRate();
         LOGV(TAG, "openLivePlaybackStream(): mSampleRate = ");
-        LOGV(TAG, std::to_string(sampleRate).c_str());
+        LOGV(TAG, to_string(sampleRate).c_str());
 
         int32_t mFramesPerBurst = mLivePlaybackStream->getFramesPerBurst();
         LOGV(TAG, "openLivePlaybackStream(): mFramesPerBurst = ");
-        LOGV(TAG, std::to_string(mFramesPerBurst).c_str());
+        LOGV(TAG, to_string(mFramesPerBurst).c_str());
 
         mLivePlaybackStream->setBufferSizeInFrames(mFramesPerBurst);
 

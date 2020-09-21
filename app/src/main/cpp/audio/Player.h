@@ -29,6 +29,8 @@
 #include "IRenderableAudio.h"
 #include "DataSource.h"
 
+using namespace std;
+
 class Player : public IRenderableAudio{
 
 public:
@@ -39,7 +41,7 @@ public:
      *
      * @param source
      */
-    Player(std::shared_ptr<DataSource> source, std::function<void(void)> stopPlaybackCallback)
+    Player(shared_ptr<DataSource> source, function<void(void)> stopPlaybackCallback)
         : mSource(source)
     {
         mStopPlaybackCallback = stopPlaybackCallback;
@@ -55,10 +57,10 @@ public:
 
 private:
     int32_t mReadFrameIndex = 0;
-    std::atomic<bool> mIsPlaying { false };
-    std::atomic<bool> mIsLooping { false };
-    std::function<void(void)> mStopPlaybackCallback = nullptr;
-    std::shared_ptr<DataSource> mSource;
+    atomic<bool> mIsPlaying { false };
+    atomic<bool> mIsLooping { false };
+    function<void(void)> mStopPlaybackCallback = nullptr;
+    shared_ptr<DataSource> mSource;
 
     void renderSilence(float*, int32_t);
 };

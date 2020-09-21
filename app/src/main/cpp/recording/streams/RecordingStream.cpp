@@ -18,7 +18,7 @@ void RecordingStream::openRecordingStream() {
         auto sampleRate = mRecordingStream->getSampleRate();
         auto format = mRecordingStream->getFormat();
         LOGV(TAG, "openRecordingStream(): mSampleRate = ");
-        LOGV(TAG, std::to_string(sampleRate).c_str());
+        LOGV(TAG, to_string(sampleRate).c_str());
 
         LOGV(TAG, "openRecordingStream(): mFormat = ");
         LOGV(TAG, oboe::convertToText(format));

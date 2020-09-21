@@ -24,7 +24,7 @@
 
 constexpr int kInternalBufferSize = 1152; // Use MP3 block size. https://wiki.hydrogenaud.io/index.php?title=MP3
 
-FFMpegExtractor::FFMpegExtractor(const std::string &filePath, const AudioProperties targetProperties) {
+FFMpegExtractor::FFMpegExtractor(const string &filePath, const AudioProperties targetProperties) {
     mFilePath = filePath.c_str();
     mTargetProperties = targetProperties;
 }
@@ -144,7 +144,7 @@ bool FFMpegExtractor::decode() {
     auto buffer = reinterpret_cast<uint8_t*>(av_malloc(kInternalBufferSize));
 
     // Create an AVIOContext with a custom deleter
-    std::unique_ptr<AVIOContext, void(*)(AVIOContext *)> ioContext {
+    unique_ptr<AVIOContext, void(*)(AVIOContext *)> ioContext {
             nullptr,
             [](AVIOContext *c) {
                 av_free(c->buffer);
@@ -161,7 +161,7 @@ bool FFMpegExtractor::decode() {
     }
 
     // Create an AVFormatContext using the avformat_free_context as the deleter function
-    mFormatContext = std::unique_ptr<AVFormatContext, decltype(&avformat_free_context)> {
+    mFormatContext = unique_ptr<AVFormatContext, decltype(&avformat_free_context)> {
             nullptr,
             &avformat_free_context
     };
@@ -196,7 +196,7 @@ bool FFMpegExtractor::decode() {
     }
 
     // Create the codec context, specifying the deleter function
-    mCodecContext = std::unique_ptr<AVCodecContext, void(*)(AVCodecContext *)> {
+    mCodecContext = unique_ptr<AVCodecContext, void(*)(AVCodecContext *)> {
             nullptr,
             [](AVCodecContext *c) { avcodec_free_context(&c); }
     };

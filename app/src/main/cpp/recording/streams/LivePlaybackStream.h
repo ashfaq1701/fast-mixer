@@ -7,6 +7,8 @@
 
 #include "../../streams/BaseStream.h"
 
+using namespace std;
+
 class LivePlaybackStream: public BaseStream, public oboe::AudioStreamCallback {
 public:
     LivePlaybackStream(RecordingIO* recordingIO);

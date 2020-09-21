@@ -75,6 +75,6 @@ class MixingScreenViewModel(override val context: Context, mixerApplication: Mix
     }
 
     fun renderAudioFiles() {
-        Timber.d("Rendering audio files ${audioFiles.size}")
+
     }
 }

@@ -6,8 +6,14 @@
 #define FAST_MIXER_MIXINGIO_H
 
 
-class MixingIO {
+#include <memory>
+#include <FileDataSource.h>
 
+using namespace std;
+
+class MixingIO {
+public:
+    static shared_ptr<FileDataSource> readFile(string filename);
 };
 
 

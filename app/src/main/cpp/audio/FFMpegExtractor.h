@@ -28,9 +28,11 @@ extern "C" {
 #include <android/asset_manager.h>
 #include "../Constants.h"
 
+using namespace std;
+
 class FFMpegExtractor {
 public:
-    FFMpegExtractor(const std::string &filePath, const AudioProperties targetProperties);
+    FFMpegExtractor(const string &filePath, const AudioProperties targetProperties);
 
     bool decode();
 
@@ -50,8 +52,8 @@ private:
 
     AVStream *mStream;
 
-    std::unique_ptr<AVFormatContext, decltype(&avformat_free_context)> mFormatContext {nullptr,nullptr};
-    std::unique_ptr<AVCodecContext, void(*)(AVCodecContext *)> mCodecContext {nullptr, nullptr};
+    unique_ptr<AVFormatContext, decltype(&avformat_free_context)> mFormatContext {nullptr,nullptr};
+    unique_ptr<AVCodecContext, void(*)(AVCodecContext *)> mCodecContext {nullptr, nullptr};
 
     bool createAVIOContext(uint8_t *buffer, uint32_t bufferSize,
                                   AVIOContext **avioContext);

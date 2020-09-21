@@ -15,8 +15,8 @@
 #include "../Constants.h"
 #include "RecordingEngine.h"
 
-std::mutex RecordingIO::mtx;
-std::condition_variable RecordingIO::reallocated;
+mutex RecordingIO::mtx;
+condition_variable RecordingIO::reallocated;
 bool RecordingIO::is_reallocated = false;
 
 bool RecordingIO::check_if_reallocated() {
@@ -34,7 +34,7 @@ bool RecordingIO::setup_audio_source() {
             .sampleRate = StreamConstants::mSampleRate
     };
 
-    std::shared_ptr<FileDataSource> audioSource{
+    shared_ptr<FileDataSource> audioSource{
             FileDataSource::newFromCompressedFile(mRecordingFilePath.c_str(), targetProperties)
     };
 
@@ -50,7 +50,7 @@ bool RecordingIO::setup_audio_source() {
         }
     }
 
-    mRecordedTrack = std::make_shared<Player>(audioSource, mStopPlaybackCallback);
+    mRecordedTrack = make_shared<Player>(audioSource, mStopPlaybackCallback);
     mRecordedTrack->setPlayHead(playHead);
     mRecordedTrack->setPlaying(true);
 
@@ -87,18 +87,18 @@ void RecordingIO::read_playback(float *targetData, int32_t numFrames, int32_t ch
     mRecordedTrack->renderAudio(targetData, numFrames);
 }
 
-void RecordingIO::flush_to_file(int16_t* buffer, int32_t length, const std::string& recordingFilePath, std::shared_ptr<SndfileHandle>& recordingFile) {
+void RecordingIO::flush_to_file(int16_t* buffer, int32_t length, const string& recordingFilePath, shared_ptr<SndfileHandle>& recordingFile) {
     if (recordingFile == nullptr) {
         int format = SF_FORMAT_WAV | SF_FORMAT_PCM_16;
         SndfileHandle file = SndfileHandle(recordingFilePath, SFM_WRITE, format, StreamConstants::mInputChannelCount, StreamConstants::mSampleRate);
-        recordingFile = std::make_shared<SndfileHandle>(file);
+        recordingFile = make_shared<SndfileHandle>(file);
     }
     if (buffer == nullptr) {
         return;
     }
     recordingFile->write(buffer, length);
 
-    std::unique_lock<std::mutex> lck(mtx);
+    unique_lock<mutex> lck(mtx);
     reallocated.wait(lck, check_if_reallocated);
     delete[] buffer;
     is_reallocated = false;
@@ -112,7 +112,7 @@ void RecordingIO::perform_flush(int flushIndex) {
         flush_to_file(oldBuffer, flushIndex, mRecordingFilePath, mRecordingFile);
     });
     auto * newData = new int16_t[kMaxSamples]{0};
-    std::copy(mData + flushIndex, mData + mWriteIndex, newData);
+    copy(mData + flushIndex, mData + mWriteIndex, newData);
     mData = newData;
     is_reallocated = true;
     reallocated.notify_all();
@@ -154,7 +154,7 @@ int32_t RecordingIO::write(const int16_t *sourceData, int32_t numSamples) {
         mIteration++;
         int32_t newSize = mIteration * kMaxSamples;
         auto * newData = new int16_t[newSize]{0};
-        std::copy(mData, mData + mWriteIndex, newData);
+        copy(mData, mData + mWriteIndex, newData);
         delete[] mData;
         mData = newData;
     }
@@ -226,7 +226,7 @@ void RecordingIO::resetCurrentMax() {
     currentMax = 0;
 }
 
-void RecordingIO::setStopPlaybackCallback(std::function<void()> stopPlaybackCallback) {
+void RecordingIO::setStopPlaybackCallback(function<void()> stopPlaybackCallback) {
     mStopPlaybackCallback = stopPlaybackCallback;
 }
 

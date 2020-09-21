@@ -22,11 +22,11 @@ void PlaybackStream::openPlaybackStream() {
 
         auto sampleRate = mPlaybackStream->getSampleRate();
         LOGV(TAG, "openPlaybackStream(): mSampleRate = ");
-        LOGV(TAG, std::to_string(sampleRate).c_str());
+        LOGV(TAG, to_string(sampleRate).c_str());
 
         int32_t mFramesPerBurst = mPlaybackStream->getFramesPerBurst();
         LOGV(TAG, "openPlaybackStream(): mFramesPerBurst = ");
-        LOGV(TAG, std::to_string(mFramesPerBurst).c_str());
+        LOGV(TAG, to_string(mFramesPerBurst).c_str());
 
         // Set the buffer size to the burst size - this will give us the minimum possible latency
         mPlaybackStream->setBufferSizeInFrames(mFramesPerBurst);

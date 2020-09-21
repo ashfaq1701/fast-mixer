@@ -30,7 +30,7 @@ constexpr int kMaxCompressionRatio { 12 };
 FileDataSource* FileDataSource::newFromCompressedFile(
         const char *filename,
         const AudioProperties targetProperties) {
-    std::string filenameStr(filename);
+    string filenameStr(filename);
 
     FILE* fl = fopen(filenameStr.c_str(), "r");
     if (!fl) {
@@ -85,13 +85,13 @@ FileDataSource* FileDataSource::newFromCompressedFile(
     auto numSamples = bytesDecoded / sizeof(float);
 
     // Now we know the exact number of samples we can create a float array to hold the audio data
-    auto outputBuffer = std::make_unique<float[]>(numSamples);
+    auto outputBuffer = make_unique<float[]>(numSamples);
     memcpy(outputBuffer.get(), decodedData, (size_t)bytesDecoded);
 
     delete[] decodedData;
     fclose(fl);
 
-    return new FileDataSource(std::move(outputBuffer),
+    return new FileDataSource(move(outputBuffer),
                               numSamples,
                               targetProperties);
 }

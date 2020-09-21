@@ -16,6 +16,8 @@
 #define MODULE_NAME  "RecordingIO"
 #endif
 
+using namespace std;
+
 const int kMaxSamples = 60 * oboe::DefaultStreamValues::SampleRate * oboe::ChannelCount::Stereo;
 
 class RecordingIO {
@@ -34,7 +36,7 @@ public:
 
     void flush_buffer();
 
-    void setRecordingFilePath(std::string recordingFilePath) {
+    void setRecordingFilePath(string recordingFilePath) {
         mRecordingFilePath = recordingFilePath;
     }
 
@@ -50,7 +52,7 @@ public:
 
     void resetCurrentMax();
 
-    void setStopPlaybackCallback(std::function<void(void)> stopPlaybackCallback);
+    void setStopPlaybackCallback(function<void(void)> stopPlaybackCallback);
 
     int getTotalRecordedFrames();
 
@@ -66,11 +68,11 @@ private:
 
     TaskQueue *taskQueue;
 
-    std::string mRecordingFilePath;
+    string mRecordingFilePath;
 
-    std::shared_ptr<Player> mRecordedTrack {nullptr};
+    shared_ptr<Player> mRecordedTrack {nullptr};
 
-    std::shared_ptr<SndfileHandle> mRecordingFile {nullptr};
+    shared_ptr<SndfileHandle> mRecordingFile {nullptr};
 
     int32_t mTotalSamples = 0;
     int32_t mIteration = 1;
@@ -84,18 +86,18 @@ private:
     bool readyToFlush = false;
     bool toFlush = false;
 
-    std::function<void()> mStopPlaybackCallback = nullptr;
+    function<void()> mStopPlaybackCallback = nullptr;
 
     int16_t* mData = new int16_t[kMaxSamples]{0};
 
-    static void flush_to_file(int16_t* buffer, int length, const std::string& recordingFilePath, std::shared_ptr<SndfileHandle>& recordingFile);
+    static void flush_to_file(int16_t* buffer, int length, const string& recordingFilePath, shared_ptr<SndfileHandle>& recordingFile);
 
     bool validate_audio_file();
 
     void perform_flush(int flushIndex);
 
-    static std::mutex mtx;
-    static std::condition_variable reallocated;
+    static mutex mtx;
+    static condition_variable reallocated;
     static bool is_reallocated;
 
     static bool check_if_reallocated();
