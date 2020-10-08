@@ -8,12 +8,17 @@ import androidx.core.content.res.getIntOrThrow
 import androidx.core.content.res.getStringOrThrow
 import com.bluehub.fastmixer.R
 
+class AudioFileReader {
+
+}
+
 class FileWaveView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     filePath: String? = null,
     channelCount: Int? = null,
     sampleRate: Int? = null,
+
 ) : View(context, attrs) {
     private val audioFilePath: String
     private val audioFileChannelCount: Int

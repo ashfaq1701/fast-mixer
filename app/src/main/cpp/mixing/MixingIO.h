@@ -8,12 +8,13 @@
 
 #include <memory>
 #include <FileDataSource.h>
+#include "StreamConstants.h"
 
 using namespace std;
 
 class MixingIO {
 public:
-    static shared_ptr<FileDataSource> readFile(string filename);
+    shared_ptr<FileDataSource> readFile(string filename);
 };
 
 

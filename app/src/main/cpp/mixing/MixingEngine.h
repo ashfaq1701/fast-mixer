@@ -6,8 +6,17 @@
 #define FAST_MIXER_MIXINGENGINE_H
 
 
-class MixingEngine {
+#include "MixingIO.h"
+#include "list"
 
+using namespace std;
+
+class MixingEngine {
+public:
+    void addFile(string filePath);
+private:
+    MixingIO mixingIO;
+    list<shared_ptr<FileDataSource>> sourceList;
 };
 
 
