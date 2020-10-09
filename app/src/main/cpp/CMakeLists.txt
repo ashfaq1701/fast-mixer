@@ -47,7 +47,7 @@ add_library( # Sets the name of the library.
         # Provides a relative path to your source file(s).
         mixing/MixingIO.cpp
         mixing/MixingEngine.cpp
-        mixing/StreamConstants.cpp
+        mixing/conf/StreamConstants.cpp
 
         audio/FileDataSource.cpp
         audio/Player.cpp

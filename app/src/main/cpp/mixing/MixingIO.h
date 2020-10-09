@@ -8,7 +8,7 @@
 
 #include <memory>
 #include <FileDataSource.h>
-#include "StreamConstants.h"
+#include "conf/StreamConstants.h"
 
 using namespace std;
 
