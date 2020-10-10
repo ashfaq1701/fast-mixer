@@ -108,10 +108,13 @@ unique_ptr<buffer_data> FileDataSource::readData(size_t numSamples) {
     } else {
         samplesToHandle = numSamples;
     }
-    float* selectedSamples = new float [samplesToHandle];
+    auto selectedSamples = new float [samplesToHandle];
     for(int i = 0; i < samplesToHandle; i++) {
-        selectedSamples[i] = mBuffer[currentPtr + channelCount];
-        currentPtr += channelCount;
+        float totalSample = 0;
+        for (int j = 1; j <= channelCount; j++) {
+            totalSample += mBuffer[++currentPtr];
+        }
+        selectedSamples[i] = totalSample / (float) channelCount;
     }
     buffer_data buff = {
             .ptr = selectedSamples,

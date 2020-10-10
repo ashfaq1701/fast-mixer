@@ -13,4 +13,10 @@ class MixingEngineProxy {
     }
 
     fun create() = MixingEngine.create()
+
+    fun addFile(filePath: String) = MixingEngine.addFile(filePath)
+
+    fun readSamples(index: Int, numSamples: Int) = MixingEngine.readSamples(index, numSamples)
+
+    fun deleteFile(index: Int) = MixingEngine.deleteFile(index)
 }

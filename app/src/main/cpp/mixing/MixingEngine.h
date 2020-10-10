@@ -7,16 +7,18 @@
 
 
 #include "MixingIO.h"
-#include "list"
+#include "vector"
 
 using namespace std;
 
 class MixingEngine {
 public:
     void addFile(string filePath);
+    unique_ptr<buffer_data> readSamples(int index, size_t numSamples);
+    void deleteFile(int idx);
 private:
     MixingIO mixingIO;
-    list<shared_ptr<FileDataSource>> sourceList;
+    vector<shared_ptr<FileDataSource>> sourceList;
 };
 
 
