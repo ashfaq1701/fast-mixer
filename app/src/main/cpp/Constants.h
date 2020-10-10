@@ -13,8 +13,8 @@ struct AudioProperties {
 };
 
 struct buffer_data {
-    uint8_t *ptr;
-    size_t size; ///< size left in the buffer
+    float *ptr;
+    size_t numSamples; ///< size left in the buffer
 };
 
 struct method_ids {

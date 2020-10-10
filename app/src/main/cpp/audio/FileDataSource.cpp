@@ -99,3 +99,23 @@ FileDataSource* FileDataSource::newFromCompressedFile(
 long FileDataSource::getFileSize(const char *fileName) {
     return getSizeOfFile(fileName);
 }
+
+unique_ptr<buffer_data> FileDataSource::readData(size_t numSamples) {
+    int channelCount = mProperties.channelCount;
+    size_t samplesToHandle = 0;
+    if (currentPtr + numSamples * channelCount > mBufferSize) {
+        samplesToHandle = (mBufferSize - currentPtr) / channelCount;
+    } else {
+        samplesToHandle = numSamples;
+    }
+    float* selectedSamples = new float [samplesToHandle];
+    for(int i = 0; i < samplesToHandle; i++) {
+        selectedSamples[i] = mBuffer[currentPtr + channelCount];
+        currentPtr += channelCount;
+    }
+    buffer_data buff = {
+            .ptr = selectedSamples,
+            .numSamples = samplesToHandle
+    };
+    return make_unique<buffer_data>(buff);
+}

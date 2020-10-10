@@ -35,6 +35,8 @@ public:
             const char *filename,
             const AudioProperties targetProperties);
 
+    unique_ptr<buffer_data> readData(size_t numSamples);
+
 private:
 
     FileDataSource(unique_ptr<float[]> data, size_t size,
@@ -49,6 +51,6 @@ private:
     const unique_ptr<float[]> mBuffer;
     const int64_t mBufferSize;
     const AudioProperties mProperties;
-
+    int64_t currentPtr = 0;
 };
 #endif //RHYTHMGAME_AASSETDATASOURCE_H
