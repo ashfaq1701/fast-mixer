@@ -19,7 +19,7 @@ class MixingScreenViewModel(override val context: Context, mixerApplication: Mix
     private var audioFiles: MutableList<AudioFile> = mutableListOf()
     val audioFilesLiveData = MutableLiveData<MutableList<AudioFile>>(mutableListOf())
 
-    val fileWaveViews: MutableList<FileWaveView> = mutableListOf()
+    private val fileWaveViews: MutableList<FileWaveView> = mutableListOf()
     val fileWaveViewsLiveData = MutableLiveData<MutableList<FileWaveView>>(mutableListOf())
 
     @Inject
@@ -32,8 +32,8 @@ class MixingScreenViewModel(override val context: Context, mixerApplication: Mix
     val eventRecord: LiveData<Boolean>
         get() = _eventRecord
 
-    val _eventRead = MutableLiveData<Boolean>()
-        val eventRead: LiveData<Boolean>
+    private val _eventRead = MutableLiveData<Boolean>()
+    val eventRead: LiveData<Boolean>
         get() = _eventRead
 
     init {
