@@ -6,4 +6,4 @@ enum class AudioFileType {
     RECORDED, IMPORTED
 }
 
-data class AudioFile(val path: String, val fileType: AudioFileType, val rendered: Boolean): Serializable
+data class AudioFile(val path: String, val fileType: AudioFileType, var rendered: Boolean): Serializable

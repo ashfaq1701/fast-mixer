@@ -16,22 +16,19 @@ class FileWaveView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     filePath: String? = null,
-    channelCount: Int? = null,
-    sampleRate: Int? = null,
-
+    loadFileCallback: (String) -> Unit,
+    var readSamplesCallback: (Int) -> Array<Float>
 ) : View(context, attrs) {
     private val audioFilePath: String
-    private val audioFileChannelCount: Int
-    private val audioFileSampleRate: Int
 
     init {
         val typedArray = context.obtainStyledAttributes(attrs, R.styleable.FileWaveView)
 
         audioFilePath = filePath ?: typedArray.getStringOrThrow(R.styleable.FileWaveView_audioFilePath)
-        audioFileChannelCount = channelCount ?: typedArray.getIntOrThrow(R.styleable.FileWaveView_channelCount)
-        audioFileSampleRate = sampleRate ?: typedArray.getIntOrThrow(R.styleable.FileWaveView_sampleRate)
 
         typedArray.recycle()
+
+        loadFileCallback(audioFilePath)
     }
 
     override fun onDraw(canvas: Canvas) {
