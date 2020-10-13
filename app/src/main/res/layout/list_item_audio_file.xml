@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <data>
+        <variable
+            name="audioFile"
+            type="com.bluehub.fastmixer.screens.mixing.AudioFile" />
+        <variable
+            name="eventListener"
+            type="com.bluehub.fastmixer.screens.mixing.AudioFileEventListeners" />
+        <variable
+            name="index"
+            type="Integer" />
+    </data>
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <com.bluehub.fastmixer.common.views.FileWaveView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="parent"
+            app:audioFilePath="@{audioFile.path}"
+            app:onLoadFile="@{eventListener.loadFileCallback}"
+            app:onReadSamples="@{eventListener.readSamplesCallbackWithIndex(index)}"
+            app:onDeleteFile="@{eventListener.deleteFileCallbackWithIndex(index)}" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

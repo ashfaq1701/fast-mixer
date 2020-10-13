@@ -61,8 +61,6 @@ class MixingScreen : PermissionFragment() {
 
         dataBinding.lifecycleOwner = viewLifecycleOwner
 
-        localViewModel.reInitRecordedFiles()
-
         navArguments.recordedFilePath?.let {
             if (it.isNotEmpty()) localViewModel.addRecordedFilePath(it)
         }
@@ -97,10 +95,6 @@ class MixingScreen : PermissionFragment() {
                     ScreenConstants.READ_FROM_FILE -> localViewModel.onReadFromDisk()
                 }
             }
-        })
-
-        localViewModel.audioFilesLiveData.observe(viewLifecycleOwner, Observer {
-            localViewModel.renderAudioFiles()
         })
     }
 }

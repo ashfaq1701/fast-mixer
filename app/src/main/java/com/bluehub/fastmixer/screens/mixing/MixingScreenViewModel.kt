@@ -19,9 +19,6 @@ class MixingScreenViewModel(override val context: Context, mixerApplication: Mix
     private var audioFiles: MutableList<AudioFile> = mutableListOf()
     val audioFilesLiveData = MutableLiveData<MutableList<AudioFile>>(mutableListOf())
 
-    private val fileWaveViews: MutableList<FileWaveView> = mutableListOf()
-    val fileWaveViewsLiveData = MutableLiveData<MutableList<FileWaveView>>(mutableListOf())
-
     @Inject
     override lateinit var permissionManager: PermissionManager
 
@@ -66,16 +63,9 @@ class MixingScreenViewModel(override val context: Context, mixerApplication: Mix
     fun addRecordedFilePath(filePath: String) {
         val file = File(filePath)
         if (file.exists()) {
-            audioFiles.add(AudioFile(filePath, AudioFileType.RECORDED, false))
+            audioFiles.add(AudioFile(filePath, AudioFileType.RECORDED))
             audioFilesLiveData.value = audioFiles
         }
-    }
-
-    fun reInitRecordedFiles() {
-        audioFiles = audioFiles.map {
-            it.copy(rendered = false)
-        } as MutableList<AudioFile>
-        audioFilesLiveData.value = audioFiles
     }
 
     fun addFile(filePath: String) = viewModelScope.launch {
@@ -92,33 +82,6 @@ class MixingScreenViewModel(override val context: Context, mixerApplication: Mix
 
         audioFiles.removeAt(index)
 
-        fileWaveViews.forEachIndexed { idx, _ ->
-            if (idx > index) {
-                fileWaveViews[idx].readSamplesCallback = readSamples(idx - 1)
-            }
-        }
-
-        fileWaveViews.removeAt(index)
-
-        fileWaveViewsLiveData.value = fileWaveViews
         audioFilesLiveData.value = audioFiles
-    }
-
-    fun renderAudioFiles() {
-        audioFilesLiveData.value?.forEachIndexed { idx, audioFile ->
-            if (!audioFile.rendered) {
-                fileWaveViews.add(
-                    FileWaveView(
-                        context = context,
-                        filePath = audioFile.path,
-                        loadFileCallback = { addFile(audioFile.path) },
-                        readSamplesCallback = readSamples(idx)
-                    )
-                )
-                fileWaveViewsLiveData.value = fileWaveViews
-
-                audioFilesLiveData.value!![idx].rendered = true
-            }
-        }
     }
 }
