@@ -34,6 +34,8 @@ class MixingScreen : PermissionFragment() {
 
     private lateinit var dataBinding: MixingScreenBinding
 
+    private lateinit var audioFileListAdapter: AudioFileListAdapter
+
     val navArguments: MixingScreenArgs by navArgs()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -55,8 +57,15 @@ class MixingScreen : PermissionFragment() {
        val scopedViewModel: MixingScreenViewModel by navGraphViewModels(R.id.nav_graph) { viewModelFactory }
 
         viewModel = scopedViewModel
-
         val localViewModel = viewModel as MixingScreenViewModel
+
+        audioFileListAdapter = AudioFileListAdapter(requireContext(), AudioFileEventListeners(
+            { filePath: String -> localViewModel.addFile(filePath) },
+            { index: Int -> localViewModel.readSamples(index) },
+            { index: Int -> localViewModel.deleteFile(index) }
+        ))
+        dataBinding.audioFileListView.adapter = audioFileListAdapter
+
         dataBinding.mixingScreenViewModel = localViewModel
 
         dataBinding.lifecycleOwner = viewLifecycleOwner

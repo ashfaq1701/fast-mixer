@@ -4,4 +4,5 @@
     <dimen name="record_button_height">50dp</dimen>
     <dimen name="button_text_size">12sp</dimen>
     <dimen name="recording_timer_text_size">25sp</dimen>
+    <dimen name="audio_file_margin_top">20dp</dimen>
 </resources>
