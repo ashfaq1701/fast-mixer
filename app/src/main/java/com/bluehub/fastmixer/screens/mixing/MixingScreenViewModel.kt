@@ -8,15 +8,15 @@ import com.bluehub.fastmixer.MixerApplication
 import com.bluehub.fastmixer.common.permissions.PermissionViewModel
 import com.bluehub.fastmixer.common.utils.PermissionManager
 import com.bluehub.fastmixer.common.utils.ScreenConstants
-import com.bluehub.fastmixer.common.views.FileWaveView
 import kotlinx.coroutines.*
 import java.io.File
+import java.util.*
 import javax.inject.Inject
 
 class MixingScreenViewModel(override val context: Context, mixerApplication: MixerApplication, override val tag: String): PermissionViewModel(context, mixerApplication, tag) {
     override var TAG: String = javaClass.simpleName
 
-    private var audioFiles: MutableList<AudioFile> = mutableListOf()
+    var audioFiles: MutableList<AudioFile> = mutableListOf()
     val audioFilesLiveData = MutableLiveData<MutableList<AudioFile>>(mutableListOf())
 
     @Inject
@@ -63,25 +63,33 @@ class MixingScreenViewModel(override val context: Context, mixerApplication: Mix
     fun addRecordedFilePath(filePath: String) {
         val file = File(filePath)
         if (file.exists()) {
-            audioFiles.add(AudioFile(filePath, AudioFileType.RECORDED))
+            audioFiles.add(AudioFile(UUID.randomUUID().toString(), filePath, AudioFileType.RECORDED))
             audioFilesLiveData.value = audioFiles
         }
     }
 
-    fun addFile(filePath: String) = viewModelScope.launch {
-        mixingRepository.addFile(filePath)
+    fun addFile(uuid: String) = fun (filePath: String) {
+        viewModelScope.launch {
+            mixingRepository.addFile(filePath, uuid)
+        }
     }
 
-    fun readSamples(index: Int) = fun (numSamples: Int): Array<Float> = runBlocking(Dispatchers.IO) {
-        mixingRepository.readSamples(index, numSamples)
+    fun readSamples(uuid: String) = fun (numSamples: Int): Array<Float> = runBlocking(Dispatchers.IO) {
+        mixingRepository.readSamples(uuid, numSamples)
     }
 
 
-    fun deleteFile(index: Int) = viewModelScope.launch {
-        mixingRepository.deleteFile(index)
+    fun deleteFile(uuid: String) {
+        viewModelScope.launch {
+            mixingRepository.deleteFile(uuid)
 
-        audioFiles.removeAt(index)
+            audioFiles.remove(
+                audioFiles.find {
+                    it.uuid == uuid
+                }
+            )
 
-        audioFilesLiveData.value = audioFiles
+            audioFilesLiveData.value = audioFiles
+        }
     }
 }

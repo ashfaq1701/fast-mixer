@@ -36,7 +36,7 @@ class MixingScreen : PermissionFragment() {
 
     private lateinit var audioFileListAdapter: AudioFileListAdapter
 
-    val navArguments: MixingScreenArgs by navArgs()
+    private val navArguments: MixingScreenArgs by navArgs()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,10 +60,10 @@ class MixingScreen : PermissionFragment() {
         val localViewModel = viewModel as MixingScreenViewModel
 
         audioFileListAdapter = AudioFileListAdapter(requireContext(), AudioFileEventListeners(
-            { filePath: String -> localViewModel.addFile(filePath) },
-            { index: Int -> localViewModel.readSamples(index) },
-            { index: Int -> localViewModel.deleteFile(index) }
-        ))
+            { uuid: String -> localViewModel.addFile(uuid) },
+            { uuid: String -> localViewModel.readSamples(uuid) },
+            { uuid: String -> localViewModel.deleteFile(uuid) }
+        ), localViewModel.audioFiles)
         dataBinding.audioFileListView.adapter = audioFileListAdapter
 
         dataBinding.mixingScreenViewModel = localViewModel
@@ -80,7 +80,7 @@ class MixingScreen : PermissionFragment() {
         return dataBinding.root
     }
 
-    fun initUI() {
+    private fun initUI() {
         val localViewModel = viewModel as MixingScreenViewModel
 
         localViewModel.eventRecord.observe(viewLifecycleOwner, Observer { record ->
@@ -104,6 +104,10 @@ class MixingScreen : PermissionFragment() {
                     ScreenConstants.READ_FROM_FILE -> localViewModel.onReadFromDisk()
                 }
             }
+        })
+
+        localViewModel.audioFilesLiveData.observe(viewLifecycleOwner, Observer {
+            audioFileListAdapter.notifyDataSetChanged()
         })
     }
 }

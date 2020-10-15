@@ -8,7 +8,7 @@
 #include <unistd.h>
 #include "RecordingIO.h"
 #include "../logging_macros.h"
-#include "../Utils.h"
+#include "../utils/Utils.h"
 #include <mutex>
 #include <condition_variable>
 #include <sys/stat.h>

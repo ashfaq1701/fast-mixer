@@ -20,7 +20,7 @@
 #include <unistd.h>
 #include "FFMpegExtractor.h"
 #include "../logging_macros.h"
-#include "../Utils.h"
+#include "../utils/Utils.h"
 
 constexpr int kInternalBufferSize = 1152; // Use MP3 block size. https://wiki.hydrogenaud.io/index.php?title=MP3
 

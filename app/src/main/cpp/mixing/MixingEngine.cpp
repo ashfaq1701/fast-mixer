@@ -6,28 +6,30 @@
 
 #include <utility>
 
-void MixingEngine::addFile(string filePath) {
+void MixingEngine::addFile(string filePath, string uuid) {
     shared_ptr<FileDataSource> source = mixingIO.readFile(std::move(filePath));
-    sourceList.push_back(source);
+    sourceMap.insert(pair<string, shared_ptr<FileDataSource>>(uuid, source));
 }
 
-unique_ptr<buffer_data> MixingEngine::readSamples(int index, size_t numSamples) {
-    if (index >= sourceList.size()) {
+unique_ptr<buffer_data> MixingEngine::readSamples(string uuid, size_t numSamples) {
+    auto it = sourceMap.find(uuid);
+    if (it == sourceMap.end()) {
         buffer_data emptyData {
             .ptr = nullptr,
             .numSamples = 0
         };
         return make_unique<buffer_data>(emptyData);
     }
-    shared_ptr<FileDataSource> dataSource = sourceList.at(index);
+    shared_ptr<FileDataSource> dataSource = it->second;
     return dataSource->readData(numSamples);
 }
 
-void MixingEngine::deleteFile(int idx) {
-    if (idx < sourceList.size()) {
-        shared_ptr<FileDataSource> dataSource = sourceList.at(idx);
+void MixingEngine::deleteFile(string uuid) {
+    auto it = sourceMap.find(uuid);
+    if (it != sourceMap.end()) {
+        shared_ptr<FileDataSource> dataSource = it->second;
         dataSource.reset();
-        sourceList.erase(sourceList.begin() + idx);
+        sourceMap.erase(uuid);
     }
 }
 

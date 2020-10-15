@@ -1,7 +1,5 @@
 package com.bluehub.fastmixer.screens.mixing
 
-import com.bluehub.fastmixer.screens.recording.RecordingEngineProxy
-
 class MixingEngineProxy {
     companion object {
         private val INSTANCE: MixingEngineProxy =
@@ -14,9 +12,9 @@ class MixingEngineProxy {
 
     fun create() = MixingEngine.create()
 
-    fun addFile(filePath: String) = MixingEngine.addFile(filePath)
+    fun addFile(filePath: String, uuid: String) = MixingEngine.addFile(filePath, uuid)
 
-    fun readSamples(index: Int, numSamples: Int) = MixingEngine.readSamples(index, numSamples)
+    fun readSamples(uuid: String, numSamples: Int) = MixingEngine.readSamples(uuid, numSamples)
 
-    fun deleteFile(index: Int) = MixingEngine.deleteFile(index)
+    fun deleteFile(uuid: String) = MixingEngine.deleteFile(uuid)
 }

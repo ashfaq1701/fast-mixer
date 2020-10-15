@@ -30,25 +30,28 @@ extern "C" {
     }
 
     JNIEXPORT void JNICALL
-    Java_com_bluehub_fastmixer_screens_mixing_MixingEngine_addFile(JNIEnv *env, jclass, jstring filePathStr) {
+    Java_com_bluehub_fastmixer_screens_mixing_MixingEngine_addFile(JNIEnv *env, jclass, jstring filePathStr, jstring uuid) {
         if (mixingEngine == nullptr) {
             LOGE("addFile: mixingEngine is null, you must call create() method before calling this method");
         }
         char* filePath = const_cast<char *>(env->GetStringUTFChars(filePathStr, NULL));
-        mixingEngine->addFile(filePath);
+        char* uuidStr = const_cast<char *>(env->GetStringUTFChars(uuid, NULL));
+        mixingEngine->addFile(filePath, uuidStr);
     }
 
     JNIEXPORT jobjectArray JNICALL
-    Java_com_bluehub_fastmixer_screens_mixing_MixingEngine_readSamples(JNIEnv *env, jclass, jint index, jint numSamples) {
+    Java_com_bluehub_fastmixer_screens_mixing_MixingEngine_readSamples(JNIEnv *env, jclass, jstring uuid, jint numSamples) {
         if (mixingEngine == nullptr) {
             LOGE("readSamples: mixingEngine is null, you must call create() method before calling this method");
         }
+
+        char* uuidStr = const_cast<char *>(env->GetStringUTFChars(uuid, NULL));
 
         jclass floatCls = env->FindClass("java/lang/Float");
         jmethodID floatConstructor = env->GetMethodID(floatCls, "<init>", "(F)V");
 
         jobjectArray result;
-        buffer_data* data = mixingEngine->readSamples(index, numSamples).release();
+        buffer_data* data = mixingEngine->readSamples(uuidStr, numSamples).release();
 
         float* dataSamples = data->ptr;
 
@@ -67,11 +70,12 @@ extern "C" {
     }
 
     JNIEXPORT void JNICALL
-    Java_com_bluehub_fastmixer_screens_mixing_MixingEngine_deleteFile(JNIEnv *env, jclass, jint index) {
+    Java_com_bluehub_fastmixer_screens_mixing_MixingEngine_deleteFile(JNIEnv *env, jclass, jstring uuid) {
         if (mixingEngine == nullptr) {
             LOGE("deleteFile: mixingEngine is null, you must call create() method before calling this method");
         }
-        mixingEngine->deleteFile(index);
+        char* uuidStr = const_cast<char *>(env->GetStringUTFChars(uuid, NULL));
+        mixingEngine->deleteFile(uuidStr);
     }
 }
 

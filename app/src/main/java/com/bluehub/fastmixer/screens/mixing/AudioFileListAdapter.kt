@@ -8,23 +8,23 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import com.bluehub.fastmixer.databinding.ListItemAudioFileBinding
 
-class AudioFileListAdapter(context: Context, private val audioFileEventListeners: AudioFileEventListeners): ArrayAdapter<AudioFile>(context, -1) {
+class AudioFileListAdapter(context: Context, private val audioFileEventListeners: AudioFileEventListeners, audioFileList: MutableList<AudioFile>): ArrayAdapter<AudioFile>(context, -1, audioFileList) {
     @SuppressLint("ViewHolder")
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         val binding = ListItemAudioFileBinding.inflate(inflater, parent, false)
         binding.audioFile = getItem(position)
         binding.eventListener = audioFileEventListeners
-        binding.index = position
         return binding.root
     }
 }
 
 class AudioFileEventListeners(
-    val loadFileCallback: (String) -> Unit,
-    val readSamplesCallback: (Int)->(Int)->Array<Float>,
-    val deleteFileCallback: (Int)->Unit
+    var loadFileCallback: (String) -> (String) -> Unit,
+    var readSamplesCallback: (String) -> (Int) -> Array<Float>,
+    var deleteFileCallback: (String) -> Unit
 ) {
-    fun readSamplesCallbackWithIndex(idx: Int): (Int)->Array<Float> = readSamplesCallback(idx)
-    fun deleteFileCallbackWithIndex(idx: Int): (Int)->Unit = { deleteFileCallback(idx) }
+    fun readSamplesCallbackWithIndex(uuid: String): (Int)->Array<Float> = readSamplesCallback(uuid)
+    fun loadFileCallbackWithIndex(uuid: String): (String)->Unit = loadFileCallback(uuid)
+    fun deleteFileCallbackWithIndex(uuid: String): (String)->Unit = { deleteFileCallback(uuid) }
 }

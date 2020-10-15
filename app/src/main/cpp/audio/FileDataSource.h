@@ -20,7 +20,7 @@
 #include <android/asset_manager.h>
 #include "../Constants.h"
 #include "DataSource.h"
-#include "../Utils.h"
+#include "../utils/Utils.h"
 
 using namespace std;
 
@@ -30,6 +30,7 @@ public:
     int64_t getSize() const override { return mBufferSize; }
     AudioProperties getProperties() const override { return mProperties; }
     const float* getData() const override { return mBuffer.get(); }
+    int64_t getSampleSize() { return mBufferSize / mProperties.channelCount; };
 
     static FileDataSource* newFromCompressedFile(
             const char *filename,

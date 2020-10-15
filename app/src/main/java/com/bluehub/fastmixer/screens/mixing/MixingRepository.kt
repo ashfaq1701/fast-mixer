@@ -1,6 +1,5 @@
 package com.bluehub.fastmixer.screens.mixing
 
-import com.bluehub.fastmixer.screens.recording.RecordingEngineProxy
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -9,13 +8,13 @@ class MixingRepository(val mixingEngineProxy: MixingEngineProxy) {
         mixingEngineProxy.create()
     }
 
-    suspend fun addFile(filePath: String) = withContext(Dispatchers.IO){
-        mixingEngineProxy.addFile(filePath)
+    suspend fun addFile(filePath: String, uuid: String) = withContext(Dispatchers.IO){
+        mixingEngineProxy.addFile(filePath, uuid)
     }
 
-    fun readSamples(index: Int, numSamples: Int): Array<Float> = mixingEngineProxy.readSamples(index, numSamples)
+    fun readSamples(uuid: String, numSamples: Int): Array<Float> = mixingEngineProxy.readSamples(uuid, numSamples)
 
-    suspend fun deleteFile(index: Int) = withContext(Dispatchers.IO) {
-        mixingEngineProxy.deleteFile(index)
+    suspend fun deleteFile(uuid: String) = withContext(Dispatchers.IO) {
+        mixingEngineProxy.deleteFile(uuid)
     }
 }

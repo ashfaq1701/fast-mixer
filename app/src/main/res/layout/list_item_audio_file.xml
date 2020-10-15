@@ -8,9 +8,6 @@
         <variable
             name="eventListener"
             type="com.bluehub.fastmixer.screens.mixing.AudioFileEventListeners" />
-        <variable
-            name="index"
-            type="Integer" />
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -20,7 +17,7 @@
             android:layout_height="wrap_content"
             app:layout_constraintTop_toTopOf="parent"
             app:audioFilePath="@{audioFile.path}"
-            app:fileLoader="@{eventListener.loadFileCallback}"
-            app:samplesReader="@{eventListener.readSamplesCallbackWithIndex(index)}" />
+            app:fileLoader="@{eventListener.loadFileCallbackWithIndex(audioFile.uuid)}"
+            app:samplesReader="@{eventListener.readSamplesCallbackWithIndex(audioFile.uuid)}" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
