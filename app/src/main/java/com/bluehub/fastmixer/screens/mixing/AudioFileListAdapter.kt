@@ -9,7 +9,7 @@ import android.widget.ArrayAdapter
 class AudioFileListAdapter(context: Context, audioFileEventListeners: AudioFileEventListeners): ArrayAdapter<AudioFile>(context, -1) {
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-
+        //inflater.inflate()
         return super.getView(position, convertView, parent)
     }
 }

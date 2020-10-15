@@ -19,8 +19,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:layout_constraintTop_toTopOf="parent"
-            app:audioFilePath="@{audioFile.path}" />
-<!--            app:onLoadFile="@{eventListener.loadFileCallback}"-->
-<!--            app:onReadSamples="@{eventListener.readSamplesCallbackWithIndex(index)}" />-->
+            app:audioFilePath="@{audioFile.path}"
+            app:fileLoader="@{eventListener.loadFileCallback}"
+            app:samplesReader="@{eventListener.readSamplesCallbackWithIndex(index)}" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
