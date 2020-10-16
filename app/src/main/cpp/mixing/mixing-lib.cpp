@@ -77,5 +77,14 @@ extern "C" {
         char* uuidStr = const_cast<char *>(env->GetStringUTFChars(uuid, NULL));
         mixingEngine->deleteFile(uuidStr);
     }
+
+    JNIEXPORT jint JNICALL
+    Java_com_bluehub_fastmixer_screens_mixing_MixingEngine_getTotalSamples(JNIEnv *env, jclass, jstring uuid) {
+        if (mixingEngine == nullptr) {
+            LOGE("deleteFile: mixingEngine is null, you must call create() method before calling this method");
+        }
+        char* uuidStr = const_cast<char *>(env->GetStringUTFChars(uuid, NULL));
+        return mixingEngine->getAudioFileTotalSamples(uuidStr);
+    }
 }
 

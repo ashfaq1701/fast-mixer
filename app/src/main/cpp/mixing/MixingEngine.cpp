@@ -33,3 +33,12 @@ void MixingEngine::deleteFile(string uuid) {
     }
 }
 
+int64_t MixingEngine::getAudioFileTotalSamples(string uuid) {
+    auto it = sourceMap.find(uuid);
+    if (it == sourceMap.end()) {
+        return 0;
+    }
+    shared_ptr<FileDataSource> dataSource = it->second;
+    return dataSource->getSampleSize();
+}
+

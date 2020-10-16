@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import com.bluehub.fastmixer.databinding.ListItemAudioFileBinding
+import kotlinx.coroutines.Job
 
 class AudioFileListAdapter(context: Context, private val audioFileEventListeners: AudioFileEventListeners, audioFileList: MutableList<AudioFile>): ArrayAdapter<AudioFile>(context, -1, audioFileList) {
     @SuppressLint("ViewHolder")
@@ -20,11 +21,13 @@ class AudioFileListAdapter(context: Context, private val audioFileEventListeners
 }
 
 class AudioFileEventListeners(
-    var loadFileCallback: (String) -> (String) -> Unit,
+    var loadFileCallback: (String) -> (String) -> Job,
     var readSamplesCallback: (String) -> (Int) -> Array<Float>,
-    var deleteFileCallback: (String) -> Unit
+    var deleteFileCallback: (String) -> Unit,
+    var getTotalSamples: (String) -> Int
 ) {
     fun readSamplesCallbackWithIndex(uuid: String): (Int)->Array<Float> = readSamplesCallback(uuid)
-    fun loadFileCallbackWithIndex(uuid: String): (String)->Unit = loadFileCallback(uuid)
+    fun loadFileCallbackWithIndex(uuid: String): (String)->Job = loadFileCallback(uuid)
     fun deleteFileCallbackWithIndex(uuid: String): (String)->Unit = { deleteFileCallback(uuid) }
+    fun getTotalSamplesWithIndex(uuid: String): () -> Int = { getTotalSamples(uuid) }
 }

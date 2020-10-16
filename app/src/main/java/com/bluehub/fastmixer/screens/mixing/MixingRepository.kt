@@ -17,4 +17,6 @@ class MixingRepository(val mixingEngineProxy: MixingEngineProxy) {
     suspend fun deleteFile(uuid: String) = withContext(Dispatchers.IO) {
         mixingEngineProxy.deleteFile(uuid)
     }
+
+    fun getTotalSamples(uuid: String): Int = mixingEngineProxy.getTotalSamples(uuid)
 }

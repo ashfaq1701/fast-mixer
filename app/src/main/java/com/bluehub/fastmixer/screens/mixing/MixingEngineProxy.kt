@@ -17,4 +17,6 @@ class MixingEngineProxy {
     fun readSamples(uuid: String, numSamples: Int) = MixingEngine.readSamples(uuid, numSamples)
 
     fun deleteFile(uuid: String) = MixingEngine.deleteFile(uuid)
+
+    fun getTotalSamples(uuid: String): Int = MixingEngine.getTotalSamples(uuid)
 }

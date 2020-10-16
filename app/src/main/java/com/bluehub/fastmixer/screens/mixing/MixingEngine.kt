@@ -13,5 +13,7 @@ class MixingEngine {
         @JvmStatic external fun readSamples(uuid: String, numSamples: Int): Array<Float>
 
         @JvmStatic external fun deleteFile(uuid: String)
+
+        @JvmStatic external fun getTotalSamples(uuid: String): Int
     }
 }
