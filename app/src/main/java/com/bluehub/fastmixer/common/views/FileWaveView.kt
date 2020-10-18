@@ -2,11 +2,14 @@ package com.bluehub.fastmixer.common.views
 
 import android.content.Context
 import android.graphics.Canvas
+import android.graphics.Paint
+import android.graphics.Typeface
 import android.util.AttributeSet
 import android.view.View
 import androidx.databinding.BindingMethod
 import androidx.databinding.BindingMethods
 import kotlinx.coroutines.Job
+import timber.log.Timber
 
 
 @BindingMethods(value = [
@@ -27,6 +30,13 @@ class FileWaveView @JvmOverloads constructor(
 
     private var fileLoaded = false
     private var totalSampleCount: Int = 0
+
+    private val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        style = Paint.Style.FILL
+        textAlign = Paint.Align.CENTER
+        textSize = 15.0f
+        typeface = Typeface.create("", Typeface.BOLD)
+    }
 
     fun setAudioFilePath(audioFilePath: String) {
         mAudioFilePath = audioFilePath
@@ -56,11 +66,15 @@ class FileWaveView @JvmOverloads constructor(
                     fileLoaded = true
                     totalSampleCount = mTotalSampleCountReader()
                 }
+                invalidate()
             }
         }
     }
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
+        if(::mAudioFilePath.isInitialized) {
+            canvas.drawText(mAudioFilePath, 10F, 10F, paint)
+        }
     }
 }

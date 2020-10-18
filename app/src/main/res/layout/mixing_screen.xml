@@ -45,9 +45,10 @@
         <ListView
             android:id="@+id/audioFileListView"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
             android:layout_marginTop="@dimen/audio_file_margin_top"
             app:layout_constraintTop_toBottomOf="@id/save_to_disk"
+            app:layout_constraintBottom_toBottomOf="parent"
             tools:listitem="@layout/list_item_audio_file" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

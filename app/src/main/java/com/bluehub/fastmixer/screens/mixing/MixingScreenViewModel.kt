@@ -9,6 +9,7 @@ import com.bluehub.fastmixer.common.permissions.PermissionViewModel
 import com.bluehub.fastmixer.common.utils.PermissionManager
 import com.bluehub.fastmixer.common.utils.ScreenConstants
 import kotlinx.coroutines.*
+import timber.log.Timber
 import java.io.File
 import java.util.*
 import javax.inject.Inject
@@ -80,7 +81,6 @@ class MixingScreenViewModel(override val context: Context, mixerApplication: Mix
     fun deleteFile(uuid: String) {
         viewModelScope.launch {
             mixingRepository.deleteFile(uuid)
-
             audioFiles.remove(
                 audioFiles.find {
                     it.uuid == uuid

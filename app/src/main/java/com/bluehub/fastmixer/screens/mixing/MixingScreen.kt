@@ -16,6 +16,7 @@ import com.bluehub.fastmixer.common.permissions.PermissionViewModel
 import com.bluehub.fastmixer.common.utils.DialogManager
 import com.bluehub.fastmixer.common.utils.ScreenConstants
 import com.bluehub.fastmixer.databinding.MixingScreenBinding
+import timber.log.Timber
 import javax.inject.Inject
 
 class MixingScreen : PermissionFragment() {
@@ -59,6 +60,10 @@ class MixingScreen : PermissionFragment() {
         viewModel = scopedViewModel
         val localViewModel = viewModel as MixingScreenViewModel
 
+        dataBinding.mixingScreenViewModel = localViewModel
+
+        dataBinding.lifecycleOwner = viewLifecycleOwner
+
         audioFileListAdapter = AudioFileListAdapter(requireContext(), AudioFileEventListeners(
             { uuid: String -> localViewModel.addFile(uuid) },
             { uuid: String -> localViewModel.readSamples(uuid) },
@@ -66,10 +71,6 @@ class MixingScreen : PermissionFragment() {
             { uuid: String -> localViewModel.getTotalSamples(uuid) }
         ), localViewModel.audioFiles)
         dataBinding.audioFileListView.adapter = audioFileListAdapter
-
-        dataBinding.mixingScreenViewModel = localViewModel
-
-        dataBinding.lifecycleOwner = viewLifecycleOwner
 
         navArguments.recordedFilePath?.let {
             if (it.isNotEmpty()) localViewModel.addRecordedFilePath(it)

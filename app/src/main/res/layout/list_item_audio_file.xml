@@ -14,7 +14,7 @@
         android:layout_height="wrap_content">
         <com.bluehub.fastmixer.common.views.FileWaveView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="50dp"
             app:layout_constraintTop_toTopOf="parent"
             app:audioFilePath="@{audioFile.path}"
             app:fileLoader="@{eventListener.loadFileCallbackWithIndex(audioFile.uuid)}"
