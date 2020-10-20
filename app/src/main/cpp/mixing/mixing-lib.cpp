@@ -33,6 +33,7 @@ extern "C" {
     Java_com_bluehub_fastmixer_screens_mixing_MixingEngine_addFile(JNIEnv *env, jclass, jstring filePathStr, jstring uuid) {
         if (mixingEngine == nullptr) {
             LOGE("addFile: mixingEngine is null, you must call create() method before calling this method");
+            return;
         }
         char* filePath = const_cast<char *>(env->GetStringUTFChars(filePathStr, NULL));
         char* uuidStr = const_cast<char *>(env->GetStringUTFChars(uuid, NULL));
@@ -43,6 +44,7 @@ extern "C" {
     Java_com_bluehub_fastmixer_screens_mixing_MixingEngine_readSamples(JNIEnv *env, jclass, jstring uuid, jint numSamples) {
         if (mixingEngine == nullptr) {
             LOGE("readSamples: mixingEngine is null, you must call create() method before calling this method");
+            return nullptr;
         }
 
         char* uuidStr = const_cast<char *>(env->GetStringUTFChars(uuid, NULL));
@@ -73,6 +75,7 @@ extern "C" {
     Java_com_bluehub_fastmixer_screens_mixing_MixingEngine_deleteFile(JNIEnv *env, jclass, jstring uuid) {
         if (mixingEngine == nullptr) {
             LOGE("deleteFile: mixingEngine is null, you must call create() method before calling this method");
+            return;
         }
         char* uuidStr = const_cast<char *>(env->GetStringUTFChars(uuid, NULL));
         mixingEngine->deleteFile(uuidStr);
@@ -82,9 +85,20 @@ extern "C" {
     Java_com_bluehub_fastmixer_screens_mixing_MixingEngine_getTotalSamples(JNIEnv *env, jclass, jstring uuid) {
         if (mixingEngine == nullptr) {
             LOGE("deleteFile: mixingEngine is null, you must call create() method before calling this method");
+            return 0;
         }
         char* uuidStr = const_cast<char *>(env->GetStringUTFChars(uuid, NULL));
         return mixingEngine->getAudioFileTotalSamples(uuidStr);
+    }
+
+    JNIEXPORT void JNICALL
+    Java_com_bluehub_fastmixer_screens_mixing_MixingEngine_delete(JNIEnv *env, jclass) {
+        if (mixingEngine != nullptr) {
+            LOGE("delete: mixingEngine is null, you must call create() method before calling this method");
+            return;
+        }
+        delete mixingEngine;
+        mixingEngine = nullptr;
     }
 }
 

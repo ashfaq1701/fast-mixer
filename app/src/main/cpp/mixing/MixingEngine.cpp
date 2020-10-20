@@ -6,6 +6,15 @@
 
 #include <utility>
 
+MixingEngine::~MixingEngine() {
+    auto it = sourceMap.begin();
+    while (it != sourceMap.end()) {
+        shared_ptr<FileDataSource> dataSource = it->second;
+        dataSource.reset();
+    }
+    sourceMap.clear();
+}
+
 void MixingEngine::addFile(string filePath, string uuid) {
     shared_ptr<FileDataSource> source = mixingIO.readFile(std::move(filePath));
     sourceMap.insert(pair<string, shared_ptr<FileDataSource>>(uuid, source));

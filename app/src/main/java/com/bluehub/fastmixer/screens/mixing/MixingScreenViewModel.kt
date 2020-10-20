@@ -35,6 +35,7 @@ class MixingScreenViewModel(override val context: Context, mixerApplication: Mix
         get() = _eventRead
 
     init {
+        Timber.d("Creating mixing viewmodel")
         getViewModelComponent().inject(this)
         mixingRepository.createMixingEngine()
     }
@@ -92,4 +93,10 @@ class MixingScreenViewModel(override val context: Context, mixerApplication: Mix
     }
 
     fun getTotalSamples(uuid: String): Int = mixingRepository.getTotalSamples(uuid)
+
+    override fun onCleared() {
+        super.onCleared()
+        Timber.d("Mixing engine getting deleted")
+        mixingRepository.deleteMixingEngine()
+    }
 }

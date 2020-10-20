@@ -35,7 +35,7 @@ void BaseStream::stopStream(oboe::AudioStream *stream) {
 void BaseStream::closeStream(oboe::AudioStream *stream) {
     LOGD("closeStream(): ");
 
-    if (stream) {
+    if (stream && stream->getState() != oboe::StreamState::Closing && stream->getState() != oboe::StreamState::Closed) {
         oboe::Result result = stream->close();
         if (result != oboe::Result::OK) {
             LOGE(TAG, "Error closing stream. %s", oboe::convertToText(result));

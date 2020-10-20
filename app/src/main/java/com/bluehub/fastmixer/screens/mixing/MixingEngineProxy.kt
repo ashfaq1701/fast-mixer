@@ -12,11 +12,15 @@ class MixingEngineProxy {
 
     fun create() = MixingEngine.create()
 
-    fun addFile(filePath: String, uuid: String) = MixingEngine.addFile(filePath, uuid)
+    fun addFile(filePath: String, uuid: String) = synchronized(this) {
+        MixingEngine.addFile(filePath, uuid)
+    }
 
     fun readSamples(uuid: String, numSamples: Int) = MixingEngine.readSamples(uuid, numSamples)
 
     fun deleteFile(uuid: String) = MixingEngine.deleteFile(uuid)
 
     fun getTotalSamples(uuid: String): Int = MixingEngine.getTotalSamples(uuid)
+
+    fun delete() = MixingEngine.delete()
 }

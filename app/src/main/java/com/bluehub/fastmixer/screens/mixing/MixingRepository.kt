@@ -19,4 +19,6 @@ class MixingRepository(val mixingEngineProxy: MixingEngineProxy) {
     }
 
     fun getTotalSamples(uuid: String): Int = mixingEngineProxy.getTotalSamples(uuid)
+
+    fun deleteMixingEngine() = mixingEngineProxy.delete()
 }
