@@ -9,19 +9,19 @@
 MixingEngine::~MixingEngine() {
     auto it = sourceMap.begin();
     while (it != sourceMap.end()) {
-        shared_ptr<FileDataSource> dataSource = it->second;
-        dataSource.reset();
+        unique_ptr<FileDataSource> source = move(it->second);
+        source.reset(nullptr);
     }
     sourceMap.clear();
 }
 
 void MixingEngine::addFile(string filePath, string uuid) {
     auto it = sourceMap.find(uuid);
-    if (it == sourceMap.end()) {
+    if (it != sourceMap.end()) {
         return;
     }
-    shared_ptr<FileDataSource> source = mixingIO.readFile(std::move(filePath));
-    sourceMap.insert(pair<string, shared_ptr<FileDataSource>>(uuid, source));
+    unique_ptr<FileDataSource> source = mixingIO.readFile(std::move(filePath));
+    sourceMap.insert(pair<string, unique_ptr<FileDataSource>>(uuid, move(source)));
 }
 
 unique_ptr<buffer_data> MixingEngine::readSamples(string uuid, size_t numSamples) {
@@ -33,15 +33,14 @@ unique_ptr<buffer_data> MixingEngine::readSamples(string uuid, size_t numSamples
         };
         return make_unique<buffer_data>(emptyData);
     }
-    shared_ptr<FileDataSource> dataSource = it->second;
-    return dataSource->readData(numSamples);
+    return it->second->readData(numSamples);
 }
 
 void MixingEngine::deleteFile(string uuid) {
     auto it = sourceMap.find(uuid);
     if (it != sourceMap.end()) {
-        shared_ptr<FileDataSource> dataSource = it->second;
-        dataSource.reset();
+        unique_ptr<FileDataSource> dataSource = move(it->second);
+        dataSource.reset(nullptr);
         sourceMap.erase(uuid);
     }
 }
@@ -51,7 +50,6 @@ int64_t MixingEngine::getAudioFileTotalSamples(string uuid) {
     if (it == sourceMap.end()) {
         return 0;
     }
-    shared_ptr<FileDataSource> dataSource = it->second;
-    return dataSource->getSampleSize();
+    return it->second->getSampleSize();
 }
 
