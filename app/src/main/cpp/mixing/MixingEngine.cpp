@@ -9,8 +9,7 @@
 MixingEngine::~MixingEngine() {
     auto it = sourceMap.begin();
     while (it != sourceMap.end()) {
-        unique_ptr<FileDataSource> source = move(it->second);
-        source.reset(nullptr);
+        it->second.reset(nullptr);
     }
     sourceMap.clear();
 }
@@ -39,8 +38,7 @@ unique_ptr<buffer_data> MixingEngine::readSamples(string uuid, size_t numSamples
 void MixingEngine::deleteFile(string uuid) {
     auto it = sourceMap.find(uuid);
     if (it != sourceMap.end()) {
-        unique_ptr<FileDataSource> dataSource = move(it->second);
-        dataSource.reset(nullptr);
+        it->second.reset(nullptr);
         sourceMap.erase(uuid);
     }
 }

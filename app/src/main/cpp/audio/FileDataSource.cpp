@@ -82,6 +82,7 @@ FileDataSource* FileDataSource::newFromCompressedFile(
     auto decodedData = new uint8_t[maximumDataSizeInBytes];
 
     int64_t bytesDecoded = ffmpegExtractor.readData(decodedData);
+
     auto numSamples = bytesDecoded / sizeof(float);
 
     // Now we know the exact number of samples we can create a float array to hold the audio data

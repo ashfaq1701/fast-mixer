@@ -181,6 +181,7 @@ bool FFMpegExtractor::decode() {
 
     // Obtain the best audio stream to decode
     mStream = getBestAudioStream(mFormatContext.get());
+
     if (mStream == nullptr || mStream->codecpar == nullptr){
         LOGE("Could not find a suitable audio stream to decode");
         return decodedSuccessfully;
@@ -230,6 +231,39 @@ bool FFMpegExtractor::decode() {
     return decodedSuccessfully;
 }
 
+/*int64_t FFMpegExtractor::readData(
+        uint8_t *targetData) {
+    int ret = 0;
+    int src_nb_channels = 0, dst_nb_channels = 0;
+    uint8_t **src_data = NULL, **dst_data = NULL;
+    int src_linesize, dst_linesize;
+    int64_t src_nb_samples = 0;
+
+    if (!decodedSuccessfully) {
+        return AVERROR(ENOMEM);
+    }
+
+    int32_t outChannelLayout = (1 << mTargetProperties.channelCount) - 1;
+
+    struct SwrContext *swr_ctx = swr_alloc();
+    if (!swr_ctx) {
+        LOGD("Could not allocate resampler context");
+        ret = AVERROR(ENOMEM);
+        goto end;
+    }
+
+    src_nb_channels = av_get_channel_layout_nb_channels(mStream->codecpar->channel_layout);
+    src_nb_samples = (int64_t) ((mStream->duration / (float) AV_TIME_BASE) * mStream->codecpar->sample_rate * mStream->codecpar->channels);
+
+    src_nb_channels = mStream->nb_frames;
+    ret = av_samples_alloc_array_and_samples(&src_data, &src_linesize, src_nb_channels,
+                                             src_nb_samples, static_cast<AVSampleFormat>(mStream->codecpar->format), 0);
+
+
+    end:
+
+}*/
+
 int64_t FFMpegExtractor::readData(
         uint8_t *targetData) {
     int returnValue = -1;
@@ -270,7 +304,7 @@ int64_t FFMpegExtractor::readData(
     int bytesPerSample = av_get_bytes_per_sample((AVSampleFormat)mStream->codecpar->format);
 
     // While there is more data to read, read it into the avPacket
-    while (av_read_frame(mFormatContext.get(), &avPacket) == 0){
+    while (av_read_frame(mFormatContext.get(), &avPacket) == 0) {
 
         if (avPacket.stream_index == mStream->index && avPacket.size > 0) {
 
@@ -309,6 +343,7 @@ int64_t FFMpegExtractor::readData(
                     dst_nb_samples,
                     AV_SAMPLE_FMT_FLT,
                     0);
+
             int frame_count = swr_convert(
                     swr,
                     (uint8_t **) &buffer1,
@@ -317,12 +352,17 @@ int64_t FFMpegExtractor::readData(
                     decodedFrame->nb_samples);
 
             int64_t bytesToWrite = frame_count * sizeof(float) * mTargetProperties.channelCount;
+
             memcpy(targetData + bytesWritten, buffer1, (size_t)bytesToWrite);
             bytesWritten += bytesToWrite;
-            av_freep(&buffer1);
 
+            av_freep(&buffer1);
             avPacket.size = 0;
             avPacket.data = nullptr;
+            avPacket.buf = nullptr;
+            avPacket.side_data = nullptr;
+
+            delete buffer1;
         }
     }
 
@@ -331,6 +371,8 @@ int64_t FFMpegExtractor::readData(
     returnValue = bytesWritten;
 
     cleanup:
+    delete decodedFrame;
+
     return returnValue;
 }
 

@@ -10,7 +10,9 @@ unique_ptr<FileDataSource> MixingIO::readFile(string filename) {
             .sampleRate = StreamConstants::mSampleRate
     };
 
-    return unique_ptr<FileDataSource>{
-            FileDataSource::newFromCompressedFile(filename.c_str(), targetProperties)
+    FileDataSource* source = FileDataSource::newFromCompressedFile(filename.c_str(), targetProperties);
+
+    return unique_ptr<FileDataSource> {
+        source
     };
 }
