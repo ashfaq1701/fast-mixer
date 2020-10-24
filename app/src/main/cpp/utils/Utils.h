@@ -6,13 +6,13 @@
 #define MODULE_NAME  "RecordingIO"
 #endif
 
-#include "../../../../../../../Android/Sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/c++/v1/cstdint"
-#include "../../../../../../../Android/Sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/c++/v1/cmath"
-#include "../../../../../../../Android/Sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/sys/stat.h"
-#include "../../../../../../../Android/Sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/c++/v1/cstring"
-#include "../../../../../../../Android/Sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/c++/v1/string"
-#include "../../../../../../../Android/Sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/c++/v1/sstream"
-#include "../../../../../../../Android/Sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/c++/v1/ios"
+#include "cstdint"
+#include "cmath"
+#include "sys/stat.h"
+#include "cstring"
+#include "string"
+#include "sstream"
+#include "ios"
 #include "../logging_macros.h"
 
 using namespace std;
