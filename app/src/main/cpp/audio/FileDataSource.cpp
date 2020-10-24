@@ -75,6 +75,7 @@ FileDataSource* FileDataSource::newFromCompressedFile(
 
     long maximumDataSizeInBytes = 0;
     maximumDataSizeInBytes = assetSize * ffmpegExtractor.mChannelCount * (sizeof(float_t) / numBytesInSample);
+
     if (!strEndedWith(filenameStr, ".wav")) {
         maximumDataSizeInBytes = kMaxCompressionRatio * maximumDataSizeInBytes;
     }

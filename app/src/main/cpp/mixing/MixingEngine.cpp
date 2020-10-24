@@ -19,8 +19,8 @@ void MixingEngine::addFile(string filePath, string uuid) {
     if (it != sourceMap.end()) {
         return;
     }
-    unique_ptr<FileDataSource> source = mixingIO.readFile(std::move(filePath));
-    sourceMap.insert(pair<string, unique_ptr<FileDataSource>>(uuid, move(source)));
+    unique_ptr<FileDataSource> source = mixingIO.readFile(move(filePath));
+    sourceMap.insert(pair<string, unique_ptr<FileDataSource>>(move(uuid), move(source)));
 }
 
 unique_ptr<buffer_data> MixingEngine::readSamples(string uuid, size_t numSamples) {
@@ -46,6 +46,9 @@ void MixingEngine::deleteFile(string uuid) {
 int64_t MixingEngine::getAudioFileTotalSamples(string uuid) {
     auto it = sourceMap.find(uuid);
     if (it == sourceMap.end()) {
+        return 0;
+    }
+    if (it->second == nullptr) {
         return 0;
     }
     return it->second->getSampleSize();
