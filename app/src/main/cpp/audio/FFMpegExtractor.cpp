@@ -301,10 +301,9 @@ int64_t FFMpegExtractor::readData(
     AVPacket avPacket; // Stores compressed audio data
     av_init_packet(&avPacket);
     AVFrame *decodedFrame = av_frame_alloc(); // Stores raw audio data
-    int bytesPerSample = av_get_bytes_per_sample((AVSampleFormat)mStream->codecpar->format);
 
     // While there is more data to read, read it into the avPacket
-    while (av_read_frame(mFormatContext.get(), &avPacket) == 0) {
+    while (av_read_frame(mFormatContext.get(), &avPacket) == 0){
 
         if (avPacket.stream_index == mStream->index && avPacket.size > 0) {
 
@@ -343,7 +342,6 @@ int64_t FFMpegExtractor::readData(
                     dst_nb_samples,
                     AV_SAMPLE_FMT_FLT,
                     0);
-
             int frame_count = swr_convert(
                     swr,
                     (uint8_t **) &buffer1,
@@ -352,17 +350,12 @@ int64_t FFMpegExtractor::readData(
                     decodedFrame->nb_samples);
 
             int64_t bytesToWrite = frame_count * sizeof(float) * mTargetProperties.channelCount;
-
             memcpy(targetData + bytesWritten, buffer1, (size_t)bytesToWrite);
             bytesWritten += bytesToWrite;
-
             av_freep(&buffer1);
+
             avPacket.size = 0;
             avPacket.data = nullptr;
-            avPacket.buf = nullptr;
-            avPacket.side_data = nullptr;
-
-            delete buffer1;
         }
     }
 
