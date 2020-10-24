@@ -5,9 +5,9 @@ includedir=build/x86_64/include
 
 Name: libavcodec
 Description: FFmpeg codec library
-Version: 58.97.102
+Version: 58.111.101
 Requires: 
-Requires.private: libavutil >= 56.57.100
+Requires.private: libavutil >= 56.60.100
 Conflicts:
 Libs: -L${libdir}  -lavcodec 
 Libs.private: -pthread -lm

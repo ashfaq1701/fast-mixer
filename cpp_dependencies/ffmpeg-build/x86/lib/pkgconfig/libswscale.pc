@@ -7,7 +7,7 @@ Name: libswscale
 Description: FFmpeg image rescaling library
 Version: 5.8.100
 Requires: 
-Requires.private: libavutil >= 56.57.100
+Requires.private: libavutil >= 56.60.100
 Conflicts:
 Libs: -L${libdir}  -lswscale 
 Libs.private: -lm

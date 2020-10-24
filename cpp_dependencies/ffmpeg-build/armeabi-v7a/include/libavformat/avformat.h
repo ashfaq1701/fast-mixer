@@ -534,7 +534,9 @@ typedef struct AVOutputFormat {
 #else
 #define ff_const59 const
 #endif
+#if FF_API_NEXT
     ff_const59 struct AVOutputFormat *next;
+#endif
     /**
      * size of private data so that it can be allocated in the wrapper
      */
@@ -679,7 +681,9 @@ typedef struct AVInputFormat {
      * New public fields should be added right above.
      *****************************************************************
      */
+#if FF_API_NEXT
     ff_const59 struct AVInputFormat *next;
+#endif
 
     /**
      * Raw demuxers store their codec ID here.
@@ -2006,12 +2010,6 @@ void av_format_inject_global_side_data(AVFormatContext *s);
  * @return AVFMT_DURATION_FROM_PTS, AVFMT_DURATION_FROM_STREAM, or AVFMT_DURATION_FROM_BITRATE.
  */
 enum AVDurationEstimationMethod av_fmt_ctx_get_duration_estimation_method(const AVFormatContext* ctx);
-
-typedef struct AVPacketList {
-    AVPacket pkt;
-    struct AVPacketList *next;
-} AVPacketList;
-
 
 /**
  * @defgroup lavf_core Core functions

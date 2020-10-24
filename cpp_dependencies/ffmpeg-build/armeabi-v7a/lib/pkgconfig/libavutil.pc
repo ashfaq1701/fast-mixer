@@ -5,7 +5,7 @@ includedir=build/armeabi-v7a/include
 
 Name: libavutil
 Description: FFmpeg utility library
-Version: 56.57.100
+Version: 56.60.100
 Requires: 
 Requires.private: 
 Conflicts:
