@@ -12,4 +12,13 @@ git submodule update --init
 
 to download all of the C++ dependencies required by this project. Then this project can be built and run.
 
+Then run the following commands to build ffmpeg (through the provided bash script).
+
+```bash
+cd cpp_dependencies/ffmpeg-scripts
+./ffmpeg-build.sh
+```
+
+This will build ffmpeg and move it to the expected directory.
+
 This README.md file will further be enhanced later.

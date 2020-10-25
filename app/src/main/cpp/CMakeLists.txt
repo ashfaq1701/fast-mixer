@@ -82,7 +82,7 @@ find_library( # Sets the name of the path variable.
         # you want CMake to locate.
         log )
 
-set(FFMPEG_DIR ${PROJECT_SOURCE_DIR}/../../../../cpp_dependencies/ffmpeg-build/${ANDROID_ABI})
+set(FFMPEG_DIR ${PROJECT_SOURCE_DIR}/../../../../cpp_dependencies/ffmpeg-scripts/ffmpeg-build/${ANDROID_ABI})
 include_directories(audioEngine ${FFMPEG_DIR}/include)
 
 add_library( avformat SHARED IMPORTED)
