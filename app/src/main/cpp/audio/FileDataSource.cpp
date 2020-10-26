@@ -21,7 +21,7 @@
 #include <string>
 #include <sys/stat.h>
 #include "FileDataSource.h"
-#include "FFMpegExtractor.h"
+#include "FFMpegExtractorBak.h"
 #include <regex>
 
 
@@ -44,7 +44,7 @@ FileDataSource* FileDataSource::newFromCompressedFile(
     // size of the decoded data until after decoding so we make an assumption about the
     // maximum compression ratio and the decoded sample format (float for FFmpeg, int16 for NDK).
 
-    auto ffmpegExtractor = FFMpegExtractor(filenameStr, targetProperties);
+    auto ffmpegExtractor = FFMpegExtractorBak(filenameStr, targetProperties);
     ffmpegExtractor.decode();
 
     int numBytesInSample = 0;

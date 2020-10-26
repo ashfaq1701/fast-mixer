@@ -1,77 +1,31 @@
-/*
- * Copyright 2018 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+//
+// Created by asalehin on 10/26/20.
+//
 
-#ifndef FFMPEG_FFMPEGEXTRACTOR_H
-#define FFMPEG_FFMPEGEXTRACTOR_H
+#ifndef FAST_MIXER_FFMPEGEXTRACTOR_H
+#define FAST_MIXER_FFMPEGEXTRACTOR_H
 
-
-extern "C" {
-#include <libavformat/avformat.h>
-#include <libswresample/swresample.h>
-#include <libavutil/opt.h>
-}
-
-#include <cstdint>
-#include <android/asset_manager.h>
+#include <string>
 #include "../Constants.h"
+#include "list"
 
 using namespace std;
 
+#define AUDIO_INBUF_SIZE 20480
+#define AUDIO_REFILL_THRESH 4096
+
 class FFMpegExtractor {
-public:
     FFMpegExtractor(const string &filePath, const AudioProperties targetProperties);
 
-    bool decode();
+    list<uint8_t>& read();
 
-    int64_t readData(uint8_t *targetData);
-
-    const char *mFilePath;
-    FILE* fp = nullptr;
-
-    int mSampleRate = 0;
-    int mChannelCount = 0;
-    int mAudioFormat = 0;
+    static void decode(AVCodecContext *dec_ctx, AVPacket *pkt, AVFrame *frame, list<uint8_t>& samples, list<uint8_t>::iterator& it);
 
 private:
-    AudioProperties mTargetProperties;
-
-    bool decodedSuccessfully = false;
-
-    AVStream *mStream;
-
-    unique_ptr<AVFormatContext, decltype(&avformat_free_context)> mFormatContext {nullptr,nullptr};
-    unique_ptr<AVCodecContext, void(*)(AVCodecContext *)> mCodecContext {nullptr, nullptr};
-
-    bool createAVIOContext(uint8_t *buffer, uint32_t bufferSize,
-                                  AVIOContext **avioContext);
-
-    bool createAVFormatContext(AVIOContext *avioContext, AVFormatContext **avFormatContext);
-
-    bool openAVFormatContext(AVFormatContext *avFormatContext, FILE* fl);
-
-    int32_t cleanup(AVIOContext *avioContext, AVFormatContext *avFormatContext);
-
-    bool getStreamInfo(AVFormatContext *avFormatContext);
-
-    AVStream *getBestAudioStream(AVFormatContext *avFormatContext);
-
-    AVCodec *findCodec(AVCodecID id);
-
-    void printCodecParameters(AVCodecParameters *params);
+    AudioProperties mTargetProperties{};
+    const char *mFilePath;
+    list<uint8_t> samples;
 };
 
 
-#endif //FFMPEG_FFMPEGEXTRACTOR_H
+#endif //FAST_MIXER_FFMPEGEXTRACTOR_H
