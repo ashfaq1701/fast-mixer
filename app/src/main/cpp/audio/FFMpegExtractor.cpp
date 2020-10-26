@@ -5,6 +5,8 @@
 #include <libavcodec/codec.h>
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
+#include <libswresample/swresample.h>
+#include <libavutil/opt.h>
 #include "FFMpegExtractor.h"
 #include "../logging_macros.h"
 #include "list"
@@ -19,6 +21,7 @@ list<uint8_t>& FFMpegExtractor::read() {
     const AVCodec *codec;
     AVCodecContext *c= nullptr;
     AVCodecParserContext *parser = nullptr;
+    SwrContext *swr_ctx = nullptr;
     int len, ret;
     FILE *f = nullptr;
 
@@ -30,6 +33,8 @@ list<uint8_t>& FFMpegExtractor::read() {
     AVPacket *pkt;
     AVFrame *decoded_frame = nullptr;
     AVFormatContext* format = nullptr;
+
+    int32_t outChannelLayout = 0;
 
     auto it = samples.begin();
 
@@ -72,6 +77,28 @@ list<uint8_t>& FFMpegExtractor::read() {
 
     data = inbuf;
     data_size = fread(inbuf, 1, audioInbufSize, f);
+
+    swr_ctx = swr_alloc();
+    if (!swr_ctx) {
+        LOGE("Could not allocate resampler context");
+        goto cleanup;
+    }
+
+    outChannelLayout = (1 << mTargetProperties.channelCount) - 1;
+
+    /* set options */
+    /*av_opt_set_int(swr_ctx, "in_channel_layout",    src_ch_layout, 0);
+    av_opt_set_int(swr_ctx, "in_sample_rate",       src_rate, 0);
+    av_opt_set_sample_fmt(swr_ctx, "in_sample_fmt", src_sample_fmt, 0);*/
+    av_opt_set_int(swr_ctx, "out_channel_layout", outChannelLayout, 0);
+    av_opt_set_int(swr_ctx, "out_sample_rate", mTargetProperties.sampleRate, 0);
+    av_opt_set_sample_fmt(swr_ctx, "out_sample_fmt", AV_SAMPLE_FMT_FLT, 0);
+
+    if (swr_init(swr_ctx) < 0) {
+        LOGE("Failed to initialize the resampling context");
+        goto cleanup;
+    }
+
 
     while (data_size > 0) {
         if (!decoded_frame) {
@@ -122,6 +149,9 @@ list<uint8_t>& FFMpegExtractor::read() {
     }
     if (parser) {
         av_parser_close(parser);
+    }
+    if (swr_ctx) {
+        swr_free(&swr_ctx);
     }
     if (decoded_frame) {
         av_frame_free(&decoded_frame);
