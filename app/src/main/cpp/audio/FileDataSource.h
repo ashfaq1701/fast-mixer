@@ -47,8 +47,6 @@ private:
             , mProperties(properties) {
     }
 
-    static long getFileSize(const char *fileName);
-
     const unique_ptr<float[]> mBuffer;
     const int64_t mBufferSize;
     const AudioProperties mProperties;

@@ -38,7 +38,7 @@ FileDataSource* FileDataSource::newFromCompressedFile(
         return nullptr;
     }
 
-    off_t assetSize = getFileSize(filenameStr.c_str());
+    off_t assetSize = getSizeOfFile(filenameStr.c_str());
 
     // Allocate memory to store the decompressed audio. We don't know the exact
     // size of the decoded data until after decoding so we make an assumption about the
@@ -97,10 +97,6 @@ FileDataSource* FileDataSource::newFromCompressedFile(
     return new FileDataSource(move(outputBuffer),
                               numSamples,
                               targetProperties);
-}
-
-long FileDataSource::getFileSize(const char *fileName) {
-    return getSizeOfFile(fileName);
 }
 
 unique_ptr<buffer_data> FileDataSource::readData(size_t numSamples) {

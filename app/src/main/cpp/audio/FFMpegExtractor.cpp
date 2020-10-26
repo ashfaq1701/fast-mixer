@@ -4,9 +4,11 @@
 
 #include <libavcodec/codec.h>
 #include <libavcodec/avcodec.h>
+#include <libavformat/avformat.h>
 #include "FFMpegExtractor.h"
 #include "../logging_macros.h"
 #include "list"
+#include "../utils/Utils.h"
 
 FFMpegExtractor::FFMpegExtractor(const string &filePath, const AudioProperties targetProperties) {
     mFilePath = filePath.c_str();
@@ -19,18 +21,28 @@ list<uint8_t>& FFMpegExtractor::read() {
     AVCodecParserContext *parser = nullptr;
     int len, ret;
     FILE *f = nullptr;
-    uint8_t inbuf[AUDIO_INBUF_SIZE + AV_INPUT_BUFFER_PADDING_SIZE];
+
+    audioInbufSize = getSizeOfFile(mFilePath);
+
+    uint8_t inbuf[audioInbufSize + AV_INPUT_BUFFER_PADDING_SIZE];
     uint8_t *data;
     size_t data_size;
     AVPacket *pkt;
     AVFrame *decoded_frame = nullptr;
+    AVFormatContext* format = nullptr;
 
     auto it = samples.begin();
 
     pkt = av_packet_alloc();
 
-    codec = avcodec_find_decoder(AV_CODEC_ID_MP2);
-    if (!codec) {
+    format = avformat_alloc_context();
+    if (avformat_open_input(&format, mFilePath, NULL, NULL) != 0) {
+        LOGE("Could not detect file format");
+        goto cleanup;
+    }
+
+    codec = format->audio_codec;
+    if (!codec || (codec->id != AV_CODEC_ID_NONE)) {
         LOGE("Codec not found");
         goto cleanup;
     }
@@ -59,7 +71,7 @@ list<uint8_t>& FFMpegExtractor::read() {
     }
 
     data = inbuf;
-    data_size = fread(inbuf, 1, AUDIO_INBUF_SIZE, f);
+    data_size = fread(inbuf, 1, audioInbufSize, f);
 
     while (data_size > 0) {
         if (!decoded_frame) {
@@ -86,7 +98,7 @@ list<uint8_t>& FFMpegExtractor::read() {
         if (data_size < AUDIO_REFILL_THRESH) {
             memmove(inbuf, data, data_size);
             data = inbuf;
-            len = fread(data + data_size, 1, AUDIO_INBUF_SIZE - data_size, f);
+            len = fread(data + data_size, 1, audioInbufSize - data_size, f);
             if (len > 0) {
                 data_size += len;
             }
@@ -99,6 +111,9 @@ list<uint8_t>& FFMpegExtractor::read() {
 
     cleanup:
 
+    if (format) {
+        avformat_free_context(format);
+    }
     if (c) {
         avcodec_free_context(&c);
     }
@@ -114,7 +129,6 @@ list<uint8_t>& FFMpegExtractor::read() {
     if (pkt) {
         av_packet_free(&pkt);
     }
-
     return samples;
 }
 

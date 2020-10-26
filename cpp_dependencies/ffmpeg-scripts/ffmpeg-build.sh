@@ -12,7 +12,7 @@ function configure_ffmpeg {
   ABI=$1
   PLATFORM_VERSION=$2
   TOOLCHAIN_PATH=$ANDROID_NDK/toolchains/llvm/prebuilt/${HOST_OS_ARCH}/bin
-  local STRIP_COMMAND
+  local STRIP_COMMAND5
 
   case ${ABI} in
   armeabi-v7a)

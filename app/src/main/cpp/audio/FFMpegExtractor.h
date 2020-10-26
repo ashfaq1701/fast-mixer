@@ -11,7 +11,6 @@
 
 using namespace std;
 
-#define AUDIO_INBUF_SIZE 20480
 #define AUDIO_REFILL_THRESH 4096
 
 class FFMpegExtractor {
@@ -23,6 +22,7 @@ class FFMpegExtractor {
 
 private:
     AudioProperties mTargetProperties{};
+    long audioInbufSize = 0;
     const char *mFilePath;
     list<uint8_t> samples;
 };
