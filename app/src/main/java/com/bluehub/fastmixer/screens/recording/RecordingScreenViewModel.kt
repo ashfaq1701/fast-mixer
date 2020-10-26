@@ -352,14 +352,18 @@ class RecordingScreenViewModel(override val context: Context, mixerApplication: 
     fun stopUpdatingTimer() {
         recordingTimer?.cancel()
         recordingTimer = null
+
+        seekbarTimer?.cancel()
+        seekbarTimer = null;
+
+        visualizerTimer?.cancel()
+        visualizerTimer = null
     }
 
     override fun onCleared() {
         super.onCleared()
         repository.deleteAudioEngine()
         context.unregisterReceiver(audioDeviceChangeListener)
-        visualizerTimer?.cancel()
-        seekbarTimer?.cancel()
-        recordingTimer?.cancel()
+        stopUpdatingTimer()
     }
 }

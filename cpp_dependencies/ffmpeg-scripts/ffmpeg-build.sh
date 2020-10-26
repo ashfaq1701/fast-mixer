@@ -58,6 +58,7 @@ function configure_ffmpeg {
   --enable-shared \
   --disable-static \
   --disable-everything \
+  --enable-debug \
   --enable-demuxer=aac \
   --enable-demuxer=ac3 \
   --enable-demuxer=avi \

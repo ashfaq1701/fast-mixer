@@ -1,0 +1,14 @@
+prefix=build/armeabi-v7a
+exec_prefix=${prefix}
+libdir=build/armeabi-v7a/lib
+includedir=build/armeabi-v7a/include
+
+Name: libavformat
+Description: FFmpeg container format library
+Version: 58.62.100
+Requires: 
+Requires.private: libavcodec >= 58.111.101, libavutil >= 56.60.100
+Conflicts:
+Libs: -L${libdir}  -lavformat 
+Libs.private: -lm -lz
+Cflags: -I${includedir}

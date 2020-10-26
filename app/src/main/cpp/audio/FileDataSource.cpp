@@ -91,6 +91,7 @@ FileDataSource* FileDataSource::newFromCompressedFile(
     memcpy(outputBuffer.get(), decodedData, (size_t)bytesDecoded);
 
     delete[] decodedData;
+
     fclose(fl);
 
     return new FileDataSource(move(outputBuffer),
