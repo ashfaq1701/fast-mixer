@@ -36,7 +36,6 @@ add_library( # Sets the name of the library.
         audio/FileDataSource.cpp
         audio/Player.cpp
         audio/FFMpegExtractor.cpp
-        audio/FFMpegExtractorBak.cpp
         recording/recording-lib.cpp)
 
 add_library( # Sets the name of the library.
@@ -53,7 +52,6 @@ add_library( # Sets the name of the library.
         audio/FileDataSource.cpp
         audio/Player.cpp
         audio/FFMpegExtractor.cpp
-        audio/FFMpegExtractorBak.cpp
         mixing/mixing-lib.cpp)
 
 # Build the Oboe library

@@ -2,11 +2,6 @@
 // Created by asalehin on 10/26/20.
 //
 
-#include <libavcodec/codec.h>
-#include <libavcodec/avcodec.h>
-#include <libavformat/avformat.h>
-#include <libswresample/swresample.h>
-#include <libavutil/opt.h>
 #include "FFMpegExtractor.h"
 #include "../logging_macros.h"
 #include "list"
@@ -26,6 +21,8 @@ int64_t FFMpegExtractor::read(uint8_t *targetData) {
     FILE *f = nullptr;
 
     uint8_t *dataPtr = targetData;
+
+    int64_t totalDecoded = 0;
 
     audioInbufSize = getSizeOfFile(mFilePath);
 
@@ -118,6 +115,10 @@ int64_t FFMpegExtractor::read(uint8_t *targetData) {
         goto cleanup;
     }
 
+    if (!swr_is_initialized(swr_ctx)) {
+        LOGE("swr_is_initialized is false");
+        goto cleanup;
+    }
 
     while (data_size > 0) {
         if (!decoded_frame) {
@@ -138,7 +139,7 @@ int64_t FFMpegExtractor::read(uint8_t *targetData) {
         data_size -= ret;
 
         if (pkt->size)
-            decode(c, pkt, decoded_frame, &dataPtr);
+            totalDecoded += decode(c, pkt, decoded_frame, &dataPtr, swr_ctx);
 
         if (data_size < AUDIO_REFILL_THRESH) {
             memmove(inbuf, data, data_size);
@@ -153,10 +154,11 @@ int64_t FFMpegExtractor::read(uint8_t *targetData) {
     pkt->data = nullptr;
     pkt->size = 0;
 
-    decode(c, pkt, decoded_frame, &dataPtr);
+    totalDecoded += decode(c, pkt, decoded_frame, &dataPtr, swr_ctx);
 
     cleanup:
 
+    dataPtr = nullptr;
     if (f) {
         fclose(f);
     }
@@ -179,39 +181,68 @@ int64_t FFMpegExtractor::read(uint8_t *targetData) {
         av_packet_free(&pkt);
     }
 
-    return 0;
+    return totalDecoded;
 }
 
-void FFMpegExtractor::decode(AVCodecContext *dec_ctx, AVPacket *pkt, AVFrame *frame, uint8_t **dataPtr) {
-    int i, ch;
-    int ret, data_size;
+int64_t FFMpegExtractor::decode(AVCodecContext *dec_ctx, AVPacket *pkt, AVFrame *frame, uint8_t **dataPtr, SwrContext *swr) {
+    int ret, data_size, frame_count, dst_nb_samples = 0;
+
+    int64_t bytesToWrite = 0;
+
+    uint8_t **buffer1 = nullptr;
     /* send the packet with the compressed data to the decoder */
     ret = avcodec_send_packet(dec_ctx, pkt);
     if (ret < 0) {
         LOGE("Error submitting the packet to the decoder");
-        return;
+        goto ret;
     }
     /* read all the output frames (in general there may be any number of them */
     while (ret >= 0) {
         ret = avcodec_receive_frame(dec_ctx, frame);
         if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF)
-            return;
+            goto ret;
         else if (ret < 0) {
             LOGE("Error during decoding");
-            return;
+            goto ret;
         }
         data_size = av_get_bytes_per_sample(dec_ctx->sample_fmt);
         if (data_size < 0) {
             /* This should not occur, checking just for paranoia */
             LOGE("Failed to calculate data size");
-            return;
+            goto ret;
         }
 
-        for (i = 0; i < frame->nb_samples; i++) {
-            for (ch = 0; ch < dec_ctx->channels; ch++) {
-                memcpy(*dataPtr, frame->data[ch] + data_size * i, data_size);
-                *dataPtr += data_size;
-            }
-        }
+        dst_nb_samples = (int32_t) av_rescale_rnd(
+                swr_get_delay(swr, dec_ctx->sample_rate) + frame->nb_samples,
+                mTargetProperties.sampleRate,
+                frame->sample_rate,
+                AV_ROUND_UP);
+
+        av_samples_alloc(
+                buffer1,
+                nullptr,
+                mTargetProperties.channelCount,
+                dst_nb_samples,
+                AV_SAMPLE_FMT_FLT,
+                0);
+
+        frame_count = swr_convert(
+                swr,
+                buffer1,
+                dst_nb_samples,
+                (const uint8_t **) frame->data,
+                frame->nb_samples);
+
+        bytesToWrite = frame_count * sizeof(float) * mTargetProperties.channelCount;
+
+        memcpy(*dataPtr, *buffer1, (size_t)bytesToWrite);
+
+        *dataPtr += bytesToWrite;
+
+        ret:
+        if (buffer1)
+            av_freep(&buffer1[0]);
+        av_freep(&buffer1);
+        return bytesToWrite;
     }
 }

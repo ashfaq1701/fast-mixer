@@ -5,6 +5,11 @@
 #ifndef FAST_MIXER_FFMPEGEXTRACTOR_H
 #define FAST_MIXER_FFMPEGEXTRACTOR_H
 
+extern "C" {
+#include <libavformat/avformat.h>
+#include <libswresample/swresample.h>
+#include <libavutil/opt.h>
+}
 #include <string>
 #include "../Constants.h"
 #include "list"
@@ -19,7 +24,7 @@ public:
 
     int64_t read(uint8_t *targetData);
 
-    static void decode(AVCodecContext *dec_ctx, AVPacket *pkt, AVFrame *frame, uint8_t **targetData);
+    int64_t decode(AVCodecContext *dec_ctx, AVPacket *pkt, AVFrame *frame, uint8_t **targetData, SwrContext *swr);
 
 private:
     AudioProperties mTargetProperties{};
