@@ -45,8 +45,8 @@ FileDataSource* FileDataSource::newFromCompressedFile(
 
     auto ffmpegExtractor = FFMpegExtractor(filenameStr, targetProperties);
 
-    long maximumDataSizeInBytes = 0;
-    maximumDataSizeInBytes = assetSize * AUDIO_CHANNEL_STEREO * (sizeof(float_t) / MIN_NUMBER_OF_BYTES_PER_SAMPLE);
+    // TODO: Review, probably too much memory is allocated to buffer
+    long maximumDataSizeInBytes = assetSize * AUDIO_CHANNEL_STEREO * (sizeof(float_t) / MIN_NUMBER_OF_BYTES_PER_SAMPLE);
 
     if (!strEndedWith(filenameStr, ".wav")) {
         maximumDataSizeInBytes = kMaxCompressionRatio * maximumDataSizeInBytes;

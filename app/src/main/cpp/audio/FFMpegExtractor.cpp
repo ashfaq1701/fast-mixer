@@ -138,7 +138,6 @@ int64_t FFMpegExtractor::read(uint8_t *targetData) {
         data_size -= ret;
 
         if (pkt->size)
-            // TODO Pass proper data pointer
             decode(c, pkt, decoded_frame, &dataPtr);
 
         if (data_size < AUDIO_REFILL_THRESH) {
@@ -154,7 +153,6 @@ int64_t FFMpegExtractor::read(uint8_t *targetData) {
     pkt->data = nullptr;
     pkt->size = 0;
 
-    // TODO Pass proper data pointer
     decode(c, pkt, decoded_frame, &dataPtr);
 
     cleanup:
