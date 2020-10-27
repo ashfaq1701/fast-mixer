@@ -24,6 +24,9 @@
 
 using namespace std;
 
+#define AUDIO_CHANNEL_STEREO 2
+#define MIN_NUMBER_OF_BYTES_PER_SAMPLE 1
+
 class FileDataSource : public DataSource {
 
 public:

@@ -14,17 +14,17 @@ using namespace std;
 #define AUDIO_REFILL_THRESH 4096
 
 class FFMpegExtractor {
+public:
     FFMpegExtractor(const string &filePath, const AudioProperties targetProperties);
 
-    list<uint8_t>& read();
+    int64_t read(uint8_t *targetData);
 
-    static void decode(AVCodecContext *dec_ctx, AVPacket *pkt, AVFrame *frame, list<uint8_t>& samples, list<uint8_t>::iterator& it);
+    static void decode(AVCodecContext *dec_ctx, AVPacket *pkt, AVFrame *frame, uint8_t **targetData);
 
 private:
     AudioProperties mTargetProperties{};
     long audioInbufSize = 0;
     const char *mFilePath;
-    list<uint8_t> samples;
 };
 
 

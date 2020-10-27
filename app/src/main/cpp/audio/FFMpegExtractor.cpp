@@ -17,13 +17,15 @@ FFMpegExtractor::FFMpegExtractor(const string &filePath, const AudioProperties t
     mTargetProperties = targetProperties;
 }
 
-list<uint8_t>& FFMpegExtractor::read() {
+int64_t FFMpegExtractor::read(uint8_t *targetData) {
     const AVCodec *codec;
     AVCodecContext *c= nullptr;
     AVCodecParserContext *parser = nullptr;
     SwrContext *swr_ctx = nullptr;
     int len, ret;
     FILE *f = nullptr;
+
+    uint8_t *dataPtr = targetData;
 
     audioInbufSize = getSizeOfFile(mFilePath);
 
@@ -35,8 +37,6 @@ list<uint8_t>& FFMpegExtractor::read() {
     AVFormatContext* format = nullptr;
 
     int32_t outChannelLayout = 0;
-
-    auto it = samples.begin();
 
     pkt = av_packet_alloc();
 
@@ -119,8 +119,8 @@ list<uint8_t>& FFMpegExtractor::read() {
         data_size -= ret;
 
         if (pkt->size)
-            // Call decode
-            decode(c, pkt, decoded_frame, samples, it);
+            // TODO Pass proper data pointer
+            decode(c, pkt, decoded_frame, &dataPtr);
 
         if (data_size < AUDIO_REFILL_THRESH) {
             memmove(inbuf, data, data_size);
@@ -134,7 +134,9 @@ list<uint8_t>& FFMpegExtractor::read() {
 
     pkt->data = nullptr;
     pkt->size = 0;
-    decode(c, pkt, decoded_frame, samples, it);
+
+    // TODO Pass proper data pointer
+    decode(c, pkt, decoded_frame, &dataPtr);
 
     cleanup:
 
@@ -159,10 +161,11 @@ list<uint8_t>& FFMpegExtractor::read() {
     if (pkt) {
         av_packet_free(&pkt);
     }
-    return samples;
+
+    return 0;
 }
 
-void FFMpegExtractor::decode(AVCodecContext *dec_ctx, AVPacket *pkt, AVFrame *frame, list<uint8_t>& samples, list<uint8_t>::iterator& it) {
+void FFMpegExtractor::decode(AVCodecContext *dec_ctx, AVPacket *pkt, AVFrame *frame, uint8_t **dataPtr) {
     int i, ch;
     int ret, data_size;
     /* send the packet with the compressed data to the decoder */
@@ -188,9 +191,7 @@ void FFMpegExtractor::decode(AVCodecContext *dec_ctx, AVPacket *pkt, AVFrame *fr
         }
         for (i = 0; i < frame->nb_samples; i++) {
             for (ch = 0; ch < dec_ctx->channels; ch++) {
-                for (int k = 0; k < data_size; k++) {
-                    samples.insert(it, *(frame->data[ch] + data_size * i + k));
-                }
+                // TODO resample and insert in memory
             }
         }
     }
