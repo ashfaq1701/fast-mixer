@@ -34,7 +34,10 @@ int64_t FFMpegExtractor::read(uint8_t *targetData) {
     size_t data_size;
     AVPacket *pkt;
     AVFrame *decoded_frame = nullptr;
+    AVStream *stream = nullptr;
     AVFormatContext* format = nullptr;
+
+    int streamId = -1;
 
     int32_t outChannelLayout = 0;
 
@@ -43,6 +46,19 @@ int64_t FFMpegExtractor::read(uint8_t *targetData) {
     format = avformat_alloc_context();
     if (avformat_open_input(&format, mFilePath, NULL, NULL) != 0) {
         LOGE("Could not detect file format");
+        goto cleanup;
+    }
+
+    streamId = av_find_best_stream(format, AVMEDIA_TYPE_AUDIO, -1, -1, nullptr, 0);
+    if (streamId < 0) {
+        LOGE("Could not find Audio Stream");
+        goto cleanup;
+    }
+
+    stream = format->streams[streamId];
+
+    if (stream == nullptr || stream->codecpar == nullptr){
+        LOGE("Could not find a suitable audio stream to decode");
         goto cleanup;
     }
 
@@ -87,12 +103,15 @@ int64_t FFMpegExtractor::read(uint8_t *targetData) {
     outChannelLayout = (1 << mTargetProperties.channelCount) - 1;
 
     /* set options */
-    /*av_opt_set_int(swr_ctx, "in_channel_layout",    src_ch_layout, 0);
-    av_opt_set_int(swr_ctx, "in_sample_rate",       src_rate, 0);
-    av_opt_set_sample_fmt(swr_ctx, "in_sample_fmt", src_sample_fmt, 0);*/
+    av_opt_set_int(swr_ctx, "in_channel_count", stream->codecpar->channels, 0);
+    av_opt_set_int(swr_ctx, "in_channel_layout", stream->codecpar->channel_layout, 0);
+    av_opt_set_int(swr_ctx, "in_sample_rate", stream->codecpar->sample_rate, 0);
+    av_opt_set_int(swr_ctx, "in_sample_fmt", stream->codecpar->format, 0);
+    av_opt_set_int(swr_ctx, "out_channel_count", mTargetProperties.channelCount, 0);
     av_opt_set_int(swr_ctx, "out_channel_layout", outChannelLayout, 0);
     av_opt_set_int(swr_ctx, "out_sample_rate", mTargetProperties.sampleRate, 0);
     av_opt_set_sample_fmt(swr_ctx, "out_sample_fmt", AV_SAMPLE_FMT_FLT, 0);
+    av_opt_set_int(swr_ctx, "force_resampling", 1, 0);
 
     if (swr_init(swr_ctx) < 0) {
         LOGE("Failed to initialize the resampling context");
