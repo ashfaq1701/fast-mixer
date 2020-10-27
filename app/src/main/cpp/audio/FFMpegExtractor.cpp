@@ -37,14 +37,14 @@ int64_t FFMpegExtractor::read(uint8_t *targetData) {
     AVStream *stream = nullptr;
     AVFormatContext* format = nullptr;
 
-    int streamId = -1;
+    int streamId;
 
     int32_t outChannelLayout = 0;
 
     pkt = av_packet_alloc();
 
     format = avformat_alloc_context();
-    if (avformat_open_input(&format, mFilePath, NULL, NULL) != 0) {
+    if (avformat_open_input(&format, mFilePath, nullptr, nullptr) != 0) {
         LOGE("Could not detect file format");
         goto cleanup;
     }
@@ -80,7 +80,7 @@ int64_t FFMpegExtractor::read(uint8_t *targetData) {
         goto cleanup;
     }
 
-    if (avcodec_open2(c, codec, NULL) < 0) {
+    if (avcodec_open2(c, codec, nullptr) < 0) {
         LOGE("Could not open codec");
         goto cleanup;
     }
