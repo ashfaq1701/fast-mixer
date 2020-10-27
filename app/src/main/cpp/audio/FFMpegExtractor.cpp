@@ -157,14 +157,14 @@ int64_t FFMpegExtractor::read(uint8_t *targetData) {
 
     cleanup:
 
+    if (f) {
+        fclose(f);
+    }
     if (format) {
         avformat_free_context(format);
     }
     if (c) {
         avcodec_free_context(&c);
-    }
-    if (f) {
-        fclose(f);
     }
     if (parser) {
         av_parser_close(parser);
