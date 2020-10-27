@@ -189,9 +189,11 @@ void FFMpegExtractor::decode(AVCodecContext *dec_ctx, AVPacket *pkt, AVFrame *fr
             LOGE("Failed to calculate data size");
             return;
         }
+
         for (i = 0; i < frame->nb_samples; i++) {
             for (ch = 0; ch < dec_ctx->channels; ch++) {
-                // TODO resample and insert in memory
+                memcpy(*dataPtr, frame->data[ch] + data_size * i, data_size);
+                *dataPtr += data_size;
             }
         }
     }
