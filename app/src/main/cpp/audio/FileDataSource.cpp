@@ -54,7 +54,7 @@ FileDataSource* FileDataSource::newFromCompressedFile(
 
     auto decodedData = new uint8_t[maximumDataSizeInBytes];
 
-    int64_t bytesDecoded = ffmpegExtractor.read(decodedData);
+    int64_t bytesDecoded = ffmpegExtractor.decode(decodedData);
 
     auto numSamples = bytesDecoded / sizeof(float);
 

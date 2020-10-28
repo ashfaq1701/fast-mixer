@@ -16,20 +16,29 @@ extern "C" {
 
 using namespace std;
 
-#define AUDIO_REFILL_THRESH 4096
-
 class FFMpegExtractor {
 public:
     FFMpegExtractor(const string &filePath, const AudioProperties targetProperties);
+    FILE* fp = nullptr;
+    const char *mFilePath;
 
-    int64_t read(uint8_t *targetData);
-
-    int64_t decode(AVCodecContext *dec_ctx, AVPacket *pkt, AVFrame *frame, uint8_t **targetData, SwrContext *swr);
+    int64_t decode(uint8_t *targetData);
 
 private:
     AudioProperties mTargetProperties{};
-    long audioInbufSize = 0;
-    const char *mFilePath;
+
+    bool createAVIOContext(uint8_t *buffer, uint32_t bufferSize,
+                                            AVIOContext **avioContext);
+
+    bool createAVFormatContext(AVIOContext *avioContext, AVFormatContext **avFormatContext);
+
+    bool openAVFormatContext(AVFormatContext *avFormatContext);
+
+    bool getStreamInfo(AVFormatContext *avFormatContext);
+
+    AVStream* getBestAudioStream(AVFormatContext *avFormatContext);
+
+    void printCodecParameters(AVCodecParameters *params);
 };
 
 
