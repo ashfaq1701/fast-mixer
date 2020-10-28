@@ -147,9 +147,6 @@ void FFMpegExtractor::getAudioFileProperties() {
     if (fp) {
         fclose(fp);
     }
-    if (buffer) {
-        delete buffer;
-    }
     if (ctx) {
         av_free(ctx->buffer);
         avio_context_free(&ctx);
@@ -166,26 +163,9 @@ int64_t FFMpegExtractor::decode(uint8_t *targetData) {
     // Create a buffer for FFmpeg to use for decoding (freed in the custom deleter below)
     auto buffer = reinterpret_cast<uint8_t*>(av_malloc(kInternalBufferSize));
 
-    // Create an AVIOContext with a custom deleter
-    std::unique_ptr<AVIOContext, void(*)(AVIOContext *)> ioContext {
-            nullptr,
-            [](AVIOContext *c) {
-                av_free(c->buffer);
-                avio_context_free(&c);
-            }
-    };
-
-    // Create an AVFormatContext using the avformat_free_context as the deleter function
-    std::unique_ptr<AVFormatContext, decltype(&avformat_free_context)> formatContext {
-            nullptr,
-            &avformat_free_context
-    };
-
-    // Create the codec context, specifying the deleter function
-    std::unique_ptr<AVCodecContext, void(*)(AVCodecContext *)> codecContext {
-            nullptr,
-            [](AVCodecContext *c) { avcodec_free_context(&c); }
-    };
+    AVIOContext *ctx = nullptr;
+    AVFormatContext *formatCtx = nullptr;
+    AVCodecContext *codecCtx = nullptr;
 
     AVStream *stream = nullptr;
 
@@ -203,27 +183,19 @@ int64_t FFMpegExtractor::decode(uint8_t *targetData) {
 
     fp = fopen(mFilePath, "rb");
 
-    {
-        AVIOContext *tmp = nullptr;
-        if (!createAVIOContext(buffer, kInternalBufferSize, &tmp)){
-            LOGE("Could not create an AVIOContext");
-            goto cleanup;
-        }
-        ioContext.reset(tmp);
+    if (!createAVIOContext(buffer, kInternalBufferSize, &ctx)){
+        LOGE("Could not create an AVIOContext");
+        goto cleanup;
     }
 
-    {
-        AVFormatContext *tmp;
-        if (!createAVFormatContext(ioContext.get(), &tmp)) goto cleanup;
-        formatContext.reset(tmp);
-    }
+    if (!createAVFormatContext(ctx, &formatCtx)) goto cleanup;
 
-    if (!openAVFormatContext(formatContext.get())) goto cleanup;
+    if (!openAVFormatContext(formatCtx)) goto cleanup;
 
-    if (!getStreamInfo(formatContext.get())) goto cleanup;
+    if (!getStreamInfo(formatCtx)) goto cleanup;
 
     // Obtain the best audio stream to decode
-    stream = getBestAudioStream(formatContext.get());
+    stream = getBestAudioStream(formatCtx);
     if (stream == nullptr || stream->codecpar == nullptr){
         LOGE("Could not find a suitable audio stream to decode");
         goto cleanup;
@@ -238,23 +210,20 @@ int64_t FFMpegExtractor::decode(uint8_t *targetData) {
         goto cleanup;
     }
 
-    {
-        AVCodecContext *tmp = avcodec_alloc_context3(codec);
-        if (!tmp){
-            LOGE("Failed to allocate codec context");
-            goto cleanup;
-        }
-        codecContext.reset(tmp);
+    codecCtx = avcodec_alloc_context3(codec);
+    if (!codecCtx) {
+        LOGE("Failed to allocate codec context");
+        goto cleanup;
     }
 
     // Copy the codec parameters into the context
-    if (avcodec_parameters_to_context(codecContext.get(), stream->codecpar) < 0){
+    if (avcodec_parameters_to_context(codecCtx, stream->codecpar) < 0){
         LOGE("Failed to copy codec parameters to codec context");
         goto cleanup;
     }
 
     // Open the codec
-    if (avcodec_open2(codecContext.get(), codec, nullptr) < 0){
+    if (avcodec_open2(codecCtx, codec, nullptr) < 0){
         LOGE("Could not open codec");
         goto cleanup;
     }
@@ -295,19 +264,19 @@ int64_t FFMpegExtractor::decode(uint8_t *targetData) {
     LOGD("DECODE START");
 
     // While there is more data to read, read it into the avPacket
-    while (av_read_frame(formatContext.get(), &avPacket) == 0){
+    while (av_read_frame(formatCtx, &avPacket) == 0){
 
         if (avPacket.stream_index == stream->index && avPacket.size > 0) {
 
             // Pass our compressed data into the codec
-            result = avcodec_send_packet(codecContext.get(), &avPacket);
+            result = avcodec_send_packet(codecCtx, &avPacket);
             if (result != 0) {
                 LOGE("avcodec_send_packet error: %s", av_err2str(result));
                 goto cleanup;
             }
 
             // Retrieve our raw data from the codec
-            result = avcodec_receive_frame(codecContext.get(), decodedFrame);
+            result = avcodec_receive_frame(codecCtx, decodedFrame);
             if (result == AVERROR(EAGAIN)) {
                 // The codec needs more data before it can decode
                 LOGI("avcodec_receive_frame returned EAGAIN");
@@ -360,8 +329,15 @@ int64_t FFMpegExtractor::decode(uint8_t *targetData) {
     if (fp) {
         fclose(fp);
     }
-    if (buffer) {
-        delete buffer;
+    if (ctx) {
+        av_free(ctx->buffer);
+        avio_context_free(&ctx);
+    }
+    if (formatCtx) {
+        avformat_free_context(formatCtx);
+    }
+    if (codecCtx) {
+        avcodec_free_context(&codecCtx);
     }
     return returnValue;
 }

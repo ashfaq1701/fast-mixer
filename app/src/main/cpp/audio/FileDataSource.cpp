@@ -46,7 +46,7 @@ FileDataSource* FileDataSource::newFromCompressedFile(
     // maximum compression ratio and the decoded sample format (float for FFmpeg, int16 for NDK).
 
     auto ffmpegExtractor = FFMpegExtractor(filenameStr, targetProperties);
-    /*ffmpegExtractor.getAudioFileProperties();
+    ffmpegExtractor.getAudioFileProperties();
 
     int numBytesInSample = 0;
     switch (ffmpegExtractor.mAudioFormat) {
@@ -72,9 +72,9 @@ FileDataSource* FileDataSource::newFromCompressedFile(
             break;
         default:
             numBytesInSample = 8;
-    }*/
+    }
 
-    long maximumDataSizeInBytes = 1000000;//assetSize * ffmpegExtractor.mChannelCount * (sizeof(float_t) / numBytesInSample);
+    long maximumDataSizeInBytes = assetSize * ffmpegExtractor.mChannelCount * (sizeof(float_t) / numBytesInSample);
 
     if (!strEndedWith(filenameStr, ".wav")) {
         maximumDataSizeInBytes = kMaxCompressionRatio * maximumDataSizeInBytes;
