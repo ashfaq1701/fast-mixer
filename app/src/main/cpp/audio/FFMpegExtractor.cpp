@@ -330,7 +330,9 @@ int64_t FFMpegExtractor::decode(uint8_t *targetData) {
         fclose(fp);
     }
     if (ctx) {
-        av_free(ctx->buffer);
+        if (ctx->buffer) {
+            av_free(ctx->buffer);
+        }
         avio_context_free(&ctx);
     }
     if (formatCtx) {
