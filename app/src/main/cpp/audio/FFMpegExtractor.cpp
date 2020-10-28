@@ -112,6 +112,53 @@ AVStream *FFMpegExtractor::getBestAudioStream(AVFormatContext *avFormatContext) 
     }
 }
 
+void FFMpegExtractor::getAudioFileProperties() {
+    auto buffer = reinterpret_cast<uint8_t*>(av_malloc(kInternalBufferSize));
+
+    AVIOContext *ctx = nullptr;
+    AVFormatContext *formatCtx = nullptr;
+    AVStream *stream = nullptr;
+
+    fp = fopen(mFilePath, "rb");
+
+    if (!createAVIOContext(buffer, kInternalBufferSize, &ctx)){
+        LOGE("Could not create an AVIOContext");
+        goto cleanup;
+    }
+
+    if (!createAVFormatContext(ctx, &formatCtx)) goto cleanup;
+
+    if (!openAVFormatContext(formatCtx)) goto cleanup;
+
+    if (!getStreamInfo(formatCtx)) goto cleanup;
+
+    // Obtain the best audio stream to decode
+    stream = getBestAudioStream(formatCtx);
+    if (stream == nullptr || stream->codecpar == nullptr){
+        LOGE("Could not find a suitable audio stream to decode");
+        goto cleanup;
+    }
+
+    mSampleRate = stream->codecpar->sample_rate;
+    mChannelCount = stream->codecpar->channels;
+    mAudioFormat = stream->codecpar->format;
+
+    cleanup:
+    if (fp) {
+        fclose(fp);
+    }
+    if (buffer) {
+        delete buffer;
+    }
+    if (ctx) {
+        av_free(ctx->buffer);
+        avio_context_free(&ctx);
+    }
+    if (formatCtx) {
+        avformat_free_context(formatCtx);
+    }
+}
+
 int64_t FFMpegExtractor::decode(uint8_t *targetData) {
 
     int returnValue = -1; // -1 indicates error
@@ -312,6 +359,9 @@ int64_t FFMpegExtractor::decode(uint8_t *targetData) {
     cleanup:
     if (fp) {
         fclose(fp);
+    }
+    if (buffer) {
+        delete buffer;
     }
     return returnValue;
 }

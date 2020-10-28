@@ -24,6 +24,12 @@ public:
 
     int64_t decode(uint8_t *targetData);
 
+    void getAudioFileProperties();
+
+    int mSampleRate = 0;
+    int mChannelCount = 0;
+    int mAudioFormat = 0;
+
 private:
     AudioProperties mTargetProperties{};
 

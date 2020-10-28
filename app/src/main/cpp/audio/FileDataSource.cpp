@@ -46,9 +46,35 @@ FileDataSource* FileDataSource::newFromCompressedFile(
     // maximum compression ratio and the decoded sample format (float for FFmpeg, int16 for NDK).
 
     auto ffmpegExtractor = FFMpegExtractor(filenameStr, targetProperties);
+    /*ffmpegExtractor.getAudioFileProperties();
 
-    // TODO: Review, probably too much memory is allocated to buffer
-    long maximumDataSizeInBytes = assetSize * AUDIO_CHANNEL_STEREO * (sizeof(float_t) / MIN_NUMBER_OF_BYTES_PER_SAMPLE);
+    int numBytesInSample = 0;
+    switch (ffmpegExtractor.mAudioFormat) {
+        case AV_SAMPLE_FMT_U8:
+        case AV_SAMPLE_FMT_U8P:
+            numBytesInSample = 1;
+            break;
+        case AV_SAMPLE_FMT_S16:
+        case AV_SAMPLE_FMT_S16P:
+            numBytesInSample = 2;
+            break;
+        case AV_SAMPLE_FMT_S32:
+        case AV_SAMPLE_FMT_S32P:
+        case AV_SAMPLE_FMT_FLT:
+        case AV_SAMPLE_FMT_FLTP:
+            numBytesInSample = 4;
+            break;
+        case AV_SAMPLE_FMT_DBL:
+        case AV_SAMPLE_FMT_DBLP:
+        case AV_SAMPLE_FMT_S64:
+        case AV_SAMPLE_FMT_S64P:
+            numBytesInSample = 8;
+            break;
+        default:
+            numBytesInSample = 8;
+    }*/
+
+    long maximumDataSizeInBytes = 1000000;//assetSize * ffmpegExtractor.mChannelCount * (sizeof(float_t) / numBytesInSample);
 
     if (!strEndedWith(filenameStr, ".wav")) {
         maximumDataSizeInBytes = kMaxCompressionRatio * maximumDataSizeInBytes;
