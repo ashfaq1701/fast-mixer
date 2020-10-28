@@ -34,8 +34,10 @@ FileDataSource* FileDataSource::newFromCompressedFile(
     FILE* fl = fopen(filenameStr.c_str(), "r");
     if (!fl) {
         LOGE("Failed to open asset %s", filenameStr.c_str());
+        fclose(fl);
         return nullptr;
     }
+    fclose(fl);
 
     off_t assetSize = getSizeOfFile(filenameStr.c_str());
 
@@ -63,8 +65,6 @@ FileDataSource* FileDataSource::newFromCompressedFile(
     memcpy(outputBuffer.get(), decodedData, (size_t)bytesDecoded);
 
     delete[] decodedData;
-
-    fclose(fl);
 
     return new FileDataSource(move(outputBuffer),
                               numSamples,
