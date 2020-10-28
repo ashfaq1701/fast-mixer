@@ -14,7 +14,7 @@ using namespace std;
 
 class MixingIO {
 public:
-    unique_ptr<FileDataSource> readFile(string filename);
+    FileDataSource* readFile(string filename);
 };
 
 
