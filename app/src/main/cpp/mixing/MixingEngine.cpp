@@ -6,51 +6,13 @@
 
 #include <utility>
 
-MixingEngine::~MixingEngine() {
-    auto it = sourceMap.begin();
-    while (it != sourceMap.end()) {
-        delete it->second;
-    }
-    sourceMap.clear();
-}
-
-void MixingEngine::addFile(string filePath, string uuid) {
-    auto it = sourceMap.find(uuid);
-    if (it != sourceMap.end()) {
-        return;
-    }
+unique_ptr<buffer_data> MixingEngine::readAllSamples(string filePath) {
     FileDataSource* source = mixingIO.readFile(move(filePath));
-    sourceMap.insert(pair<string, FileDataSource*>(move(uuid), source));
+    auto dataRead = source->readAllData();
+    return dataRead;
 }
 
-unique_ptr<buffer_data> MixingEngine::readSamples(string uuid, size_t numSamples) {
-    auto it = sourceMap.find(uuid);
-    if (it == sourceMap.end()) {
-        buffer_data emptyData {
-            .ptr = nullptr,
-            .numSamples = 0
-        };
-        return make_unique<buffer_data>(emptyData);
-    }
-    return it->second->readData(numSamples);
-}
-
-void MixingEngine::deleteFile(string uuid) {
-    auto it = sourceMap.find(uuid);
-    if (it != sourceMap.end()) {
-        delete it->second;
-        sourceMap.erase(uuid);
-    }
-}
-
-int64_t MixingEngine::getAudioFileTotalSamples(string uuid) {
-    auto it = sourceMap.find(uuid);
-    if (it == sourceMap.end()) {
-        return 0;
-    }
-    if (it->second == nullptr) {
-        return 0;
-    }
-    return it->second->getSampleSize();
+int64_t MixingEngine::getAudioFileTotalSamples(string filePath) {
+    return mixingIO.getTotalSamples(move(filePath));
 }
 

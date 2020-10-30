@@ -70,26 +70,8 @@ class MixingScreenViewModel(override val context: Context, mixerApplication: Mix
         }
     }
 
-    fun addFile(uuid: String) = fun (filePath: String): Job = viewModelScope.launch {
-        mixingRepository.addFile(filePath, uuid)
-    }
-
-    fun readSamples(uuid: String) = fun (numSamples: Int): Array<Float> = runBlocking(Dispatchers.IO) {
-        mixingRepository.readSamples(uuid, numSamples)
-    }
-
-
-    fun deleteFile(uuid: String) {
-        viewModelScope.launch {
-            mixingRepository.deleteFile(uuid)
-            audioFiles.remove(
-                audioFiles.find {
-                    it.uuid == uuid
-                }
-            )
-
-            audioFilesLiveData.value = audioFiles
-        }
+    fun readAllSamples(filePath: String): Array<Float> = runBlocking(Dispatchers.IO) {
+        mixingRepository.readAllSamples(filePath)
     }
 
     fun getTotalSamples(uuid: String): Int = mixingRepository.getTotalSamples(uuid)

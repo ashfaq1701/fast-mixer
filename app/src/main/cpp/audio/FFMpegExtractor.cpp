@@ -156,8 +156,7 @@ void FFMpegExtractor::getAudioFileProperties() {
     }
 }
 
-int64_t FFMpegExtractor::decode(uint8_t *targetData) {
-
+int64_t FFMpegExtractor::decodeOp(uint8_t *targetData, function<void(uint8_t*, int, short*, int64_t)> f) {
     int returnValue = -1; // -1 indicates error
 
     // Create a buffer for FFmpeg to use for decoding (freed in the custom deleter below)
@@ -311,7 +310,7 @@ int64_t FFMpegExtractor::decode(uint8_t *targetData) {
                     decodedFrame->nb_samples);
 
             int64_t bytesToWrite = frame_count * sizeof(float) * mTargetProperties.channelCount;
-            memcpy(targetData + bytesWritten, buffer1, (size_t)bytesToWrite);
+            f(targetData, bytesWritten, buffer1, bytesToWrite);
             bytesWritten += bytesToWrite;
             av_freep(&buffer1);
 
@@ -342,6 +341,18 @@ int64_t FFMpegExtractor::decode(uint8_t *targetData) {
         avcodec_free_context(&codecCtx);
     }
     return returnValue;
+}
+
+int64_t FFMpegExtractor::decode(uint8_t *targetData) {
+    function<void(uint8_t*, int, short*, int64_t)> f = [] (uint8_t* targetData, int bytesWritten, short* buffer1, int64_t bytesToWrite) {
+        memcpy(targetData + bytesWritten, buffer1, (size_t)bytesToWrite);
+    };
+    return decodeOp(targetData, f);
+}
+
+int64_t FFMpegExtractor::getTotalNumberOfSamples() {
+    function<void(uint8_t*, int, short*, int64_t)> f = [] (uint8_t* targetData, int bytesWritten, short* buffer1, int64_t bytesToWrite) {};
+    return decodeOp(nullptr, f);
 }
 
 void FFMpegExtractor::printCodecParameters(AVCodecParameters *params) {

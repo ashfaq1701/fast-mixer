@@ -8,13 +8,10 @@ import android.util.AttributeSet
 import android.view.View
 import androidx.databinding.BindingMethod
 import androidx.databinding.BindingMethods
-import kotlinx.coroutines.Job
-import timber.log.Timber
 
 
 @BindingMethods(value = [
-    BindingMethod(type = FileWaveView::class, attribute = "fileLoader", method = "setFileLoader"),
-    BindingMethod(type = FileWaveView::class, attribute = "samplesReader", method = "setSamplesReader"),
+    BindingMethod(type = FileWaveView::class, attribute = "allSamplesReader", method = "setAllSamplesReader"),
     BindingMethod(type = FileWaveView::class, attribute = "audioFilePath", method = "setAudioFilePath"),
     BindingMethod(type = FileWaveView::class, attribute = "totalSampleCountReader", method = "setTotalSampleCountReader")
 ])
@@ -24,8 +21,7 @@ class FileWaveView @JvmOverloads constructor(
 ) : View(context, attrs) {
     private lateinit var mAudioFilePath: String
 
-    lateinit var mFileLoader: (String) -> Job
-    lateinit var mSamplesReader: (Int) -> Array<Float>
+    lateinit var mAllSamplesReader: () -> Array<Float>
     lateinit var mTotalSampleCountReader: () -> Int
 
     private var fileLoaded = false
@@ -43,13 +39,8 @@ class FileWaveView @JvmOverloads constructor(
         checkAndSetupAudioFileSource()
     }
 
-    fun setFileLoader(fileLoader: (String) -> Job) {
-        mFileLoader = fileLoader
-        checkAndSetupAudioFileSource()
-    }
-
-    fun setSamplesReader(samplesReader: (Int) -> Array<Float>) {
-        mSamplesReader = samplesReader
+    fun setAllSamplesReader(allSamplesReader: () -> Array<Float>) {
+        mAllSamplesReader = allSamplesReader
     }
 
     fun setTotalSampleCountReader(totalSampleCountReader: () -> Int) {
@@ -59,15 +50,8 @@ class FileWaveView @JvmOverloads constructor(
 
     private fun checkAndSetupAudioFileSource() {
         if (::mAudioFilePath.isInitialized
-            && ::mFileLoader.isInitialized
             && ::mTotalSampleCountReader.isInitialized) {
-            mFileLoader(mAudioFilePath).invokeOnCompletion {
-                if (it == null) {
-                    fileLoaded = true
-                    totalSampleCount = mTotalSampleCountReader()
-                }
-                invalidate()
-            }
+            totalSampleCount = mTotalSampleCountReader()
         }
     }
 

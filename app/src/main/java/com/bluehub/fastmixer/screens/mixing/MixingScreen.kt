@@ -65,10 +65,8 @@ class MixingScreen : PermissionFragment() {
         dataBinding.lifecycleOwner = viewLifecycleOwner
 
         audioFileListAdapter = AudioFileListAdapter(requireContext(), AudioFileEventListeners(
-            { uuid: String -> localViewModel.addFile(uuid) },
-            { uuid: String -> localViewModel.readSamples(uuid) },
-            { uuid: String -> localViewModel.deleteFile(uuid) },
-            { uuid: String -> localViewModel.getTotalSamples(uuid) }
+            { filePath: String -> localViewModel.readAllSamples(filePath) },
+            { filePath: String -> localViewModel.getTotalSamples(filePath) }
         ), localViewModel.audioFiles)
         dataBinding.audioFileListView.adapter = audioFileListAdapter
 

@@ -22,13 +22,9 @@ class AudioFileListAdapter(context: Context, private val audioFileEventListeners
 }
 
 class AudioFileEventListeners(
-    var loadFileCallback: (String) -> (String) -> Job,
-    var readSamplesCallback: (String) -> (Int) -> Array<Float>,
-    var deleteFileCallback: (String) -> Unit,
+    var readAllSamplesCallback: (String) -> Array<Float>,
     var getTotalSamples: (String) -> Int
 ) {
-    fun readSamplesCallbackWithIndex(uuid: String): (Int)->Array<Float> = readSamplesCallback(uuid)
-    fun loadFileCallbackWithIndex(uuid: String): (String)->Job = loadFileCallback(uuid)
-    fun deleteFileCallbackWithIndex(uuid: String): (String)->Unit = { deleteFileCallback(uuid) }
+    fun readAllSamplesCallbackWithIndex(filePath: String): ()->Array<Float> = { readAllSamplesCallback(filePath) }
     fun getTotalSamplesWithIndex(uuid: String): () -> Int = { getTotalSamples(uuid) }
 }

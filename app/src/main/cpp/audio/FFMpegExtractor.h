@@ -30,6 +30,8 @@ public:
     int mChannelCount = 0;
     int mAudioFormat = 0;
 
+    int64_t getTotalNumberOfSamples();
+
 private:
     AudioProperties mTargetProperties{};
 
@@ -45,6 +47,8 @@ private:
     AVStream* getBestAudioStream(AVFormatContext *avFormatContext);
 
     void printCodecParameters(AVCodecParameters *params);
+
+    int64_t decodeOp(uint8_t *targetData, function<void(uint8_t *, int, short *, int64_t)> f);
 };
 
 

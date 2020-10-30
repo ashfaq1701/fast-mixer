@@ -29,31 +29,20 @@ extern "C" {
         return (mixingEngine != nullptr);
     }
 
-    JNIEXPORT void JNICALL
-    Java_com_bluehub_fastmixer_screens_mixing_MixingEngine_addFile(JNIEnv *env, jclass, jstring filePathStr, jstring uuid) {
-        if (mixingEngine == nullptr) {
-            LOGE("addFile: mixingEngine is null, you must call create() method before calling this method");
-            return;
-        }
-        char* filePath = const_cast<char *>(env->GetStringUTFChars(filePathStr, NULL));
-        char* uuidStr = const_cast<char *>(env->GetStringUTFChars(uuid, NULL));
-        mixingEngine->addFile(filePath, uuidStr);
-    }
-
     JNIEXPORT jobjectArray JNICALL
-    Java_com_bluehub_fastmixer_screens_mixing_MixingEngine_readSamples(JNIEnv *env, jclass, jstring uuid, jint numSamples) {
+    Java_com_bluehub_fastmixer_screens_mixing_MixingEngine_readAllSamples(JNIEnv *env, jclass, jstring fileName) {
         if (mixingEngine == nullptr) {
-            LOGE("readSamples: mixingEngine is null, you must call create() method before calling this method");
+            LOGE("readAllSamples: mixingEngine is null, you must call create() method before calling this method");
             return nullptr;
         }
 
-        char* uuidStr = const_cast<char *>(env->GetStringUTFChars(uuid, NULL));
+        char* fileNameStr = const_cast<char *>(env->GetStringUTFChars(fileName, NULL));
 
         jclass floatCls = env->FindClass("java/lang/Float");
         jmethodID floatConstructor = env->GetMethodID(floatCls, "<init>", "(F)V");
 
         jobjectArray result;
-        buffer_data* data = mixingEngine->readSamples(uuidStr, numSamples).release();
+        buffer_data* data = mixingEngine->readAllSamples(fileNameStr).release();
 
         float* dataSamples = data->ptr;
 
@@ -71,24 +60,14 @@ extern "C" {
         return result;
     }
 
-    JNIEXPORT void JNICALL
-    Java_com_bluehub_fastmixer_screens_mixing_MixingEngine_deleteFile(JNIEnv *env, jclass, jstring uuid) {
-        if (mixingEngine == nullptr) {
-            LOGE("deleteFile: mixingEngine is null, you must call create() method before calling this method");
-            return;
-        }
-        char* uuidStr = const_cast<char *>(env->GetStringUTFChars(uuid, NULL));
-        mixingEngine->deleteFile(uuidStr);
-    }
-
     JNIEXPORT jint JNICALL
-    Java_com_bluehub_fastmixer_screens_mixing_MixingEngine_getTotalSamples(JNIEnv *env, jclass, jstring uuid) {
+    Java_com_bluehub_fastmixer_screens_mixing_MixingEngine_getTotalSamples(JNIEnv *env, jclass, jstring filePath) {
         if (mixingEngine == nullptr) {
             LOGE("deleteFile: mixingEngine is null, you must call create() method before calling this method");
             return 0;
         }
-        char* uuidStr = const_cast<char *>(env->GetStringUTFChars(uuid, NULL));
-        return mixingEngine->getAudioFileTotalSamples(uuidStr);
+        char* filePathStr = const_cast<char *>(env->GetStringUTFChars(filePath, NULL));
+        return mixingEngine->getAudioFileTotalSamples(filePathStr);
     }
 
     JNIEXPORT void JNICALL

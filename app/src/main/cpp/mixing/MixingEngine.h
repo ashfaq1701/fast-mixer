@@ -13,14 +13,10 @@ using namespace std;
 
 class MixingEngine {
 public:
-    ~MixingEngine();
-    void addFile(string filePath, string uuid);
-    unique_ptr<buffer_data> readSamples(string uuid, size_t numSamples);
-    void deleteFile(string uuid);
+    unique_ptr<buffer_data> readAllSamples(string filePath);
     int64_t getAudioFileTotalSamples(string uuid);
 private:
     MixingIO mixingIO;
-    map<string, FileDataSource*> sourceMap;
 };
 
 
