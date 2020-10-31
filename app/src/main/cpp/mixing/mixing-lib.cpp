@@ -30,9 +30,9 @@ extern "C" {
     }
 
     JNIEXPORT jobjectArray JNICALL
-    Java_com_bluehub_fastmixer_screens_mixing_MixingEngine_readAllSamples(JNIEnv *env, jclass, jstring fileName) {
+    Java_com_bluehub_fastmixer_screens_mixing_MixingEngine_readSamples(JNIEnv *env, jclass, jstring fileName) {
         if (mixingEngine == nullptr) {
-            LOGE("readAllSamples: mixingEngine is null, you must call create() method before calling this method");
+            LOGE("readSamples: mixingEngine is null, you must call create() method before calling this method");
             return nullptr;
         }
 
@@ -42,7 +42,7 @@ extern "C" {
         jmethodID floatConstructor = env->GetMethodID(floatCls, "<init>", "(F)V");
 
         jobjectArray result;
-        buffer_data* data = mixingEngine->readAllSamples(fileNameStr).release();
+        buffer_data* data = mixingEngine->readSamples(fileNameStr).release();
 
         float* dataSamples = data->ptr;
 

@@ -117,7 +117,7 @@ int64_t FileDataSource::getTotalSamples(
 }
 
 
-unique_ptr<buffer_data> FileDataSource::readAllData() {
+unique_ptr<buffer_data> FileDataSource::readSingleChannelSamples() {
     int64_t currentPtr = 0;
 
     int channelCount = mProperties.channelCount;

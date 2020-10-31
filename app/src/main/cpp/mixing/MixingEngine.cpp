@@ -6,9 +6,9 @@
 
 #include <utility>
 
-unique_ptr<buffer_data> MixingEngine::readAllSamples(string filePath) {
+unique_ptr<buffer_data> MixingEngine::readSamples(string filePath) {
     FileDataSource* source = mixingIO.readFile(move(filePath));
-    auto dataRead = source->readAllData();
+    auto dataRead = source->readSingleChannelSamples();
     return dataRead;
 }
 

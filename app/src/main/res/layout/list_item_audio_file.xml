@@ -17,7 +17,7 @@
             android:layout_height="50dp"
             app:layout_constraintTop_toTopOf="parent"
             app:audioFilePath="@{audioFile.path}"
-            app:allSamplesReader="@{eventListener.readAllSamplesCallbackWithIndex(audioFile.path)}"
-            app:totalSampleCountReader="@{eventListener.getTotalSamplesWithIndex(audioFile.path)}" />
+            app:samplesReader="@{eventListener.readSamplesCallbackWithIndexAsync(audioFile.path)}"
+            app:totalSampleCountReader="@{eventListener.getTotalSamplesWithIndexAsync(audioFile.path)}" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

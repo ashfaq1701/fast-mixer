@@ -12,7 +12,7 @@ class MixingEngineProxy {
 
     fun create() = MixingEngine.create()
 
-    fun readAllSamples(uuid: String) = MixingEngine.readAllSamples(uuid)
+    fun readSamples(uuid: String) = MixingEngine.readSamples(uuid)
 
     fun getTotalSamples(filePath: String): Int = MixingEngine.getTotalSamples(filePath)
 

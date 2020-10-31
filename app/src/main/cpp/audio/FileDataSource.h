@@ -38,7 +38,7 @@ public:
             const char *filename,
             const AudioProperties targetProperties);
 
-    unique_ptr<buffer_data> readAllData();
+    unique_ptr<buffer_data> readSingleChannelSamples();
 
     static int64_t getTotalSamples(const char *filename, const AudioProperties targetProperties);
 

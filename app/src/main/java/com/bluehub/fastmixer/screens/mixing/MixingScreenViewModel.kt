@@ -9,6 +9,7 @@ import com.bluehub.fastmixer.common.permissions.PermissionViewModel
 import com.bluehub.fastmixer.common.utils.PermissionManager
 import com.bluehub.fastmixer.common.utils.ScreenConstants
 import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
 import timber.log.Timber
 import java.io.File
 import java.util.*
@@ -70,11 +71,17 @@ class MixingScreenViewModel(override val context: Context, mixerApplication: Mix
         }
     }
 
-    fun readAllSamples(filePath: String): Array<Float> = runBlocking(Dispatchers.IO) {
-        mixingRepository.readAllSamples(filePath)
+    fun readSamplesAsync(filePath: String): Deferred<Array<Float>> = viewModelScope.async {
+        withContext(Dispatchers.IO) {
+            mixingRepository.readSamples(filePath)
+        }
     }
 
-    fun getTotalSamples(uuid: String): Int = mixingRepository.getTotalSamples(uuid)
+    fun getTotalSamplesAsync(filePath: String): Deferred<Int> = viewModelScope.async {
+        withContext(Dispatchers.IO) {
+            mixingRepository.getTotalSamples(filePath)
+        }
+    }
 
     override fun onCleared() {
         super.onCleared()

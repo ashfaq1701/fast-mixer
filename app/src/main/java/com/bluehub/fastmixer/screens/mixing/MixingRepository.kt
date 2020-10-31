@@ -5,9 +5,9 @@ class MixingRepository(val mixingEngineProxy: MixingEngineProxy) {
         mixingEngineProxy.create()
     }
 
-    fun readAllSamples(filePath: String): Array<Float> = mixingEngineProxy.readAllSamples(filePath)
+    fun readSamples(filePath: String): Array<Float> = mixingEngineProxy.readSamples(filePath)
 
-    fun getTotalSamples(uuid: String): Int = mixingEngineProxy.getTotalSamples(uuid)
+    fun getTotalSamples(filePath: String): Int = mixingEngineProxy.getTotalSamples(filePath)
 
     fun deleteMixingEngine() = mixingEngineProxy.delete()
 }

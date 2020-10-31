@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import com.bluehub.fastmixer.databinding.ListItemAudioFileBinding
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Job
 import timber.log.Timber
 
@@ -22,9 +23,9 @@ class AudioFileListAdapter(context: Context, private val audioFileEventListeners
 }
 
 class AudioFileEventListeners(
-    var readAllSamplesCallback: (String) -> Array<Float>,
-    var getTotalSamples: (String) -> Int
+    var readSamplesCallbackAsync: (String) -> Deferred<Array<Float>>,
+    var getTotalSamplesAsync: (String) -> Deferred<Int>
 ) {
-    fun readAllSamplesCallbackWithIndex(filePath: String): ()->Array<Float> = { readAllSamplesCallback(filePath) }
-    fun getTotalSamplesWithIndex(uuid: String): () -> Int = { getTotalSamples(uuid) }
+    fun readSamplesCallbackWithIndexAsync(filePath: String): ()->Deferred<Array<Float>> = { readSamplesCallbackAsync(filePath) }
+    fun getTotalSamplesWithIndexAsync(filePath: String): () -> Deferred<Int> = { getTotalSamplesAsync(filePath) }
 }
