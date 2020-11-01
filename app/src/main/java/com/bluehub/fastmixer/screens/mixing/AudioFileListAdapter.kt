@@ -23,9 +23,9 @@ class AudioFileListAdapter(context: Context, private val audioFileEventListeners
 }
 
 class AudioFileEventListeners(
-    var readSamplesCallbackAsync: (String) -> Deferred<Array<Float>>,
-    var getTotalSamplesAsync: (String) -> Deferred<Int>
+    var readSamplesCallback: (String) -> Array<Float>,
+    var getTotalSamples: (String) -> Int
 ) {
-    fun readSamplesCallbackWithIndexAsync(filePath: String): ()->Deferred<Array<Float>> = { readSamplesCallbackAsync(filePath) }
-    fun getTotalSamplesWithIndexAsync(filePath: String): () -> Deferred<Int> = { getTotalSamplesAsync(filePath) }
+    fun readSamplesCallbackWithIndex(filePath: String): () -> Array<Float> = { readSamplesCallback(filePath) }
+    fun getTotalSamplesWithIndex(filePath: String): () -> Int = { getTotalSamples(filePath) }
 }

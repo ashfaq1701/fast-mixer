@@ -13,8 +13,10 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.selects.select
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 
@@ -31,8 +33,8 @@ class FileWaveView @JvmOverloads constructor(
 
     private lateinit var mAudioFilePath: String
 
-    lateinit var mSamplesReader: () -> Deferred<Array<Float>>
-    lateinit var mTotalSampleCountReader: () -> Deferred<Int>
+    lateinit var mSamplesReader: () -> Array<Float>
+    lateinit var mTotalSampleCountReader: () -> Int
 
     private var fileLoaded = false
     private var totalSampleCount: Int = 0
@@ -49,12 +51,12 @@ class FileWaveView @JvmOverloads constructor(
         checkAndSetupAudioFileSource()
     }
 
-    fun setSamplesReader(samplesReader: () -> Deferred<Array<Float>>) {
+    fun setSamplesReader(samplesReader: () -> Array<Float>) {
         mSamplesReader = samplesReader
         checkAndSetupAudioFileSource()
     }
 
-    fun setTotalSampleCountReader(totalSampleCountReader: () -> Deferred<Int>) {
+    fun setTotalSampleCountReader(totalSampleCountReader: () -> Int) {
         mTotalSampleCountReader = totalSampleCountReader
         checkAndSetupAudioFileSource()
     }
@@ -63,18 +65,16 @@ class FileWaveView @JvmOverloads constructor(
         return registry
     }
 
-    fun checkAndSetupAudioFileSource() {
+    private fun checkAndSetupAudioFileSource() {
         if (::mAudioFilePath.isInitialized
             && ::mSamplesReader.isInitialized
             && ::mTotalSampleCountReader.isInitialized) {
             lifecycleScope.launch {
-                select {
-                    mTotalSampleCountReader().onAwait { samplesCount ->
-                        totalSampleCount = samplesCount
-                        Timber.d("Total samples: %s", totalSampleCount)
-                        invalidate()
-                    }
+                withContext(Dispatchers.IO) {
+                    totalSampleCount = mTotalSampleCountReader();
                 }
+                Timber.d("Total samples: %s", totalSampleCount)
+                invalidate()
             }
         }
     }

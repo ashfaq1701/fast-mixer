@@ -71,17 +71,10 @@ class MixingScreenViewModel(override val context: Context, mixerApplication: Mix
         }
     }
 
-    fun readSamplesAsync(filePath: String): Deferred<Array<Float>> = viewModelScope.async {
-        withContext(Dispatchers.IO) {
-            mixingRepository.readSamples(filePath)
-        }
-    }
+    fun readSamples(filePath: String):  Array<Float> = mixingRepository.readSamples(filePath)
 
-    fun getTotalSamplesAsync(filePath: String): Deferred<Int> = viewModelScope.async {
-        withContext(Dispatchers.IO) {
-            mixingRepository.getTotalSamples(filePath)
-        }
-    }
+
+    fun getTotalSamples(filePath: String): Int = mixingRepository.getTotalSamples(filePath)
 
     override fun onCleared() {
         super.onCleared()
