@@ -72,7 +72,7 @@ extern "C" {
 
     JNIEXPORT void JNICALL
     Java_com_bluehub_fastmixer_screens_mixing_MixingEngine_delete(JNIEnv *env, jclass) {
-        if (mixingEngine != nullptr) {
+        if (mixingEngine == nullptr) {
             LOGE("delete: mixingEngine is null, you must call create() method before calling this method");
             return;
         }
