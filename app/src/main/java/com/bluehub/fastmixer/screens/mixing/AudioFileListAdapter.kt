@@ -7,9 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import com.bluehub.fastmixer.databinding.ListItemAudioFileBinding
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.Job
-import timber.log.Timber
 
 class AudioFileListAdapter(context: Context, private val audioFileEventListeners: AudioFileEventListeners, audioFileList: MutableList<AudioFile>): ArrayAdapter<AudioFile>(context, -1, audioFileList) {
     @SuppressLint("ViewHolder")

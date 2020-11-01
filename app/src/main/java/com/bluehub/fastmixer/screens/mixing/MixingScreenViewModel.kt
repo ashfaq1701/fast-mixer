@@ -3,13 +3,10 @@ package com.bluehub.fastmixer.screens.mixing
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
 import com.bluehub.fastmixer.MixerApplication
 import com.bluehub.fastmixer.common.permissions.PermissionViewModel
 import com.bluehub.fastmixer.common.utils.PermissionManager
 import com.bluehub.fastmixer.common.utils.ScreenConstants
-import kotlinx.coroutines.*
-import kotlinx.coroutines.CoroutineScope
 import timber.log.Timber
 import java.io.File
 import java.util.*
