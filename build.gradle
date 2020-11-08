@@ -42,6 +42,14 @@ allprojects {
     }
 }
 
+Properties properties = new Properties()
+properties.load(project.rootProject.file('local.properties').newDataInputStream())
+
+project.ext {
+    useHWASAN = properties.getProperty("useHWASAN").toBoolean()
+    println("HWASAN Settings Value: " + useHWASAN)
+}
+
 task clean(type: Delete) {
     delete rootProject.buildDir
 }

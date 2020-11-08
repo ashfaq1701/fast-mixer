@@ -18,12 +18,20 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         externalNativeBuild {
             cmake {
-                arguments "-DANDROID_STL=c++_shared"
+                cppFlags "-std=c++11 -frtti -fexceptions"
             }
         }
     }
 
     buildTypes {
+        debug {
+            externalNativeBuild {
+                cmake {
+                    if (rootProject.ext.useHWASAN)
+                        arguments "-DANDROID_STL=c++_shared -DUSEHWASAN=ON"
+                }
+            }
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
