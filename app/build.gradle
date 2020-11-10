@@ -4,7 +4,7 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'androidx.navigation.safeargs'
 
-def SupportedABIs = ['armeabi-v7a']
+def SupportedABIs = ['arm64-v8a']
 
 android {
     compileSdkVersion 30
@@ -21,7 +21,6 @@ android {
         externalNativeBuild {
             cmake {
                 cppFlags "-std=c++14 -frtti -fexceptions"
-                abiFilters.addAll( SupportedABIs )
             }
         }
     }
@@ -31,6 +30,7 @@ android {
             externalNativeBuild {
                 cmake {
                     if (rootProject.ext.useHWASAN == true) {
+                        abiFilters.addAll( SupportedABIs )
                         arguments "-DANDROID_STL=c++_shared", "-DUSEHWASAN=ON"
                     }
                 }
