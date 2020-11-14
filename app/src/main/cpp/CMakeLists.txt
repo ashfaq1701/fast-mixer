@@ -3,7 +3,9 @@
 
 # Sets the minimum version of CMake required to build the native library.
 
-cmake_minimum_required(VERSION 3.4.1)
+project(FastMixer)
+
+cmake_minimum_required(VERSION 3.14.0)
 
 include_directories(taskqueue)
 
@@ -66,6 +68,7 @@ set(LIB_SND_FILE_DIR ../../../../cpp_dependencies/libsndfile)
 add_subdirectory(${LIB_SND_FILE_DIR} ./sndfile)
 include_directories(${LIB_SND_FILE_DIR}/src)
 
+set(KISSFFT_TEST OFF)
 set(KISS_FFT_DIR ../../../../cpp_dependencies/kissfft)
 add_subdirectory(${KISS_FFT_DIR} ./kissfft)
 
