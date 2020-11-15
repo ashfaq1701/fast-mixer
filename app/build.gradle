@@ -20,7 +20,6 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         externalNativeBuild {
             cmake {
-                version "$cmake_version"
                 cppFlags "-std=c++14 -frtti -fexceptions"
             }
         }
@@ -50,7 +49,7 @@ android {
     externalNativeBuild {
         cmake {
             path "src/main/cpp/CMakeLists.txt"
-            version "3.19.0+"
+            version "3.10.2"
         }
     }
 

@@ -19,7 +19,6 @@ buildscript {
         dagger_version = "2.29.1"
         dagger_compiler_version = "2.29.1"
         audio_record_view_version = "1.0.2"
-        cmake_version="3.13+"
     }
     repositories {
         google()
