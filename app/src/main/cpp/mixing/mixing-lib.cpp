@@ -10,14 +10,14 @@
 #include <jni.h>
 #include "MixingEngine.h"
 #include "../logging_macros.h"
-#include "../jvm_env.h"
+#include "mixing_jvm_env.h"
 
 const char *TAG = "mixing-lib: %s";
 static MixingEngine *mixingEngine = nullptr;
 
 extern "C" {
     extern "C" JNIEXPORT jint JNI_OnLoad(JavaVM* vm, void* reserved) {
-        java_machine = vm;
+        java_mixing_machine = vm;
         return  JNI_VERSION_1_6;
     }
 

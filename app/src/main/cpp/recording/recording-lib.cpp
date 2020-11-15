@@ -6,7 +6,7 @@
 #include <string>
 #include "RecordingEngine.h"
 #include "../logging_macros.h"
-#include "../jvm_env.h"
+#include "recording_jvm_env.h"
 #include <android/asset_manager_jni.h>
 
 const char *TAG = "native-lib: %s";
@@ -34,7 +34,7 @@ extern "C" {
     }
 
     extern "C" JNIEXPORT jint JNI_OnLoad(JavaVM* vm, void* reserved) {
-        java_machine = vm;
+        java_recording_machine = vm;
         return  JNI_VERSION_1_6;
     }
 
