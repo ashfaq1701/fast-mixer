@@ -47,6 +47,8 @@ properties.load(project.rootProject.file('local.properties').newDataInputStream(
 
 project.ext {
     useHWASAN = properties.getProperty("useHWASAN").toBoolean()
+    useASAN = properties.getProperty("useASAN").toBoolean()
+    ndkDir = properties.getProperty('ndk.dir')
 }
 
 task clean(type: Delete) {

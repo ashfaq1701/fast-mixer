@@ -20,7 +20,11 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         externalNativeBuild {
             cmake {
-                cppFlags "-std=c++14 -frtti -fexceptions"
+                if (rootProject.ext.useASAN == true) {
+                    cppFlags "-std=c++14 -frtti -fexceptions"
+                } else {
+                    arguments "-DANDROID_ARM_MODE=arm", "-DANDROID_STL=c++_shared"
+                }
             }
         }
     }
@@ -32,6 +36,8 @@ android {
                     if (rootProject.ext.useHWASAN == true) {
                         abiFilters.addAll( SupportedABIs )
                         arguments "-DANDROID_STL=c++_shared", "-DUSEHWASAN=ON"
+                    } else if (rootProject.ext.useASAN == false) {
+                        arguments "-DUSEASAN=ON"
                     }
                 }
             }
