@@ -5,6 +5,7 @@ apply plugin: 'kotlin-kapt'
 apply plugin: 'androidx.navigation.safeargs'
 
 def SupportedABIs = ['arm64-v8a']
+def WrapScriptABIs = ['arm64-v8a', 'armeabi-v7a', 'x86', 'x86_64']
 
 android {
     compileSdkVersion 30
@@ -16,14 +17,19 @@ android {
         targetSdkVersion 30
         versionCode 1
         versionName "1.0"
+        if (rootProject.ext.useASAN == true) {
+            manifestPlaceholders = [debuggable: "true"]
+        } else {
+            manifestPlaceholders = [debuggable: "false"]
+        }
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         externalNativeBuild {
             cmake {
                 if (rootProject.ext.useASAN == true) {
-                    cppFlags "-std=c++14 -frtti -fexceptions"
-                } else {
                     arguments "-DANDROID_ARM_MODE=arm", "-DANDROID_STL=c++_shared"
+                } else {
+                    cppFlags "-std=c++14 -frtti -fexceptions"
                 }
             }
         }
@@ -96,3 +102,31 @@ dependencies {
 
     implementation "com.github.Armen101:AudioRecordView:$audio_record_view_version"
 }
+
+task deleteWrapDir(type: Delete) {
+    delete 'src/main/resources/lib'
+}
+
+task copyWrapFile {
+    outputs.upToDateWhen { false }
+
+    if (rootProject.ext.useASAN) {
+        def folder = new File('src/main/resources/lib')
+        def wrapFilePath = file("$rootProject.ext.ndkDir").absolutePath + "/wrap.sh/asan.sh"
+        if (!folder.exists()) {
+            WrapScriptABIs.each { currentABI ->
+                println("Folder will be created " + currentABI)
+                mkdir "src/main/resources/lib/" + currentABI
+
+                copy {
+                    from wrapFilePath
+                    into "src/main/resources/lib/" + currentABI
+                    rename "asan.sh", "wrap.sh"
+                }
+            }
+        }
+    }
+}
+
+clean.dependsOn(deleteWrapDir)
+preBuild.dependsOn(copyWrapFile)
