@@ -27,7 +27,7 @@ android {
         externalNativeBuild {
             cmake {
                 if (rootProject.ext.useASAN == true) {
-                    arguments "-DANDROID_ARM_MODE=arm", "-DANDROID_STL=c++_shared"
+                    arguments "-std=c++14 -DANDROID_ARM_MODE=arm", "-DANDROID_STL=c++_shared"
                 } else {
                     cppFlags "-std=c++14 -frtti -fexceptions"
                 }

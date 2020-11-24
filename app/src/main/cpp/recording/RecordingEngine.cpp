@@ -4,6 +4,7 @@
 
 #include <oboe/Oboe.h>
 
+#include <cassert>
 #include <utility>
 #include "recording_jvm_env.h"
 #include "RecordingEngine.h"

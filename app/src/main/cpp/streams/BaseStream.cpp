@@ -2,6 +2,7 @@
 // Created by asalehin on 7/30/20.
 //
 
+#include <cassert>
 #include "BaseStream.h"
 
 BaseStream::BaseStream(RecordingIO* recordingIO) {
