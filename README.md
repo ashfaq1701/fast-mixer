@@ -21,4 +21,6 @@ cd cpp_dependencies/ffmpeg-scripts
 
 This will build ffmpeg and move it to the expected directory.
 
+Then copy ```local.example.properties``` content in ```local.properties``` and tweak it according to your need.
+
 This README.md file will further be enhanced later.
