@@ -1,5 +1,7 @@
 package com.bluehub.fastmixer.screens.mixing
 
+import java.util.*
+
 class MixingEngine {
     companion object {
         init {
@@ -8,7 +10,11 @@ class MixingEngine {
 
         @JvmStatic external fun create(): Boolean
 
-        @JvmStatic external fun readSamples(fileName: String): Array<Float>
+        @JvmStatic external fun addFile(filePath: String)
+
+        @JvmStatic external fun readSamples(filePath: String, numSamples: Int): Array<Float>
+
+        @JvmStatic external fun deleteFile(filePath: String)
 
         @JvmStatic external fun getTotalSamples(filePath: String): Int
 

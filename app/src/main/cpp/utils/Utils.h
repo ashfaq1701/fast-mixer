@@ -40,4 +40,18 @@ inline long getSizeOfFile(const char *fileName) {
         return -1;
 }
 
+inline string java_str_to_c_str(JNIEnv * env, jstring jStr) {
+    const auto stringClass = env->FindClass("java/lang/String");
+    const auto getBytes = env->GetMethodID(stringClass, "getBytes", "()[B");
+
+    const auto stringJbytes = (jbyteArray) env->CallObjectMethod(jStr, getBytes);
+
+    const auto length = env->GetArrayLength(stringJbytes);
+    const auto pBytes = env->GetByteArrayElements(stringJbytes, nullptr);
+    std::string str((char *)pBytes, length);
+    env->ReleaseByteArrayElements(stringJbytes, pBytes, JNI_ABORT);
+
+    return forward<string>(str);
+}
+
 #endif //FAST_MIXER_UTILS_H

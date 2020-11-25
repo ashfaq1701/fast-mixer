@@ -33,14 +33,13 @@ public:
     int64_t getSize() const override { return mBufferSize; }
     AudioProperties getProperties() const override { return mProperties; }
     const float* getData() const override { return mBuffer.get(); }
+    int64_t getSampleSize() { return mBufferSize / mProperties.channelCount; };
 
     static FileDataSource* newFromCompressedFile(
             const char *filename,
             const AudioProperties targetProperties);
 
-    unique_ptr<buffer_data> readSingleChannelSamples();
-
-    static int64_t getTotalSamples(const char *filename, const AudioProperties targetProperties);
+    unique_ptr<buffer_data> readData(size_t numSamples);
 
 private:
 
@@ -54,5 +53,6 @@ private:
     const unique_ptr<float[]> mBuffer;
     const int64_t mBufferSize;
     const AudioProperties mProperties;
+    int64_t currentPtr = 0;
 };
 #endif //RHYTHMGAME_AASSETDATASOURCE_H

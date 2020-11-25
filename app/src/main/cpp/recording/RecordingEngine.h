@@ -20,7 +20,7 @@
 
 class RecordingEngine {
 public:
-    RecordingEngine(char* appDir, char* mRecordingSessionId, bool recordingScreenViewModelPassed);
+    RecordingEngine(string appDir, string recordingSessionId, bool recordingScreenViewModelPassed);
     ~RecordingEngine();
 
     void startRecording();
@@ -57,8 +57,8 @@ public:
 private:
     const char* TAG = "Audio Engine:: %s";
 
-    char* mRecordingSessionId = nullptr;
-    char* mAppDir = nullptr;
+    string mRecordingSessionId = nullptr;
+    string mAppDir = nullptr;
     bool mPlayback = true;
 
     RecordingIO mRecordingIO;

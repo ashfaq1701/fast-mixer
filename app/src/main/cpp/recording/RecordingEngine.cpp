@@ -11,14 +11,13 @@
 #include "../logging_macros.h"
 
 RecordingEngine::RecordingEngine(
-        char* appDir,
-        char* recordingSessionId,
-        bool recordingScreenViewModelPassed) {
-    assert(StreamConstants::mInputChannelCount == StreamConstants::mOutputChannelCount);
-    mAppDir = appDir;
-    mRecordingSessionId = recordingSessionId;
+        string appDir,
+        string recordingSessionId,
+        bool recordingScreenViewModelPassed): mAppDir(move(appDir)), mRecordingSessionId(move(recordingSessionId)) {
 
-    char* recordingFilePath = strcat(mAppDir, "/recording.wav");
+    assert(StreamConstants::mInputChannelCount == StreamConstants::mOutputChannelCount);
+    auto recordingFilePath = mAppDir + "/recording.wav";
+
     mRecordingIO.setRecordingFilePath(recordingFilePath);
     mRecordingIO.setStopPlaybackCallback([&] () {
         setStopPlayback();

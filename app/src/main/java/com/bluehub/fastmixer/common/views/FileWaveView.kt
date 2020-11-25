@@ -8,17 +8,12 @@ import android.util.AttributeSet
 import android.view.View
 import androidx.databinding.BindingMethod
 import androidx.databinding.BindingMethods
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.LifecycleRegistry
-import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.Job
 import timber.log.Timber
 
 
 @BindingMethods(value = [
+    BindingMethod(type = FileWaveView::class, attribute = "fileLoader", method = "setFileLoader"),
     BindingMethod(type = FileWaveView::class, attribute = "samplesReader", method = "setSamplesReader"),
     BindingMethod(type = FileWaveView::class, attribute = "audioFilePath", method = "setAudioFilePath"),
     BindingMethod(type = FileWaveView::class, attribute = "totalSampleCountReader", method = "setTotalSampleCountReader")
@@ -26,12 +21,11 @@ import timber.log.Timber
 class FileWaveView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null
-) : View(context, attrs), LifecycleOwner {
-    private var registry: LifecycleRegistry = LifecycleRegistry(this)
-
+) : View(context, attrs) {
     private lateinit var mAudioFilePath: String
 
-    lateinit var mSamplesReader: () -> Array<Float>
+    lateinit var mFileLoader: () -> Job
+    lateinit var mSamplesReader: (Int) -> Array<Float>
     lateinit var mTotalSampleCountReader: () -> Int
 
     private var fileLoaded = false
@@ -49,9 +43,13 @@ class FileWaveView @JvmOverloads constructor(
         checkAndSetupAudioFileSource()
     }
 
-    fun setSamplesReader(samplesReader: () -> Array<Float>) {
-        mSamplesReader = samplesReader
+    fun setFileLoader(fileLoader: () -> Job) {
+        mFileLoader = fileLoader
         checkAndSetupAudioFileSource()
+    }
+
+    fun setSamplesReader(samplesReader: (Int) -> Array<Float>) {
+        mSamplesReader = samplesReader
     }
 
     fun setTotalSampleCountReader(totalSampleCountReader: () -> Int) {
@@ -59,19 +57,15 @@ class FileWaveView @JvmOverloads constructor(
         checkAndSetupAudioFileSource()
     }
 
-    override fun getLifecycle(): Lifecycle {
-        return registry
-    }
-
     private fun checkAndSetupAudioFileSource() {
         if (::mAudioFilePath.isInitialized
-            && ::mSamplesReader.isInitialized
+            && ::mFileLoader.isInitialized
             && ::mTotalSampleCountReader.isInitialized) {
-            lifecycleScope.launch {
-                withContext(Dispatchers.IO) {
-                    totalSampleCount = mTotalSampleCountReader();
+            mFileLoader().invokeOnCompletion {
+                if (it == null) {
+                    fileLoaded = true
+                    totalSampleCount = mTotalSampleCountReader()
                 }
-                Timber.d("Total samples: %s", totalSampleCount)
                 invalidate()
             }
         }

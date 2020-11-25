@@ -14,7 +14,6 @@ using namespace std;
 
 class MixingIO {
 public:
-    int64_t getTotalSamples(string filename);
     FileDataSource* readFile(string filename);
 };
 

@@ -41,9 +41,8 @@ extern "C" {
     JNIEXPORT jboolean JNICALL
     Java_com_bluehub_fastmixer_screens_recording_RecordingEngine_create(JNIEnv *env, jclass, jstring appDirStr, jstring recordingSessionIdStr, jboolean  recordingScreenViewModelPassed) {
         if (recordingEngine == nullptr) {
-            char* appDir = const_cast<char *>(env->GetStringUTFChars(appDirStr, NULL));
-            char* recordingSessionId = const_cast<char *>(env->GetStringUTFChars(
-                    recordingSessionIdStr, NULL));
+            auto appDir = java_str_to_c_str(env, appDirStr);
+            auto recordingSessionId = java_str_to_c_str(env, recordingSessionIdStr);
 
             prepare_kotlin_method_ids(env);
 

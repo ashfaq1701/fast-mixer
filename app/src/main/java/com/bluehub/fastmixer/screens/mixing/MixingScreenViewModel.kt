@@ -1,12 +1,12 @@
 package com.bluehub.fastmixer.screens.mixing
 
 import android.content.Context
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.*
 import com.bluehub.fastmixer.MixerApplication
 import com.bluehub.fastmixer.common.permissions.PermissionViewModel
 import com.bluehub.fastmixer.common.utils.PermissionManager
 import com.bluehub.fastmixer.common.utils.ScreenConstants
+import kotlinx.coroutines.*
 import timber.log.Timber
 import java.io.File
 import java.util.*
@@ -63,12 +63,32 @@ class MixingScreenViewModel(override val context: Context, mixerApplication: Mix
     fun addRecordedFilePath(filePath: String) {
         val file = File(filePath)
         if (file.exists()) {
-            audioFiles.add(AudioFile(UUID.randomUUID().toString(), filePath, AudioFileType.RECORDED))
+            audioFiles.add(AudioFile(filePath, AudioFileType.RECORDED))
             audioFilesLiveData.value = audioFiles
         }
     }
 
-    fun readSamples(filePath: String):  Array<Float> = mixingRepository.readSamples(filePath)
+    fun addFile(filePath: String): Job = viewModelScope.launch {
+        mixingRepository.addFile(filePath)
+    }
+
+    fun readSamples(filePath: String) = fun (numSamples: Int): Array<Float> = runBlocking(Dispatchers.IO) {
+        mixingRepository.readSamples(filePath, numSamples)
+    }
+
+
+    fun deleteFile(filePath: String) {
+        viewModelScope.launch {
+            mixingRepository.deleteFile(filePath)
+            audioFiles.remove(
+                audioFiles.find {
+                    it.path == filePath
+                }
+            )
+
+            audioFilesLiveData.value = audioFiles
+        }
+    }
 
 
     fun getTotalSamples(filePath: String): Int = mixingRepository.getTotalSamples(filePath)

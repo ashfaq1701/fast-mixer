@@ -97,32 +97,14 @@ FileDataSource* FileDataSource::newFromCompressedFile(
                               targetProperties);
 }
 
-
-int64_t FileDataSource::getTotalSamples(
-        const char *filename,
-        const AudioProperties targetProperties) {
-    string filenameStr(filename);
-
-    FILE* fl = fopen(filenameStr.c_str(), "r");
-    if (!fl) {
-        LOGE("Failed to open asset %s", filenameStr.c_str());
-        fclose(fl);
-        return 0;
-    }
-    fclose(fl);
-    auto ffmpegExtractor = FFMpegExtractor(filenameStr, targetProperties);
-    int64_t bytesDecoded = ffmpegExtractor.getTotalNumberOfSamples();
-    auto numSamples = bytesDecoded / sizeof(float);
-    return numSamples / targetProperties.channelCount;
-}
-
-
-unique_ptr<buffer_data> FileDataSource::readSingleChannelSamples() {
-    int64_t currentPtr = 0;
-
+unique_ptr<buffer_data> FileDataSource::readData(size_t numSamples) {
     int channelCount = mProperties.channelCount;
-    size_t samplesToHandle = mBufferSize / channelCount;
-
+    size_t samplesToHandle = 0;
+    if (currentPtr + numSamples * channelCount > mBufferSize) {
+        samplesToHandle = (mBufferSize - currentPtr) / channelCount;
+    } else {
+        samplesToHandle = numSamples;
+    }
     auto selectedSamples = new float [samplesToHandle];
     for(int i = 0; i < samplesToHandle; i++) {
         float totalSample = 0;
