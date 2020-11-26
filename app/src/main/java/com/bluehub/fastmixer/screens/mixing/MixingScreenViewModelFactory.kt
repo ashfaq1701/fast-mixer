@@ -3,7 +3,6 @@ package com.bluehub.fastmixer.screens.mixing
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.bluehub.fastmixer.MixerApplication
 import com.bluehub.fastmixer.common.utils.PermissionManager
 
 class MixingScreenViewModelFactory (private val context: Context,
