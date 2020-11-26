@@ -2,27 +2,18 @@ package com.bluehub.fastmixer.screens.mixing
 
 import android.content.Context
 import androidx.lifecycle.*
-import com.bluehub.fastmixer.MixerApplication
 import com.bluehub.fastmixer.common.permissions.PermissionViewModel
 import com.bluehub.fastmixer.common.utils.PermissionManager
 import com.bluehub.fastmixer.common.utils.ScreenConstants
 import kotlinx.coroutines.*
 import timber.log.Timber
 import java.io.File
-import java.util.*
-import javax.inject.Inject
 
-class MixingScreenViewModel(override val context: Context, mixerApplication: MixerApplication, override val tag: String): PermissionViewModel(context, mixerApplication, tag) {
-    override var TAG: String = javaClass.simpleName
-
+class MixingScreenViewModel(override val context: Context,
+                            override val permissionManager: PermissionManager,
+                            val mixingRepository: MixingRepository): PermissionViewModel(context) {
     var audioFiles: MutableList<AudioFile> = mutableListOf()
     val audioFilesLiveData = MutableLiveData<MutableList<AudioFile>>(mutableListOf())
-
-    @Inject
-    override lateinit var permissionManager: PermissionManager
-
-    @Inject
-    lateinit var mixingRepository: MixingRepository
 
     private val _eventRecord = MutableLiveData<Boolean>()
     val eventRecord: LiveData<Boolean>
@@ -34,7 +25,6 @@ class MixingScreenViewModel(override val context: Context, mixerApplication: Mix
 
     init {
         Timber.d("Creating mixing viewmodel")
-        getViewModelComponent().inject(this)
         mixingRepository.createMixingEngine()
     }
 

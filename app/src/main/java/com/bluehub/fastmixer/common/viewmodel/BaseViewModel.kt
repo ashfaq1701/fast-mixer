@@ -2,32 +2,11 @@ package com.bluehub.fastmixer.common.viewmodel
 
 import androidx.databinding.Observable
 import androidx.databinding.PropertyChangeRegistry
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
-import com.bluehub.fastmixer.MixerApplication
-import com.bluehub.fastmixer.common.dependencyinjection.viewmodel.DaggerViewModelComponent
-import com.bluehub.fastmixer.common.dependencyinjection.viewmodel.ViewModelComponent
-import com.bluehub.fastmixer.common.dependencyinjection.viewmodel.ViewModelModule
 
-open class BaseViewModel(mixerApplication: MixerApplication): AndroidViewModel(mixerApplication), Observable {
-    open var TAG: String = ""
-
-    private lateinit var mViewModelComponent: ViewModelComponent
-
+open class BaseViewModel : ViewModel(), Observable {
     @delegate:Transient
     private val mCallBacks: PropertyChangeRegistry by lazy { PropertyChangeRegistry() }
-
-    fun getViewModelComponent(): ViewModelComponent {
-        if (::mViewModelComponent.isInitialized) {
-            return mViewModelComponent
-        }
-        mViewModelComponent = DaggerViewModelComponent.builder()
-            .viewModelModule(
-                ViewModelModule()
-            )
-            .build()
-        return mViewModelComponent
-    }
 
     override fun addOnPropertyChangedCallback(callback: Observable.OnPropertyChangedCallback) {
         mCallBacks.add(callback)

@@ -4,25 +4,22 @@ import android.content.Context
 import android.content.IntentFilter
 import android.media.AudioManager
 import androidx.databinding.Bindable
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
-import androidx.lifecycle.viewModelScope
-import com.bluehub.fastmixer.BR
-import com.bluehub.fastmixer.MixerApplication
+import androidx.lifecycle.*
+import com.bluehub.fastmixer.*
 import com.bluehub.fastmixer.R
 import com.bluehub.fastmixer.broadcastReceivers.AudioDeviceChangeListener
 import com.bluehub.fastmixer.common.permissions.PermissionViewModel
 import com.bluehub.fastmixer.common.repositories.AudioRepository
 import com.bluehub.fastmixer.common.utils.PermissionManager
 import com.bluehub.fastmixer.common.utils.ScreenConstants
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import java.util.*
-import javax.inject.Inject
 
-class RecordingScreenViewModel(override val context: Context, mixerApplication: MixerApplication, override val tag: String) : PermissionViewModel(context, mixerApplication, tag) {
+class RecordingScreenViewModel(override val context: Context,
+                               override val permissionManager: PermissionManager,
+                               val repository: RecordingRepository,
+                               val audioRepository: AudioRepository,
+                               val audioDeviceChangeListener: AudioDeviceChangeListener) : PermissionViewModel(context) {
     companion object {
         private lateinit var instance: RecordingScreenViewModel
 
@@ -38,20 +35,6 @@ class RecordingScreenViewModel(override val context: Context, mixerApplication: 
             }
         }
     }
-
-    override var TAG: String = javaClass.simpleName
-
-    @Inject
-    override lateinit var permissionManager: PermissionManager
-
-    @Inject
-    lateinit var repository: RecordingRepository
-
-    @Inject
-    lateinit var audioRepository: AudioRepository
-
-    @Inject
-    lateinit var audioDeviceChangeListener: AudioDeviceChangeListener
 
     private var visualizerTimer: Timer? = null
     private var seekbarTimer: Timer? = null
@@ -128,7 +111,6 @@ class RecordingScreenViewModel(override val context: Context, mixerApplication: 
     }
 
     init {
-        getViewModelComponent().inject(this)
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 repository.createCacheDirectory(context.cacheDir.absolutePath)

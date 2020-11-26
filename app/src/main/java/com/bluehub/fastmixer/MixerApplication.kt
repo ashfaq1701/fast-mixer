@@ -1,6 +1,7 @@
 package com.bluehub.fastmixer
 
 import android.app.Application
+import androidx.navigation.fragment.NavHostFragment
 import com.bluehub.fastmixer.common.dependencyinjection.application.ApplicationComponent
 import com.bluehub.fastmixer.common.dependencyinjection.application.ApplicationModule
 import com.bluehub.fastmixer.common.dependencyinjection.application.DaggerApplicationComponent

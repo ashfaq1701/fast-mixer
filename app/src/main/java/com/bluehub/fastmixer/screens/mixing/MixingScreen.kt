@@ -1,37 +1,30 @@
 package com.bluehub.fastmixer.screens.mixing
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import androidx.navigation.navGraphViewModels
-import com.bluehub.fastmixer.MixerApplication
 import com.bluehub.fastmixer.R
 import com.bluehub.fastmixer.common.permissions.PermissionFragment
-import com.bluehub.fastmixer.common.permissions.PermissionViewModel
 import com.bluehub.fastmixer.common.utils.DialogManager
 import com.bluehub.fastmixer.common.utils.ScreenConstants
 import com.bluehub.fastmixer.databinding.MixingScreenBinding
-import timber.log.Timber
 import javax.inject.Inject
 
-class MixingScreen : PermissionFragment() {
+class MixingScreen : PermissionFragment<MixingScreenViewModel>() {
     companion object {
         fun newInstance() = MixingScreen()
     }
 
     override var TAG: String = javaClass.simpleName
 
-    override lateinit var viewModel: PermissionViewModel
+    @Inject
+    override lateinit var viewModel: MixingScreenViewModel
 
     @Inject
     override lateinit var dialogManager: DialogManager
-
-    private lateinit var viewModelFactory: MixingScreenViewModelFactory
 
     private lateinit var dataBinding: MixingScreenBinding
 
@@ -51,29 +44,20 @@ class MixingScreen : PermissionFragment() {
         dataBinding = DataBindingUtil
             .inflate(inflater, R.layout.mixing_screen, container, false)
 
-        val mixerApplication = requireContext().applicationContext as MixerApplication
-
-        viewModelFactory = MixingScreenViewModelFactory(requireContext(), mixerApplication, TAG)
-
-       val scopedViewModel: MixingScreenViewModel by navGraphViewModels(R.id.nav_graph) { viewModelFactory }
-
-        viewModel = scopedViewModel
-        val localViewModel = viewModel as MixingScreenViewModel
-
-        dataBinding.mixingScreenViewModel = localViewModel
+        dataBinding.mixingScreenViewModel = viewModel
 
         dataBinding.lifecycleOwner = viewLifecycleOwner
 
         audioFileListAdapter = AudioFileListAdapter(requireContext(), AudioFileEventListeners(
-            { filePath: String -> localViewModel.addFile(filePath) },
-            { filePath: String -> localViewModel.readSamples(filePath) },
-            { filePath: String -> localViewModel.deleteFile(filePath) },
-            { filePath: String -> localViewModel.getTotalSamples(filePath) }
-        ), localViewModel.audioFiles)
+            { filePath: String -> viewModel.addFile(filePath) },
+            { filePath: String -> viewModel.readSamples(filePath) },
+            { filePath: String -> viewModel.deleteFile(filePath) },
+            { filePath: String -> viewModel.getTotalSamples(filePath) }
+        ), viewModel.audioFiles)
         dataBinding.audioFileListView.adapter = audioFileListAdapter
 
         navArguments.recordedFilePath?.let {
-            if (it.isNotEmpty()) localViewModel.addRecordedFilePath(it)
+            if (it.isNotEmpty()) viewModel.addRecordedFilePath(it)
         }
 
         setPermissionEvents()
@@ -83,32 +67,30 @@ class MixingScreen : PermissionFragment() {
     }
 
     private fun initUI() {
-        val localViewModel = viewModel as MixingScreenViewModel
-
-        localViewModel.eventRecord.observe(viewLifecycleOwner, Observer { record ->
+        viewModel.eventRecord.observe(viewLifecycleOwner, Observer { record ->
             if (record) {
                 findNavController().navigate(MixingScreenDirections.actionMixingScreenToRecordingScreen())
-                localViewModel.onRecordNavigated()
+                viewModel.onRecordNavigated()
             }
         })
 
-        localViewModel.eventWriteFilePermission.observe(viewLifecycleOwner, Observer {record ->
+        viewModel.eventWriteFilePermission.observe(viewLifecycleOwner, Observer {record ->
             if (record.fromCallback && record.hasPermission) {
                 when(record.permissionCode) {
-                    ScreenConstants.WRITE_TO_FILE -> localViewModel.onSaveToDisk()
+                    ScreenConstants.WRITE_TO_FILE -> viewModel.onSaveToDisk()
                 }
             }
         })
 
-        localViewModel.eventReadFilePermission.observe(viewLifecycleOwner, Observer {record ->
+        viewModel.eventReadFilePermission.observe(viewLifecycleOwner, Observer {record ->
             if (record.fromCallback && record.hasPermission) {
                 when(record.permissionCode) {
-                    ScreenConstants.READ_FROM_FILE -> localViewModel.onReadFromDisk()
+                    ScreenConstants.READ_FROM_FILE -> viewModel.onReadFromDisk()
                 }
             }
         })
 
-        localViewModel.audioFilesLiveData.observe(viewLifecycleOwner, Observer {
+        viewModel.audioFilesLiveData.observe(viewLifecycleOwner, Observer {
             audioFileListAdapter.notifyDataSetChanged()
         })
     }

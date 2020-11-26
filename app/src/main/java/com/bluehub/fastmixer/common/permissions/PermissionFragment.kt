@@ -8,10 +8,10 @@ import android.Manifest
 import android.os.Build
 import android.util.Log
 
-abstract class PermissionFragment: BaseFragment() {
+abstract class PermissionFragment<T: PermissionViewModel>: BaseFragment() {
     abstract var dialogManager: DialogManager
 
-    abstract var viewModel: PermissionViewModel
+    abstract var viewModel: T
 
     fun setPermissionEvents() {
         viewModel.eventRequestRecordPermission.observe(viewLifecycleOwner, Observer { requestRecordPermission ->
@@ -44,7 +44,7 @@ abstract class PermissionFragment: BaseFragment() {
                 }
 
                 context?.let {
-                    dialogManager.showPermissionsErrorDialog(context!!, Manifest.permission.RECORD_AUDIO, neverAskAgain)
+                    dialogManager.showPermissionsErrorDialog(requireContext(), Manifest.permission.RECORD_AUDIO, neverAskAgain)
                 }
                 viewModel.hideRecordingPermissionDialog()
             }
@@ -59,7 +59,7 @@ abstract class PermissionFragment: BaseFragment() {
                 }
 
                 context?.let {
-                    dialogManager.showPermissionsErrorDialog(context!!, Manifest.permission.READ_EXTERNAL_STORAGE, neverAskAgain)
+                    dialogManager.showPermissionsErrorDialog(requireContext(), Manifest.permission.READ_EXTERNAL_STORAGE, neverAskAgain)
                 }
                 viewModel.hideReadFilePermissionDialog()
             }
@@ -75,7 +75,7 @@ abstract class PermissionFragment: BaseFragment() {
 
                 context?.let {
                     dialogManager.showPermissionsErrorDialog(
-                        context!!,
+                        requireContext(),
                         Manifest.permission.WRITE_EXTERNAL_STORAGE,
                         neverAskAgain)
                 }

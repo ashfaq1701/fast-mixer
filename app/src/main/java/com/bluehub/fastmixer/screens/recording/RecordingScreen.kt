@@ -1,21 +1,13 @@
 package com.bluehub.fastmixer.screens.recording
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.SeekBar
 import androidx.databinding.DataBindingUtil
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
-import androidx.navigation.NavController
-import androidx.navigation.NavHostController
 import androidx.navigation.fragment.findNavController
-import com.bluehub.fastmixer.MixerApplication
 import com.bluehub.fastmixer.R
 import com.bluehub.fastmixer.common.permissions.PermissionFragment
-import com.bluehub.fastmixer.common.permissions.PermissionViewModel
 import com.bluehub.fastmixer.common.utils.DialogManager
 import com.bluehub.fastmixer.common.utils.ScreenConstants
 import com.bluehub.fastmixer.databinding.RecordingScreenBinding
@@ -23,7 +15,7 @@ import com.visualizer.amplitude.AudioRecordView
 import javax.inject.Inject
 
 
-class RecordingScreen : PermissionFragment() {
+class RecordingScreen : PermissionFragment<RecordingScreenViewModel>() {
 
     companion object {
         fun newInstance() = RecordingScreen()
@@ -36,8 +28,8 @@ class RecordingScreen : PermissionFragment() {
     @Inject
     override lateinit var dialogManager: DialogManager
 
-    override lateinit var viewModel: PermissionViewModel
-    private lateinit var viewModelFactory: RecordingScreenViewModelFactory
+    @Inject
+    override lateinit var viewModel: RecordingScreenViewModel
 
     private lateinit var recordingSeekbar: SeekBar
 
@@ -59,18 +51,8 @@ class RecordingScreen : PermissionFragment() {
 
         recordingSeekbar = dataBinding.recordingSeekbar
 
-        val mixerApplication = requireContext().applicationContext as MixerApplication
-
-        viewModelFactory = RecordingScreenViewModelFactory(requireContext(), mixerApplication, TAG)
-
-        val localViewModel: RecordingScreenViewModel by viewModels { viewModelFactory }
-
-        RecordingScreenViewModel.setInstance(localViewModel)
-        viewModel = localViewModel
-
-        RecordingScreenViewModel.setInstance(viewModel as RecordingScreenViewModel)
-
-        dataBinding.viewModel = viewModel as RecordingScreenViewModel
+        RecordingScreenViewModel.setInstance(viewModel)
+        dataBinding.viewModel = viewModel
 
         dataBinding.lifecycleOwner = viewLifecycleOwner
 
@@ -81,80 +63,78 @@ class RecordingScreen : PermissionFragment() {
     }
 
     fun initUI() {
-        val localViewModel = viewModel as RecordingScreenViewModel
-
-        localViewModel.eventIsRecording.observe(viewLifecycleOwner, Observer { isRecording ->
+        viewModel.eventIsRecording.observe(viewLifecycleOwner, Observer { isRecording ->
             if (isRecording) {
-                localViewModel.startDrawingVisualizer()
-                localViewModel.startUpdatingTimer()
+                viewModel.startDrawingVisualizer()
+                viewModel.startUpdatingTimer()
             } else {
-                localViewModel.stopDrawingVisualizer()
-                localViewModel.stopUpdatingTimer()
+                viewModel.stopDrawingVisualizer()
+                viewModel.stopUpdatingTimer()
             }
         })
 
-        localViewModel.eventIsPlaying.observe(viewLifecycleOwner, Observer { isPlaying ->
+        viewModel.eventIsPlaying.observe(viewLifecycleOwner, Observer { isPlaying ->
             if (!isPlaying) {
                 dataBinding.togglePlay.text = getString(R.string.play_label)
-                localViewModel.stopTrackingSeekbar()
+                viewModel.stopTrackingSeekbar()
             } else {
                 dataBinding.togglePlay.text = getString(R.string.pause_label)
-                localViewModel.startTrackingSeekbar()
+                viewModel.startTrackingSeekbar()
             }
         })
 
-        localViewModel.eventGoBack.observe(viewLifecycleOwner, Observer { goBack ->
+        viewModel.eventGoBack.observe(viewLifecycleOwner, Observer { goBack ->
             if (goBack) {
                 val action = RecordingScreenDirections.actionRecordingScreenToMixingScreen()
-                action.recordedFilePath = localViewModel.repository.getRecordedFilePath()
-                localViewModel.resetGoBack()
+                action.recordedFilePath = viewModel.repository.getRecordedFilePath()
+                viewModel.resetGoBack()
                 findNavController().navigate(action)
             }
         })
 
-        localViewModel.eventRecordPermission.observe(viewLifecycleOwner, Observer { record ->
+        viewModel.eventRecordPermission.observe(viewLifecycleOwner, Observer { record ->
             if (record.fromCallback && record.hasPermission) {
                 when(record.permissionCode) {
-                    ScreenConstants.TOGGLE_RECORDING -> localViewModel.toggleRecording()
-                    ScreenConstants.STOP_RECORDING -> localViewModel.reset()
+                    ScreenConstants.TOGGLE_RECORDING -> viewModel.toggleRecording()
+                    ScreenConstants.STOP_RECORDING -> viewModel.reset()
                 }
             }
         })
 
-        localViewModel.audioVisualizerMaxAmplitude.observe(viewLifecycleOwner, Observer {
-            if (localViewModel.audioVisualizerRunning.value == true) {
+        viewModel.audioVisualizerMaxAmplitude.observe(viewLifecycleOwner, Observer {
+            if (viewModel.audioVisualizerRunning.value == true) {
                 audioRecordView.update(it)
             }
         })
 
-        localViewModel.audioVisualizerRunning.observe(viewLifecycleOwner, Observer {
+        viewModel.audioVisualizerRunning.observe(viewLifecycleOwner, Observer {
             audioRecordView.recreate()
         })
 
-        localViewModel.seekbarMaxValue.observe(viewLifecycleOwner, Observer {
+        viewModel.seekbarMaxValue.observe(viewLifecycleOwner, Observer {
             recordingSeekbar.max = it
         })
 
-        localViewModel.seekbarProgress.observe(viewLifecycleOwner, Observer {
+        viewModel.seekbarProgress.observe(viewLifecycleOwner, Observer {
             recordingSeekbar.progress = it
         })
 
         recordingSeekbar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
                 if (fromUser) {
-                    localViewModel.setPlayHead(progress)
+                    viewModel.setPlayHead(progress)
                 }
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar) {
-                if (localViewModel.eventIsPlaying.value == true) {
-                    localViewModel.pausePlayback()
+                if (viewModel.eventIsPlaying.value == true) {
+                    viewModel.pausePlayback()
                 }
             }
 
             override fun onStopTrackingTouch(seekBar: SeekBar) {
-                if (localViewModel.eventIsPlaying.value == true) {
-                    localViewModel.startPlayback()
+                if (viewModel.eventIsPlaying.value == true) {
+                    viewModel.startPlayback()
                 }
             }
         })
