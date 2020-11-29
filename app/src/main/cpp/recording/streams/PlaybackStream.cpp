@@ -47,7 +47,7 @@ PlaybackStream::setupPlaybackStreamParameters(oboe::AudioStreamBuilder *builder,
             ->setDirection(oboe::Direction::Output)
             ->setSampleRate(sampleRate)
             ->setChannelCount(channelCount)
-            ->setFramesPerDataCallback(StreamConstants::mPlaybackFramesPerCallback);;
+            ->setFramesPerDataCallback(StreamConstants::mPlaybackFramesPerCallback);
     return builder;
 }
 

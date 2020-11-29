@@ -17,8 +17,7 @@
 #include "Player.h"
 #include "../logging_macros.h"
 
-void Player::renderAudio(float *targetData, int32_t numFrames){
-
+void Player::renderAudio(float *targetData, int32_t numFrames) {
     const AudioProperties properties = mSource->getProperties();
 
     if (mIsPlaying){
@@ -36,10 +35,11 @@ void Player::renderAudio(float *targetData, int32_t numFrames){
             }
         }
 
-        memcpy(targetData, data + mReadFrameIndex * properties.channelCount, framesToRenderFromData * properties.channelCount *
-                sizeof(float));
-
         for (int i = 0; i < framesToRenderFromData; ++i) {
+            for (int j = 0; j < properties.channelCount; ++j) {
+                targetData[(i*properties.channelCount)+j] = data[(mReadFrameIndex*properties.channelCount)+j];
+            }
+
             // Increment and handle wraparound
             if (++mReadFrameIndex >= totalSourceFrames) mReadFrameIndex = 0;
         }
