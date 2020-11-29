@@ -24,6 +24,7 @@ public:
 
     static int32_t mRecordingFramesPerCallback;
     static int32_t mLivePlaybackFramesPerCallback;
+    static int32_t mPlaybackFramesPerCallback;
 };
 
 

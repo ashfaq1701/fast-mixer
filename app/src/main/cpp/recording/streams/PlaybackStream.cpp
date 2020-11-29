@@ -21,15 +21,8 @@ void PlaybackStream::openPlaybackStream() {
 //        assert(mPlaybackStream->getSampleRate() == mSampleRate);
         assert(mPlaybackStream->getFormat() == StreamConstants::mPlaybackFormat);
 
-        auto sampleRate = mPlaybackStream->getSampleRate();
-        LOGV(TAG, "openPlaybackStream(): mSampleRate = ");
-        LOGV(TAG, to_string(sampleRate).c_str());
-
         int32_t mFramesPerBurst = mPlaybackStream->getFramesPerBurst();
-        LOGV(TAG, "openPlaybackStream(): mFramesPerBurst = ");
-        LOGV(TAG, to_string(mFramesPerBurst).c_str());
 
-        // Set the buffer size to the burst size - this will give us the minimum possible latency
         mPlaybackStream->setBufferSizeInFrames(mFramesPerBurst);
 
     } else {
@@ -49,10 +42,12 @@ PlaybackStream::setupPlaybackStreamParameters(oboe::AudioStreamBuilder *builder,
             ->setSharingMode(oboe::SharingMode::Exclusive)
             ->setPerformanceMode(oboe::PerformanceMode::LowLatency)
             ->setDataCallback(audioStreamCallback)
+            ->setErrorCallback(reinterpret_cast<AudioStreamErrorCallback *>(audioStreamCallback))
             ->setDeviceId(deviceId)
             ->setDirection(oboe::Direction::Output)
             ->setSampleRate(sampleRate)
-            ->setChannelCount(channelCount);
+            ->setChannelCount(channelCount)
+            ->setFramesPerDataCallback(StreamConstants::mPlaybackFramesPerCallback);;
     return builder;
 }
 
@@ -71,4 +66,8 @@ PlaybackStream::processPlaybackFrame(oboe::AudioStream *audioStream, float *audi
 
 void PlaybackStream::onErrorAfterClose(oboe::AudioStream *audioStream, oboe::Result result) {
     mPlaybackStream = nullptr;
+}
+
+bool PlaybackStream::onError(oboe::AudioStream *stream, oboe::Result result) {
+    return AudioStreamErrorCallback::onError(stream, result);
 }
