@@ -13,6 +13,7 @@ import com.bluehub.fastmixer.common.repositories.AudioRepository
 import com.bluehub.fastmixer.common.utils.PermissionManager
 import com.bluehub.fastmixer.common.utils.ScreenConstants
 import kotlinx.coroutines.*
+import timber.log.Timber
 import java.util.*
 
 class RecordingScreenViewModel(override val context: Context,

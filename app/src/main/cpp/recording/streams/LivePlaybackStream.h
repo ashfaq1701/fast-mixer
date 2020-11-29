@@ -9,7 +9,7 @@
 
 using namespace std;
 
-class LivePlaybackStream: public BaseStream, public oboe::AudioStreamCallback {
+class LivePlaybackStream: public BaseStream, public oboe::AudioStreamDataCallback {
 public:
     LivePlaybackStream(RecordingIO* recordingIO);
 
@@ -20,7 +20,7 @@ public:
     oboe::AudioStreamBuilder* setupLivePlaybackStreamParameters(oboe::AudioStreamBuilder *builder,
                                                                 oboe::AudioApi audioApi,
                                                                 oboe::AudioFormat audioFormat,
-                                                                oboe::AudioStreamCallback *audioStreamCallback,
+                                                                oboe::AudioStreamDataCallback *audioStreamCallback,
                                                                 int32_t deviceId, int32_t sampleRate,
                                                                 int channelCount);
 

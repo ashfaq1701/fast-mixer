@@ -41,14 +41,14 @@ void PlaybackStream::openPlaybackStream() {
 oboe::AudioStreamBuilder *
 PlaybackStream::setupPlaybackStreamParameters(oboe::AudioStreamBuilder *builder,
                                           oboe::AudioApi audioApi, oboe::AudioFormat audioFormat,
-                                          oboe::AudioStreamCallback *audioStreamCallback,
+                                          oboe::AudioStreamDataCallback *audioStreamCallback,
                                           int32_t deviceId, int32_t sampleRate, int channelCount) {
     LOGD(TAG, "setupPlaybackStreamParameters()");
     builder->setAudioApi(audioApi)
             ->setFormat(audioFormat)
             ->setSharingMode(oboe::SharingMode::Exclusive)
             ->setPerformanceMode(oboe::PerformanceMode::LowLatency)
-            ->setCallback(audioStreamCallback)
+            ->setDataCallback(audioStreamCallback)
             ->setDeviceId(deviceId)
             ->setDirection(oboe::Direction::Output)
             ->setSampleRate(sampleRate)

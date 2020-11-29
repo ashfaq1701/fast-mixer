@@ -34,11 +34,11 @@ RecordingStream::setupRecordingStreamParameters(oboe::AudioStreamBuilder *builde
             ->setFormat(StreamConstants::mFormat)
             ->setSharingMode(oboe::SharingMode::Exclusive)
             ->setPerformanceMode(oboe::PerformanceMode::LowLatency)
-            ->setCallback(this)
+            ->setDataCallback(this)
             ->setDeviceId(StreamConstants::mRecordingDeviceId)
             ->setDirection(oboe::Direction::Input)
             ->setChannelCount(StreamConstants::mInputChannelCount)
-            ->setFramesPerCallback(StreamConstants::mRecordingFramesPerCallback);
+            ->setFramesPerDataCallback(StreamConstants::mRecordingFramesPerCallback);
 
     return builder;
 }
