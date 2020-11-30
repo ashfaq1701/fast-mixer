@@ -20,9 +20,11 @@ public:
 
     RecordingIO* mRecordingIO;
 
-    void startStream(oboe::AudioStream *stream);
-    void stopStream(oboe::AudioStream *stream);
-    void closeStream(oboe::AudioStream *stream);
+    oboe::AudioStream* stream;
+
+    void startStream();
+    void stopStream();
+    void closeStream();
 
 private:
     const char* TAG = "Stream Processor:: %s";

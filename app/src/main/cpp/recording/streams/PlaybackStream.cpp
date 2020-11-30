@@ -15,15 +15,15 @@ void PlaybackStream::openPlaybackStream() {
     oboe::AudioStreamBuilder builder;
     setupPlaybackStreamParameters(&builder, StreamConstants::mAudioApi, StreamConstants::mPlaybackFormat, this,
                                   StreamConstants::mPlaybackDeviceId, StreamConstants::mPlaybackSampleRate, StreamConstants::mOutputChannelCount);
-    oboe::Result result = builder.openStream(&mPlaybackStream);
-    if (result == oboe::Result::OK && mPlaybackStream) {
-        assert(mPlaybackStream->getChannelCount() == StreamConstants::mOutputChannelCount);
-//        assert(mPlaybackStream->getSampleRate() == mSampleRate);
-        assert(mPlaybackStream->getFormat() == StreamConstants::mPlaybackFormat);
+    oboe::Result result = builder.openStream(&stream);
+    if (result == oboe::Result::OK && stream) {
+        assert(stream->getChannelCount() == StreamConstants::mOutputChannelCount);
+//        assert(stream->getSampleRate() == mSampleRate);
+        assert(stream->getFormat() == StreamConstants::mPlaybackFormat);
 
-        int32_t mFramesPerBurst = mPlaybackStream->getFramesPerBurst();
+        int32_t mFramesPerBurst = stream->getFramesPerBurst();
 
-        mPlaybackStream->setBufferSizeInFrames(mFramesPerBurst);
+        stream->setBufferSizeInFrames(mFramesPerBurst);
 
     } else {
         LOGE(TAG, "openPlaybackStream(): Failed to create playback stream. Error: %s",
@@ -64,7 +64,7 @@ PlaybackStream::processPlaybackFrame(oboe::AudioStream *audioStream, float *audi
 }
 
 void PlaybackStream::onErrorAfterClose(oboe::AudioStream *audioStream, oboe::Result result) {
-    mPlaybackStream = nullptr;
+    stream = nullptr;
 }
 
 bool PlaybackStream::onError(oboe::AudioStream *stream, oboe::Result result) {

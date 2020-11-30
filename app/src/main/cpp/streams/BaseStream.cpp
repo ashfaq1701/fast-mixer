@@ -9,9 +9,8 @@ BaseStream::BaseStream(RecordingIO* recordingIO) {
     mRecordingIO = recordingIO;
 }
 
-void BaseStream::startStream(oboe::AudioStream *stream) {
+void BaseStream::startStream() {
     LOGD(TAG, "startStream(): ");
-    assert(stream);
     if (stream) {
         oboe::Result result = stream->requestStart();
         if (result != oboe::Result::OK) {
@@ -20,9 +19,9 @@ void BaseStream::startStream(oboe::AudioStream *stream) {
     }
 }
 
-void BaseStream::stopStream(oboe::AudioStream *stream) {
+void BaseStream::stopStream() {
     LOGD("stopStream(): ");
-    if (stream && stream->getState() != oboe::StreamState::Closed) {
+    if (stream != nullptr && stream->getState() != oboe::StreamState::Closed) {
         oboe::Result result = stream->stop(0L);
 
         oboe::StreamState inputState = oboe::StreamState::Stopping;
@@ -41,14 +40,14 @@ void BaseStream::stopStream(oboe::AudioStream *stream) {
     }
 }
 
-void BaseStream::closeStream(oboe::AudioStream *stream) {
+void BaseStream::closeStream() {
     LOGD("closeStream(): ");
 
     oboe::StreamState inputState = oboe::StreamState::Closing;
     oboe::StreamState nextState = oboe::StreamState::Uninitialized;
     int64_t millisecondsPerNanosecond = 1000000;
     int64_t timeoutNanos = 100 * millisecondsPerNanosecond;
-    if (stream != nullptr) {
+    if (stream) {
         stream->waitForStateChange(inputState, &nextState, timeoutNanos);
         if (nextState != oboe::StreamState::Closed) {
             oboe::Result result = stream->close();

@@ -13,21 +13,21 @@ void LivePlaybackStream::openLivePlaybackStream() {
     oboe::AudioStreamBuilder builder;
     setupLivePlaybackStreamParameters(&builder, StreamConstants::mAudioApi, StreamConstants::mFormat, this,
                                       StreamConstants::mPlaybackDeviceId, StreamConstants::mSampleRate, StreamConstants::mOutputChannelCount);
-    oboe::Result result = builder.openStream(&mLivePlaybackStream);
-    if (result == oboe::Result::OK && mLivePlaybackStream) {
-        assert(mLivePlaybackStream->getChannelCount() == StreamConstants::mOutputChannelCount);
-//        assert(mLivePlaybackStream->getSampleRate() == mSampleRate);
-        assert(mLivePlaybackStream->getFormat() == StreamConstants::mFormat);
+    oboe::Result result = builder.openStream(&stream);
+    if (result == oboe::Result::OK && stream) {
+        assert(stream->getChannelCount() == StreamConstants::mOutputChannelCount);
+//        assert(stream->getSampleRate() == mSampleRate);
+        assert(stream->getFormat() == StreamConstants::mFormat);
 
-        auto sampleRate = mLivePlaybackStream->getSampleRate();
+        auto sampleRate = stream->getSampleRate();
         LOGV(TAG, "openLivePlaybackStream(): mSampleRate = ");
         LOGV(TAG, to_string(sampleRate).c_str());
 
-        int32_t mFramesPerBurst = mLivePlaybackStream->getFramesPerBurst();
+        int32_t mFramesPerBurst = stream->getFramesPerBurst();
         LOGV(TAG, "openLivePlaybackStream(): mFramesPerBurst = ");
         LOGV(TAG, to_string(mFramesPerBurst).c_str());
 
-        mLivePlaybackStream->setBufferSizeInFrames(mFramesPerBurst);
+        stream->setBufferSizeInFrames(mFramesPerBurst);
 
     } else {
         LOGE(TAG, "openLivePlaybackStream(): Failed to create live playback stream. Error: %s",
@@ -71,5 +71,5 @@ LivePlaybackStream::processLivePlaybackFrame(oboe::AudioStream *audioStream, int
 }
 
 void LivePlaybackStream::onErrorAfterClose(oboe::AudioStream *audioStream, oboe::Result result) {
-    mLivePlaybackStream = nullptr;
+    stream = nullptr;
 }

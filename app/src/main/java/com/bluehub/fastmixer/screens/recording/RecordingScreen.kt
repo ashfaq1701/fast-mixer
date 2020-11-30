@@ -12,6 +12,7 @@ import com.bluehub.fastmixer.common.utils.DialogManager
 import com.bluehub.fastmixer.common.utils.ScreenConstants
 import com.bluehub.fastmixer.databinding.RecordingScreenBinding
 import com.visualizer.amplitude.AudioRecordView
+import timber.log.Timber
 import javax.inject.Inject
 
 

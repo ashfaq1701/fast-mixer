@@ -9,7 +9,7 @@
 
 using namespace std;
 
-class RecordingStream: public BaseStream, public oboe::AudioStreamDataCallback {
+class RecordingStream: public BaseStream, public oboe::AudioStreamDataCallback, public oboe::AudioStreamErrorCallback {
 public:
     RecordingStream(RecordingIO* recordingIO);
 
