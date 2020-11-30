@@ -17,4 +17,3 @@ oboe::AudioFormat StreamConstants::mPlaybackFormat = oboe::AudioFormat::Float;
 // 5ms of audio data at a sampling rate of 48kHz
 int32_t StreamConstants::mRecordingFramesPerCallback = 144;
 int32_t StreamConstants::mLivePlaybackFramesPerCallback = StreamConstants::mRecordingFramesPerCallback;
-int32_t StreamConstants::mPlaybackFramesPerCallback = StreamConstants::mRecordingFramesPerCallback;
