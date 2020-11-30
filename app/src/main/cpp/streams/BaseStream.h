@@ -20,7 +20,7 @@ public:
 
     RecordingIO* mRecordingIO;
 
-    oboe::AudioStream* stream;
+    oboe::AudioStream* stream = nullptr;
 
     void startStream();
     void stopStream();
