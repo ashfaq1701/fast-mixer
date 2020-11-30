@@ -11,8 +11,8 @@
 
 using namespace std;
 
-inline JavaVM *java_recording_machine;
-inline shared_ptr<method_ids> kotlinMethodIdsPtr {nullptr};
+inline JavaVM *java_recording_machine = nullptr;
+inline shared_ptr<method_ids> kotlinMethodIdsPtr = nullptr;
 
 inline int get_recording_env(JNIEnv **g_env) {
     int getEnvStat = java_recording_machine->GetEnv((void **) g_env, JNI_VERSION_1_6);
@@ -39,7 +39,6 @@ public:
         if (needDetach && java_recording_machine) {
             java_recording_machine->DetachCurrentThread();
         }
-        java_recording_machine = nullptr;
     }
 
     JNIEnv *env() const noexcept {

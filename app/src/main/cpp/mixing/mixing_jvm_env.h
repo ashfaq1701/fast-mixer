@@ -39,7 +39,6 @@ public:
         if (needDetach && java_mixing_machine) {
             java_mixing_machine->DetachCurrentThread();
         }
-        java_mixing_machine = nullptr;
     }
 
     JNIEnv *env() const noexcept {
