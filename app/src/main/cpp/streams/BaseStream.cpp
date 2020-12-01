@@ -13,6 +13,14 @@ void BaseStream::startStream() {
     LOGD(TAG, "startStream(): ");
     if (stream) {
         oboe::Result result = stream->requestStart();
+
+        oboe::StreamState inputState = oboe::StreamState::Starting;
+        oboe::StreamState nextState = oboe::StreamState::Uninitialized;
+        int64_t nanosecondsPerMillisecond = 1000000;
+        int64_t timeoutNanos = 100 * nanosecondsPerMillisecond;
+
+        stream->waitForStateChange(inputState, &nextState, timeoutNanos);
+
         if (result != oboe::Result::OK) {
             LOGE(TAG, "Error starting the stream: %s", oboe::convertToText(result));
         }
@@ -22,12 +30,12 @@ void BaseStream::startStream() {
 void BaseStream::stopStream() {
     LOGD("stopStream(): ");
     if (stream != nullptr && stream->getState() != oboe::StreamState::Closed) {
-        oboe::Result result = stream->stop(0L);
+        oboe::Result result = stream->requestStop();
 
         oboe::StreamState inputState = oboe::StreamState::Stopping;
         oboe::StreamState nextState = oboe::StreamState::Uninitialized;
-        int64_t millisecondsPerNanosecond = 1000000;
-        int64_t timeoutNanos = 100 * millisecondsPerNanosecond;
+        int64_t nanosecondsPerMillisecond = 1000000;
+        int64_t timeoutNanos = 100 * nanosecondsPerMillisecond;
 
         stream->waitForStateChange(inputState, &nextState, timeoutNanos);
 
@@ -43,22 +51,22 @@ void BaseStream::stopStream() {
 void BaseStream::closeStream() {
     LOGD("closeStream(): ");
 
-    oboe::StreamState inputState = oboe::StreamState::Closing;
-    oboe::StreamState nextState = oboe::StreamState::Uninitialized;
-    int64_t millisecondsPerNanosecond = 1000000;
-    int64_t timeoutNanos = 100 * millisecondsPerNanosecond;
-    if (stream) {
-        stream->waitForStateChange(inputState, &nextState, timeoutNanos);
-        if (nextState != oboe::StreamState::Closed) {
-            oboe::Result result = stream->close();
-            if (result != oboe::Result::OK) {
-                LOGE(TAG, "Error closing stream. %s", oboe::convertToText(result));
-            } else {
-                stream = nullptr;
-            }
+    if (stream != nullptr && stream->getState() != oboe::StreamState::Closing && stream->getState() != oboe::StreamState::Closed) {
+        oboe::Result result = stream->close();
 
-            LOGW(TAG, "closeStream(): mTotalSamples = ");
-            LOGW(TAG, to_string(mRecordingIO->getTotalSamples()).c_str());
+        oboe::StreamState inputState = oboe::StreamState::Closing;
+        oboe::StreamState nextState = oboe::StreamState::Uninitialized;
+        int64_t nanosecondsPerMillisecond = 1000000;
+        int64_t timeoutNanos = 100 * nanosecondsPerMillisecond;
+        stream->waitForStateChange(inputState, &nextState, timeoutNanos);
+
+        if (result != oboe::Result::OK) {
+            LOGE(TAG, "Error closing stream. %s", oboe::convertToText(result));
+        } else {
+            stream = nullptr;
         }
+
+        LOGW(TAG, "closeStream(): mTotalSamples = ");
+        LOGW(TAG, to_string(mRecordingIO->getTotalSamples()).c_str());
     }
 }

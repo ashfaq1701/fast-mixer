@@ -85,7 +85,6 @@ class MixingScreenViewModel(override val context: Context,
 
     override fun onCleared() {
         super.onCleared()
-        Timber.d("Mixing engine getting deleted")
         mixingRepository.deleteMixingEngine()
     }
 }
