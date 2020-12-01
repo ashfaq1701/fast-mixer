@@ -3,8 +3,6 @@ package com.bluehub.fastmixer.screens.recording
 import android.content.Context
 import android.os.Build
 import android.os.Environment
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Paths
@@ -15,10 +13,8 @@ class RecordingRepository(val recordingEngineProxy: RecordingEngineProxy) {
     private val recordingSessionId = UUID.randomUUID().toString()
     private lateinit var cacheDir: String
 
-    suspend fun stopRecording() {
-        withContext(Dispatchers.IO) {
-            recordingEngineProxy.stopRecording()
-        }
+    fun stopRecording() {
+        recordingEngineProxy.stopRecording()
     }
 
     fun startLivePlayback() {
@@ -41,13 +37,7 @@ class RecordingRepository(val recordingEngineProxy: RecordingEngineProxy) {
         recordingEngineProxy.pausePlayback()
     }
 
-    suspend fun stopPlaying() {
-        withContext(Dispatchers.IO) {
-            recordingEngineProxy.stopPlayback()
-        }
-    }
-
-    fun stopPlayingSync() {
+    fun stopPlaying() {
         recordingEngineProxy.stopPlayback()
     }
 
@@ -55,22 +45,16 @@ class RecordingRepository(val recordingEngineProxy: RecordingEngineProxy) {
         recordingEngineProxy.startRecording()
     }
 
-    suspend fun pauseRecording() {
-        withContext(Dispatchers.IO) {
-            recordingEngineProxy.pauseRecording()
-        }
+    fun pauseRecording() {
+        recordingEngineProxy.pauseRecording()
     }
 
-    suspend fun flushWriteBuffer() {
-        withContext(Dispatchers.IO) {
-            recordingEngineProxy.flushWriteBuffer()
-        }
+    fun flushWriteBuffer() {
+        recordingEngineProxy.flushWriteBuffer()
     }
 
-    suspend fun restartPlayback() {
-        withContext(Dispatchers.IO) {
-            recordingEngineProxy.restartPlayback()
-        }
+    fun restartPlayback() {
+        recordingEngineProxy.restartPlayback()
     }
 
     fun deleteAudioEngine() {

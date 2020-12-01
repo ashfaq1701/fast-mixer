@@ -97,7 +97,9 @@ class RecordingScreenViewModel(override val context: Context,
     val handleInputStreamDisconnection: () -> Unit = {
         if (_eventIsRecording.value == true) {
             viewModelScope.launch {
-                repository.flushWriteBuffer()
+                withContext(Dispatchers.IO) {
+                    repository.flushWriteBuffer()
+                }
                 _eventIsRecording.value = false
             }
         }
@@ -106,7 +108,9 @@ class RecordingScreenViewModel(override val context: Context,
     val handleOutputStreamDisconnection: () -> Unit = {
         if (_eventIsPlaying.value == true) {
             viewModelScope.launch {
-                repository.restartPlayback()
+                withContext(Dispatchers.IO) {
+                    repository.restartPlayback()
+                }
             }
         }
     }
@@ -223,13 +227,17 @@ class RecordingScreenViewModel(override val context: Context,
     fun stopPlay() {
         _eventIsPlaying.postValue(false)
         viewModelScope.launch {
-            repository.stopPlaying()
+            withContext(Dispatchers.IO) {
+                repository.stopPlaying()
+            }
         }
     }
 
     fun reset() {
         viewModelScope.launch {
-            repository.stopRecording()
+            withContext(Dispatchers.IO) {
+                repository.stopRecording()
+            }
             _eventLivePlaybackSet.value?.let {
                 if (it) {
                     repository.stopLivePlayback()
@@ -245,7 +253,9 @@ class RecordingScreenViewModel(override val context: Context,
 
     fun setGoBack() {
         viewModelScope.launch {
-            repository.stopRecording()
+            withContext(Dispatchers.IO) {
+                repository.stopRecording()
+            }
             _eventIsRecording.value = false
             _eventLivePlaybackSet.value?.let {
                 if (it) {
@@ -255,7 +265,9 @@ class RecordingScreenViewModel(override val context: Context,
             }
             _eventIsPlaying.value?.let {
                 if (it) {
-                    repository.stopPlaying()
+                    withContext(Dispatchers.IO) {
+                        repository.stopPlaying()
+                    }
                     _eventIsPlaying.value = false
                 }
             }

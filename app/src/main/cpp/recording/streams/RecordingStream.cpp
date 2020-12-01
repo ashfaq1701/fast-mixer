@@ -52,6 +52,7 @@ RecordingStream::setupRecordingStreamParameters(oboe::AudioStreamBuilder *builde
 
 oboe::DataCallbackResult
 RecordingStream::onAudioReady(oboe::AudioStream *audioStream, void *audioData, int32_t numFrames) {
+    LOGD("ON AUDIO READY: %d", numFrames);
     return processRecordingFrames(audioStream, static_cast<int16_t *>(audioData), numFrames * audioStream->getChannelCount());
 }
 
