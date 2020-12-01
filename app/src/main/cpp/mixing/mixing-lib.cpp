@@ -96,8 +96,6 @@ extern "C" {
             LOGE("delete: mixingEngine is null, you must call create() method before calling this method");
             return;
         }
-        delete mixingEngine;
         mixingEngine = nullptr;
     }
 }
-
