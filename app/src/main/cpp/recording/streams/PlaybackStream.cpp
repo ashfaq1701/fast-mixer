@@ -10,6 +10,13 @@ PlaybackStream::PlaybackStream(RecordingIO* recordingIO): BaseStream(recordingIO
     mRecordingIO = recordingIO;
 }
 
+void PlaybackStream::startStream() {
+    if (!stream) {
+        openPlaybackStream();
+    }
+    BaseStream::startStream();
+}
+
 void PlaybackStream::openPlaybackStream() {
     LOGD(TAG, "openLivePlaybackStream(): ");
     oboe::AudioStreamBuilder builder;

@@ -13,6 +13,8 @@ class PlaybackStream: public BaseStream, public oboe::AudioStreamDataCallback, p
 public:
     PlaybackStream(RecordingIO* recordingIO);
 
+    void startStream();
+
     void openPlaybackStream();
 
     oboe::AudioStreamBuilder* setupPlaybackStreamParameters(oboe::AudioStreamBuilder *builder,

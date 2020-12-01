@@ -8,6 +8,13 @@
 LivePlaybackStream::LivePlaybackStream(RecordingIO *recordingIO): BaseStream(recordingIO) {
 }
 
+void LivePlaybackStream::startStream() {
+    if (!stream) {
+        openLivePlaybackStream();
+    }
+    BaseStream::startStream();
+}
+
 void LivePlaybackStream::openLivePlaybackStream() {
     LOGD(TAG, "openLivePlaybackStream(): ");
     oboe::AudioStreamBuilder builder;

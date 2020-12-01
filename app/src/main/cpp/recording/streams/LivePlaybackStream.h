@@ -15,6 +15,8 @@ public:
 
     void openLivePlaybackStream();
 
+    void startStream();
+
     oboe::AudioStreamBuilder* setupLivePlaybackStreamParameters(oboe::AudioStreamBuilder *builder,
                                                                 oboe::AudioApi audioApi,
                                                                 oboe::AudioFormat audioFormat,

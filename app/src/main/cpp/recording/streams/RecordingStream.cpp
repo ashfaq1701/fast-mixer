@@ -9,6 +9,13 @@
 RecordingStream::RecordingStream(RecordingIO* recordingIO): BaseStream(recordingIO) {
 }
 
+void RecordingStream::startStream() {
+    if (!stream) {
+        openRecordingStream();
+    }
+    BaseStream::startStream();
+}
+
 void RecordingStream::openRecordingStream() {
     oboe::AudioStreamBuilder builder;
     setupRecordingStreamParameters(&builder);
