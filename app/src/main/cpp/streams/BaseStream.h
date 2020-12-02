@@ -22,7 +22,7 @@ public:
 
     oboe::AudioStream* stream = nullptr;
 
-    void startStream();
+    virtual void startStream();
     void stopStream();
     void closeStream();
 

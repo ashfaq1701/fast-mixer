@@ -29,8 +29,6 @@ private:
     const char* TAG = "Recording Stream:: %s";
 
     void onErrorAfterClose(oboe::AudioStream *audioStream, oboe::Result result);
-
-    bool onError(oboe::AudioStream* audioStream, oboe::Result error);
 };
 
 

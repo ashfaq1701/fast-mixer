@@ -13,7 +13,6 @@ import com.bluehub.fastmixer.common.repositories.AudioRepository
 import com.bluehub.fastmixer.common.utils.PermissionManager
 import com.bluehub.fastmixer.common.utils.ScreenConstants
 import kotlinx.coroutines.*
-import timber.log.Timber
 import java.util.*
 
 class RecordingScreenViewModel(override val context: Context,
@@ -98,7 +97,7 @@ class RecordingScreenViewModel(override val context: Context,
         if (_eventIsRecording.value == true) {
             viewModelScope.launch {
                 withContext(Dispatchers.IO) {
-                    repository.flushWriteBuffer()
+                    repository.stopRecording()
                 }
                 _eventIsRecording.value = false
             }
@@ -171,10 +170,10 @@ class RecordingScreenViewModel(override val context: Context,
                 } else {
                     _eventLivePlaybackSet.value?.let {
                         if (it) {
-                            repository.pauseLivePlayback()
+                            repository.stopLivePlayback()
                         }
                     }
-                    repository.pauseRecording()
+                    repository.stopRecording()
                 }
             }
             _eventIsRecording.value = !_eventIsRecording.value!!

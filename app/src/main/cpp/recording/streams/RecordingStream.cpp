@@ -53,7 +53,6 @@ RecordingStream::setupRecordingStreamParameters(oboe::AudioStreamBuilder *builde
 
 oboe::DataCallbackResult
 RecordingStream::onAudioReady(oboe::AudioStream *audioStream, void *audioData, int32_t numFrames) {
-    LOGD("ON AUDIO READY: %d", numFrames);
     return processRecordingFrames(audioStream, static_cast<int16_t *>(audioData), numFrames * audioStream->getChannelCount());
 }
 
@@ -64,14 +63,6 @@ RecordingStream::processRecordingFrames(oboe::AudioStream *audioStream, int16_t 
     return oboe::DataCallbackResult::Continue;
 }
 
-
-
 void RecordingStream::onErrorAfterClose(oboe::AudioStream *audioStream, oboe::Result result) {
-    LOGD("STREAM CLOSED AFTER ERROR %s", oboe::convertToText(result));
     stream = nullptr;
-}
-
-bool RecordingStream::onError(oboe::AudioStream* audioStream, oboe::Result error) {
-    LOGD("RECORDING STREAM ERROR CAUGHT %s", oboe::convertToText(error));
-    return AudioStreamErrorCallback::onError(stream, error);
 }

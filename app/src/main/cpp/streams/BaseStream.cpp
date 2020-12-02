@@ -29,7 +29,9 @@ void BaseStream::startStream() {
 
 void BaseStream::stopStream() {
     LOGD("stopStream(): ");
-    if (stream != nullptr && stream->getState() != oboe::StreamState::Closed) {
+    if (stream &&
+        stream->getState() != oboe::StreamState::Closing &&
+        stream->getState() != oboe::StreamState::Closed) {
         oboe::Result result = stream->requestStop();
 
         oboe::StreamState inputState = oboe::StreamState::Stopping;
@@ -51,7 +53,9 @@ void BaseStream::stopStream() {
 void BaseStream::closeStream() {
     LOGD("closeStream(): ");
 
-    if (stream != nullptr && stream->getState() != oboe::StreamState::Closing && stream->getState() != oboe::StreamState::Closed) {
+    if (stream &&
+        stream->getState() != oboe::StreamState::Closing &&
+        stream->getState() != oboe::StreamState::Closed) {
         oboe::Result result = stream->close();
 
         oboe::StreamState inputState = oboe::StreamState::Closing;
