@@ -8,7 +8,7 @@ import com.bluehub.fastmixer.common.repositories.AudioRepository
 import javax.inject.Inject
 
 
-class AudioDeviceChangeListener @Inject constructor (val audioRepository: AudioRepository) : BroadcastReceiver() {
+class AudioDeviceChangeListener @Inject constructor(val audioRepository: AudioRepository) : BroadcastReceiver() {
     private var isHeadphoneConnected = audioRepository.isHeadphoneConnected()
     private var isBluetoothHeadsetConnected = audioRepository.isBluetoothHeadsetConnected()
     private lateinit var mHeadphoneConnectedCallback: () -> Unit

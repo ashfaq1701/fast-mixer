@@ -10,7 +10,7 @@ import java.nio.file.StandardCopyOption
 import java.util.*
 import javax.inject.Inject
 
-class RecordingRepository @Inject constructor (val recordingEngineProxy: RecordingEngineProxy) {
+class RecordingRepository @Inject constructor(val recordingEngineProxy: RecordingEngineProxy) {
     private val recordingSessionId = UUID.randomUUID().toString()
     private lateinit var cacheDir: String
 

@@ -3,7 +3,6 @@ package com.bluehub.fastmixer.common.repositories
 import android.media.AudioDeviceInfo
 import android.media.AudioManager
 import android.os.Build
-import androidx.annotation.RequiresApi
 import javax.inject.Inject
 
 class AudioRepository @Inject constructor() {
