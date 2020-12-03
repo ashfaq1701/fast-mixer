@@ -12,9 +12,7 @@ import com.bluehub.fastmixer.common.utils.DialogManager
 import com.bluehub.fastmixer.common.utils.ScreenConstants
 import com.bluehub.fastmixer.common.utils.ViewModelType
 import com.bluehub.fastmixer.databinding.RecordingScreenBinding
-import com.bluehub.fastmixer.screens.mixing.MixingScreenViewModel
 import com.visualizer.amplitude.AudioRecordView
-import timber.log.Timber
 import javax.inject.Inject
 
 
@@ -70,14 +68,14 @@ class RecordingScreen : PermissionFragment<RecordingScreenViewModel>(ViewModelTy
                 viewModel.startUpdatingTimer()
             } else {
                 viewModel.stopDrawingVisualizer()
-                viewModel.stopUpdatingTimer()
+                viewModel.stopTrackingRecordingTimer()
             }
         })
 
         viewModel.eventIsPlaying.observe(viewLifecycleOwner, Observer { isPlaying ->
             if (!isPlaying) {
                 dataBinding.togglePlay.text = getString(R.string.play_label)
-                viewModel.stopTrackingSeekbar()
+                viewModel.stopTrackingSeekbarTimer()
             } else {
                 dataBinding.togglePlay.text = getString(R.string.pause_label)
                 viewModel.startTrackingSeekbar()
