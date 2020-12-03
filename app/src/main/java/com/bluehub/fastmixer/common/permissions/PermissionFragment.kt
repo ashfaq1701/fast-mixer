@@ -8,10 +8,8 @@ import android.Manifest
 import android.os.Build
 import android.util.Log
 
-abstract class PermissionFragment<T: PermissionViewModel>: BaseFragment() {
+abstract class PermissionFragment<T: PermissionViewModel>: BaseFragment<T>() {
     abstract var dialogManager: DialogManager
-
-    abstract var viewModel: T
 
     fun setPermissionEvents() {
         viewModel.eventRequestRecordPermission.observe(viewLifecycleOwner, Observer { requestRecordPermission ->

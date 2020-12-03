@@ -20,8 +20,7 @@ class MixingScreen : PermissionFragment<MixingScreenViewModel>() {
 
     override var TAG: String = javaClass.simpleName
 
-    @Inject
-    override lateinit var viewModel: MixingScreenViewModel
+    override val viewModelClass = MixingScreenViewModel::class
 
     @Inject
     override lateinit var dialogManager: DialogManager
@@ -34,7 +33,6 @@ class MixingScreen : PermissionFragment<MixingScreenViewModel>() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        getPresentationComponent().inject(this)
     }
 
     override fun onCreateView(

@@ -14,12 +14,13 @@ import com.bluehub.fastmixer.common.utils.PermissionManager
 import com.bluehub.fastmixer.common.utils.ScreenConstants
 import kotlinx.coroutines.*
 import java.util.*
+import javax.inject.Inject
 
-class RecordingScreenViewModel(override val context: Context,
-                               override val permissionManager: PermissionManager,
-                               val repository: RecordingRepository,
-                               val audioRepository: AudioRepository,
-                               val audioDeviceChangeListener: AudioDeviceChangeListener) : PermissionViewModel(context) {
+class RecordingScreenViewModel @Inject constructor (override val context: Context,
+                                                    override val permissionManager: PermissionManager,
+                                                    val repository: RecordingRepository,
+                                                    val audioRepository: AudioRepository,
+                                                    val audioDeviceChangeListener: AudioDeviceChangeListener) : PermissionViewModel(context) {
     companion object {
         private lateinit var instance: RecordingScreenViewModel
 

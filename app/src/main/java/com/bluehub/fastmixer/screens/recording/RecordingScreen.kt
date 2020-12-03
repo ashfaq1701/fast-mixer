@@ -11,6 +11,7 @@ import com.bluehub.fastmixer.common.permissions.PermissionFragment
 import com.bluehub.fastmixer.common.utils.DialogManager
 import com.bluehub.fastmixer.common.utils.ScreenConstants
 import com.bluehub.fastmixer.databinding.RecordingScreenBinding
+import com.bluehub.fastmixer.screens.mixing.MixingScreenViewModel
 import com.visualizer.amplitude.AudioRecordView
 import timber.log.Timber
 import javax.inject.Inject
@@ -24,13 +25,12 @@ class RecordingScreen : PermissionFragment<RecordingScreenViewModel>() {
 
     override var TAG: String = javaClass.simpleName
 
-    private lateinit var dataBinding: RecordingScreenBinding
+    override val viewModelClass = RecordingScreenViewModel::class
 
     @Inject
     override lateinit var dialogManager: DialogManager
 
-    @Inject
-    override lateinit var viewModel: RecordingScreenViewModel
+    private lateinit var dataBinding: RecordingScreenBinding
 
     private lateinit var recordingSeekbar: SeekBar
 
@@ -38,7 +38,6 @@ class RecordingScreen : PermissionFragment<RecordingScreenViewModel>() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        getPresentationComponent().inject(this)
     }
 
     override fun onCreateView(
