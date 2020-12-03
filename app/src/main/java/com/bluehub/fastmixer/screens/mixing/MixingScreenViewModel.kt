@@ -59,7 +59,7 @@ class MixingScreenViewModel @Inject constructor (override val context: Context,
         if (file.exists()) {
             if (audioFiles.filter {
                 it.path == filePath
-            }.count() > 0) {
+            }.count() == 0) {
                 audioFiles.add(AudioFile(filePath, AudioFileType.RECORDED))
                 audioFilesLiveData.value = audioFiles
             }
