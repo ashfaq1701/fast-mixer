@@ -5,18 +5,15 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.util.Log
 import androidx.core.app.ActivityCompat
+import javax.inject.Inject
 
-class PermissionManager private constructor() {
+class PermissionManager @Inject constructor() {
     companion object {
         const val REQUEST_GROUP_ID = 12446
 
         val allPermissions = arrayOf(Manifest.permission.RECORD_AUDIO,
             Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.WRITE_EXTERNAL_STORAGE)
-
-        fun create(): PermissionManager {
-            return PermissionManager()
-        }
     }
 
     fun isSpecifiedPermissionsGranted(permissions: Array<String>, context: Context?): Boolean {

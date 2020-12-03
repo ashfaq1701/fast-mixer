@@ -1,15 +1,8 @@
 package com.bluehub.fastmixer.screens.recording
 
-class RecordingEngineProxy {
-    companion object {
-        private val INSTANCE: RecordingEngineProxy =
-            RecordingEngineProxy()
+import javax.inject.Inject
 
-        public fun getInstance(): RecordingEngineProxy {
-            return INSTANCE
-        }
-    }
-
+class RecordingEngineProxy @Inject constructor(){
     fun create(appPathStr: String,
                recordingSessionIdStr: String,
                recordingScreenViewModelPassed: Boolean = false): Boolean =

@@ -10,18 +10,18 @@ import com.bluehub.fastmixer.R
 import com.bluehub.fastmixer.common.permissions.PermissionFragment
 import com.bluehub.fastmixer.common.utils.DialogManager
 import com.bluehub.fastmixer.common.utils.ScreenConstants
+import com.bluehub.fastmixer.common.utils.ViewModelType
 import com.bluehub.fastmixer.databinding.MixingScreenBinding
 import javax.inject.Inject
 
-class MixingScreen : PermissionFragment<MixingScreenViewModel>() {
+class MixingScreen : PermissionFragment<MixingScreenViewModel>(ViewModelType.NAV_SCOPED) {
     companion object {
         fun newInstance() = MixingScreen()
     }
 
     override var TAG: String = javaClass.simpleName
 
-    @Inject
-    override lateinit var viewModel: MixingScreenViewModel
+    override val viewModelClass = MixingScreenViewModel::class
 
     @Inject
     override lateinit var dialogManager: DialogManager
@@ -34,7 +34,6 @@ class MixingScreen : PermissionFragment<MixingScreenViewModel>() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        getPresentationComponent().inject(this)
     }
 
     override fun onCreateView(

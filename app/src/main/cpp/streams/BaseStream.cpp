@@ -62,6 +62,9 @@ void BaseStream::closeStream() {
         oboe::StreamState nextState = oboe::StreamState::Uninitialized;
         int64_t nanosecondsPerMillisecond = 1000000;
         int64_t timeoutNanos = 100 * nanosecondsPerMillisecond;
+
+        if (!stream) return;
+
         stream->waitForStateChange(inputState, &nextState, timeoutNanos);
 
         if (result != oboe::Result::OK) {

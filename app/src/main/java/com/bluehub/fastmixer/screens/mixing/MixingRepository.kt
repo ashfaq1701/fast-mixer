@@ -2,8 +2,9 @@ package com.bluehub.fastmixer.screens.mixing
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
-class MixingRepository(val mixingEngineProxy: MixingEngineProxy) {
+class MixingRepository @Inject constructor(val mixingEngineProxy: MixingEngineProxy) {
     fun createMixingEngine() {
         mixingEngineProxy.create()
     }

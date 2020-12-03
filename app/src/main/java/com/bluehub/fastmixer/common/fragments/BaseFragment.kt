@@ -1,34 +1,36 @@
 package com.bluehub.fastmixer.common.fragments
 
-import androidx.annotation.UiThread
-import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
-import com.bluehub.fastmixer.MixerApplication
 import com.bluehub.fastmixer.R
-import com.bluehub.fastmixer.common.dependencyinjection.application.ApplicationComponent
-import com.bluehub.fastmixer.common.dependencyinjection.presentation.PresentationComponent
-import com.bluehub.fastmixer.common.dependencyinjection.presentation.PresentationModule
+import com.bluehub.fastmixer.common.dependencyinjection.DaggerFragment
+import com.bluehub.fastmixer.common.dependencyinjection.FragmentViewModelFactory
+import com.bluehub.fastmixer.common.utils.ViewModelType
+import javax.inject.Inject
+import kotlin.reflect.KClass
 
 
-abstract class BaseFragment: Fragment() {
+abstract class BaseFragment<T: ViewModel>(viewModelType: ViewModelType = ViewModelType.FRAGMENT_SCOPED): DaggerFragment() {
     abstract var TAG: String
 
-    private var mIsInjectorUsed = false
-    @UiThread
-    fun getPresentationComponent(): PresentationComponent {
-        if (mIsInjectorUsed) {
-            throw RuntimeException("there is no need to use injector more than once")
+    @Inject
+    lateinit var viewModelFactory: FragmentViewModelFactory
+
+    protected val viewModel: T by lazy {
+        when (viewModelType) {
+            ViewModelType.FRAGMENT_SCOPED -> fragmentScopedViewModel()
+            ViewModelType.NAV_SCOPED -> navScopedViewModel()
         }
-
-        val navStoreOwner = findNavController().getViewModelStoreOwner(R.id.nav_graph)
-
-        mIsInjectorUsed = true
-        return getApplicationComponent()
-            .newPresentationComponent(PresentationModule(requireContext(), this, navStoreOwner))
     }
 
-    private fun getApplicationComponent(): ApplicationComponent {
-        return (requireActivity().getApplication() as MixerApplication).getApplicationComponent()
+    protected abstract val viewModelClass: KClass<T>
+
+    private fun fragmentScopedViewModel(): T =
+            ViewModelProvider(this, viewModelFactory)[viewModelClass.java]
+
+    private fun navScopedViewModel(): T {
+        val viewModelStoreOwner = findNavController().getViewModelStoreOwner(R.id.nav_graph)
+        return ViewModelProvider(viewModelStoreOwner, viewModelFactory)[viewModelClass.java]
     }
 }

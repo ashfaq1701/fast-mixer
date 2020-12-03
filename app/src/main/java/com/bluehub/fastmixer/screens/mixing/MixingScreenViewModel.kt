@@ -8,10 +8,11 @@ import com.bluehub.fastmixer.common.utils.ScreenConstants
 import kotlinx.coroutines.*
 import timber.log.Timber
 import java.io.File
+import javax.inject.Inject
 
-class MixingScreenViewModel(override val context: Context,
-                            override val permissionManager: PermissionManager,
-                            val mixingRepository: MixingRepository): PermissionViewModel(context) {
+class MixingScreenViewModel @Inject constructor (override val context: Context,
+                                                 override val permissionManager: PermissionManager,
+                                                 val mixingRepository: MixingRepository): PermissionViewModel(context) {
     var audioFiles: MutableList<AudioFile> = mutableListOf()
     val audioFilesLiveData = MutableLiveData<MutableList<AudioFile>>(mutableListOf())
 

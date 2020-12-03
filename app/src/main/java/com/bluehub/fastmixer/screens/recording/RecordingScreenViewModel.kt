@@ -4,22 +4,28 @@ import android.content.Context
 import android.content.IntentFilter
 import android.media.AudioManager
 import androidx.databinding.Bindable
-import androidx.lifecycle.*
-import com.bluehub.fastmixer.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Transformations
+import androidx.lifecycle.viewModelScope
+import com.bluehub.fastmixer.BR
 import com.bluehub.fastmixer.R
 import com.bluehub.fastmixer.broadcastReceivers.AudioDeviceChangeListener
 import com.bluehub.fastmixer.common.permissions.PermissionViewModel
 import com.bluehub.fastmixer.common.repositories.AudioRepository
 import com.bluehub.fastmixer.common.utils.PermissionManager
 import com.bluehub.fastmixer.common.utils.ScreenConstants
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.*
+import javax.inject.Inject
 
-class RecordingScreenViewModel(override val context: Context,
-                               override val permissionManager: PermissionManager,
-                               val repository: RecordingRepository,
-                               val audioRepository: AudioRepository,
-                               val audioDeviceChangeListener: AudioDeviceChangeListener) : PermissionViewModel(context) {
+class RecordingScreenViewModel @Inject constructor (override val context: Context,
+                                                    override val permissionManager: PermissionManager,
+                                                    val repository: RecordingRepository,
+                                                    val audioRepository: AudioRepository,
+                                                    val audioDeviceChangeListener: AudioDeviceChangeListener) : PermissionViewModel(context) {
     companion object {
         private lateinit var instance: RecordingScreenViewModel
 
@@ -31,7 +37,7 @@ class RecordingScreenViewModel(override val context: Context,
         public fun setStopPlay() {
             if (::instance.isInitialized) {
                 instance.stopPlay()
-                instance.stopTrackingSeekbar()
+                instance.stopTrackingSeekbarTimer()
             }
         }
     }
@@ -254,26 +260,24 @@ class RecordingScreenViewModel(override val context: Context,
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 repository.stopRecording()
-            }
-            _eventIsRecording.value = false
-            _eventLivePlaybackSet.value?.let {
-                if (it) {
-                    repository.stopLivePlayback()
-                    _eventLivePlaybackSet.value = false
-                }
-            }
-            _eventIsPlaying.value?.let {
-                if (it) {
-                    withContext(Dispatchers.IO) {
-                        repository.stopPlaying()
+                _eventIsRecording.postValue(false)
+                _eventLivePlaybackSet.value?.let {
+                    if (it) {
+                        repository.stopLivePlayback()
+                        _eventLivePlaybackSet.postValue(false)
                     }
-                    _eventIsPlaying.value = false
                 }
+                _eventIsPlaying.value?.let {
+                    if (it) {
+                        repository.stopPlaying()
+                        _eventIsPlaying.postValue(false)
+                    }
+                }
+                repository.copyRecordedFile(context)
             }
-            repository.copyRecordedFile(context)
-            stopUpdatingTimer()
             _eventGoBack.value = true
         }
+        stopAllTimers()
     }
 
     fun resetGoBack() {
@@ -282,6 +286,7 @@ class RecordingScreenViewModel(override val context: Context,
 
     fun startDrawingVisualizer() {
         _audioVisualizerRunning.value = true
+        stopTrackingVisualizerTimer()
         visualizerTimer = Timer()
         visualizerTimer?.schedule(object : TimerTask() {
             override fun run() {
@@ -291,15 +296,14 @@ class RecordingScreenViewModel(override val context: Context,
     }
 
     fun stopDrawingVisualizer() {
-        visualizerTimer?.let {
-            it.cancel()
-            _audioVisualizerRunning.value = false
-        }
+        stopTrackingVisualizerTimer()
+        _audioVisualizerRunning.value = false
     }
 
     fun startTrackingSeekbar() {
         _seekbarProgress.value = 0
         _seekbarMaxValue.value = repository.getTotalRecordedFrames()
+        stopTrackingSeekbarTimer()
         seekbarTimer = Timer()
         seekbarTimer?.schedule(object: TimerTask() {
             override fun run() {
@@ -308,15 +312,12 @@ class RecordingScreenViewModel(override val context: Context,
         }, 0, 10)
     }
 
-    fun stopTrackingSeekbar() {
-        seekbarTimer?.cancel()
-    }
-
     fun setPlayHead(position: Int) {
         repository.setPlayHead(position)
     }
 
     fun startUpdatingTimer() {
+        stopTrackingRecordingTimer()
         recordingTimer = Timer()
         recordingTimer?.schedule(object: TimerTask() {
             override fun run() {
@@ -343,21 +344,31 @@ class RecordingScreenViewModel(override val context: Context,
         }, 0, 1000)
     }
 
-    fun stopUpdatingTimer() {
+    fun stopTrackingSeekbarTimer() {
+        seekbarTimer?.cancel()
+        seekbarTimer = null
+    }
+
+    fun stopTrackingRecordingTimer() {
         recordingTimer?.cancel()
         recordingTimer = null
+    }
 
-        seekbarTimer?.cancel()
-        seekbarTimer = null;
-
+    fun stopTrackingVisualizerTimer() {
         visualizerTimer?.cancel()
         visualizerTimer = null
+    }
+
+    fun stopAllTimers() {
+        stopTrackingSeekbarTimer()
+        stopTrackingRecordingTimer()
+        stopTrackingVisualizerTimer()
     }
 
     override fun onCleared() {
         super.onCleared()
         repository.deleteAudioEngine()
         context.unregisterReceiver(audioDeviceChangeListener)
-        stopUpdatingTimer()
+        stopAllTimers()
     }
 }

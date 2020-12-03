@@ -1,15 +1,8 @@
 package com.bluehub.fastmixer.screens.mixing
 
-class MixingEngineProxy {
-    companion object {
-        private val INSTANCE: MixingEngineProxy =
-            MixingEngineProxy()
+import javax.inject.Inject
 
-        public fun getInstance(): MixingEngineProxy {
-            return INSTANCE
-        }
-    }
-
+class MixingEngineProxy @Inject constructor() {
     fun create() = MixingEngine.create()
 
     fun addFile(filePath: String) = MixingEngine.addFile(filePath)

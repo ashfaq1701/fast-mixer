@@ -10,13 +10,13 @@ import com.bluehub.fastmixer.R
 import com.bluehub.fastmixer.common.permissions.PermissionFragment
 import com.bluehub.fastmixer.common.utils.DialogManager
 import com.bluehub.fastmixer.common.utils.ScreenConstants
+import com.bluehub.fastmixer.common.utils.ViewModelType
 import com.bluehub.fastmixer.databinding.RecordingScreenBinding
 import com.visualizer.amplitude.AudioRecordView
-import timber.log.Timber
 import javax.inject.Inject
 
 
-class RecordingScreen : PermissionFragment<RecordingScreenViewModel>() {
+class RecordingScreen : PermissionFragment<RecordingScreenViewModel>(ViewModelType.FRAGMENT_SCOPED) {
 
     companion object {
         fun newInstance() = RecordingScreen()
@@ -24,13 +24,12 @@ class RecordingScreen : PermissionFragment<RecordingScreenViewModel>() {
 
     override var TAG: String = javaClass.simpleName
 
-    private lateinit var dataBinding: RecordingScreenBinding
+    override val viewModelClass = RecordingScreenViewModel::class
 
     @Inject
     override lateinit var dialogManager: DialogManager
 
-    @Inject
-    override lateinit var viewModel: RecordingScreenViewModel
+    private lateinit var dataBinding: RecordingScreenBinding
 
     private lateinit var recordingSeekbar: SeekBar
 
@@ -38,7 +37,6 @@ class RecordingScreen : PermissionFragment<RecordingScreenViewModel>() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        getPresentationComponent().inject(this)
     }
 
     override fun onCreateView(
@@ -70,14 +68,14 @@ class RecordingScreen : PermissionFragment<RecordingScreenViewModel>() {
                 viewModel.startUpdatingTimer()
             } else {
                 viewModel.stopDrawingVisualizer()
-                viewModel.stopUpdatingTimer()
+                viewModel.stopTrackingRecordingTimer()
             }
         })
 
         viewModel.eventIsPlaying.observe(viewLifecycleOwner, Observer { isPlaying ->
             if (!isPlaying) {
                 dataBinding.togglePlay.text = getString(R.string.play_label)
-                viewModel.stopTrackingSeekbar()
+                viewModel.stopTrackingSeekbarTimer()
             } else {
                 dataBinding.togglePlay.text = getString(R.string.pause_label)
                 viewModel.startTrackingSeekbar()

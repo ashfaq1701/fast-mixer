@@ -5,10 +5,10 @@ import android.content.Context
 import android.content.Intent
 import android.media.AudioManager
 import com.bluehub.fastmixer.common.repositories.AudioRepository
-import timber.log.Timber
+import javax.inject.Inject
 
 
-class AudioDeviceChangeListener(val audioRepository: AudioRepository) : BroadcastReceiver() {
+class AudioDeviceChangeListener @Inject constructor(val audioRepository: AudioRepository) : BroadcastReceiver() {
     private var isHeadphoneConnected = audioRepository.isHeadphoneConnected()
     private var isBluetoothHeadsetConnected = audioRepository.isBluetoothHeadsetConnected()
     private lateinit var mHeadphoneConnectedCallback: () -> Unit
