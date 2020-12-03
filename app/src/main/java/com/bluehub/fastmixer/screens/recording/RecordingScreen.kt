@@ -10,6 +10,7 @@ import com.bluehub.fastmixer.R
 import com.bluehub.fastmixer.common.permissions.PermissionFragment
 import com.bluehub.fastmixer.common.utils.DialogManager
 import com.bluehub.fastmixer.common.utils.ScreenConstants
+import com.bluehub.fastmixer.common.utils.ViewModelType
 import com.bluehub.fastmixer.databinding.RecordingScreenBinding
 import com.bluehub.fastmixer.screens.mixing.MixingScreenViewModel
 import com.visualizer.amplitude.AudioRecordView
@@ -17,7 +18,7 @@ import timber.log.Timber
 import javax.inject.Inject
 
 
-class RecordingScreen : PermissionFragment<RecordingScreenViewModel>() {
+class RecordingScreen : PermissionFragment<RecordingScreenViewModel>(ViewModelType.FRAGMENT_SCOPED) {
 
     companion object {
         fun newInstance() = RecordingScreen()

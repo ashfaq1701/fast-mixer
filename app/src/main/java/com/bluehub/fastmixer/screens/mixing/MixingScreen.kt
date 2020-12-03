@@ -10,10 +10,11 @@ import com.bluehub.fastmixer.R
 import com.bluehub.fastmixer.common.permissions.PermissionFragment
 import com.bluehub.fastmixer.common.utils.DialogManager
 import com.bluehub.fastmixer.common.utils.ScreenConstants
+import com.bluehub.fastmixer.common.utils.ViewModelType
 import com.bluehub.fastmixer.databinding.MixingScreenBinding
 import javax.inject.Inject
 
-class MixingScreen : PermissionFragment<MixingScreenViewModel>() {
+class MixingScreen : PermissionFragment<MixingScreenViewModel>(ViewModelType.NAV_SCOPED) {
     companion object {
         fun newInstance() = MixingScreen()
     }
