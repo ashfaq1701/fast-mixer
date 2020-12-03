@@ -7,7 +7,7 @@ import android.util.Log
 import androidx.core.app.ActivityCompat
 import javax.inject.Inject
 
-class PermissionManager {
+class PermissionManager @Inject constructor() {
     companion object {
         const val REQUEST_GROUP_ID = 12446
 

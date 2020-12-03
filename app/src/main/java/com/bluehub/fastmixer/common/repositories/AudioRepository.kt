@@ -4,8 +4,9 @@ import android.media.AudioDeviceInfo
 import android.media.AudioManager
 import android.os.Build
 import androidx.annotation.RequiresApi
+import javax.inject.Inject
 
-class AudioRepository {
+class AudioRepository @Inject constructor() {
     var audioManager: AudioManager? = null
 
     fun isHeadphoneConnected(): Boolean {

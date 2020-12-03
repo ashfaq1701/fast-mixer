@@ -13,7 +13,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.bluehub.fastmixer.R
 import javax.inject.Inject
 
-class DialogManager {
+class DialogManager @Inject constructor() {
     private val tag = DialogManager::class.java.simpleName
 
     fun showPermissionsErrorDialog(context: Context, permission: String, neverAskAgain: Boolean) {

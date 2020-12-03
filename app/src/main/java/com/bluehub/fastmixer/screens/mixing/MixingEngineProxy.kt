@@ -1,6 +1,8 @@
 package com.bluehub.fastmixer.screens.mixing
 
-class MixingEngineProxy {
+import javax.inject.Inject
+
+class MixingEngineProxy @Inject constructor() {
     fun create() = MixingEngine.create()
 
     fun addFile(filePath: String) = MixingEngine.addFile(filePath)
