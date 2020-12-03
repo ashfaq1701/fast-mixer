@@ -1,12 +1,16 @@
 package com.bluehub.fastmixer.screens.mixing
 
 import android.content.Context
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.bluehub.fastmixer.common.permissions.PermissionViewModel
 import com.bluehub.fastmixer.common.utils.PermissionManager
 import com.bluehub.fastmixer.common.utils.ScreenConstants
-import kotlinx.coroutines.*
-import timber.log.Timber
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.io.File
 import javax.inject.Inject
 
@@ -25,7 +29,6 @@ class MixingScreenViewModel @Inject constructor (override val context: Context,
         get() = _eventRead
 
     init {
-        Timber.d("Creating mixing viewmodel")
         mixingRepository.createMixingEngine()
     }
 
