@@ -13,16 +13,14 @@ oboe::Result BaseStream::startStream() {
     lock_guard<mutex> lock(mLock);
     LOGD(TAG, "startStream(): ");
 
-    oboe::Result result;
-
     if (!mStream) {
-        result = openStream();
+        oboe::Result openResult = openStream();
 
         if (result != oboe::Result::OK) {
-            return result;
+            return openResult;
         }
     }
-    result = mStream->start();
+    oboe::Result result = mStream->start();
 
     if (result != oboe::Result::OK) {
         LOGE(TAG, "Error starting the stream: %s", oboe::convertToText(result));
@@ -37,6 +35,12 @@ void BaseStream::stopStream() {
     if (mStream) {
         mStream->stop();
         mStream->close();
+        mStream.reset();
+    }
+}
+
+void BaseStream::resetStream() {
+    if (mStream) {
         mStream.reset();
     }
 }

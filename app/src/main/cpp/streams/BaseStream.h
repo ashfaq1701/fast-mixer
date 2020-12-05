@@ -27,6 +27,8 @@ public:
     oboe::Result startStream();
     void stopStream();
 
+    void resetStream()
+
 private:
     const char* TAG = "Stream Processor:: %s";
 };
