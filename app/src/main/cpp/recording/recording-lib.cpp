@@ -78,15 +78,6 @@ extern "C" {
         recordingEngine->stopRecording();
     }
 
-    JNIEXPORT void JNICALL
-    Java_com_bluehub_fastmixer_screens_recording_RecordingEngine_pauseRecording(JNIEnv *env, jclass) {
-        if (recordingEngine == nullptr) {
-            LOGE("pauseRecording: recordingEngine is null, you must call create() method before calling this method");
-            return;
-        }
-        recordingEngine->pauseRecording();
-    }
-
     JNIEXPORT jboolean JNICALL
     Java_com_bluehub_fastmixer_screens_recording_RecordingEngine_startPlayback(JNIEnv * env, jclass) {
         if (recordingEngine == nullptr) {
@@ -130,15 +121,6 @@ extern "C" {
             return;
         }
         recordingEngine->stopLivePlayback();
-    }
-
-    JNIEXPORT void JNICALL
-    Java_com_bluehub_fastmixer_screens_recording_RecordingEngine_pauseLivePlayback(JNIEnv *env, jclass) {
-        if (recordingEngine == nullptr) {
-            LOGE("pauseLivePlayback: recordingEngine is null, you must call create() method before calling this method");
-            return;
-        }
-        recordingEngine->pauseLivePlayback();
     }
 
     JNIEXPORT void JNICALL

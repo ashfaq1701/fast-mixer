@@ -20,13 +20,9 @@ class RecordingEngine {
 
         @JvmStatic external fun stopRecording()
 
-        @JvmStatic external fun pauseRecording()
-
         @JvmStatic external fun startLivePlayback()
 
         @JvmStatic external fun stopLivePlayback()
-
-        @JvmStatic external fun pauseLivePlayback()
 
         @JvmStatic external fun startPlayback(): Boolean
 

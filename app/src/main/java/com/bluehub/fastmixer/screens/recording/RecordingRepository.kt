@@ -22,10 +22,6 @@ class RecordingRepository @Inject constructor(val recordingEngineProxy: Recordin
         recordingEngineProxy.startLivePlayback()
     }
 
-    fun pauseLivePlayback() {
-        recordingEngineProxy.pauseLivePlayback()
-    }
-
     fun stopLivePlayback() {
         recordingEngineProxy.stopLivePlayback()
     }
@@ -44,10 +40,6 @@ class RecordingRepository @Inject constructor(val recordingEngineProxy: Recordin
 
     fun startRecording() {
         recordingEngineProxy.startRecording()
-    }
-
-    fun pauseRecording() {
-        recordingEngineProxy.pauseRecording()
     }
 
     fun flushWriteBuffer() {

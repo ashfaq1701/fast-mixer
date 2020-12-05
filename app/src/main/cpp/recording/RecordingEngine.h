@@ -25,11 +25,9 @@ public:
 
     void startRecording();
     void stopRecording();
-    void pauseRecording();
 
     void startLivePlayback();
     void stopLivePlayback();
-    void pauseLivePlayback();
 
     bool startPlayback();
     void stopAndResetPlayback();

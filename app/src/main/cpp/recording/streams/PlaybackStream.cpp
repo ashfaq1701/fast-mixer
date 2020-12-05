@@ -10,7 +10,7 @@ PlaybackStream::PlaybackStream(RecordingIO* recordingIO): BaseStream(recordingIO
     mRecordingIO = recordingIO;
 }
 
-oboe::Result PlaybackStream::openPlaybackStream() {
+oboe::Result PlaybackStream::openStream() {
     LOGD(TAG, "openLivePlaybackStream(): ");
     oboe::AudioStreamBuilder builder;
     setupPlaybackStreamParameters(&builder, StreamConstants::mAudioApi, StreamConstants::mPlaybackFormat, this,

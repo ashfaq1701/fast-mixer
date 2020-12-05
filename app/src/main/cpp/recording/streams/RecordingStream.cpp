@@ -9,7 +9,7 @@
 RecordingStream::RecordingStream(RecordingIO* recordingIO): BaseStream(recordingIO) {
 }
 
-oboe::Result RecordingStream::openRecordingStream() {
+oboe::Result RecordingStream::openStream() {
     oboe::AudioStreamBuilder builder;
     setupRecordingStreamParameters(&builder);
     oboe::Result result = builder.openStream(mStream);

@@ -22,12 +22,14 @@ public:
 
     std::shared_ptr<oboe::AudioStream> mStream;
 
+    std::mutex mLock;
+
     virtual oboe::Result openStream();
 
     oboe::Result startStream();
     void stopStream();
 
-    void resetStream()
+    void resetStream();
 
 private:
     const char* TAG = "Stream Processor:: %s";

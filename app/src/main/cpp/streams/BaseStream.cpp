@@ -16,7 +16,7 @@ oboe::Result BaseStream::startStream() {
     if (!mStream) {
         oboe::Result openResult = openStream();
 
-        if (result != oboe::Result::OK) {
+        if (openResult != oboe::Result::OK) {
             return openResult;
         }
     }

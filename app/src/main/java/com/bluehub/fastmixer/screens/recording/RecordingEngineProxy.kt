@@ -14,13 +14,9 @@ class RecordingEngineProxy @Inject constructor(){
 
     fun stopRecording() = RecordingEngine.stopRecording()
 
-    fun pauseRecording() = RecordingEngine.pauseRecording()
-
     fun startLivePlayback() = RecordingEngine.startLivePlayback()
 
     fun stopLivePlayback() = RecordingEngine.stopLivePlayback()
-
-    fun pauseLivePlayback() = RecordingEngine.pauseLivePlayback()
 
     fun startPlayback(): Boolean = RecordingEngine.startPlayback()
 
