@@ -10,32 +10,26 @@ PlaybackStream::PlaybackStream(RecordingIO* recordingIO): BaseStream(recordingIO
     mRecordingIO = recordingIO;
 }
 
-void PlaybackStream::startStream() {
-    if (!stream) {
-        openPlaybackStream();
-    }
-    BaseStream::startStream();
-}
-
-void PlaybackStream::openPlaybackStream() {
+oboe::Result PlaybackStream::openPlaybackStream() {
     LOGD(TAG, "openLivePlaybackStream(): ");
     oboe::AudioStreamBuilder builder;
     setupPlaybackStreamParameters(&builder, StreamConstants::mAudioApi, StreamConstants::mPlaybackFormat, this,
                                   StreamConstants::mPlaybackDeviceId, StreamConstants::mPlaybackSampleRate, StreamConstants::mOutputChannelCount);
-    oboe::Result result = builder.openStream(&stream);
-    if (result == oboe::Result::OK && stream) {
-        assert(stream->getChannelCount() == StreamConstants::mOutputChannelCount);
-//        assert(stream->getSampleRate() == mSampleRate);
-        assert(stream->getFormat() == StreamConstants::mPlaybackFormat);
+    oboe::Result result = builder.openStream(mStream);
+    if (result == oboe::Result::OK && mStream) {
+        assert(mStream->getChannelCount() == StreamConstants::mOutputChannelCount);
+//        assert(mStream->getSampleRate() == mSampleRate);
+        assert(mStream->getFormat() == StreamConstants::mPlaybackFormat);
 
-        int32_t mFramesPerBurst = stream->getFramesPerBurst();
+        int32_t mFramesPerBurst = mStream->getFramesPerBurst();
 
-        stream->setBufferSizeInFrames(mFramesPerBurst);
+        mStream->setBufferSizeInFrames(mFramesPerBurst);
 
     } else {
         LOGE(TAG, "openPlaybackStream(): Failed to create playback stream. Error: %s",
              oboe::convertToText(result));
     }
+    return result;
 }
 
 oboe::AudioStreamBuilder *
@@ -71,9 +65,5 @@ PlaybackStream::processPlaybackFrame(oboe::AudioStream *audioStream, float *audi
 }
 
 void PlaybackStream::onErrorAfterClose(oboe::AudioStream *audioStream, oboe::Result result) {
-    stream = nullptr;
-}
-
-bool PlaybackStream::onError(oboe::AudioStream *stream, oboe::Result result) {
-    return AudioStreamErrorCallback::onError(stream, result);
+    mStream = nullptr;
 }

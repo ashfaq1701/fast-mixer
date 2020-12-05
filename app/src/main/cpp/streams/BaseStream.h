@@ -20,11 +20,12 @@ public:
 
     RecordingIO* mRecordingIO;
 
-    oboe::AudioStream* stream = nullptr;
+    std::shared_ptr<oboe::AudioStream> mStream;
 
-    virtual void startStream();
+    virtual oboe::Result openStream();
+
+    oboe::Result startStream();
     void stopStream();
-    void closeStream();
 
 private:
     const char* TAG = "Stream Processor:: %s";

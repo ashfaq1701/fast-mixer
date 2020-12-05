@@ -13,9 +13,7 @@ class PlaybackStream: public BaseStream, public oboe::AudioStreamDataCallback, p
 public:
     PlaybackStream(RecordingIO* recordingIO);
 
-    void startStream();
-
-    void openPlaybackStream();
+    oboe::Result openStream();
 
     oboe::AudioStreamBuilder* setupPlaybackStreamParameters(oboe::AudioStreamBuilder *builder,
                                                             oboe::AudioApi audioApi, oboe::AudioFormat audioFormat,
@@ -30,8 +28,6 @@ public:
 
 private:
     const char* TAG = "Playback Stream:: %s";
-
-    bool onError(oboe::AudioStream *stream, oboe::Result result);
 
     void onErrorAfterClose(oboe::AudioStream* audioStream, oboe::Result result);
 };

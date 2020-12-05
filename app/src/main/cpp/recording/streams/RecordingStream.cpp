@@ -9,22 +9,15 @@
 RecordingStream::RecordingStream(RecordingIO* recordingIO): BaseStream(recordingIO) {
 }
 
-void RecordingStream::startStream() {
-    if (!stream) {
-        openRecordingStream();
-    }
-    BaseStream::startStream();
-}
-
-void RecordingStream::openRecordingStream() {
+oboe::Result RecordingStream::openRecordingStream() {
     oboe::AudioStreamBuilder builder;
     setupRecordingStreamParameters(&builder);
-    oboe::Result result = builder.openStream(&stream);
+    oboe::Result result = builder.openStream(mStream);
 
-    if (result == oboe::Result::OK && stream) {
-        assert(stream->getChannelCount() == StreamConstants::mInputChannelCount);
-        auto sampleRate = stream->getSampleRate();
-        auto format = stream->getFormat();
+    if (result == oboe::Result::OK && mStream) {
+        assert(mStream->getChannelCount() == StreamConstants::mInputChannelCount);
+        auto sampleRate = mStream->getSampleRate();
+        auto format = mStream->getFormat();
         LOGV(TAG, "openRecordingStream(): mSampleRate = ");
         LOGV(TAG, to_string(sampleRate).c_str());
 
@@ -33,6 +26,7 @@ void RecordingStream::openRecordingStream() {
     } else {
         LOGE(TAG, "Failed to create recording stream. Error: %s", oboe::convertToText(result));
     }
+    return result;
 }
 
 oboe::AudioStreamBuilder *
@@ -64,5 +58,5 @@ RecordingStream::processRecordingFrames(oboe::AudioStream *audioStream, int16_t 
 }
 
 void RecordingStream::onErrorAfterClose(oboe::AudioStream *audioStream, oboe::Result result) {
-    stream = nullptr;
+    mStream = nullptr;
 }

@@ -8,38 +8,32 @@
 LivePlaybackStream::LivePlaybackStream(RecordingIO *recordingIO): BaseStream(recordingIO) {
 }
 
-void LivePlaybackStream::startStream() {
-    if (!stream) {
-        openLivePlaybackStream();
-    }
-    BaseStream::startStream();
-}
-
-void LivePlaybackStream::openLivePlaybackStream() {
+oboe::Result LivePlaybackStream::openStream() {
     LOGD(TAG, "openLivePlaybackStream(): ");
     oboe::AudioStreamBuilder builder;
     setupLivePlaybackStreamParameters(&builder, StreamConstants::mAudioApi, StreamConstants::mFormat, this,
                                       StreamConstants::mPlaybackDeviceId, StreamConstants::mSampleRate, StreamConstants::mOutputChannelCount);
-    oboe::Result result = builder.openStream(&stream);
-    if (result == oboe::Result::OK && stream) {
-        assert(stream->getChannelCount() == StreamConstants::mOutputChannelCount);
-//        assert(stream->getSampleRate() == mSampleRate);
-        assert(stream->getFormat() == StreamConstants::mFormat);
+    oboe::Result result = builder.openStream(mStream);
+    if (result == oboe::Result::OK) {
+        assert(mStream->getChannelCount() == StreamConstants::mOutputChannelCount);
+//        assert(mStream->getSampleRate() == mSampleRate);
+        assert(mStream->getFormat() == StreamConstants::mFormat);
 
-        auto sampleRate = stream->getSampleRate();
+        auto sampleRate = mStream->getSampleRate();
         LOGV(TAG, "openLivePlaybackStream(): mSampleRate = ");
         LOGV(TAG, to_string(sampleRate).c_str());
 
-        int32_t mFramesPerBurst = stream->getFramesPerBurst();
+        int32_t mFramesPerBurst = mStream->getFramesPerBurst();
         LOGV(TAG, "openLivePlaybackStream(): mFramesPerBurst = ");
         LOGV(TAG, to_string(mFramesPerBurst).c_str());
 
-        stream->setBufferSizeInFrames(mFramesPerBurst);
+        mStream->setBufferSizeInFrames(mFramesPerBurst);
 
     } else {
         LOGE(TAG, "openLivePlaybackStream(): Failed to create live playback stream. Error: %s",
              oboe::convertToText(result));
     }
+    return result;
 }
 
 oboe::AudioStreamBuilder *
@@ -78,5 +72,5 @@ LivePlaybackStream::processLivePlaybackFrame(oboe::AudioStream *audioStream, int
 }
 
 void LivePlaybackStream::onErrorAfterClose(oboe::AudioStream *audioStream, oboe::Result result) {
-    stream = nullptr;
+    mStream = nullptr;
 }
