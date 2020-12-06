@@ -5,7 +5,7 @@
 #include <cassert>
 #include "LivePlaybackStream.h"
 
-LivePlaybackStream::LivePlaybackStream(RecordingIO *recordingIO, mutex &mtx): BaseStream(recordingIO, mtx) {}
+LivePlaybackStream::LivePlaybackStream(RecordingIO *recordingIO): BaseStream(recordingIO) {}
 
 oboe::Result LivePlaybackStream::openStream() {
     LOGD(TAG, "openLivePlaybackStream(): ");

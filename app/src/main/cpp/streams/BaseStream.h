@@ -16,13 +16,11 @@ using namespace std;
 
 class BaseStream {
 public:
-    BaseStream(RecordingIO* recordingIO, mutex& mtx);
+    BaseStream(RecordingIO* recordingIO);
 
     RecordingIO* mRecordingIO;
 
     shared_ptr<oboe::AudioStream> mStream;
-
-    mutex& mLock;
 
     virtual oboe::Result openStream() = 0;
 

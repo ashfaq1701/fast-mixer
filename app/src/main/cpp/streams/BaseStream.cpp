@@ -5,12 +5,11 @@
 #include <cassert>
 #include "BaseStream.h"
 
-BaseStream::BaseStream(RecordingIO* recordingIO, mutex& mtx): mLock(mtx) {
+BaseStream::BaseStream(RecordingIO* recordingIO) {
     mRecordingIO = recordingIO;
 }
 
 oboe::Result BaseStream::startStream() {
-    lock_guard<mutex> lock(mLock);
     LOGD(TAG, "startStream(): ");
 
     if (!mStream) {
@@ -30,7 +29,6 @@ oboe::Result BaseStream::startStream() {
 }
 
 void BaseStream::stopStream() {
-    lock_guard<mutex> lock(mLock);
     LOGD(TAG, "stopStream(): ");
     if (mStream) {
         mStream->stop();

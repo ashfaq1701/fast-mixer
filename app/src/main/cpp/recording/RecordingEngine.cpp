@@ -51,7 +51,7 @@ void RecordingEngine::stopLivePlayback() {
 bool RecordingEngine::startPlayback() {
     LOGD(TAG, "startPlayback(): ");
 
-    oboe::Result result = playbackStream.startStream();\
+    oboe::Result result = playbackStream.startStream();
     if (result != oboe::Result::OK) {
         return false;
     }

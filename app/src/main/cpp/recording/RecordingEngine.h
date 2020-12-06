@@ -61,13 +61,9 @@ private:
 
     RecordingIO mRecordingIO;
 
-    mutex recordingStreamMtx;
-    mutex livePlaybackStreamMtx;
-    mutex playbackStreamMtx;
-
-    RecordingStream recordingStream = RecordingStream(&mRecordingIO, recordingStreamMtx);
-    LivePlaybackStream livePlaybackStream = LivePlaybackStream(&mRecordingIO, livePlaybackStreamMtx);
-    PlaybackStream playbackStream = PlaybackStream(&mRecordingIO, playbackStreamMtx);
+    RecordingStream recordingStream = RecordingStream(&mRecordingIO);
+    LivePlaybackStream livePlaybackStream = LivePlaybackStream(&mRecordingIO);
+    PlaybackStream playbackStream = PlaybackStream(&mRecordingIO);
     bool mRecordingScreenViewModelPassed = false;
 
     void closePlaybackStream();
