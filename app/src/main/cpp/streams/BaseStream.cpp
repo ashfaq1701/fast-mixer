@@ -5,7 +5,7 @@
 #include <cassert>
 #include "BaseStream.h"
 
-BaseStream::BaseStream(RecordingIO* recordingIO) {
+BaseStream::BaseStream(RecordingIO* recordingIO, mutex& mtx): mLock(mtx) {
     mRecordingIO = recordingIO;
 }
 

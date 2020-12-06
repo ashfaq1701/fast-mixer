@@ -6,8 +6,7 @@
 #include "RecordingStream.h"
 #include "../../streams/BaseStream.h"
 
-RecordingStream::RecordingStream(RecordingIO* recordingIO): BaseStream(recordingIO) {
-}
+RecordingStream::RecordingStream(RecordingIO* recordingIO, mutex &mtx): BaseStream(recordingIO, mtx) {}
 
 oboe::Result RecordingStream::openStream() {
     oboe::AudioStreamBuilder builder;

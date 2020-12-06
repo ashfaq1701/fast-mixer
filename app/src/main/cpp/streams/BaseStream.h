@@ -16,15 +16,15 @@ using namespace std;
 
 class BaseStream {
 public:
-    BaseStream(RecordingIO* recordingIO);
+    BaseStream(RecordingIO* recordingIO, mutex& mtx);
 
     RecordingIO* mRecordingIO;
 
-    std::shared_ptr<oboe::AudioStream> mStream;
+    shared_ptr<oboe::AudioStream> mStream;
 
-    std::mutex mLock;
+    mutex& mLock;
 
-    virtual oboe::Result openStream();
+    virtual oboe::Result openStream() = 0;
 
     oboe::Result startStream();
     void stopStream();
@@ -33,6 +33,8 @@ public:
 
 private:
     const char* TAG = "Stream Processor:: %s";
+
+
 };
 
 

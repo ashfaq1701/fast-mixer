@@ -6,9 +6,7 @@
 #include "PlaybackStream.h"
 #include "../../streams/BaseStream.h"
 
-PlaybackStream::PlaybackStream(RecordingIO* recordingIO): BaseStream(recordingIO) {
-    mRecordingIO = recordingIO;
-}
+PlaybackStream::PlaybackStream(RecordingIO* recordingIO, mutex &mtx): BaseStream(recordingIO, mtx) {}
 
 oboe::Result PlaybackStream::openStream() {
     LOGD(TAG, "openLivePlaybackStream(): ");
