@@ -12,6 +12,10 @@ BaseStream::BaseStream(RecordingIO* recordingIO) {
 oboe::Result BaseStream::startStream() {
     LOGD(TAG, "startStream(): ");
 
+    if (mStream && mStream->getState() == oboe::StreamState::Closed) {
+        mStream.reset();
+    }
+
     if (!mStream) {
         oboe::Result openResult = openStream();
 
