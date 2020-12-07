@@ -28,6 +28,7 @@ RecordingEngine::RecordingEngine(
 RecordingEngine::~RecordingEngine() {
     stopRecording();
     stopLivePlayback();
+    stopPlayback();
 }
 
 void RecordingEngine::startLivePlayback() {
