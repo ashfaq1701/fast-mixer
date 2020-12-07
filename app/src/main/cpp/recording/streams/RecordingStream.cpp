@@ -52,10 +52,13 @@ RecordingStream::onAudioReady(oboe::AudioStream *audioStream, void *audioData, i
 oboe::DataCallbackResult
 RecordingStream::processRecordingFrames(oboe::AudioStream *audioStream, int16_t *audioData,
                                           int32_t numFrames) {
-    int32_t framesWritten = mRecordingIO->write(audioData, numFrames);
-    return oboe::DataCallbackResult::Continue;
+    if (audioStream && audioStream->getState() != oboe::StreamState::Closed) {
+        int32_t framesWritten = mRecordingIO->write(audioData, numFrames);
+        return oboe::DataCallbackResult::Continue;
+    }
+    return oboe::DataCallbackResult::Stop;
 }
 
 void RecordingStream::onErrorAfterClose(oboe::AudioStream *audioStream, oboe::Result result) {
-    mStream = nullptr;
+    mStream.reset();
 }

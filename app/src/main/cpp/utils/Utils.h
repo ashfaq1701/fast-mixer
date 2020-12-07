@@ -19,7 +19,6 @@ using namespace std;
 
 template <typename K>
 void fillArrayWithZeros(K *data, int32_t length) {
-
     size_t bufferSize = length * sizeof(K);
     memset(data, 0, bufferSize);
 }

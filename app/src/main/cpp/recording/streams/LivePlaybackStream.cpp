@@ -65,11 +65,15 @@ LivePlaybackStream::onAudioReady(oboe::AudioStream *audioStream, void *audioData
 oboe::DataCallbackResult
 LivePlaybackStream::processLivePlaybackFrame(oboe::AudioStream *audioStream, int16_t *audioData,
                                                int32_t numFrames) {
-    fillArrayWithZeros(audioData, numFrames);
-    int64_t framesWritten = mRecordingIO->read_live_playback(audioData, numFrames);
-    return oboe::DataCallbackResult::Continue;
+    if (audioStream && audioStream->getState() != oboe::StreamState::Closed) {
+        fillArrayWithZeros(audioData, numFrames);
+        int64_t framesWritten = mRecordingIO->read_live_playback(audioData, numFrames);
+        return oboe::DataCallbackResult::Continue;
+    } else {
+        return oboe::DataCallbackResult::Stop;
+    }
 }
 
 void LivePlaybackStream::onErrorAfterClose(oboe::AudioStream *audioStream, oboe::Result result) {
-    mStream = nullptr;
+    mStream.reset();
 }

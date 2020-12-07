@@ -51,11 +51,19 @@ void RecordingEngine::stopLivePlayback() {
 bool RecordingEngine::startPlayback() {
     LOGD(TAG, "startPlayback(): ");
 
-    oboe::Result result = playbackStream.startStream();
-    if (result != oboe::Result::OK) {
-        return false;
+    if (!playbackStream.mStream) {
+        if (playbackStream.openStream() != oboe::Result::OK) {
+            return false;
+        }
     }
-    return mRecordingIO.setup_audio_source();
+
+    auto setupSourceResult = mRecordingIO.setup_audio_source();
+
+    if (setupSourceResult) {
+        return playbackStream.startStream() == oboe::Result::OK;
+    }
+
+    return setupSourceResult;
 }
 
 void RecordingEngine::stopAndResetPlayback() {
