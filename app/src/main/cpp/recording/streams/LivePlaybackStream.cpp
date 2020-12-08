@@ -59,19 +59,19 @@ LivePlaybackStream::setupLivePlaybackStreamParameters(oboe::AudioStreamBuilder *
 oboe::DataCallbackResult
 LivePlaybackStream::onAudioReady(oboe::AudioStream *audioStream, void *audioData,
                                    int32_t numFrames) {
-    return processLivePlaybackFrame(audioStream, static_cast<int16_t *>(audioData), numFrames * audioStream->getChannelCount());
+    if (audioStream && audioStream->getState() != oboe::StreamState::Closed) {
+        return processLivePlaybackFrame(audioStream, static_cast<int16_t *>(audioData),
+                                        numFrames * audioStream->getChannelCount());
+    }
+    return oboe::DataCallbackResult::Stop;
 }
 
 oboe::DataCallbackResult
 LivePlaybackStream::processLivePlaybackFrame(oboe::AudioStream *audioStream, int16_t *audioData,
                                                int32_t numFrames) {
-    if (audioStream && audioStream->getState() != oboe::StreamState::Closed) {
-        fillArrayWithZeros(audioData, numFrames);
-        int64_t framesWritten = mRecordingIO->read_live_playback(audioData, numFrames);
-        return oboe::DataCallbackResult::Continue;
-    } else {
-        return oboe::DataCallbackResult::Stop;
-    }
+    fillArrayWithZeros(audioData, numFrames);
+    int64_t framesWritten = mRecordingIO->read_live_playback(audioData, numFrames);
+    return oboe::DataCallbackResult::Continue;
 }
 
 void LivePlaybackStream::onErrorAfterClose(oboe::AudioStream *audioStream, oboe::Result result) {

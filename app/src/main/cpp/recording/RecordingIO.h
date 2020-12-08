@@ -41,8 +41,8 @@ public:
     }
 
     bool setup_audio_source();
+    void clear_audio_source();
     void pause_audio_source();
-    void stop_audio_source();
 
     void sync_live_playback();
 
@@ -63,14 +63,15 @@ public:
     int getDurationInSeconds();
 
     void resetProperties();
+
+    shared_ptr<Player> mRecordedTrack {nullptr};
+
 private:
     const char* TAG = "RecordingIO:: %d";
 
     TaskQueue *taskQueue;
 
     string mRecordingFilePath;
-
-    shared_ptr<Player> mRecordedTrack {nullptr};
 
     shared_ptr<SndfileHandle> mRecordingFile {nullptr};
 

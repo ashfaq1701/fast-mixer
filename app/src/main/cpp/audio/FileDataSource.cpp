@@ -80,7 +80,7 @@ FileDataSource* FileDataSource::newFromCompressedFile(
         maximumDataSizeInBytes = kMaxCompressionRatio * maximumDataSizeInBytes;
     }
 
-    auto decodedData = new uint8_t[maximumDataSizeInBytes];
+    auto decodedData = new uint8_t [maximumDataSizeInBytes];
 
     int64_t bytesDecoded = ffmpegExtractor.decode(decodedData);
 
@@ -90,7 +90,7 @@ FileDataSource* FileDataSource::newFromCompressedFile(
     auto outputBuffer = make_unique<float[]>(numSamples);
     memcpy(outputBuffer.get(), decodedData, (size_t)bytesDecoded);
 
-    delete[] decodedData;
+    delete [] decodedData;
 
     return new FileDataSource(move(outputBuffer),
                               numSamples,

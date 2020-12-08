@@ -58,15 +58,14 @@ bool RecordingIO::setup_audio_source() {
 }
 
 void RecordingIO::pause_audio_source() {
-    if (mRecordedTrack == nullptr) {
-        return;
+    if (mRecordedTrack) {
+        mRecordedTrack->setPlaying(false);
     }
-    mRecordedTrack->setPlaying(false);
 }
 
-void RecordingIO::stop_audio_source() {
+void RecordingIO::clear_audio_source() {
     pause_audio_source();
-    mRecordedTrack = nullptr;
+    mRecordedTrack.reset();
 }
 
 bool RecordingIO::validate_audio_file() {
@@ -257,8 +256,8 @@ int RecordingIO::getDurationInSeconds() {
 void RecordingIO::resetProperties() {
     taskQueue->clear_queue();
     mRecordedTrack.reset();
-    mRecordedTrack = nullptr;
-    mRecordingFile = nullptr;
+    mRecordedTrack.reset();
+    mRecordingFile.reset();
     mTotalSamples = 0;
     mIteration = 1;
     mWriteIndex = 0;

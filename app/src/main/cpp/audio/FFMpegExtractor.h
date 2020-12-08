@@ -30,8 +30,6 @@ public:
     int mChannelCount = 0;
     int mAudioFormat = 0;
 
-    int64_t getTotalNumberOfSamples();
-
 private:
     AudioProperties mTargetProperties{};
 

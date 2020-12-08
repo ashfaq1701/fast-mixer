@@ -52,6 +52,8 @@ void RecordingEngine::stopLivePlayback() {
 bool RecordingEngine::startPlayback() {
     LOGD(TAG, "startPlayback(): ");
 
+    mRecordingIO.clear_audio_source();
+
     if (!playbackStream.mStream) {
         if (playbackStream.openStream() != oboe::Result::OK) {
             return false;
@@ -69,7 +71,7 @@ bool RecordingEngine::startPlayback() {
 
 void RecordingEngine::stopAndResetPlayback() {
     LOGD(TAG, "stopAndResetPlayback()");
-    mRecordingIO.stop_audio_source();
+    mRecordingIO.clear_audio_source();
     closePlaybackStream();
 }
 
