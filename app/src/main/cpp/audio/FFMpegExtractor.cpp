@@ -51,7 +51,7 @@ bool FFMpegExtractor::createAVIOContext(uint8_t *buffer, uint32_t bufferSize,
             nullptr, // Write callback function (not used)
             seek); // Seek callback function
 
-    if (*avioContext == nullptr){
+    if (!*avioContext){
         LOGE("Failed to create AVIO context");
         return false;
     } else {
@@ -65,7 +65,7 @@ FFMpegExtractor::createAVFormatContext(AVIOContext *avioContext, AVFormatContext
     *avFormatContext = avformat_alloc_context();
     (*avFormatContext)->pb = avioContext;
 
-    if (*avFormatContext == nullptr){
+    if (!*avFormatContext){
         LOGE("Failed to create AVFormatContext");
         return false;
     } else {
@@ -134,7 +134,7 @@ void FFMpegExtractor::getAudioFileProperties() {
 
     // Obtain the best audio stream to decode
     stream = getBestAudioStream(formatCtx);
-    if (stream == nullptr || stream->codecpar == nullptr){
+    if (!stream || !stream->codecpar){
         LOGE("Could not find a suitable audio stream to decode");
         goto cleanup;
     }
@@ -195,7 +195,7 @@ int64_t FFMpegExtractor::decodeOp(uint8_t *targetData, function<void(uint8_t *, 
 
     // Obtain the best audio stream to decode
     stream = getBestAudioStream(formatCtx);
-    if (stream == nullptr || stream->codecpar == nullptr){
+    if (!stream || !stream->codecpar){
         LOGE("Could not find a suitable audio stream to decode");
         goto cleanup;
     }

@@ -32,15 +32,17 @@ RecordingEngine::~RecordingEngine() {
 }
 
 void RecordingEngine::startLivePlayback() {
+    lock_guard<mutex> lock(livePlaybackStreamMtx);
     LOGD(TAG, "startLivePlayback(): ");
     mRecordingIO.sync_live_playback();
     livePlaybackStream.startStream();
 }
 
 void RecordingEngine::stopLivePlayback() {
+    lock_guard<mutex> lock(livePlaybackStreamMtx);
     LOGD(TAG, "stopLivePlayback(): %d");
 
-    if (livePlaybackStream.mStream != nullptr) {
+    if (livePlaybackStream.mStream) {
         if (livePlaybackStream.mStream->getState() != oboe::StreamState::Closed) {
             livePlaybackStream.stopStream();
         } else {
@@ -49,9 +51,7 @@ void RecordingEngine::stopLivePlayback() {
     }
 }
 
-bool RecordingEngine::startPlayback() {
-    LOGD(TAG, "startPlayback(): ");
-
+bool RecordingEngine::startPlaybackCallable() {
     if (!playbackStream.mStream) {
         if (playbackStream.openStream() != oboe::Result::OK) {
             return false;
@@ -67,18 +67,33 @@ bool RecordingEngine::startPlayback() {
     return setupSourceResult;
 }
 
+bool RecordingEngine::startPlayback() {
+    lock_guard<mutex> lock(playbackStreamMtx);
+    LOGD(TAG, "startPlayback(): ");
+
+    return startPlaybackCallable();
+}
+
 void RecordingEngine::stopAndResetPlayback() {
+    lock_guard<mutex> lock(playbackStreamMtx);
     LOGD(TAG, "stopAndResetPlayback()");
     mRecordingIO.clear_audio_source();
     closePlaybackStream();
 }
 
 void RecordingEngine::stopPlayback() {
+    lock_guard<mutex> lock(playbackStreamMtx);
+    LOGD(TAG, "startPlayback()");
+
+    stopPlaybackCallable();
+}
+
+void RecordingEngine::stopPlaybackCallable() {
     closePlaybackStream();
 }
 
 void RecordingEngine::closePlaybackStream() {
-    if (playbackStream.mStream != nullptr) {
+    if (playbackStream.mStream) {
         if (playbackStream.mStream->getState() != oboe::StreamState::Closed) {
             playbackStream.stopStream();
         } else {
@@ -88,20 +103,23 @@ void RecordingEngine::closePlaybackStream() {
 }
 
 void RecordingEngine::pausePlayback() {
+    lock_guard<mutex> lock(playbackStreamMtx);
     LOGD(TAG, "pausePlayback(): ");
     mRecordingIO.pause_audio_source();
     playbackStream.stopStream();
 }
 
 void RecordingEngine::startRecording() {
+    lock_guard<mutex> lock(recordingStreamMtx);
     LOGD(TAG, "startRecording(): ");
     recordingStream.startStream();
 }
 
 void RecordingEngine::stopRecording() {
+    lock_guard<mutex> lock(recordingStreamMtx);
     LOGD(TAG, "stopRecording(): %d");
 
-    if (recordingStream.mStream != nullptr) {
+    if (recordingStream.mStream) {
         if (recordingStream.mStream->getState() != oboe::StreamState::Closed) {
             recordingStream.stopStream();
             flushWriteBuffer();
@@ -112,8 +130,9 @@ void RecordingEngine::stopRecording() {
 }
 
 void RecordingEngine::restartPlayback() {
-    stopPlayback();
-    startPlayback();
+    lock_guard<mutex> lock(playbackStreamMtx);
+    stopPlaybackCallable();
+    startPlaybackCallable();
 }
 
 void RecordingEngine::flushWriteBuffer() {
@@ -130,7 +149,7 @@ void RecordingEngine::resetCurrentMax() {
 
 void RecordingEngine::setStopPlayback() {
     call_in_attached_thread([&](auto env) {
-        if (mRecordingScreenViewModelPassed && kotlinMethodIdsPtr != nullptr) {
+        if (mRecordingScreenViewModelPassed && kotlinMethodIdsPtr) {
             env->CallStaticVoidMethod(kotlinMethodIdsPtr->recordingScreenVM, kotlinMethodIdsPtr->recordingScreenVMTogglePlay);
         }
     });

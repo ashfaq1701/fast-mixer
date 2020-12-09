@@ -26,7 +26,7 @@ extern "C" {
     }
 
     void delete_kotlin_global_refs(JNIEnv *env) {
-        if (kotlinMethodIdsPtr != nullptr && kotlinMethodIdsPtr->recordingScreenVM != nullptr) {
+        if (kotlinMethodIdsPtr && kotlinMethodIdsPtr->recordingScreenVM) {
             env->DeleteGlobalRef(kotlinMethodIdsPtr->recordingScreenVM);
             kotlinMethodIdsPtr.reset();
             kotlinMethodIdsPtr = nullptr;
@@ -40,7 +40,7 @@ extern "C" {
 
     JNIEXPORT jboolean JNICALL
     Java_com_bluehub_fastmixer_screens_recording_RecordingEngine_create(JNIEnv *env, jclass, jstring appDirStr, jstring recordingSessionIdStr, jboolean  recordingScreenViewModelPassed) {
-        if (recordingEngine == nullptr) {
+        if (!recordingEngine) {
             auto appDir = java_str_to_c_str(env, appDirStr);
             auto recordingSessionId = java_str_to_c_str(env, recordingSessionIdStr);
 
@@ -54,7 +54,7 @@ extern "C" {
     JNIEXPORT void JNICALL
     Java_com_bluehub_fastmixer_screens_recording_RecordingEngine_delete(JNIEnv *env, jclass) {
         delete_kotlin_global_refs(env);
-        if (recordingEngine == nullptr) {
+        if (!recordingEngine) {
             return;
         }
         delete recordingEngine;
@@ -63,7 +63,7 @@ extern "C" {
 
     JNIEXPORT void JNICALL
     Java_com_bluehub_fastmixer_screens_recording_RecordingEngine_startRecording(JNIEnv *env, jclass) {
-        if (recordingEngine == nullptr) {
+        if (!recordingEngine) {
             LOGE("startRecording: recordingEngine is null, you must call create() method before calling this method");
         }
         recordingEngine->startRecording();
@@ -71,7 +71,7 @@ extern "C" {
 
     JNIEXPORT void JNICALL
     Java_com_bluehub_fastmixer_screens_recording_RecordingEngine_stopRecording(JNIEnv *env, jclass) {
-        if (recordingEngine == nullptr) {
+        if (!recordingEngine) {
             LOGE("stopRecording: recordingEngine is null, you must call create() method before calling this method");
             return;
         }
@@ -80,7 +80,7 @@ extern "C" {
 
     JNIEXPORT jboolean JNICALL
     Java_com_bluehub_fastmixer_screens_recording_RecordingEngine_startPlayback(JNIEnv * env, jclass) {
-        if (recordingEngine == nullptr) {
+        if (!recordingEngine) {
             LOGE("startPlayback: recordingEngine is null, you must call create() method before calling this method");
             return false;
         }
@@ -89,7 +89,7 @@ extern "C" {
 
     JNIEXPORT void JNICALL
     Java_com_bluehub_fastmixer_screens_recording_RecordingEngine_stopPlayback(JNIEnv *env, jclass) {
-        if (recordingEngine == nullptr) {
+        if (!recordingEngine) {
             LOGE("stopPlayback: recordingEngine is null, you must call create() method before calling this method");
             return;
         }
@@ -98,7 +98,7 @@ extern "C" {
 
     JNIEXPORT void JNICALL
     Java_com_bluehub_fastmixer_screens_recording_RecordingEngine_pausePlayback(JNIEnv *env, jclass) {
-        if (recordingEngine == nullptr) {
+        if (!recordingEngine) {
             LOGE("pausePlayback: recordingEngine is null, you must call create() method before calling this method");
             return;
         }
@@ -107,7 +107,7 @@ extern "C" {
 
     JNIEXPORT void JNICALL
     Java_com_bluehub_fastmixer_screens_recording_RecordingEngine_startLivePlayback(JNIEnv *env, jclass) {
-        if (recordingEngine == nullptr) {
+        if (!recordingEngine) {
             LOGE("startLivePlayback: recordingEngine is null, you must call create() method before calling this method");
             return;
         }
@@ -116,7 +116,7 @@ extern "C" {
 
     JNIEXPORT void JNICALL
     Java_com_bluehub_fastmixer_screens_recording_RecordingEngine_stopLivePlayback(JNIEnv *env, jclass) {
-        if (recordingEngine == nullptr) {
+        if (!recordingEngine) {
             LOGE("stopLivePlayback: recordingEngine is null, you must call create() method before calling this method");
             return;
         }
@@ -125,7 +125,7 @@ extern "C" {
 
     JNIEXPORT void JNICALL
     Java_com_bluehub_fastmixer_screens_recording_RecordingEngine_flushWriteBuffer(JNIEnv *env, jclass) {
-        if (recordingEngine == nullptr) {
+        if (!recordingEngine) {
             LOGE("flushWriteBuffer: recordingEngine is null, you must call create() method before calling this method");
             return;
         }
@@ -134,7 +134,7 @@ extern "C" {
 
     JNIEXPORT void JNICALL
     Java_com_bluehub_fastmixer_screens_recording_RecordingEngine_restartPlayback(JNIEnv *env, jclass) {
-        if (recordingEngine == nullptr) {
+        if (!recordingEngine) {
             LOGE("restartPlayback: recordingEngine is null, you must call create() method before calling this method");
             return;
         }
@@ -143,7 +143,7 @@ extern "C" {
 
     JNIEXPORT jint JNICALL
     Java_com_bluehub_fastmixer_screens_recording_RecordingEngine_getCurrentMax(JNIEnv * env, jclass) {
-        if (recordingEngine == nullptr) {
+        if (!recordingEngine) {
             LOGE("getCurrentMax: recordingEngine is null, you must call create() method before calling this method");
             return 0;
         }
@@ -153,7 +153,7 @@ extern "C" {
 
     JNIEXPORT void JNICALL
     Java_com_bluehub_fastmixer_screens_recording_RecordingEngine_resetCurrentMax(JNIEnv *env, jclass) {
-        if (recordingEngine == nullptr) {
+        if (!recordingEngine) {
             LOGE("resetCurrentMax: recordingEngine is null, you must call create() method before calling this method");
             return;
         }
@@ -162,7 +162,7 @@ extern "C" {
 
     JNIEXPORT jint JNICALL
     Java_com_bluehub_fastmixer_screens_recording_RecordingEngine_getTotalRecordedFrames(JNIEnv * env, jclass) {
-        if (recordingEngine == nullptr) {
+        if (!recordingEngine) {
             LOGE("getTotalRecordedFrames: recordingEngine is null, you must call create() method before calling this method");
             return 0;
         }
@@ -171,7 +171,7 @@ extern "C" {
 
     JNIEXPORT jint JNICALL
     Java_com_bluehub_fastmixer_screens_recording_RecordingEngine_getCurrentPlaybackProgress(JNIEnv * env, jclass) {
-        if (recordingEngine == nullptr) {
+        if (!recordingEngine) {
             LOGE("getCurrentPlaybackProgress: recordingEngine is null, you must call create() method before calling this method");
             return 0;
         }
@@ -180,7 +180,7 @@ extern "C" {
 
     JNIEXPORT void JNICALL
     Java_com_bluehub_fastmixer_screens_recording_RecordingEngine_setPlayHead(JNIEnv *env, jclass, jint position) {
-        if (recordingEngine == nullptr) {
+        if (!recordingEngine) {
             LOGE("setPlayHead: recordingEngine is null, you must call create() method before calling this method");
             return;
         }
@@ -189,7 +189,7 @@ extern "C" {
 
     JNIEXPORT jint JNICALL
     Java_com_bluehub_fastmixer_screens_recording_RecordingEngine_getDurationInSeconds(JNIEnv * env, jclass) {
-        if (recordingEngine == nullptr) {
+        if (!recordingEngine) {
             LOGE("getDurationInSeconds: recordingEngine is null, you must call create() method before calling this method");
             return 0;
         }
@@ -198,7 +198,7 @@ extern "C" {
 
     JNIEXPORT void JNICALL
     Java_com_bluehub_fastmixer_screens_recording_RecordingEngine_resetRecordingEngine(JNIEnv *env, jclass) {
-        if (recordingEngine == nullptr) {
+        if (!recordingEngine) {
             LOGE("resetAudioEngine: recordingEngine is null, you must call create() method before calling this method");
             return;
         }

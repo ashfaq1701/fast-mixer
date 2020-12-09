@@ -52,7 +52,7 @@ int64_t MixingEngine::getAudioFileTotalSamples(string filePath) {
     if (it == sourceMap.end()) {
         return 0;
     }
-    if (it->second == nullptr) {
+    if (!it->second) {
         return 0;
     }
     filePath.erase();

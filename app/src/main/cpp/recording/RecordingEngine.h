@@ -52,6 +52,12 @@ public:
 
     void resetAudioEngine();
 
+    void closePlaybackStream();
+
+    void stopPlaybackCallable();
+
+    bool startPlaybackCallable();
+
 private:
     const char* TAG = "Audio Engine:: %s";
 
@@ -59,14 +65,16 @@ private:
     string mAppDir = nullptr;
     bool mPlayback = true;
 
+    mutex recordingStreamMtx;
+    mutex livePlaybackStreamMtx;
+    mutex playbackStreamMtx;
+
     RecordingIO mRecordingIO;
 
     RecordingStream recordingStream = RecordingStream(&mRecordingIO);
     LivePlaybackStream livePlaybackStream = LivePlaybackStream(&mRecordingIO);
     PlaybackStream playbackStream = PlaybackStream(&mRecordingIO);
     bool mRecordingScreenViewModelPassed = false;
-
-    void closePlaybackStream();
 
     void stopPlayback();
 };

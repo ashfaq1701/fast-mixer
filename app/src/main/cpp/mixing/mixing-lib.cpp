@@ -23,7 +23,7 @@ extern "C" {
 
     JNIEXPORT jboolean JNICALL
     Java_com_bluehub_fastmixer_screens_mixing_MixingEngine_create(JNIEnv *env, jclass) {
-        if (mixingEngine == nullptr) {
+        if (!mixingEngine) {
             mixingEngine = new MixingEngine();
         }
         return (mixingEngine != nullptr);
@@ -31,7 +31,7 @@ extern "C" {
 
     JNIEXPORT void JNICALL
     Java_com_bluehub_fastmixer_screens_mixing_MixingEngine_addFile(JNIEnv *env, jclass, jstring filePath) {
-        if (mixingEngine == nullptr) {
+        if (!mixingEngine) {
             LOGE("addFile: mixingEngine is null, you must call create() method before calling this method");
             return;
         }
@@ -41,7 +41,7 @@ extern "C" {
 
     JNIEXPORT jobjectArray JNICALL
     Java_com_bluehub_fastmixer_screens_mixing_MixingEngine_readSamples(JNIEnv *env, jclass, jstring filePath, jint numSamples) {
-        if (mixingEngine == nullptr) {
+        if (!mixingEngine) {
             LOGE("readSamples: mixingEngine is null, you must call create() method before calling this method");
             return nullptr;
         }
@@ -72,7 +72,7 @@ extern "C" {
 
     JNIEXPORT void JNICALL
     Java_com_bluehub_fastmixer_screens_mixing_MixingEngine_deleteFile(JNIEnv *env, jclass, jstring filePath) {
-        if (mixingEngine == nullptr) {
+        if (!mixingEngine) {
             LOGE("deleteFile: mixingEngine is null, you must call create() method before calling this method");
             return;
         }
@@ -82,7 +82,7 @@ extern "C" {
 
     JNIEXPORT jint JNICALL
     Java_com_bluehub_fastmixer_screens_mixing_MixingEngine_getTotalSamples(JNIEnv *env, jclass, jstring filePath) {
-        if (mixingEngine == nullptr) {
+        if (!mixingEngine) {
             LOGE("deleteFile: mixingEngine is null, you must call create() method before calling this method");
             return 0;
         }

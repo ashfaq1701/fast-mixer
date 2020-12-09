@@ -38,12 +38,12 @@ bool RecordingIO::setup_audio_source() {
             FileDataSource::newFromCompressedFile(mRecordingFilePath.c_str(), targetProperties)
     };
 
-    if (audioSource == nullptr) {
+    if (!audioSource) {
         return false;
     }
 
     int32_t playHead = 0;
-    if (mRecordedTrack != nullptr) {
+    if (mRecordedTrack) {
         playHead = mRecordedTrack->getPlayHead();
         if (playHead >= mRecordedTrack->getTotalSampleFrames()) {
             playHead = 0;
@@ -78,7 +78,7 @@ void RecordingIO::read_playback(float *targetData, int32_t numFrames, int32_t ch
         return;
     }
 
-    if (mRecordedTrack == nullptr) {
+    if (!mRecordedTrack) {
         mStopPlaybackCallback();
         return;
     }
@@ -87,12 +87,12 @@ void RecordingIO::read_playback(float *targetData, int32_t numFrames, int32_t ch
 }
 
 void RecordingIO::flush_to_file(int16_t* buffer, int32_t length, const string& recordingFilePath, shared_ptr<SndfileHandle>& recordingFile) {
-    if (recordingFile == nullptr) {
+    if (!recordingFile) {
         int format = SF_FORMAT_WAV | SF_FORMAT_PCM_16;
         SndfileHandle file = SndfileHandle(recordingFilePath, SFM_WRITE, format, StreamConstants::mInputChannelCount, StreamConstants::mSampleRate);
         recordingFile = make_shared<SndfileHandle>(file);
     }
-    if (buffer == nullptr) {
+    if (!buffer) {
         return;
     }
     recordingFile->write(buffer, length);
@@ -172,7 +172,7 @@ int32_t RecordingIO::write(const int16_t *sourceData, int32_t numSamples) {
 void RecordingIO::flush_buffer() {
     if (mWriteIndex > 0) {
         int16_t* oldBuffer = mData;
-        if (oldBuffer == nullptr) {
+        if (!oldBuffer) {
             return;
         }
         is_reallocated = false;
@@ -230,21 +230,21 @@ void RecordingIO::setStopPlaybackCallback(function<void()> stopPlaybackCallback)
 }
 
 int RecordingIO::getTotalRecordedFrames() {
-    if (mRecordedTrack != nullptr) {
+    if (mRecordedTrack) {
         return mRecordedTrack->getTotalSampleFrames();
     }
     return 0;
 }
 
 int32_t RecordingIO::getCurrentPlaybackProgress() {
-    if (mRecordedTrack != nullptr) {
+    if (mRecordedTrack) {
         return mRecordedTrack->getPlayHead();
     }
     return 0;
 }
 
 void RecordingIO::setPlayHead(int position) {
-    if (mRecordedTrack != nullptr) {
+    if (mRecordedTrack) {
         mRecordedTrack->setPlayHead(position);
     }
 }

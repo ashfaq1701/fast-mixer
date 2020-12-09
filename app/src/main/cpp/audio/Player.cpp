@@ -30,7 +30,7 @@ void Player::renderAudio(float *targetData, int32_t numFrames) {
         if (!mIsLooping && mReadFrameIndex + numFrames >= totalSourceFrames){
             framesToRenderFromData = totalSourceFrames - mReadFrameIndex;
             mIsPlaying = false;
-            if (mStopPlaybackCallback != nullptr) {
+            if (mStopPlaybackCallback) {
                 mStopPlaybackCallback();
             }
         }
