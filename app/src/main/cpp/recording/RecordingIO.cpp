@@ -48,6 +48,7 @@ bool RecordingIO::setup_audio_source() {
         if (playHead >= mRecordedTrack->getTotalSampleFrames()) {
             playHead = 0;
         }
+        mRecordedTrack.reset();
     }
 
     mRecordedTrack = make_shared<Player>(audioSource, mStopPlaybackCallback);

@@ -164,6 +164,7 @@ int RecordingEngine::getCurrentPlaybackProgress() {
 }
 
 void RecordingEngine::setPlayHead(int position) {
+    lock_guard<mutex> lock(playbackStreamMtx);
     mRecordingIO.setPlayHead(position);
 }
 
