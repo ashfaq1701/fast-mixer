@@ -97,13 +97,13 @@ FileDataSource* FileDataSource::newFromCompressedFile(
                               targetProperties);
 }
 
-unique_ptr<buffer_data> FileDataSource::readData(size_t numSamples) {
+unique_ptr<buffer_data> FileDataSource::readData(size_t countPoints) {
     int channelCount = mProperties.channelCount;
     size_t samplesToHandle = 0;
-    if (currentPtr + numSamples * channelCount > mBufferSize) {
+    if (currentPtr + countPoints * channelCount > mBufferSize) {
         samplesToHandle = (mBufferSize - currentPtr) / channelCount;
     } else {
-        samplesToHandle = numSamples;
+        samplesToHandle = countPoints;
     }
     auto selectedSamples = new float [samplesToHandle];
     for(int i = 0; i < samplesToHandle; i++) {
@@ -115,7 +115,7 @@ unique_ptr<buffer_data> FileDataSource::readData(size_t numSamples) {
     }
     buffer_data buff = {
             .ptr = selectedSamples,
-            .numSamples = samplesToHandle
+            .countPoints = samplesToHandle
     };
     return make_unique<buffer_data>(buff);
 }

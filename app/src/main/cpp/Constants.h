@@ -14,7 +14,7 @@ struct AudioProperties {
 
 struct buffer_data {
     float *ptr;
-    size_t numSamples; ///< size left in the buffer
+    size_t countPoints; ///< size left in the buffer
 };
 
 struct method_ids {

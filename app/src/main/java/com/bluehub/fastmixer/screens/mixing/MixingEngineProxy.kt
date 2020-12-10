@@ -7,7 +7,7 @@ class MixingEngineProxy @Inject constructor() {
 
     fun addFile(filePath: String) = MixingEngine.addFile(filePath)
 
-    fun readSamples(filePath: String, numSamples: Int) = MixingEngine.readSamples(filePath, numSamples)
+    fun readSamples(filePath: String, countPoints: Int) = MixingEngine.readSamples(filePath, countPoints)
 
     fun getTotalSamples(filePath: String): Int = MixingEngine.getTotalSamples(filePath)
 

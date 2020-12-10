@@ -10,6 +10,7 @@ import androidx.databinding.BindingMethod
 import androidx.databinding.BindingMethods
 import kotlinx.coroutines.Job
 import timber.log.Timber
+import kotlin.random.Random
 
 
 @BindingMethods(value = [
@@ -27,6 +28,9 @@ class FileWaveView @JvmOverloads constructor(
     lateinit var mFileLoader: () -> Job
     lateinit var mSamplesReader: (Int) -> Array<Float>
     lateinit var mTotalSampleCountReader: () -> Int
+
+    var mWidth: Int = 0
+    var mHeight: Int = 0
 
     private var fileLoaded = false
     private var totalSampleCount: Int = 0
@@ -71,10 +75,24 @@ class FileWaveView @JvmOverloads constructor(
         }
     }
 
+    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+        mWidth = w
+        mHeight = h
+        invalidate()
+        super.onSizeChanged(w, h, oldw, oldh)
+    }
+
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        if(::mAudioFilePath.isInitialized) {
-            canvas.drawText(mAudioFilePath, 10F, 10F, paint)
+        if (mWidth == 0 || mHeight == 0) {
+            return
         }
+        for (i in 0 until mWidth) {
+            val randNum = Random.nextInt(0, mHeight)
+            canvas.drawLine(i.toFloat(), mHeight.toFloat(), i.toFloat(), (mHeight - randNum).toFloat(), paint)
+        }
+        //if(::mAudioFilePath.isInitialized) {
+            //canvas.drawText("$mAudioFilePath, width: $mWidth, height: $mHeight", 10F, 10F, paint)
+        //}
     }
 }

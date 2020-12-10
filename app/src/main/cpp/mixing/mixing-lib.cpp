@@ -40,7 +40,7 @@ extern "C" {
     }
 
     JNIEXPORT jobjectArray JNICALL
-    Java_com_bluehub_fastmixer_screens_mixing_MixingEngine_readSamples(JNIEnv *env, jclass, jstring filePath, jint numSamples) {
+    Java_com_bluehub_fastmixer_screens_mixing_MixingEngine_readSamples(JNIEnv *env, jclass, jstring filePath, jint countPoints) {
         if (!mixingEngine) {
             LOGE("readSamples: mixingEngine is null, you must call create() method before calling this method");
             return nullptr;
@@ -52,13 +52,13 @@ extern "C" {
         jmethodID floatConstructor = env->GetMethodID(floatCls, "<init>", "(F)V");
 
         jobjectArray result;
-        buffer_data* data = mixingEngine->readSamples(filePathStr, numSamples).release();
+        buffer_data* data = mixingEngine->readSamples(filePathStr, countPoints).release();
 
         float* dataSamples = data->ptr;
 
         jobject initValue = env->NewObject(floatCls, floatConstructor, (jfloat) 0);
-        result = env->NewObjectArray(data->numSamples, floatCls, initValue);
-        for (int i = 0; i < data->numSamples; i++) {
+        result = env->NewObjectArray(data->countPoints, floatCls, initValue);
+        for (int i = 0; i < data->countPoints; i++) {
             jobject sample = env->NewObject(floatCls, floatConstructor, (jfloat) dataSamples[i]);
 
             env->SetObjectArrayElement(result, i, sample);

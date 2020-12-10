@@ -70,8 +70,8 @@ class MixingScreenViewModel @Inject constructor (override val context: Context,
         mixingRepository.addFile(filePath)
     }
 
-    fun readSamples(filePath: String) = fun (numSamples: Int): Array<Float> = runBlocking(Dispatchers.IO) {
-        mixingRepository.readSamples(filePath, numSamples)
+    fun readSamples(filePath: String) = fun (countPoints: Int): Array<Float> = runBlocking(Dispatchers.IO) {
+        mixingRepository.readSamples(filePath, countPoints)
     }
 
 

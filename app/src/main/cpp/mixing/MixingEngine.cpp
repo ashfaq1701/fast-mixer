@@ -25,17 +25,17 @@ void MixingEngine::addFile(string filePath) {
     filePath.erase();
 }
 
-unique_ptr<buffer_data> MixingEngine::readSamples(string filePath, size_t numSamples) {
+unique_ptr<buffer_data> MixingEngine::readSamples(string filePath, size_t countPoints) {
     auto it = sourceMap.find(filePath);
     filePath.erase();
     if (it == sourceMap.end()) {
         buffer_data emptyData {
                 .ptr = nullptr,
-                .numSamples = 0
+                .countPoints = 0
         };
         return make_unique<buffer_data>(emptyData);
     }
-    return it->second->readData(numSamples);
+    return it->second->readData(countPoints);
 }
 
 void MixingEngine::deleteFile(string filePath) {
