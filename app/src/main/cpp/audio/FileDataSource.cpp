@@ -99,20 +99,28 @@ FileDataSource* FileDataSource::newFromCompressedFile(
 
 unique_ptr<buffer_data> FileDataSource::readData(size_t countPoints) {
     int channelCount = mProperties.channelCount;
-    size_t samplesToHandle = 0;
-    if (currentPtr + countPoints * channelCount > mBufferSize) {
-        samplesToHandle = (mBufferSize - currentPtr) / channelCount;
+
+    size_t samplesToHandle;
+
+    if (countPoints * channelCount > mBufferSize) {
+        samplesToHandle = (int) (mBufferSize / channelCount);
     } else {
         samplesToHandle = countPoints;
     }
+
+    int ptsDistance = (int) (mBufferSize / (samplesToHandle * channelCount));
+
     auto selectedSamples = new float [samplesToHandle];
-    for(int i = 0; i < samplesToHandle; i++) {
-        float totalSample = 0;
-        for (int j = 1; j <= channelCount; j++) {
-            totalSample += mBuffer[++currentPtr];
+    for (int i = 0; i < samplesToHandle; i++) {
+        float maxValue = 0;
+        for (int j = i * ptsDistance; j < (i + 1) * ptsDistance; j += channelCount) {
+            if (abs(mBuffer[j]) > maxValue) {
+                maxValue = abs(mBuffer[j]);
+            }
         }
-        selectedSamples[i] = totalSample / (float) channelCount;
+        selectedSamples[i] = maxValue;
     }
+
     buffer_data buff = {
             .ptr = selectedSamples,
             .countPoints = samplesToHandle

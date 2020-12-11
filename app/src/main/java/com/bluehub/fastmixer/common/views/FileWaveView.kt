@@ -13,6 +13,7 @@ import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 
 @BindingMethods(value = [
@@ -90,6 +91,7 @@ class FileWaveView @JvmOverloads constructor(
 
         coroutineScope.launch {
             mPoints = mSamplesReader(numSamples).await()
+            Timber.d("Total points fetched: ${mPoints.size}")
             invalidate()
         }
     }
