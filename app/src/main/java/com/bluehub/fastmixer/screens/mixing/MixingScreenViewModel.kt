@@ -7,10 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.bluehub.fastmixer.common.permissions.PermissionViewModel
 import com.bluehub.fastmixer.common.utils.PermissionManager
 import com.bluehub.fastmixer.common.utils.ScreenConstants
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 import java.io.File
 import javax.inject.Inject
 
@@ -70,9 +67,10 @@ class MixingScreenViewModel @Inject constructor (override val context: Context,
         mixingRepository.addFile(filePath)
     }
 
-    fun readSamples(filePath: String) = fun (countPoints: Int): Array<Float> = runBlocking(Dispatchers.IO) {
-        mixingRepository.readSamples(filePath, countPoints)
-    }
+    fun readSamples(filePath: String) = fun (countPoints: Int): Deferred<Array<Float>> =
+        viewModelScope.async {
+            mixingRepository.readSamples(filePath, countPoints)
+        }
 
 
     fun deleteFile(filePath: String) {
