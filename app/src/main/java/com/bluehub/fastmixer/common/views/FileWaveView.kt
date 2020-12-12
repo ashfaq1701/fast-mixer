@@ -6,14 +6,15 @@ import android.graphics.Paint
 import android.graphics.Typeface
 import android.util.AttributeSet
 import android.view.View
+import androidx.core.content.ContextCompat
 import androidx.databinding.BindingMethod
 import androidx.databinding.BindingMethods
+import com.bluehub.fastmixer.R
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 
 @BindingMethods(value = [
@@ -34,10 +35,11 @@ class FileWaveView @JvmOverloads constructor(
 
     var mWidth: BehaviorSubject<Int> = BehaviorSubject.create()
     var mHeight: BehaviorSubject<Int> = BehaviorSubject.create()
+    var mRawPoints: BehaviorSubject<Array<Float>> = BehaviorSubject.create()
+
+    lateinit var mPlotPoints: Array<Float>
 
     private var fileLoaded: BehaviorSubject<Boolean> = BehaviorSubject.create()
-
-    private lateinit var mPoints: Array<Float>
 
     private var totalSampleCount: Int = 0
 
@@ -57,6 +59,7 @@ class FileWaveView @JvmOverloads constructor(
         textAlign = Paint.Align.CENTER
         textSize = 15.0f
         typeface = Typeface.create("", Typeface.BOLD)
+        color = ContextCompat.getColor(context, R.color.colorAccent)
     }
 
     fun setAudioFilePath(audioFilePath: String) {
@@ -84,16 +87,33 @@ class FileWaveView @JvmOverloads constructor(
         }).subscribe { pair ->
             fetchPointsToPlot(pair.first, pair.second)
         }
+
+        mRawPoints.subscribe { ptsArr ->
+            processPlotPoints(ptsArr)
+        }
     }
 
     private fun fetchPointsToPlot(numSamples: Int, height: Int) {
         if (!fileLoaded.value) return
 
         coroutineScope.launch {
-            mPoints = mSamplesReader(numSamples).await()
-            Timber.d("Total points fetched: ${mPoints.size}")
-            invalidate()
+            mRawPoints.onNext(mSamplesReader(numSamples).await())
         }
+    }
+
+    private fun processPlotPoints(rawPts: Array<Float>) {
+        val mean = rawPts.average()
+
+        val maximum = rawPts.maxOrNull()
+
+        val maxLevelInSamples = maximum ?: 3 * mean
+        val maxToScale = mHeight.value * 0.95
+
+        mPlotPoints = rawPts.map { current ->
+            ((current / maxLevelInSamples.toFloat()) * maxToScale.toFloat())
+        }.toTypedArray()
+
+        invalidate()
     }
 
     private fun checkAndSetupAudioFileSource() {
@@ -117,17 +137,12 @@ class FileWaveView @JvmOverloads constructor(
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
-        if (! ::mPoints.isInitialized) {
+        if (! ::mPlotPoints.isInitialized) {
             return
         }
 
-
-        /*for (i in 0 until mWidth) {
-            val randNum = Random.nextInt(0, mHeight)
-            canvas.drawLine(i.toFloat(), mHeight.toFloat(), i.toFloat(), (mHeight - randNum).toFloat(), paint)
-        }*/
-        //if(::mAudioFilePath.isInitialized) {
-            //canvas.drawText("$mAudioFilePath, width: $mWidth, height: $mHeight", 10F, 10F, paint)
-        //}
+        mPlotPoints.forEachIndexed { idx, item ->
+            canvas.drawLine(idx.toFloat(), mHeight.value.toFloat(), idx.toFloat(), (mHeight.value - item), paint)
+        }
     }
 }
