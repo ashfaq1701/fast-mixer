@@ -12,15 +12,13 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-        <com.bluehub.fastmixer.common.views.FileWaveView
+        <com.bluehub.fastmixer.common.views.FileWaveViewWidget
             android:layout_width="match_parent"
-            android:layout_height="@dimen/audio_file_view_height"
+            android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/audio_file_margin_horizontal"
             android:layout_marginTop="@dimen/audio_file_margin_top"
             app:layout_constraintTop_toTopOf="parent"
-            app:audioFilePath="@{audioFile.path}"
-            app:fileLoader="@{eventListener.loadFileCallbackWithIndex(audioFile.path)}"
-            app:samplesReader="@{eventListener.readSamplesCallbackWithIndex(audioFile.path)}"
-            app:totalSampleCountReader="@{eventListener.getTotalSamplesWithIndex(audioFile.path)}" />
+            app:audioFile="@{audioFile}"
+            app:audioFileEventListeners="@{eventListener}" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
