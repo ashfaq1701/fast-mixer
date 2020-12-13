@@ -15,6 +15,7 @@ import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
+import io.reactivex.rxjava3.functions.Function
 
 
 @BindingMethods(value = [
@@ -27,11 +28,10 @@ class FileWaveView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null
 ) : View(context, attrs) {
-    private lateinit var mAudioFilePath: String
-
-    lateinit var mFileLoader: () -> Job
-    lateinit var mSamplesReader: (Int) -> Deferred<Array<Float>>
-    lateinit var mTotalSampleCountReader: () -> Int
+    private val mAudioFilePath: BehaviorSubject<String> = BehaviorSubject.create()
+    var mFileLoader: BehaviorSubject<Function<Unit, Job>> = BehaviorSubject.create()
+    var mSamplesReader: BehaviorSubject<Function<Int, Deferred<Array<Float>>>> = BehaviorSubject.create()
+    var mTotalSampleCountReader: BehaviorSubject<Function<Unit, Int>> = BehaviorSubject.create()
 
     var mWidth: BehaviorSubject<Int> = BehaviorSubject.create()
     var mHeight: BehaviorSubject<Int> = BehaviorSubject.create()
@@ -48,10 +48,15 @@ class FileWaveView @JvmOverloads constructor(
     init {
         fileLoaded.subscribe {
             if (it) {
-                totalSampleCount = mTotalSampleCountReader()
+                totalSampleCount = mTotalSampleCountReader.value.apply(Unit)
                 setupObservers()
             }
         }
+
+        mAudioFilePath.subscribe{ checkAndSetupAudioFileSource() }
+        mFileLoader.subscribe { checkAndSetupAudioFileSource() }
+        mSamplesReader.subscribe { checkAndSetupAudioFileSource() }
+        mTotalSampleCountReader.subscribe { checkAndSetupAudioFileSource() }
     }
 
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
@@ -63,22 +68,19 @@ class FileWaveView @JvmOverloads constructor(
     }
 
     fun setAudioFilePath(audioFilePath: String) {
-        mAudioFilePath = audioFilePath
-        checkAndSetupAudioFileSource()
+        mAudioFilePath.onNext(audioFilePath)
     }
 
-    fun setFileLoader(fileLoader: () -> Job) {
-        mFileLoader = fileLoader
-        checkAndSetupAudioFileSource()
+    fun setFileLoader(fileLoader: (Unit) -> Job) {
+        mFileLoader.onNext(fileLoader)
     }
 
     fun setSamplesReader(samplesReader: (Int) -> Deferred<Array<Float>>) {
-        mSamplesReader = samplesReader
+        mSamplesReader.onNext(samplesReader)
     }
 
-    fun setTotalSampleCountReader(totalSampleCountReader: () -> Int) {
-        mTotalSampleCountReader = totalSampleCountReader
-        checkAndSetupAudioFileSource()
+    fun setTotalSampleCountReader(totalSampleCountReader: (Unit) -> Int) {
+        mTotalSampleCountReader.onNext(totalSampleCountReader)
     }
 
     fun setupObservers() {
@@ -97,7 +99,7 @@ class FileWaveView @JvmOverloads constructor(
         if (!fileLoaded.value) return
 
         coroutineScope.launch {
-            mRawPoints.onNext(mSamplesReader(numSamples).await())
+            mRawPoints.onNext(mSamplesReader.value.apply(numSamples).await())
         }
     }
 
@@ -117,10 +119,10 @@ class FileWaveView @JvmOverloads constructor(
     }
 
     private fun checkAndSetupAudioFileSource() {
-        if (::mAudioFilePath.isInitialized
-            && ::mFileLoader.isInitialized
-            && ::mTotalSampleCountReader.isInitialized) {
-            mFileLoader().invokeOnCompletion {
+        if (mAudioFilePath.hasValue()
+            && mFileLoader.hasValue()
+            && mTotalSampleCountReader.hasValue()) {
+            mFileLoader.value.apply(Unit).invokeOnCompletion {
                 if (it == null) {
                     fileLoaded.onNext(true)
                 }

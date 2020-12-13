@@ -28,7 +28,7 @@ class AudioFileEventListeners(
     var getTotalSamples: (String) -> Int
 ) {
     fun readSamplesCallbackWithIndex(filePath: String): (Int)->Deferred<Array<Float>> = readSamplesCallback(filePath)
-    fun loadFileCallbackWithIndex(filePath: String): () -> Job = { loadFileCallback(filePath) }
-    fun deleteFileCallbackWithIndex(filePath: String): ()->Unit = { deleteFileCallback(filePath) }
-    fun getTotalSamplesWithIndex(filePath: String): () -> Int = { getTotalSamples(filePath) }
+    fun loadFileCallbackWithIndex(filePath: String): (Unit) -> Job = { loadFileCallback(filePath) }
+    fun deleteFileCallbackWithIndex(filePath: String): (Unit)->Unit = { deleteFileCallback(filePath) }
+    fun getTotalSamplesWithIndex(filePath: String): (Unit) -> Int = { getTotalSamples(filePath) }
 }
