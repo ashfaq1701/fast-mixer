@@ -4,7 +4,9 @@
     <dimen name="record_button_height">50dp</dimen>
     <dimen name="button_text_size">12sp</dimen>
     <dimen name="recording_timer_text_size">25sp</dimen>
-    <dimen name="audio_file_margin_top">8dp</dimen>
-    <dimen name="audio_file_margin_horizontal">5dp</dimen>
-    <dimen name="audio_file_view_height">100dp</dimen>
+    <dimen name="audio_file_list_margin_top">8dp</dimen>
+    <dimen name="audio_file_margin">5dp</dimen>
+    <dimen name="divider_margin">5dp</dimen>
+    <dimen name="audio_file_view_height">120dp</dimen>
+    <dimen name="horizontal_line_height">2dp</dimen>
 </resources>

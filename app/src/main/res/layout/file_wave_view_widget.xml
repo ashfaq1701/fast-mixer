@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
     <data>
         <variable
             name="audioFile"
@@ -11,16 +12,33 @@
             type="com.bluehub.fastmixer.screens.mixing.AudioFileEventListeners" />
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <com.bluehub.fastmixer.common.views.FileWaveView
+        android:layout_height="wrap_content">
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="@dimen/audio_file_view_height"
-            app:layout_constraintTop_toTopOf="parent"
-            app:audioFilePath="@{audioFile.path}"
-            app:fileLoader="@{eventListener.loadFileCallbackWithIndex(audioFile.path)}"
-            app:samplesReader="@{eventListener.readSamplesCallbackWithIndex(audioFile.path)}"
-            app:totalSampleCountReader="@{eventListener.getTotalSamplesWithIndex(audioFile.path)}" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/audio_file_margin"
+            android:background="@drawable/audio_widget_border">
+            <com.bluehub.fastmixer.common.views.FileWaveView
+                android:id="@+id/fileWaveView"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/audio_file_view_height"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:audioFilePath="@{audioFile.path}"
+                app:fileLoader="@{eventListener.loadFileCallbackWithIndex(audioFile.path)}"
+                app:samplesReader="@{eventListener.readSamplesCallbackWithIndex(audioFile.path)}"
+                app:totalSampleCountReader="@{eventListener.getTotalSamplesWithIndex(audioFile.path)}"
+                tools:layout_height="@dimen/audio_file_view_height" />
+            <View
+                android:layout_width="match_parent"
+                app:layout_constraintTop_toBottomOf="@id/fileWaveView"
+                app:layout_constraintStart_toStartOf="parent"
+                android:layout_height="@dimen/horizontal_line_height"
+                android:layout_marginTop="@dimen/divider_margin"
+                android:layout_marginBottom="@dimen/divider_margin"
+                android:background="@color/borderColor"/>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
 </layout>
