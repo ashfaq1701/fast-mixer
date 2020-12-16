@@ -5,4 +5,5 @@
     <color name="colorAccent">#03DAC5</color>
     <color name="visualizer">#3F51B5</color>
     <color name="borderColor">#CCCCCC</color>
+    <color name="transparentBackground">#80000000</color>
 </resources>
