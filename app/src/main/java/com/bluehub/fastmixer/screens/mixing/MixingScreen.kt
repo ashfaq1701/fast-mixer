@@ -35,7 +35,7 @@ class MixingScreen : PermissionFragment<MixingScreenViewModel>(ViewModelType.NAV
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         dataBinding = DataBindingUtil
             .inflate(inflater, R.layout.mixing_screen, container, false)
 
@@ -43,12 +43,12 @@ class MixingScreen : PermissionFragment<MixingScreenViewModel>(ViewModelType.NAV
 
         dataBinding.lifecycleOwner = viewLifecycleOwner
 
-        audioFileListAdapter = AudioFileListAdapter(requireContext(), AudioFileEventListeners(
+        audioFileListAdapter = AudioFileListAdapter(AudioFileEventListeners(
             { filePath: String -> viewModel.addFile(filePath) },
             { filePath: String -> viewModel.readSamples(filePath) },
             { filePath: String -> viewModel.deleteFile(filePath) },
             { filePath: String -> viewModel.getTotalSamples(filePath) }
-        ), viewModel.audioFiles)
+        ))
         dataBinding.audioFileListView.adapter = audioFileListAdapter
 
         navArguments.recordedFilePath?.let {
@@ -86,7 +86,7 @@ class MixingScreen : PermissionFragment<MixingScreenViewModel>(ViewModelType.NAV
         })
 
         viewModel.audioFilesLiveData.observe(viewLifecycleOwner, Observer {
-            audioFileListAdapter.notifyDataSetChanged()
+            audioFileListAdapter.submitList(it)
         })
     }
 }

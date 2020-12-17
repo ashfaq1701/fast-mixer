@@ -12,10 +12,7 @@ import androidx.databinding.BindingMethods
 import com.bluehub.fastmixer.R
 import io.reactivex.rxjava3.functions.Function
 import io.reactivex.rxjava3.subjects.BehaviorSubject
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 
 
 @BindingMethods(value = [
@@ -43,7 +40,7 @@ class FileWaveView @JvmOverloads constructor(
 
     private var totalSampleCount: Int = 0
 
-    private val coroutineScope = MainScope()
+    private val coroutineScope = CoroutineScope(Job() + Dispatchers.Main)
 
     init {
         fileLoaded.subscribe {
@@ -96,7 +93,7 @@ class FileWaveView @JvmOverloads constructor(
     }
 
     private fun fetchPointsToPlot(numSamples: Int, height: Int) {
-        if (!fileLoaded.value) return
+        if (!fileLoaded.value || width == 0) return
 
         coroutineScope.launch {
             mRawPoints.onNext(mSamplesReader.value.apply(numSamples).await())
@@ -104,6 +101,10 @@ class FileWaveView @JvmOverloads constructor(
     }
 
     private fun processPlotPoints(rawPts: Array<Float>) {
+        if (rawPts.isEmpty()) {
+            return
+        }
+
         val mean = rawPts.average()
 
         val maximum = rawPts.maxOrNull()
@@ -112,7 +113,9 @@ class FileWaveView @JvmOverloads constructor(
         val maxToScale = mHeight.value * 0.95
 
         mPlotPoints = rawPts.map { current ->
-            ((current / maxLevelInSamples.toFloat()) * maxToScale.toFloat())
+            if (maxLevelInSamples != 0) {
+                ((current / maxLevelInSamples.toFloat()) * maxToScale.toFloat())
+            } else 0.0f
         }.toTypedArray()
 
         invalidate()
@@ -134,6 +137,11 @@ class FileWaveView @JvmOverloads constructor(
         mWidth.onNext(w)
         mHeight.onNext(h)
         super.onSizeChanged(w, h, oldw, oldh)
+    }
+
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        coroutineScope.cancel()
     }
 
     override fun onDraw(canvas: Canvas) {

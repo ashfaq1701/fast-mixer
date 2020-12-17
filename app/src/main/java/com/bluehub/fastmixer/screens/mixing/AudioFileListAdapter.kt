@@ -6,19 +6,48 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
+import androidx.recyclerview.widget.RecyclerView
 import com.bluehub.fastmixer.databinding.ListItemAudioFileBinding
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Job
 
-class AudioFileListAdapter(context: Context, private val audioFileEventListeners: AudioFileEventListeners, audioFileList: MutableList<AudioFile>): ArrayAdapter<AudioFile>(context, -1, audioFileList) {
-    @SuppressLint("ViewHolder")
-    override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-        val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-        val binding = ListItemAudioFileBinding.inflate(inflater, parent, false)
-        binding.audioFile = getItem(position)
-        binding.eventListener = audioFileEventListeners
-        return binding.root
+class AudioFileListAdapter(private val clickListener: AudioFileEventListeners): ListAdapter<AudioFile, AudioFileListAdapter.ViewHolder>(AudioFileDiffCallback()) {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        return ViewHolder.from(parent)
     }
+
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        holder.bind(getItem(position)!!, clickListener)
+    }
+
+    class ViewHolder private constructor(val binding: ListItemAudioFileBinding): RecyclerView.ViewHolder(binding.root) {
+        fun bind(item: AudioFile, clickListener: AudioFileEventListeners) {
+            binding.audioFile = item
+            binding.eventListener = clickListener
+            binding.executePendingBindings()
+        }
+
+        companion object {
+            fun from(parent: ViewGroup): ViewHolder {
+                val layoutInflater = LayoutInflater.from(parent.context)
+                val binding = ListItemAudioFileBinding.inflate(layoutInflater, parent, false)
+                return ViewHolder(binding)
+            }
+        }
+    }
+}
+
+class AudioFileDiffCallback : DiffUtil.ItemCallback<AudioFile>() {
+    override fun areItemsTheSame(oldItem: AudioFile, newItem: AudioFile): Boolean {
+        return oldItem.path == newItem.path
+    }
+
+    override fun areContentsTheSame(oldItem: AudioFile, newItem: AudioFile): Boolean {
+        return oldItem == newItem
+    }
+
 }
 
 class AudioFileEventListeners(
