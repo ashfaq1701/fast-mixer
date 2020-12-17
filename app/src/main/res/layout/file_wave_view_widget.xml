@@ -10,6 +10,9 @@
         <variable
             name="eventListener"
             type="com.bluehub.fastmixer.screens.mixing.AudioFileEventListeners" />
+        <variable
+            name="waveViewEventListeners"
+            type="com.bluehub.fastmixer.common.views.FileWaveViewEventListeners" />
     </data>
 
     <LinearLayout
@@ -48,7 +51,8 @@
                 app:layout_constraintTop_toBottomOf="@id/waveViewControlDivider"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                android:src="@drawable/zoom_out_button" />
+                android:src="@drawable/zoom_out_button"
+                android:onClick="@{() -> waveViewEventListeners.waveViewZoomIn.invoke()}" />
 
             <ImageButton
                 style="@style/IconButton"
@@ -58,7 +62,8 @@
                 app:layout_constraintTop_toBottomOf="@id/waveViewControlDivider"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/waveZoomOut"
-                android:src="@drawable/zoom_in_button" />
+                android:src="@drawable/zoom_in_button"
+                android:onClick="@{() -> waveViewEventListeners.waveViewZoomOut.invoke()}" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </LinearLayout>

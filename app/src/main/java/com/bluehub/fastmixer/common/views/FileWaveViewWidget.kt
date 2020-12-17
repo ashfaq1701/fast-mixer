@@ -10,6 +10,7 @@ import com.bluehub.fastmixer.databinding.FileWaveViewWidgetBinding
 import com.bluehub.fastmixer.screens.mixing.AudioFile
 import com.bluehub.fastmixer.screens.mixing.AudioFileEventListeners
 import io.reactivex.rxjava3.subjects.BehaviorSubject
+import timber.log.Timber
 
 @BindingMethods(value = [
     BindingMethod(type = FileWaveViewWidget::class, attribute = "audioFile", method = "setAudioFile"),
@@ -36,10 +37,26 @@ class FileWaveViewWidget(context: Context, attributeSet: AttributeSet?)
 
     private fun checkAndRenderView() {
         if (mAudioFile.hasValue() && mAudioFileEventListeners.hasValue()) {
+            val waveViewEventListeners = FileWaveViewEventListeners(::waveViewZoomIn, ::waveViewZoomOut)
+
             val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
             val binding = FileWaveViewWidgetBinding.inflate(inflater, this, true)
             binding.audioFile = mAudioFile.value
             binding.eventListener = mAudioFileEventListeners.value
+            binding.waveViewEventListeners = waveViewEventListeners
         }
     }
+
+    private fun waveViewZoomIn() {
+
+    }
+
+    private fun waveViewZoomOut() {
+
+    }
 }
+
+class FileWaveViewEventListeners(
+    val waveViewZoomIn: ()->Unit,
+    val waveViewZoomOut: ()->Unit
+)
