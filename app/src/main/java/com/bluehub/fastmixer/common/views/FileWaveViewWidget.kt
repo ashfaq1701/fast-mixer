@@ -10,11 +10,23 @@ import com.bluehub.fastmixer.databinding.FileWaveViewWidgetBinding
 import com.bluehub.fastmixer.screens.mixing.AudioFile
 import com.bluehub.fastmixer.screens.mixing.AudioFileEventListeners
 import io.reactivex.rxjava3.subjects.BehaviorSubject
+import kotlinx.android.synthetic.main.file_wave_view_widget.view.*
 
-@BindingMethods(value = [
-    BindingMethod(type = FileWaveViewWidget::class, attribute = "audioFile", method = "setAudioFile"),
-    BindingMethod(type = FileWaveViewWidget::class, attribute = "audioFileEventListeners", method = "setAudioFileEventListeners")
-])
+
+@BindingMethods(
+    value = [
+        BindingMethod(
+            type = FileWaveViewWidget::class,
+            attribute = "audioFile",
+            method = "setAudioFile"
+        ),
+        BindingMethod(
+            type = FileWaveViewWidget::class,
+            attribute = "audioFileEventListeners",
+            method = "setAudioFileEventListeners"
+        )
+    ]
+)
 class FileWaveViewWidget(context: Context, attributeSet: AttributeSet?)
     : ConstraintLayout(context, attributeSet) {
 
@@ -36,7 +48,10 @@ class FileWaveViewWidget(context: Context, attributeSet: AttributeSet?)
 
     private fun checkAndRenderView() {
         if (mAudioFile.hasValue() && mAudioFileEventListeners.hasValue()) {
-            val waveViewEventListeners = FileWaveViewEventListeners(::waveViewZoomIn, ::waveViewZoomOut)
+            val waveViewEventListeners = FileWaveViewEventListeners(
+                ::waveViewZoomIn,
+                ::waveViewZoomOut
+            )
 
             val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
             val binding = FileWaveViewWidgetBinding.inflate(inflater, this, true)
@@ -47,15 +62,15 @@ class FileWaveViewWidget(context: Context, attributeSet: AttributeSet?)
     }
 
     private fun waveViewZoomIn() {
-
+        fileWaveView.zoomIn()
     }
 
     private fun waveViewZoomOut() {
-
+        fileWaveView.zoomOut()
     }
 }
 
 class FileWaveViewEventListeners(
-    val waveViewZoomIn: ()->Unit,
-    val waveViewZoomOut: ()->Unit
+    val waveViewZoomIn: () -> Unit,
+    val waveViewZoomOut: () -> Unit
 )

@@ -5,7 +5,6 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-
         <variable
             name="audioFile"
             type="com.bluehub.fastmixer.screens.mixing.AudioFile" />
@@ -58,7 +57,7 @@
             style="@style/IconButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:onClick="@{() -> waveViewEventListeners.waveViewZoomIn.invoke()}"
+            android:onClick="@{() -> waveViewEventListeners.waveViewZoomOut.invoke()}"
             android:src="@drawable/zoom_out_button"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -69,7 +68,7 @@
             style="@style/IconButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:onClick="@{() -> waveViewEventListeners.waveViewZoomOut.invoke()}"
+            android:onClick="@{() -> waveViewEventListeners.waveViewZoomIn.invoke()}"
             android:src="@drawable/zoom_in_button"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/waveZoomOut"

@@ -25,6 +25,10 @@ class FileWaveView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null
 ) : View(context, attrs) {
+    companion object {
+        const val ZOOM_STEP = 1
+    }
+
     private val mAudioFilePath: BehaviorSubject<String> = BehaviorSubject.create()
     var mFileLoader: BehaviorSubject<Function<Unit, Job>> = BehaviorSubject.create()
     var mSamplesReader: BehaviorSubject<Function<Int, Deferred<Array<Float>>>> = BehaviorSubject.create()
@@ -33,8 +37,9 @@ class FileWaveView @JvmOverloads constructor(
     var mWidth: BehaviorSubject<Int> = BehaviorSubject.create()
     var mHeight: BehaviorSubject<Int> = BehaviorSubject.create()
     var mRawPoints: BehaviorSubject<Array<Float>> = BehaviorSubject.create()
+    var mTotalSamplesCount: BehaviorSubject<Int> = BehaviorSubject.create()
 
-    lateinit var mPlotPoints: Array<Float>
+    private lateinit var mPlotPoints: Array<Float>
 
     private var fileLoaded: BehaviorSubject<Boolean> = BehaviorSubject.create()
 
@@ -42,7 +47,7 @@ class FileWaveView @JvmOverloads constructor(
 
     private val coroutineScope = CoroutineScope(Job() + Dispatchers.Main)
 
-
+    private val zoomLevel: BehaviorSubject<Int> = BehaviorSubject.create()
 
     init {
         fileLoaded.subscribe {
@@ -51,6 +56,8 @@ class FileWaveView @JvmOverloads constructor(
                 setupObservers()
             }
         }
+
+        zoomLevel.onNext(1)
 
         mAudioFilePath.subscribe{ checkAndSetupAudioFileSource() }
         mFileLoader.subscribe { checkAndSetupAudioFileSource() }
@@ -82,23 +89,39 @@ class FileWaveView @JvmOverloads constructor(
         mTotalSampleCountReader.onNext(totalSampleCountReader)
     }
 
-    fun setupObservers() {
-        mWidth.zipWith(mHeight, { first: Int, second: Int ->
-            Pair(first, second)
-        }).subscribe { pair ->
-            fetchPointsToPlot(pair.first, pair.second)
+    fun zoomIn() {
+        if (zoomLevel.value * mWidth.value < mTotalSamplesCount.value) {
+            zoomLevel.onNext(zoomLevel.value + ZOOM_STEP)
+        }
+    }
+
+    fun zoomOut() {
+        if (zoomLevel.value >= 1 + ZOOM_STEP) {
+            zoomLevel.onNext(zoomLevel.value - ZOOM_STEP)
+        }
+    }
+
+    private fun setupObservers() {
+        mWidth.subscribe {
+            fetchPointsToPlot()
         }
 
         mRawPoints.subscribe { ptsArr ->
             processPlotPoints(ptsArr)
         }
+
+        zoomLevel.subscribe {
+            handleZoom()
+        }
     }
 
-    private fun fetchPointsToPlot(numSamples: Int, height: Int) {
-        if (!fileLoaded.value || width == 0) return
+    private fun fetchPointsToPlot() {
+        if (!fileLoaded.hasValue() || !mWidth.hasValue() || mWidth.value == 0) return
+
+        val numPts = mWidth.value
 
         coroutineScope.launch {
-            mRawPoints.onNext(mSamplesReader.value.apply(numSamples).await())
+            mRawPoints.onNext(mSamplesReader.value.apply(numPts).await())
         }
     }
 
@@ -129,10 +152,25 @@ class FileWaveView @JvmOverloads constructor(
             && mTotalSampleCountReader.hasValue()) {
             mFileLoader.value.apply(Unit).invokeOnCompletion {
                 if (it == null) {
+                    mTotalSamplesCount.onNext(mTotalSampleCountReader.value.apply(Unit))
                     fileLoaded.onNext(true)
                 }
             }
         }
+    }
+
+    private fun handleZoom() {
+        requestLayout()
+    }
+
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec)
+        val calculatedWidth = if (zoomLevel.hasValue()) {
+            zoomLevel.value * measuredWidth
+        } else {
+            measuredWidth
+        }
+        setMeasuredDimension(calculatedWidth, measuredHeight)
     }
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
@@ -153,7 +191,8 @@ class FileWaveView @JvmOverloads constructor(
             return
         }
 
-        val ptsDistance: Int = mWidth.value / mPlotPoints.size
+        val widthPtRatio = mWidth.value / mPlotPoints.size
+        val ptsDistance: Int = if (widthPtRatio >= 1) widthPtRatio else 1
 
         var currentPoint = 0
         mPlotPoints.forEach { item ->
