@@ -3,21 +3,20 @@ package com.bluehub.fastmixer.common.views
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
-import android.widget.LinearLayout
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.databinding.BindingMethod
 import androidx.databinding.BindingMethods
 import com.bluehub.fastmixer.databinding.FileWaveViewWidgetBinding
 import com.bluehub.fastmixer.screens.mixing.AudioFile
 import com.bluehub.fastmixer.screens.mixing.AudioFileEventListeners
 import io.reactivex.rxjava3.subjects.BehaviorSubject
-import timber.log.Timber
 
 @BindingMethods(value = [
     BindingMethod(type = FileWaveViewWidget::class, attribute = "audioFile", method = "setAudioFile"),
     BindingMethod(type = FileWaveViewWidget::class, attribute = "audioFileEventListeners", method = "setAudioFileEventListeners")
 ])
 class FileWaveViewWidget(context: Context, attributeSet: AttributeSet?)
-    : LinearLayout(context, attributeSet) {
+    : ConstraintLayout(context, attributeSet) {
 
     private var mAudioFile: BehaviorSubject<AudioFile> = BehaviorSubject.create()
     private val mAudioFileEventListeners: BehaviorSubject<AudioFileEventListeners> = BehaviorSubject.create()

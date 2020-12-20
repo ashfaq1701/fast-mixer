@@ -42,6 +42,8 @@ class FileWaveView @JvmOverloads constructor(
 
     private val coroutineScope = CoroutineScope(Job() + Dispatchers.Main)
 
+
+
     init {
         fileLoaded.subscribe {
             if (it) {
@@ -151,8 +153,12 @@ class FileWaveView @JvmOverloads constructor(
             return
         }
 
-        mPlotPoints.forEachIndexed { idx, item ->
-            canvas.drawLine(idx.toFloat(), mHeight.value.toFloat(), idx.toFloat(), (mHeight.value - item), paint)
+        val ptsDistance: Int = mWidth.value / mPlotPoints.size
+
+        var currentPoint = 0
+        mPlotPoints.forEach { item ->
+            canvas.drawLine(currentPoint.toFloat(), mHeight.value.toFloat(), currentPoint.toFloat(), (mHeight.value - item), paint)
+            currentPoint += ptsDistance
         }
     }
 }

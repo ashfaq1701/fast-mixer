@@ -3,68 +3,77 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
+
     <data>
+
         <variable
             name="audioFile"
             type="com.bluehub.fastmixer.screens.mixing.AudioFile" />
+
         <variable
             name="eventListener"
             type="com.bluehub.fastmixer.screens.mixing.AudioFileEventListeners" />
+
         <variable
             name="waveViewEventListeners"
             type="com.bluehub.fastmixer.common.views.FileWaveViewEventListeners" />
     </data>
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/audio_file_margin"
+        android:background="@drawable/audio_widget_border">
+
+        <HorizontalScrollView
+            android:id="@+id/fileWaveViewScroll"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/audio_file_margin"
-            android:background="@drawable/audio_widget_border">
+            android:fillViewport="true"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
             <com.bluehub.fastmixer.common.views.FileWaveView
                 android:id="@+id/fileWaveView"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="@dimen/audio_file_view_height"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
                 app:audioFilePath="@{audioFile.path}"
                 app:fileLoader="@{eventListener.loadFileCallbackWithIndex(audioFile.path)}"
                 app:samplesReader="@{eventListener.readSamplesCallbackWithIndex(audioFile.path)}"
                 app:totalSampleCountReader="@{eventListener.getTotalSamplesWithIndex(audioFile.path)}"
-                tools:layout_height="@dimen/audio_file_view_height" />
-            <View
-                android:id="@+id/waveViewControlDivider"
-                android:layout_width="match_parent"
-                app:layout_constraintTop_toBottomOf="@id/fileWaveView"
-                app:layout_constraintStart_toStartOf="parent"
-                android:layout_height="@dimen/horizontal_line_height"
-                android:layout_marginVertical="@dimen/divider_margin"
-                android:background="@color/borderColor"/>
+                tools:layout_height="120dp" />
+        </HorizontalScrollView>
 
-            <ImageButton
-                style="@style/IconButton"
-                android:id="@+id/waveZoomOut"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:layout_constraintTop_toBottomOf="@id/waveViewControlDivider"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                android:src="@drawable/zoom_out_button"
-                android:onClick="@{() -> waveViewEventListeners.waveViewZoomIn.invoke()}" />
+        <View
+            android:id="@+id/waveViewControlDivider"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/horizontal_line_height"
+            android:layout_marginVertical="@dimen/divider_margin"
+            android:background="@color/borderColor"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/fileWaveViewScroll" />
 
-            <ImageButton
-                style="@style/IconButton"
-                android:id="@+id/waveZoomIn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:layout_constraintTop_toBottomOf="@id/waveViewControlDivider"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/waveZoomOut"
-                android:src="@drawable/zoom_in_button"
-                android:onClick="@{() -> waveViewEventListeners.waveViewZoomOut.invoke()}" />
+        <ImageButton
+            android:id="@+id/waveZoomOut"
+            style="@style/IconButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="@{() -> waveViewEventListeners.waveViewZoomIn.invoke()}"
+            android:src="@drawable/zoom_out_button"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/waveViewControlDivider" />
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
-    </LinearLayout>
+        <ImageButton
+            android:id="@+id/waveZoomIn"
+            style="@style/IconButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="@{() -> waveViewEventListeners.waveViewZoomOut.invoke()}"
+            android:src="@drawable/zoom_in_button"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/waveZoomOut"
+            app:layout_constraintTop_toBottomOf="@id/waveViewControlDivider" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
