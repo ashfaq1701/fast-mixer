@@ -62,7 +62,7 @@ class RecordingScreen : PermissionFragment<RecordingScreenViewModel>(ViewModelTy
     }
 
     fun initUI() {
-        viewModel.eventIsRecording.observe(viewLifecycleOwner, Observer { isRecording ->
+        viewModel.eventIsRecording.observe(viewLifecycleOwner, { isRecording ->
             if (isRecording) {
                 viewModel.startDrawingVisualizer()
                 viewModel.startUpdatingTimer()
@@ -72,7 +72,7 @@ class RecordingScreen : PermissionFragment<RecordingScreenViewModel>(ViewModelTy
             }
         })
 
-        viewModel.eventIsPlaying.observe(viewLifecycleOwner, Observer { isPlaying ->
+        viewModel.eventIsPlaying.observe(viewLifecycleOwner, { isPlaying ->
             if (!isPlaying) {
                 dataBinding.togglePlay.text = getString(R.string.play_label)
                 viewModel.stopTrackingSeekbarTimer()
@@ -82,7 +82,7 @@ class RecordingScreen : PermissionFragment<RecordingScreenViewModel>(ViewModelTy
             }
         })
 
-        viewModel.eventGoBack.observe(viewLifecycleOwner, Observer { goBack ->
+        viewModel.eventGoBack.observe(viewLifecycleOwner, { goBack ->
             if (goBack) {
                 val action = RecordingScreenDirections.actionRecordingScreenToMixingScreen()
                 action.recordedFilePath = viewModel.repository.getRecordedFilePath()
@@ -91,7 +91,7 @@ class RecordingScreen : PermissionFragment<RecordingScreenViewModel>(ViewModelTy
             }
         })
 
-        viewModel.eventRecordPermission.observe(viewLifecycleOwner, Observer { record ->
+        viewModel.eventRecordPermission.observe(viewLifecycleOwner, { record ->
             if (record.fromCallback && record.hasPermission) {
                 when(record.permissionCode) {
                     ScreenConstants.TOGGLE_RECORDING -> viewModel.toggleRecording()
@@ -100,21 +100,21 @@ class RecordingScreen : PermissionFragment<RecordingScreenViewModel>(ViewModelTy
             }
         })
 
-        viewModel.audioVisualizerMaxAmplitude.observe(viewLifecycleOwner, Observer {
+        viewModel.audioVisualizerMaxAmplitude.observe(viewLifecycleOwner, {
             if (viewModel.audioVisualizerRunning.value == true) {
                 audioRecordView.update(it)
             }
         })
 
-        viewModel.audioVisualizerRunning.observe(viewLifecycleOwner, Observer {
+        viewModel.audioVisualizerRunning.observe(viewLifecycleOwner, {
             audioRecordView.recreate()
         })
 
-        viewModel.seekbarMaxValue.observe(viewLifecycleOwner, Observer {
+        viewModel.seekbarMaxValue.observe(viewLifecycleOwner, {
             recordingSeekbar.max = it
         })
 
-        viewModel.seekbarProgress.observe(viewLifecycleOwner, Observer {
+        viewModel.seekbarProgress.observe(viewLifecycleOwner, {
             recordingSeekbar.progress = it
         })
 

@@ -50,7 +50,8 @@ class FileWaveViewWidget(context: Context, attributeSet: AttributeSet?)
         if (mAudioFile.hasValue() && mAudioFileEventListeners.hasValue()) {
             val waveViewEventListeners = FileWaveViewEventListeners(
                 ::waveViewZoomIn,
-                ::waveViewZoomOut
+                ::waveViewZoomOut,
+                ::waveViewDelete
             )
 
             val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
@@ -59,6 +60,10 @@ class FileWaveViewWidget(context: Context, attributeSet: AttributeSet?)
             binding.eventListener = mAudioFileEventListeners.value
             binding.waveViewEventListeners = waveViewEventListeners
         }
+    }
+
+    private fun waveViewDelete() {
+        mAudioFileEventListeners.value.deleteFileCallback(mAudioFile.value.path)
     }
 
     private fun waveViewZoomIn() {
@@ -72,5 +77,6 @@ class FileWaveViewWidget(context: Context, attributeSet: AttributeSet?)
 
 class FileWaveViewEventListeners(
     val waveViewZoomIn: () -> Unit,
-    val waveViewZoomOut: () -> Unit
+    val waveViewZoomOut: () -> Unit,
+    val waveViewDelete: () -> Unit
 )

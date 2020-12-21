@@ -5,14 +5,17 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.bluehub.fastmixer.common.permissions.PermissionViewModel
+import com.bluehub.fastmixer.common.utils.FileManager
 import com.bluehub.fastmixer.common.utils.PermissionManager
 import com.bluehub.fastmixer.common.utils.ScreenConstants
 import kotlinx.coroutines.*
+import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 
 class MixingScreenViewModel @Inject constructor (override val context: Context,
                                                  override val permissionManager: PermissionManager,
+                                                 val fileManager: FileManager,
                                                  val mixingRepository: MixingRepository): PermissionViewModel(context) {
     var audioFiles: MutableList<AudioFile> = mutableListOf()
     val audioFilesLiveData = MutableLiveData<MutableList<AudioFile>>(mutableListOf())
@@ -24,6 +27,10 @@ class MixingScreenViewModel @Inject constructor (override val context: Context,
     private val _eventRead = MutableLiveData<Boolean>()
     val eventRead: LiveData<Boolean>
         get() = _eventRead
+
+    private val _itemRemovedIdx = MutableLiveData<Int>()
+    val itemRemovedIdx: LiveData<Int>
+        get() = _itemRemovedIdx
 
     init {
         mixingRepository.createMixingEngine()
@@ -76,14 +83,28 @@ class MixingScreenViewModel @Inject constructor (override val context: Context,
     fun deleteFile(filePath: String) {
         viewModelScope.launch {
             mixingRepository.deleteFile(filePath)
-            audioFiles.remove(
-                audioFiles.find {
-                    it.path == filePath
-                }
-            )
 
-            audioFilesLiveData.value = audioFiles
+            val idxToRemove = audioFiles.foldIndexed(listOf<Int>(), { idx, list, file ->
+                if (file.path == filePath) {
+                    list + idx
+                } else {
+                    list
+                }
+            })
+
+            val firstIdx = idxToRemove.firstOrNull()
+
+            firstIdx?.let {
+                val removedFile = audioFiles.removeAt(it)
+                fileManager.removeFile(removedFile.path)
+                audioFilesLiveData.value = audioFiles
+                _itemRemovedIdx.value = it
+            }
         }
+    }
+
+    fun resetItemRemovedIdx() {
+        _itemRemovedIdx.value = null
     }
 
 

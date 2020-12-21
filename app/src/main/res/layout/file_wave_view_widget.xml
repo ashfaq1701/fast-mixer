@@ -53,6 +53,17 @@
             app:layout_constraintTop_toBottomOf="@id/fileWaveViewScroll" />
 
         <ImageButton
+            android:id="@+id/waveDelete"
+            style="@style/IconButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="@{() -> waveViewEventListeners.waveViewDelete.invoke()}"
+            android:src="@drawable/delete_button"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/waveViewControlDivider" />
+
+        <ImageButton
             android:id="@+id/waveZoomOut"
             style="@style/IconButton"
             android:layout_width="wrap_content"
@@ -60,7 +71,7 @@
             android:onClick="@{() -> waveViewEventListeners.waveViewZoomOut.invoke()}"
             android:src="@drawable/zoom_out_button"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/waveDelete"
             app:layout_constraintTop_toBottomOf="@id/waveViewControlDivider" />
 
         <ImageButton

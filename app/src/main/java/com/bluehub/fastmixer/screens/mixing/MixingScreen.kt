@@ -12,6 +12,8 @@ import com.bluehub.fastmixer.common.utils.DialogManager
 import com.bluehub.fastmixer.common.utils.ScreenConstants
 import com.bluehub.fastmixer.common.utils.ViewModelType
 import com.bluehub.fastmixer.databinding.MixingScreenBinding
+import kotlinx.android.synthetic.main.mixing_screen.*
+import timber.log.Timber
 import javax.inject.Inject
 
 class MixingScreen : PermissionFragment<MixingScreenViewModel>(ViewModelType.NAV_SCOPED) {
@@ -62,14 +64,14 @@ class MixingScreen : PermissionFragment<MixingScreenViewModel>(ViewModelType.NAV
     }
 
     private fun initUI() {
-        viewModel.eventRecord.observe(viewLifecycleOwner, Observer { record ->
+        viewModel.eventRecord.observe(viewLifecycleOwner, { record ->
             if (record) {
                 findNavController().navigate(MixingScreenDirections.actionMixingScreenToRecordingScreen())
                 viewModel.onRecordNavigated()
             }
         })
 
-        viewModel.eventWriteFilePermission.observe(viewLifecycleOwner, Observer {record ->
+        viewModel.eventWriteFilePermission.observe(viewLifecycleOwner, { record ->
             if (record.fromCallback && record.hasPermission) {
                 when(record.permissionCode) {
                     ScreenConstants.WRITE_TO_FILE -> viewModel.onSaveToDisk()
@@ -77,7 +79,7 @@ class MixingScreen : PermissionFragment<MixingScreenViewModel>(ViewModelType.NAV
             }
         })
 
-        viewModel.eventReadFilePermission.observe(viewLifecycleOwner, Observer {record ->
+        viewModel.eventReadFilePermission.observe(viewLifecycleOwner, { record ->
             if (record.fromCallback && record.hasPermission) {
                 when(record.permissionCode) {
                     ScreenConstants.READ_FROM_FILE -> viewModel.onReadFromDisk()
@@ -85,8 +87,15 @@ class MixingScreen : PermissionFragment<MixingScreenViewModel>(ViewModelType.NAV
             }
         })
 
-        viewModel.audioFilesLiveData.observe(viewLifecycleOwner, Observer {
+        viewModel.audioFilesLiveData.observe(viewLifecycleOwner, {
             audioFileListAdapter.submitList(it)
+        })
+
+        viewModel.itemRemovedIdx.observe(viewLifecycleOwner, {
+            if (it != null) {
+                audioFileListAdapter.notifyItemRemoved(it)
+                viewModel.resetItemRemovedIdx()
+            }
         })
     }
 }

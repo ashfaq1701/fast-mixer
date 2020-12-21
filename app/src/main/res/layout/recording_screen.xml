@@ -18,15 +18,15 @@
         <com.visualizer.amplitude.AudioRecordView
             android:id="@+id/recording_visualizer"
             android:layout_width="wrap_content"
-            android:layout_height="200dp"
+            android:layout_height="@dimen/recording_visualizer_height"
             app:chunkAlignTo="bottom"
             app:chunkRoundedCorners="true"
             app:chunkSoftTransition="true"
             app:chunkColor="@color/visualizer"
-            app:chunkSpace="1dp"
-            app:chunkWidth="2dp"
-            app:chunkMaxHeight="160dp"
-            app:chunkMinHeight="20dp"
+            app:chunkSpace="@dimen/recording_visualizer_chunk_space"
+            app:chunkWidth="@dimen/recording_visualizer_chunk_width"
+            app:chunkMaxHeight="@dimen/recording_visualizer_chunk_max_width"
+            app:chunkMinHeight="@dimen/recording_visualizer_chunk_min_width"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
 
