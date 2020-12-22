@@ -1,5 +1,7 @@
 package com.bluehub.fastmixer.screens.mixing
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.view.*
 import androidx.databinding.DataBindingUtil
@@ -97,5 +99,31 @@ class MixingScreen : PermissionFragment<MixingScreenViewModel>(ViewModelType.NAV
                 viewModel.resetItemRemovedIdx()
             }
         })
+
+        viewModel.eventRead.observe(viewLifecycleOwner, {
+            openFilePicker()
+        })
+    }
+
+    fun openFilePicker() {
+        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+            type = "*/*"
+            val mimeTypes = arrayOf("audio/mpeg", "audio/x-wav")
+            putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes)
+            addCategory(Intent.CATEGORY_OPENABLE)
+        }
+        startActivityForResult(intent, OPEN_FILE_REQUEST_CODE)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == OPEN_FILE_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+            data?.data?.also { documentUri ->
+                viewModel.addReadFilePath(documentUri)
+            }
+        }
     }
 }
+
+private const val OPEN_FILE_REQUEST_CODE = 0x33

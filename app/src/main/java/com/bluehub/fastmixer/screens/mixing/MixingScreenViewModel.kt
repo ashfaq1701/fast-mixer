@@ -1,6 +1,7 @@
 package com.bluehub.fastmixer.screens.mixing
 
 import android.content.Context
+import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
@@ -45,6 +46,7 @@ class MixingScreenViewModel @Inject constructor (override val context: Context,
             setRequestReadFilePermission(ScreenConstants.READ_FROM_FILE)
             return
         }
+        _eventRead.value = true
     }
 
     fun onSaveToDisk() {
@@ -59,12 +61,22 @@ class MixingScreenViewModel @Inject constructor (override val context: Context,
     }
 
     fun addRecordedFilePath(filePath: String) {
-        val file = File(filePath)
-        if (file.exists()) {
+        if (!fileManager.fileExists(filePath)) return
+
+        if (audioFiles.filter {
+            it.path == filePath
+        }.count() == 0) {
+            audioFiles.add(AudioFile(filePath, AudioFileType.RECORDED))
+            audioFilesLiveData.value = audioFiles
+        }
+    }
+
+    fun addReadFilePath(fileUri: Uri) {
+        fileUri.path?.let { filePath ->
             if (audioFiles.filter {
                 it.path == filePath
             }.count() == 0) {
-                audioFiles.add(AudioFile(filePath, AudioFileType.RECORDED))
+                audioFiles.add(AudioFile(filePath, AudioFileType.IMPORTED))
                 audioFilesLiveData.value = audioFiles
             }
         }

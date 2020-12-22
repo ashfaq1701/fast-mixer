@@ -8,4 +8,6 @@ class FileManager @Inject constructor() {
         val file = File(filePath)
         file.delete()
     }
+
+    fun fileExists(path: String) = File(path).exists()
 }
