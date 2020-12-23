@@ -1,6 +1,7 @@
 package com.bluehub.fastmixer.screens.mixing
 
 import android.app.Activity
+import android.content.ContentResolver
 import android.content.Intent
 import android.os.Bundle
 import android.view.*
@@ -36,6 +37,8 @@ class MixingScreen : PermissionFragment<MixingScreenViewModel>(ViewModelType.NAV
 
     private val navArguments: MixingScreenArgs by navArgs()
 
+    private lateinit var resolver: ContentResolver
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -59,6 +62,8 @@ class MixingScreen : PermissionFragment<MixingScreenViewModel>(ViewModelType.NAV
             if (it.isNotEmpty()) viewModel.addRecordedFilePath(it)
         }
 
+        resolver = requireContext().contentResolver
+
         setPermissionEvents()
         initUI()
 
@@ -70,22 +75,6 @@ class MixingScreen : PermissionFragment<MixingScreenViewModel>(ViewModelType.NAV
             if (record) {
                 findNavController().navigate(MixingScreenDirections.actionMixingScreenToRecordingScreen())
                 viewModel.onRecordNavigated()
-            }
-        })
-
-        viewModel.eventWriteFilePermission.observe(viewLifecycleOwner, { record ->
-            if (record.fromCallback && record.hasPermission) {
-                when(record.permissionCode) {
-                    ScreenConstants.WRITE_TO_FILE -> viewModel.onSaveToDisk()
-                }
-            }
-        })
-
-        viewModel.eventReadFilePermission.observe(viewLifecycleOwner, { record ->
-            if (record.fromCallback && record.hasPermission) {
-                when(record.permissionCode) {
-                    ScreenConstants.READ_FROM_FILE -> viewModel.onReadFromDisk()
-                }
             }
         })
 
@@ -101,7 +90,10 @@ class MixingScreen : PermissionFragment<MixingScreenViewModel>(ViewModelType.NAV
         })
 
         viewModel.eventRead.observe(viewLifecycleOwner, {
-            openFilePicker()
+            if (it) {
+                openFilePicker()
+                viewModel.resetReadFromDisk()
+            }
         })
     }
 
@@ -120,7 +112,7 @@ class MixingScreen : PermissionFragment<MixingScreenViewModel>(ViewModelType.NAV
 
         if (requestCode == OPEN_FILE_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
             data?.data?.also { documentUri ->
-                viewModel.addReadFilePath(documentUri)
+
             }
         }
     }

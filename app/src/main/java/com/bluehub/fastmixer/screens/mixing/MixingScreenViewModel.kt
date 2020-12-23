@@ -42,18 +42,15 @@ class MixingScreenViewModel @Inject constructor (override val context: Context,
     }
 
     fun onReadFromDisk() {
-        if(!checkReadFilePermission()) {
-            setRequestReadFilePermission(ScreenConstants.READ_FROM_FILE)
-            return
-        }
         _eventRead.value = true
     }
 
+    fun resetReadFromDisk() {
+        _eventRead.value = false
+    }
+
     fun onSaveToDisk() {
-        if(!checkWriteFilePermission()) {
-            setRequestWriteFilePermission(ScreenConstants.WRITE_TO_FILE)
-            return
-        }
+
     }
 
     fun onRecordNavigated() {
@@ -80,6 +77,10 @@ class MixingScreenViewModel @Inject constructor (override val context: Context,
                 audioFilesLiveData.value = audioFiles
             }
         }
+    }
+
+    fun copyFileInAppStorage(uri: Uri) {
+        Timber.d("URI Path Segments: ${uri}")
     }
 
     fun addFile(filePath: String): Job = viewModelScope.launch {

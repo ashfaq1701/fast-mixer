@@ -20,20 +20,6 @@ abstract class PermissionFragment<T: PermissionViewModel>(viewModelType: ViewMod
             }
         })
 
-        viewModel.eventRequestReadFilePermission.observe(viewLifecycleOwner, Observer { requestReadFilePermission ->
-            if (requestReadFilePermission.toRequest) {
-                requestPermissions(arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), requestReadFilePermission.requestCode)
-                viewModel.resetRequestReadFilePermission()
-            }
-        })
-
-        viewModel.eventRequestWriteFilePermission.observe(viewLifecycleOwner, Observer { requestWriteFilePermission ->
-            if (requestWriteFilePermission.toRequest) {
-                requestPermissions(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), requestWriteFilePermission.requestCode)
-                viewModel.resetRequestWriteFilePermission()
-            }
-        })
-
         viewModel.eventShowRecordingPermissionDialog.observe(viewLifecycleOwner, Observer { showRecordingPermissionDialog ->
             if (showRecordingPermissionDialog) {
                 val neverAskAgain = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -46,39 +32,6 @@ abstract class PermissionFragment<T: PermissionViewModel>(viewModelType: ViewMod
                     dialogManager.showPermissionsErrorDialog(requireContext(), Manifest.permission.RECORD_AUDIO, neverAskAgain)
                 }
                 viewModel.hideRecordingPermissionDialog()
-            }
-        })
-
-        viewModel.eventShowReadFilePermissionDialog.observe(viewLifecycleOwner, Observer { showReadFilePermissionDialog ->
-            if (showReadFilePermissionDialog) {
-                val neverAskAgain = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    !shouldShowRequestPermissionRationale(Manifest.permission.READ_EXTERNAL_STORAGE)
-                } else {
-                    false
-                }
-
-                context?.let {
-                    dialogManager.showPermissionsErrorDialog(requireContext(), Manifest.permission.READ_EXTERNAL_STORAGE, neverAskAgain)
-                }
-                viewModel.hideReadFilePermissionDialog()
-            }
-        })
-
-        viewModel.eventShowWriteFilePermissionDialog.observe(viewLifecycleOwner, Observer { showWriteFilePermissionDialog ->
-            if (showWriteFilePermissionDialog) {
-                val neverAskAgain = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    !shouldShowRequestPermissionRationale(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                } else {
-                    false
-                }
-
-                context?.let {
-                    dialogManager.showPermissionsErrorDialog(
-                        requireContext(),
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                        neverAskAgain)
-                }
-                viewModel.hideWriteFilePermissionDialog()
             }
         })
     }
@@ -112,11 +65,6 @@ abstract class PermissionFragment<T: PermissionViewModel>(viewModelType: ViewMod
             when(permission) {
                 Manifest.permission.RECORD_AUDIO -> viewModel.setEventRecordPermission(
                     PermissionHolder(hasPermission = true, permissionCode = requestCode, fromCallback = true))
-                Manifest.permission.READ_EXTERNAL_STORAGE -> viewModel.setEventRequestReadFilePermission(
-                    PermissionHolder(hasPermission = true, permissionCode = requestCode, fromCallback = true))
-                Manifest.permission.WRITE_EXTERNAL_STORAGE -> viewModel.setEventRequestWriteFilePermission(
-                    PermissionHolder(hasPermission = true, permissionCode = requestCode, fromCallback = true)
-                )
             }
         }
 
@@ -130,19 +78,11 @@ abstract class PermissionFragment<T: PermissionViewModel>(viewModelType: ViewMod
                     Manifest.permission.RECORD_AUDIO -> viewModel.setEventRecordPermission(
                         PermissionHolder(hasPermission = false, permissionCode = requestCode, fromCallback = true)
                     )
-                    Manifest.permission.READ_EXTERNAL_STORAGE -> viewModel.setEventRequestReadFilePermission(
-                        PermissionHolder(hasPermission = false, permissionCode = requestCode, fromCallback = true)
-                    )
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE -> viewModel.setEventRequestWriteFilePermission(
-                        PermissionHolder(hasPermission = false, permissionCode = requestCode, fromCallback = true)
-                    )
                 }
             }
 
             when(notGrantedPermissions.first()) {
                 Manifest.permission.RECORD_AUDIO -> viewModel.showRecordingPermissionDialog()
-                Manifest.permission.WRITE_EXTERNAL_STORAGE -> viewModel.showWriteFilePermissionDialog()
-                Manifest.permission.READ_EXTERNAL_STORAGE -> viewModel.showReadFilePermissionDialog()
             }
         }
     }
