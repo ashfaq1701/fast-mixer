@@ -8,16 +8,16 @@ import androidx.lifecycle.viewModelScope
 import com.bluehub.fastmixer.common.permissions.PermissionViewModel
 import com.bluehub.fastmixer.common.utils.FileManager
 import com.bluehub.fastmixer.common.utils.PermissionManager
-import com.bluehub.fastmixer.common.utils.ScreenConstants
 import kotlinx.coroutines.*
-import timber.log.Timber
 import java.io.File
+import java.util.*
 import javax.inject.Inject
 
-class MixingScreenViewModel @Inject constructor (override val context: Context,
-                                                 override val permissionManager: PermissionManager,
-                                                 val fileManager: FileManager,
-                                                 val mixingRepository: MixingRepository): PermissionViewModel(context) {
+
+class MixingScreenViewModel @Inject constructor(override val context: Context,
+                                                override val permissionManager: PermissionManager,
+                                                val fileManager: FileManager,
+                                                val mixingRepository: MixingRepository): PermissionViewModel(context) {
     var audioFiles: MutableList<AudioFile> = mutableListOf()
     val audioFilesLiveData = MutableLiveData<MutableList<AudioFile>>(mutableListOf())
 
@@ -68,26 +68,42 @@ class MixingScreenViewModel @Inject constructor (override val context: Context,
         }
     }
 
-    fun addReadFilePath(fileUri: Uri) {
-        fileUri.path?.let { filePath ->
-            if (audioFiles.filter {
-                it.path == filePath
-            }.count() == 0) {
-                audioFiles.add(AudioFile(filePath, AudioFileType.IMPORTED))
-                audioFilesLiveData.value = audioFiles
+    fun addReadFile(fileUri: Uri) {
+        val fileName = fileManager.getFileNameFromUri(context.contentResolver, fileUri)
+        viewModelScope.launch(Dispatchers.IO) {
+            val newFilePath = fileName?.let { name ->
+                val fileInputStream = context.contentResolver.openInputStream(fileUri)
+                fileInputStream?.use {
+                    val dir = createImportedFileCacheDirectory()
+                    val importId = UUID.randomUUID().toString()
+
+                    fileManager.copyFileFromUri(it, name, dir, importId)
+                }
+            }
+
+            newFilePath?.let { newPath ->
+                withContext(Dispatchers.Main) {
+                    audioFiles.add(AudioFile(newPath, AudioFileType.IMPORTED))
+                    audioFilesLiveData.value = audioFiles
+                }
             }
         }
     }
 
-    fun copyFileInAppStorage(uri: Uri) {
-        Timber.d("URI Path Segments: ${uri}")
+    fun createImportedFileCacheDirectory(): String {
+        val cacheDir = "${context.cacheDir}/imported"
+        val fileObj = File(cacheDir)
+        if (!fileObj.exists()) {
+            fileObj.mkdir()
+        }
+        return cacheDir
     }
 
     fun addFile(filePath: String): Job = viewModelScope.launch {
         mixingRepository.addFile(filePath)
     }
 
-    fun readSamples(filePath: String) = fun (countPoints: Int): Deferred<Array<Float>> =
+    fun readSamples(filePath: String) = fun(countPoints: Int): Deferred<Array<Float>> =
         viewModelScope.async {
             mixingRepository.readSamples(filePath, countPoints)
         }

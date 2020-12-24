@@ -6,17 +6,13 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.*
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.bluehub.fastmixer.R
 import com.bluehub.fastmixer.common.permissions.PermissionFragment
 import com.bluehub.fastmixer.common.utils.DialogManager
-import com.bluehub.fastmixer.common.utils.ScreenConstants
 import com.bluehub.fastmixer.common.utils.ViewModelType
 import com.bluehub.fastmixer.databinding.MixingScreenBinding
-import kotlinx.android.synthetic.main.mixing_screen.*
-import timber.log.Timber
 import javax.inject.Inject
 
 class MixingScreen : PermissionFragment<MixingScreenViewModel>(ViewModelType.NAV_SCOPED) {
@@ -40,8 +36,8 @@ class MixingScreen : PermissionFragment<MixingScreenViewModel>(ViewModelType.NAV
     private lateinit var resolver: ContentResolver
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+            inflater: LayoutInflater, container: ViewGroup?,
+            savedInstanceState: Bundle?
     ): View {
         dataBinding = DataBindingUtil
             .inflate(inflater, R.layout.mixing_screen, container, false)
@@ -51,10 +47,10 @@ class MixingScreen : PermissionFragment<MixingScreenViewModel>(ViewModelType.NAV
         dataBinding.lifecycleOwner = viewLifecycleOwner
 
         audioFileListAdapter = AudioFileListAdapter(AudioFileEventListeners(
-            { filePath: String -> viewModel.addFile(filePath) },
-            { filePath: String -> viewModel.readSamples(filePath) },
-            { filePath: String -> viewModel.deleteFile(filePath) },
-            { filePath: String -> viewModel.getTotalSamples(filePath) }
+                { filePath: String -> viewModel.addFile(filePath) },
+                { filePath: String -> viewModel.readSamples(filePath) },
+                { filePath: String -> viewModel.deleteFile(filePath) },
+                { filePath: String -> viewModel.getTotalSamples(filePath) }
         ))
         dataBinding.audioFileListView.adapter = audioFileListAdapter
 
@@ -112,7 +108,7 @@ class MixingScreen : PermissionFragment<MixingScreenViewModel>(ViewModelType.NAV
 
         if (requestCode == OPEN_FILE_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
             data?.data?.also { documentUri ->
-
+                viewModel.addReadFile(documentUri)
             }
         }
     }
