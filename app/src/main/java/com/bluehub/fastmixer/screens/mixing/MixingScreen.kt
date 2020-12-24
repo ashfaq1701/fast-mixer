@@ -78,6 +78,13 @@ class MixingScreen : PermissionFragment<MixingScreenViewModel>(ViewModelType.NAV
             audioFileListAdapter.submitList(it)
         })
 
+        viewModel.itemAdded.observe(viewLifecycleOwner, {
+            if (it) {
+                audioFileListAdapter.notifyItemInserted(viewModel.audioFilesLiveData.value!!.size - 1)
+                viewModel.resetItemAdded()
+            }
+        })
+
         viewModel.itemRemovedIdx.observe(viewLifecycleOwner, {
             if (it != null) {
                 audioFileListAdapter.notifyItemRemoved(it)

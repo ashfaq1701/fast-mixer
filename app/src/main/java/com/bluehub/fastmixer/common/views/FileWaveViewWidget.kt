@@ -33,6 +33,8 @@ class FileWaveViewWidget(context: Context, attributeSet: AttributeSet?)
     private var mAudioFile: BehaviorSubject<AudioFile> = BehaviorSubject.create()
     private val mAudioFileEventListeners: BehaviorSubject<AudioFileEventListeners> = BehaviorSubject.create()
 
+    private lateinit var binding: FileWaveViewWidgetBinding
+
     init {
         mAudioFile.subscribe { checkAndRenderView() }
         mAudioFileEventListeners.subscribe { checkAndRenderView() }
@@ -55,7 +57,7 @@ class FileWaveViewWidget(context: Context, attributeSet: AttributeSet?)
             )
 
             val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-            val binding = FileWaveViewWidgetBinding.inflate(inflater, this, true)
+            binding = FileWaveViewWidgetBinding.inflate(inflater, this, true)
             binding.audioFile = mAudioFile.value
             binding.eventListener = mAudioFileEventListeners.value
             binding.waveViewEventListeners = waveViewEventListeners
@@ -67,11 +69,11 @@ class FileWaveViewWidget(context: Context, attributeSet: AttributeSet?)
     }
 
     private fun waveViewZoomIn() {
-        fileWaveView.zoomIn()
+        binding.fileWaveView.zoomIn()
     }
 
     private fun waveViewZoomOut() {
-        fileWaveView.zoomOut()
+        binding.fileWaveView.zoomOut()
     }
 }
 
