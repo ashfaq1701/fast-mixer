@@ -1,11 +1,7 @@
 package com.bluehub.fastmixer.screens.mixing
 
-import android.annotation.SuppressLint
-import android.content.Context
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -37,6 +33,18 @@ class AudioFileListAdapter(private val clickListener: AudioFileEventListeners): 
             }
         }
     }
+
+    fun notifyAddItem(pos: Int) {
+        notifyItemInserted(pos)
+        notifyItemChanged(pos)
+        notifyDataSetChanged()
+    }
+
+    fun notifyRemoveItem(pos: Int) {
+        notifyItemRemoved(pos)
+        notifyItemRangeChanged(pos, itemCount)
+        notifyDataSetChanged()
+    }
 }
 
 class AudioFileDiffCallback : DiffUtil.ItemCallback<AudioFile>() {
@@ -47,7 +55,6 @@ class AudioFileDiffCallback : DiffUtil.ItemCallback<AudioFile>() {
     override fun areContentsTheSame(oldItem: AudioFile, newItem: AudioFile): Boolean {
         return oldItem == newItem
     }
-
 }
 
 class AudioFileEventListeners(

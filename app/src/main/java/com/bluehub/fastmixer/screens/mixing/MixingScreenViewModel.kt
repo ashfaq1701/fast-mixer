@@ -33,9 +33,9 @@ class MixingScreenViewModel @Inject constructor(override val context: Context,
     val itemRemovedIdx: LiveData<Int>
         get() = _itemRemovedIdx
 
-    private val _itemAdded = MutableLiveData<Boolean>()
-    val itemAdded: LiveData<Boolean>
-        get() = _itemAdded
+    private val _itemAddedIdx = MutableLiveData<Int>()
+    val itemAddedIdx: LiveData<Int>
+        get() = _itemAddedIdx
 
     init {
         mixingRepository.createMixingEngine()
@@ -61,12 +61,8 @@ class MixingScreenViewModel @Inject constructor(override val context: Context,
         _eventRecord.value = false
     }
 
-    fun setItemAdded() {
-        _itemAdded.value = true
-    }
-
-    fun resetItemAdded() {
-        _itemAdded.value = false
+    fun resetItemAddedIdx() {
+        _itemAddedIdx.value = null
     }
 
     fun addRecordedFilePath(filePath: String) {
@@ -77,7 +73,7 @@ class MixingScreenViewModel @Inject constructor(override val context: Context,
         }.count() == 0) {
             audioFiles.add(AudioFile(filePath, AudioFileType.RECORDED))
             audioFilesLiveData.value = audioFiles
-            setItemAdded()
+
         }
     }
 
@@ -98,7 +94,7 @@ class MixingScreenViewModel @Inject constructor(override val context: Context,
                 withContext(Dispatchers.Main) {
                     audioFiles.add(AudioFile(newPath, AudioFileType.IMPORTED))
                     audioFilesLiveData.value = audioFiles
-                    setItemAdded()
+                    _itemAddedIdx.value = audioFiles.size - 1
                 }
             }
         }
