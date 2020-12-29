@@ -12,6 +12,7 @@ extern "C" {
 }
 #include <string>
 #include "../Constants.h"
+#include "../logging_macros.h"
 #include "list"
 
 using namespace std;
@@ -19,12 +20,15 @@ using namespace std;
 class FFMpegExtractor {
 public:
     FFMpegExtractor(const string &filePath, const AudioProperties targetProperties);
-    FILE* fp = nullptr;
+    std::unique_ptr<FILE, void(*)(FILE *)> fp {
+            nullptr,
+            [](FILE *f) {
+                fclose(f);
+            }
+    };
     const char *mFilePath;
 
     int64_t decode(uint8_t *targetData);
-
-    void getAudioFileProperties();
 
     int mSampleRate = 0;
     int mChannelCount = 0;
