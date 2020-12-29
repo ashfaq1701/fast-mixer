@@ -218,7 +218,7 @@ int64_t FFMpegExtractor::decodeOp(uint8_t *targetData, function<void(uint8_t *, 
     }
 
     // Prepare to read data
-    int bytesWritten = 0;
+    int64_t bytesWritten = 0;
     AVPacket avPacket;
     av_init_packet(&avPacket);
     AVFrame *decodedFrame = av_frame_alloc(); // Stores raw audio data
@@ -236,7 +236,6 @@ int64_t FFMpegExtractor::decodeOp(uint8_t *targetData, function<void(uint8_t *, 
             // Pass our compressed data into the codec
             result = avcodec_send_packet(codecContext.get(), &avPacket);
             if (result != 0) {
-                LOGE("avcodec_send_packet error: %s", av_err2str(result));
                 goto cleanup;
             }
 
@@ -288,9 +287,11 @@ int64_t FFMpegExtractor::decodeOp(uint8_t *targetData, function<void(uint8_t *, 
     av_frame_free(&decodedFrame);
     LOGD("DECODE END");
 
-    returnValue = bytesWritten;
-
     cleanup:
+
+    if (bytesWritten > 0) {
+        returnValue = bytesWritten;
+    }
     return returnValue;
 }
 
@@ -298,7 +299,7 @@ int64_t FFMpegExtractor::decode(uint8_t *targetData) {
     function<void(uint8_t*, int, short*, int64_t)> f = [] (uint8_t* targetData, int bytesWritten, short* buffer1, int64_t bytesToWrite) {
         memcpy(targetData + bytesWritten, buffer1, (size_t)bytesToWrite);
     };
-    auto decodedBytes = decodeOp(targetData, f);
+    int64_t decodedBytes = decodeOp(targetData, f);
     return decodedBytes;
 }
 
