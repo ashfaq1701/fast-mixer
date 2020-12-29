@@ -23,7 +23,9 @@ public:
     std::unique_ptr<FILE, void(*)(FILE *)> fp {
             nullptr,
             [](FILE *f) {
-                fclose(f);
+                if (f) {
+                    fclose(f);
+                }
             }
     };
     const char *mFilePath;
