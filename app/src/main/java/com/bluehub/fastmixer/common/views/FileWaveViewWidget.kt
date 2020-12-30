@@ -11,6 +11,7 @@ import com.bluehub.fastmixer.screens.mixing.AudioFile
 import com.bluehub.fastmixer.screens.mixing.AudioFileEventListeners
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import kotlinx.android.synthetic.main.file_wave_view_widget.view.*
+import timber.log.Timber
 
 
 @BindingMethods(

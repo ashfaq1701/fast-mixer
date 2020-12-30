@@ -11,7 +11,9 @@ import kotlinx.coroutines.Job
 
 class AudioFileListAdapter(private val clickListener: AudioFileEventListeners): ListAdapter<AudioFile, AudioFileListAdapter.ViewHolder>(AudioFileDiffCallback()) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        return ViewHolder.from(parent)
+        val holder = ViewHolder.from(parent)
+        holder.setIsRecyclable(false)
+        return holder
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
