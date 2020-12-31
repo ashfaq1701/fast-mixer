@@ -7,3 +7,5 @@ enum class AudioFileType {
 }
 
 data class AudioFile(val path: String, val fileType: AudioFileType): Serializable
+
+data class AudioFileWithNumSamples(val path: String, val numSamples: Int)

@@ -9,6 +9,9 @@
         <variable
             name="eventListener"
             type="com.bluehub.fastmixer.screens.mixing.AudioFileEventListeners" />
+        <variable
+            name="audioViewSampleCountStore"
+            type="com.bluehub.fastmixer.screens.mixing.AudioViewSampleCountStore" />
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -20,6 +23,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:audioFile="@{audioFile}"
             app:audioFileEventListeners="@{eventListener}"
+            app:audioViewSampleCountStore="@{audioViewSampleCountStore}"
             tools:layout_height="@dimen/audio_file_view_height"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

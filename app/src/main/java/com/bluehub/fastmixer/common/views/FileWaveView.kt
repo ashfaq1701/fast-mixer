@@ -10,16 +10,20 @@ import androidx.core.content.ContextCompat
 import androidx.databinding.BindingMethod
 import androidx.databinding.BindingMethods
 import com.bluehub.fastmixer.R
+import com.bluehub.fastmixer.screens.mixing.AudioFileWithNumSamples
+import com.bluehub.fastmixer.screens.mixing.AudioViewSampleCountStore
 import io.reactivex.rxjava3.functions.Function
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import kotlinx.coroutines.*
+import timber.log.Timber
 
 
 @BindingMethods(value = [
     BindingMethod(type = FileWaveView::class, attribute = "fileLoader", method = "setFileLoader"),
     BindingMethod(type = FileWaveView::class, attribute = "samplesReader", method = "setSamplesReader"),
     BindingMethod(type = FileWaveView::class, attribute = "audioFilePath", method = "setAudioFilePath"),
-    BindingMethod(type = FileWaveView::class, attribute = "totalSampleCountReader", method = "setTotalSampleCountReader")
+    BindingMethod(type = FileWaveView::class, attribute = "totalSampleCountReader", method = "setTotalSampleCountReader"),
+    BindingMethod(type = FileWaveView::class, attribute = "audioViewSampleCountStore", method = "setAudioViewSampleCountStore")
 ])
 class FileWaveView @JvmOverloads constructor(
     context: Context,
@@ -33,6 +37,7 @@ class FileWaveView @JvmOverloads constructor(
     var mFileLoader: BehaviorSubject<Function<Unit, Job>> = BehaviorSubject.create()
     var mSamplesReader: BehaviorSubject<Function<Int, Deferred<Array<Float>>>> = BehaviorSubject.create()
     var mTotalSampleCountReader: BehaviorSubject<Function<Unit, Int>> = BehaviorSubject.create()
+    val mAudioViewSampleCountStore: BehaviorSubject<AudioViewSampleCountStore> = BehaviorSubject.create()
 
     var mWidth: BehaviorSubject<Int> = BehaviorSubject.create()
     var mHeight: BehaviorSubject<Int> = BehaviorSubject.create()
@@ -63,6 +68,7 @@ class FileWaveView @JvmOverloads constructor(
         mFileLoader.subscribe { checkAndSetupAudioFileSource() }
         mSamplesReader.subscribe { checkAndSetupAudioFileSource() }
         mTotalSampleCountReader.subscribe { checkAndSetupAudioFileSource() }
+        mAudioViewSampleCountStore.subscribe { checkAndSetupAudioFileSource() }
     }
 
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
@@ -87,6 +93,13 @@ class FileWaveView @JvmOverloads constructor(
 
     fun setTotalSampleCountReader(totalSampleCountReader: (Unit) -> Int) {
         mTotalSampleCountReader.onNext(totalSampleCountReader)
+    }
+
+    fun setAudioViewSampleCountStore(audioViewSampleCountStore: AudioViewSampleCountStore) {
+        mAudioViewSampleCountStore.onNext(audioViewSampleCountStore)
+        mAudioViewSampleCountStore.value.isFileSampleCountMapUpdated.subscribe {
+            fetchPointsToPlot()
+        }
     }
 
     fun zoomIn() {
@@ -149,10 +162,17 @@ class FileWaveView @JvmOverloads constructor(
     private fun checkAndSetupAudioFileSource() {
         if (mAudioFilePath.hasValue()
             && mFileLoader.hasValue()
-            && mTotalSampleCountReader.hasValue()) {
+            && mTotalSampleCountReader.hasValue()
+            && mAudioViewSampleCountStore.hasValue()) {
             mFileLoader.value.apply(Unit).invokeOnCompletion {
                 if (it == null) {
                     mTotalSamplesCount.onNext(mTotalSampleCountReader.value.apply(Unit))
+
+                    mAudioViewSampleCountStore.value.addAudioFile(AudioFileWithNumSamples(
+                            mAudioFilePath.value,
+                            mTotalSamplesCount.value
+                    ))
+
                     fileLoaded.onNext(true)
                 }
             }
