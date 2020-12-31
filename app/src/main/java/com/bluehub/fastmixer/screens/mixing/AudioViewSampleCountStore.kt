@@ -1,6 +1,7 @@
 package com.bluehub.fastmixer.screens.mixing
 
 import io.reactivex.rxjava3.subjects.BehaviorSubject
+import timber.log.Timber
 import javax.inject.Inject
 
 class AudioViewSampleCountStore @Inject constructor() {
@@ -23,7 +24,7 @@ class AudioViewSampleCountStore @Inject constructor() {
     }
 
     fun updateMeasuredWidth(width: Int) {
-        if (!measuredWidth.hasValue() || measuredWidth.value != width) {
+        if ((!measuredWidth.hasValue() || measuredWidth.value != width) && width > 0) {
             measuredWidth.onNext(width)
         }
     }
@@ -64,10 +65,10 @@ class AudioViewSampleCountStore @Inject constructor() {
         }
 
         audioFilesObservable.value.forEach { audioFile ->
-            val numSamples = (audioFile.numSamples / maxNumSamples) * measuredWidth.value
-            fileSampleCountMap[audioFile.path] = numSamples
+            val numSamples = (audioFile.numSamples.toFloat() / maxNumSamples.toFloat()) * measuredWidth.value
+            fileSampleCountMap[audioFile.path] = numSamples.toInt()
         }
-        
+
         isFileSampleCountMapUpdated.onNext(true)
     }
     

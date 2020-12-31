@@ -48,8 +48,6 @@ class FileWaveView @JvmOverloads constructor(
 
     private var fileLoaded: BehaviorSubject<Boolean> = BehaviorSubject.create()
 
-    private var totalSampleCount: Int = 0
-
     private val coroutineScope = CoroutineScope(Job() + Dispatchers.Main)
 
     private val zoomLevel: BehaviorSubject<Int> = BehaviorSubject.create()
@@ -57,7 +55,6 @@ class FileWaveView @JvmOverloads constructor(
     init {
         fileLoaded.subscribe {
             if (it) {
-                totalSampleCount = mTotalSampleCountReader.value.apply(Unit)
                 setupObservers()
             }
         }
@@ -98,7 +95,7 @@ class FileWaveView @JvmOverloads constructor(
     fun setAudioViewSampleCountStore(audioViewSampleCountStore: AudioViewSampleCountStore) {
         mAudioViewSampleCountStore.onNext(audioViewSampleCountStore)
         mAudioViewSampleCountStore.value.isFileSampleCountMapUpdated.subscribe {
-            fetchPointsToPlot()
+            requestLayout()
         }
     }
 
@@ -128,10 +125,20 @@ class FileWaveView @JvmOverloads constructor(
         }
     }
 
+    private fun getPlotNumPts(): Int {
+        if (!mAudioViewSampleCountStore.hasValue() || !mAudioFilePath.hasValue()) return 0
+
+        val numSamples = mAudioViewSampleCountStore.value.getSampleCount(mAudioFilePath.value) ?: return 0
+
+        return if (zoomLevel.hasValue()) {
+            zoomLevel.value * numSamples
+        } else numSamples
+    }
+
     private fun fetchPointsToPlot() {
         if (!fileLoaded.hasValue() || !mWidth.hasValue() || mWidth.value == 0) return
 
-        val numPts = mWidth.value
+        val numPts = getPlotNumPts()
 
         coroutineScope.launch {
             mRawPoints.onNext(mSamplesReader.value.apply(numPts).await())
@@ -185,16 +192,30 @@ class FileWaveView @JvmOverloads constructor(
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-        val calculatedWidth = if (zoomLevel.hasValue()) {
-            zoomLevel.value * measuredWidth
-        } else {
-            measuredWidth
+
+        if (mAudioViewSampleCountStore.hasValue()) {
+            mAudioViewSampleCountStore.value.updateMeasuredWidth(measuredWidth)
         }
-        setMeasuredDimension(calculatedWidth, measuredHeight)
+
+        if (!mAudioFilePath.hasValue()) return
+
+        val samplesCount = mAudioViewSampleCountStore.value.getSampleCount(mAudioFilePath.value) ?: measuredWidth
+
+        val calculatedWidth = if (zoomLevel.hasValue()) {
+            zoomLevel.value * samplesCount
+        } else {
+            samplesCount
+        }
+
+        val roundedWidth = if (calculatedWidth < measuredWidth) measuredWidth else calculatedWidth
+
+        setMeasuredDimension(roundedWidth, measuredHeight)
     }
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
-        mWidth.onNext(w)
+        if (mWidth.value != w) {
+            mWidth.onNext(w)
+        }
         mHeight.onNext(h)
         super.onSizeChanged(w, h, oldw, oldh)
     }
@@ -207,11 +228,12 @@ class FileWaveView @JvmOverloads constructor(
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
-        if (! ::mPlotPoints.isInitialized) {
+        if (!::mPlotPoints.isInitialized) {
             return
         }
 
-        val widthPtRatio = mWidth.value / mPlotPoints.size
+        val numPts = getPlotNumPts()
+        val widthPtRatio = numPts / mPlotPoints.size
         val ptsDistance: Int = if (widthPtRatio >= 1) widthPtRatio else 1
 
         var currentPoint = 0
