@@ -7,7 +7,6 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bluehub.fastmixer.databinding.ListItemAudioFileBinding
 import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.Job
 
 class AudioFileListAdapter(private val clickListener: AudioFileEventListeners, private val audioViewSampleCountStore: AudioViewSampleCountStore)
     : ListAdapter<AudioFile, AudioFileListAdapter.ViewHolder>(AudioFileDiffCallback()) {
@@ -62,12 +61,8 @@ class AudioFileDiffCallback : DiffUtil.ItemCallback<AudioFile>() {
 }
 
 class AudioFileEventListeners(
-    var loadFileCallback: (String) -> Job,
     var readSamplesCallback: (String) -> (Int) -> Deferred<Array<Float>>,
     var deleteFileCallback: (String) -> Unit,
-    var getTotalSamples: (String) -> Int
 ) {
     fun readSamplesCallbackWithIndex(filePath: String): (Int)->Deferred<Array<Float>> = readSamplesCallback(filePath)
-    fun loadFileCallbackWithIndex(filePath: String): (Unit) -> Job = { loadFileCallback(filePath) }
-    fun getTotalSamplesWithIndex(filePath: String): (Unit) -> Int = { getTotalSamples(filePath) }
 }

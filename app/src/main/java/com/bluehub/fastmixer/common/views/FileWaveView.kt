@@ -10,19 +10,16 @@ import androidx.core.content.ContextCompat
 import androidx.databinding.BindingMethod
 import androidx.databinding.BindingMethods
 import com.bluehub.fastmixer.R
-import com.bluehub.fastmixer.screens.mixing.AudioFileWithNumSamples
+import com.bluehub.fastmixer.screens.mixing.AudioFile
 import com.bluehub.fastmixer.screens.mixing.AudioViewSampleCountStore
 import io.reactivex.rxjava3.functions.Function
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import kotlinx.coroutines.*
-import timber.log.Timber
 
 
 @BindingMethods(value = [
-    BindingMethod(type = FileWaveView::class, attribute = "fileLoader", method = "setFileLoader"),
     BindingMethod(type = FileWaveView::class, attribute = "samplesReader", method = "setSamplesReader"),
-    BindingMethod(type = FileWaveView::class, attribute = "audioFilePath", method = "setAudioFilePath"),
-    BindingMethod(type = FileWaveView::class, attribute = "totalSampleCountReader", method = "setTotalSampleCountReader"),
+    BindingMethod(type = FileWaveView::class, attribute = "audioFile", method = "setAudioFile"),
     BindingMethod(type = FileWaveView::class, attribute = "audioViewSampleCountStore", method = "setAudioViewSampleCountStore")
 ])
 class FileWaveView @JvmOverloads constructor(
@@ -33,27 +30,24 @@ class FileWaveView @JvmOverloads constructor(
         const val ZOOM_STEP = 1
     }
 
-    private val mAudioFilePath: BehaviorSubject<String> = BehaviorSubject.create()
-    var mFileLoader: BehaviorSubject<Function<Unit, Job>> = BehaviorSubject.create()
+    private val mAudioFile: BehaviorSubject<AudioFile> = BehaviorSubject.create()
     var mSamplesReader: BehaviorSubject<Function<Int, Deferred<Array<Float>>>> = BehaviorSubject.create()
-    var mTotalSampleCountReader: BehaviorSubject<Function<Unit, Int>> = BehaviorSubject.create()
-    val mAudioViewSampleCountStore: BehaviorSubject<AudioViewSampleCountStore> = BehaviorSubject.create()
+    private val mAudioViewSampleCountStore: BehaviorSubject<AudioViewSampleCountStore> = BehaviorSubject.create()
 
     var mWidth: BehaviorSubject<Int> = BehaviorSubject.create()
     var mHeight: BehaviorSubject<Int> = BehaviorSubject.create()
     var mRawPoints: BehaviorSubject<Array<Float>> = BehaviorSubject.create()
-    var mTotalSamplesCount: BehaviorSubject<Int> = BehaviorSubject.create()
 
     private lateinit var mPlotPoints: Array<Float>
 
-    private var fileLoaded: BehaviorSubject<Boolean> = BehaviorSubject.create()
+    private var attrsLoaded: BehaviorSubject<Boolean> = BehaviorSubject.create()
 
     private val coroutineScope = CoroutineScope(Job() + Dispatchers.Main)
 
     private val zoomLevel: BehaviorSubject<Int> = BehaviorSubject.create()
 
     init {
-        fileLoaded.subscribe {
+        attrsLoaded.subscribe {
             if (it) {
                 setupObservers()
             }
@@ -61,10 +55,8 @@ class FileWaveView @JvmOverloads constructor(
 
         zoomLevel.onNext(1)
 
-        mAudioFilePath.subscribe{ checkAndSetupAudioFileSource() }
-        mFileLoader.subscribe { checkAndSetupAudioFileSource() }
+        mAudioFile.subscribe{ checkAndSetupAudioFileSource() }
         mSamplesReader.subscribe { checkAndSetupAudioFileSource() }
-        mTotalSampleCountReader.subscribe { checkAndSetupAudioFileSource() }
         mAudioViewSampleCountStore.subscribe { checkAndSetupAudioFileSource() }
     }
 
@@ -76,20 +68,12 @@ class FileWaveView @JvmOverloads constructor(
         color = ContextCompat.getColor(context, R.color.colorAccent)
     }
 
-    fun setAudioFilePath(audioFilePath: String) {
-        mAudioFilePath.onNext(audioFilePath)
-    }
-
-    fun setFileLoader(fileLoader: (Unit) -> Job) {
-        mFileLoader.onNext(fileLoader)
+    fun setAudioFile(audioFile: AudioFile) {
+        mAudioFile.onNext(audioFile)
     }
 
     fun setSamplesReader(samplesReader: (Int) -> Deferred<Array<Float>>) {
         mSamplesReader.onNext(samplesReader)
-    }
-
-    fun setTotalSampleCountReader(totalSampleCountReader: (Unit) -> Int) {
-        mTotalSampleCountReader.onNext(totalSampleCountReader)
     }
 
     fun setAudioViewSampleCountStore(audioViewSampleCountStore: AudioViewSampleCountStore) {
@@ -100,7 +84,9 @@ class FileWaveView @JvmOverloads constructor(
     }
 
     fun zoomIn() {
-        if (zoomLevel.value * mWidth.value < mTotalSamplesCount.value) {
+        val numSamples = getPlotNumSamples()
+
+        if (zoomLevel.value * numSamples < mAudioFile.value.numSamples) {
             zoomLevel.onNext(zoomLevel.value + ZOOM_STEP)
         }
     }
@@ -125,10 +111,14 @@ class FileWaveView @JvmOverloads constructor(
         }
     }
 
-    private fun getPlotNumPts(): Int {
-        if (!mAudioViewSampleCountStore.hasValue() || !mAudioFilePath.hasValue()) return 0
+    private fun getPlotNumSamples(): Int {
+        if (!mAudioViewSampleCountStore.hasValue() || !mAudioFile.hasValue()) return 0
 
-        val numSamples = mAudioViewSampleCountStore.value.getSampleCount(mAudioFilePath.value) ?: return 0
+        return mAudioViewSampleCountStore.value.getSampleCount(mAudioFile.value.path) ?: 0
+    }
+
+    private fun getPlotNumPts(): Int {
+        val numSamples = getPlotNumSamples()
 
         return if (zoomLevel.hasValue()) {
             zoomLevel.value * numSamples
@@ -136,7 +126,7 @@ class FileWaveView @JvmOverloads constructor(
     }
 
     private fun fetchPointsToPlot() {
-        if (!fileLoaded.hasValue() || !mWidth.hasValue() || mWidth.value == 0) return
+        if (!attrsLoaded.hasValue() || !mWidth.hasValue() || mWidth.value == 0) return
 
         val numPts = getPlotNumPts()
 
@@ -167,22 +157,9 @@ class FileWaveView @JvmOverloads constructor(
     }
 
     private fun checkAndSetupAudioFileSource() {
-        if (mAudioFilePath.hasValue()
-            && mFileLoader.hasValue()
-            && mTotalSampleCountReader.hasValue()
+        if (mAudioFile.hasValue()
             && mAudioViewSampleCountStore.hasValue()) {
-            mFileLoader.value.apply(Unit).invokeOnCompletion {
-                if (it == null) {
-                    mTotalSamplesCount.onNext(mTotalSampleCountReader.value.apply(Unit))
-
-                    mAudioViewSampleCountStore.value.addAudioFile(AudioFileWithNumSamples(
-                            mAudioFilePath.value,
-                            mTotalSamplesCount.value
-                    ))
-
-                    fileLoaded.onNext(true)
-                }
-            }
+            attrsLoaded.onNext(true)
         }
     }
 
@@ -197,9 +174,9 @@ class FileWaveView @JvmOverloads constructor(
             mAudioViewSampleCountStore.value.updateMeasuredWidth(measuredWidth)
         }
 
-        if (!mAudioFilePath.hasValue()) return
+        if (!mAudioFile.hasValue()) return
 
-        val samplesCount = mAudioViewSampleCountStore.value.getSampleCount(mAudioFilePath.value) ?: measuredWidth
+        val samplesCount = mAudioViewSampleCountStore.value.getSampleCount(mAudioFile.value.path) ?: measuredWidth
 
         val calculatedWidth = if (zoomLevel.hasValue()) {
             zoomLevel.value * samplesCount

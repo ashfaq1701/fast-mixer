@@ -80,7 +80,6 @@ class FileWaveViewWidget(context: Context, attributeSet: AttributeSet?)
 
     private fun waveViewDelete() {
         mAudioFileEventListeners.value.deleteFileCallback(mAudioFile.value.path)
-        mAudioViewSampleCountStore.value.removeAudioFile(mAudioFile.value.path)
     }
 
     private fun waveViewZoomIn() {

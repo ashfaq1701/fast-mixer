@@ -17,7 +17,8 @@ import javax.inject.Inject
 class MixingScreenViewModel @Inject constructor(override val context: Context,
                                                 override val permissionManager: PermissionManager,
                                                 val fileManager: FileManager,
-                                                val mixingRepository: MixingRepository): PermissionViewModel(context) {
+                                                val mixingRepository: MixingRepository,
+                                                val audioViewSampleCountStore: AudioViewSampleCountStore): PermissionViewModel(context) {
     var audioFiles: MutableList<AudioFile> = mutableListOf()
     val audioFilesLiveData = MutableLiveData<MutableList<AudioFile>>(mutableListOf())
 
@@ -39,6 +40,7 @@ class MixingScreenViewModel @Inject constructor(override val context: Context,
 
     init {
         mixingRepository.createMixingEngine()
+        audioViewSampleCountStore.audioFilesLiveData = audioFilesLiveData
     }
 
     fun onRecord() {
@@ -71,9 +73,15 @@ class MixingScreenViewModel @Inject constructor(override val context: Context,
         if (audioFiles.filter {
             it.path == filePath
         }.count() == 0) {
-            audioFiles.add(AudioFile(filePath, AudioFileType.RECORDED))
-            audioFilesLiveData.value = audioFiles
-
+            viewModelScope.launch {
+                withContext(Dispatchers.IO) {
+                    mixingRepository.addFile(filePath)
+                    val totalSamples = getTotalSamples(filePath)
+                    audioFiles.add(AudioFile(filePath, totalSamples, AudioFileType.RECORDED))
+                }
+                audioFilesLiveData.value = audioFiles
+                _itemAddedIdx.value = audioFiles.size - 1
+            }
         }
     }
 
@@ -91,8 +99,11 @@ class MixingScreenViewModel @Inject constructor(override val context: Context,
             }
 
             newFilePath?.let { newPath ->
+                mixingRepository.addFile(newPath)
+                val totalSamples = getTotalSamples(newPath)
+                audioFiles.add(AudioFile(newPath, totalSamples, AudioFileType.IMPORTED))
+
                 withContext(Dispatchers.Main) {
-                    audioFiles.add(AudioFile(newPath, AudioFileType.IMPORTED))
                     audioFilesLiveData.value = audioFiles
                     _itemAddedIdx.value = audioFiles.size - 1
                 }
@@ -107,10 +118,6 @@ class MixingScreenViewModel @Inject constructor(override val context: Context,
             fileObj.mkdir()
         }
         return cacheDir
-    }
-
-    fun addFile(filePath: String): Job = viewModelScope.launch {
-        mixingRepository.addFile(filePath)
     }
 
     fun readSamples(filePath: String) = fun(countPoints: Int): Deferred<Array<Float>> =
@@ -152,5 +159,6 @@ class MixingScreenViewModel @Inject constructor(override val context: Context,
     override fun onCleared() {
         super.onCleared()
         mixingRepository.deleteMixingEngine()
+        audioViewSampleCountStore.removeLivedataObservers()
     }
 }

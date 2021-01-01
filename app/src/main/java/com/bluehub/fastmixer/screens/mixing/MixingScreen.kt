@@ -28,9 +28,6 @@ class MixingScreen : PermissionFragment<MixingScreenViewModel>(ViewModelType.NAV
     @Inject
     override lateinit var dialogManager: DialogManager
 
-    @Inject
-    lateinit var audioViewSampleCountStore: AudioViewSampleCountStore
-
     private lateinit var dataBinding: MixingScreenBinding
 
     private lateinit var audioFileListAdapter: AudioFileListAdapter
@@ -52,12 +49,10 @@ class MixingScreen : PermissionFragment<MixingScreenViewModel>(ViewModelType.NAV
 
         audioFileListAdapter = AudioFileListAdapter(
             AudioFileEventListeners(
-                    { filePath: String -> viewModel.addFile(filePath) },
                     { filePath: String -> viewModel.readSamples(filePath) },
-                    { filePath: String -> viewModel.deleteFile(filePath) },
-                    { filePath: String -> viewModel.getTotalSamples(filePath) }
+                    { filePath: String -> viewModel.deleteFile(filePath) }
             ),
-            audioViewSampleCountStore
+            viewModel.audioViewSampleCountStore
         )
         dataBinding.audioFileListView.adapter = audioFileListAdapter
 

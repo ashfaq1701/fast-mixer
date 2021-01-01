@@ -40,10 +40,8 @@
                 android:id="@+id/fileWaveView"
                 android:layout_width="wrap_content"
                 android:layout_height="@dimen/audio_file_view_height"
-                app:audioFilePath="@{audioFile.path}"
-                app:fileLoader="@{eventListener.loadFileCallbackWithIndex(audioFile.path)}"
+                app:audioFilePath="@{audioFile}"
                 app:samplesReader="@{eventListener.readSamplesCallbackWithIndex(audioFile.path)}"
-                app:totalSampleCountReader="@{eventListener.getTotalSamplesWithIndex(audioFile.path)}"
                 app:audioViewSampleCountStore="@{audioViewSampleCountStore}"
                 tools:layout_height="120dp" />
         </HorizontalScrollView>
