@@ -187,9 +187,12 @@ class FileWaveView @JvmOverloads constructor(
 
         val roundedWidth = if (calculatedWidth < measuredWidth) measuredWidth else calculatedWidth
 
+        val numPts = getPlotNumPts()
+
         // If sizes are same but points are empty then still points has to be fetched
         if (roundedWidth == mWidth.value
-            && measuredHeight == mHeight.value) {
+            && measuredHeight == mHeight.value
+            && (!mRawPoints.hasValue() || numPts != mRawPoints.value.size)) {
             fetchPointsToPlot()
         }
 
