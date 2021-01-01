@@ -40,7 +40,7 @@ class MixingScreenViewModel @Inject constructor(override val context: Context,
 
     init {
         mixingRepository.createMixingEngine()
-        audioViewSampleCountStore.audioFilesLiveData = audioFilesLiveData
+        audioViewSampleCountStore.setAudioFilesLiveData(audioFilesLiveData)
     }
 
     fun onRecord() {

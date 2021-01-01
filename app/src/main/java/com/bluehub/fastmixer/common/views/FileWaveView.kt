@@ -15,6 +15,7 @@ import com.bluehub.fastmixer.screens.mixing.AudioViewSampleCountStore
 import io.reactivex.rxjava3.functions.Function
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import kotlinx.coroutines.*
+import timber.log.Timber
 
 
 @BindingMethods(value = [
@@ -55,9 +56,9 @@ class FileWaveView @JvmOverloads constructor(
 
         zoomLevel.onNext(1)
 
-        mAudioFile.subscribe{ checkAndSetupAudioFileSource() }
-        mSamplesReader.subscribe { checkAndSetupAudioFileSource() }
-        mAudioViewSampleCountStore.subscribe { checkAndSetupAudioFileSource() }
+        mAudioFile.subscribe{ checkAttrs() }
+        mSamplesReader.subscribe { checkAttrs() }
+        mAudioViewSampleCountStore.subscribe { checkAttrs() }
     }
 
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
@@ -114,6 +115,8 @@ class FileWaveView @JvmOverloads constructor(
     private fun getPlotNumSamples(): Int {
         if (!mAudioViewSampleCountStore.hasValue() || !mAudioFile.hasValue()) return 0
 
+        Timber.d("PLOT PTS NUM: ${mAudioViewSampleCountStore.value.getSampleCount(mAudioFile.value.path)}")
+
         return mAudioViewSampleCountStore.value.getSampleCount(mAudioFile.value.path) ?: 0
     }
 
@@ -156,7 +159,7 @@ class FileWaveView @JvmOverloads constructor(
         invalidate()
     }
 
-    private fun checkAndSetupAudioFileSource() {
+    private fun checkAttrs() {
         if (mAudioFile.hasValue()
             && mAudioViewSampleCountStore.hasValue()) {
             attrsLoaded.onNext(true)
