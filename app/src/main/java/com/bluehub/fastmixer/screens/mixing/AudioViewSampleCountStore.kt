@@ -1,10 +1,8 @@
 package com.bluehub.fastmixer.screens.mixing
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import io.reactivex.rxjava3.subjects.BehaviorSubject
-import timber.log.Timber
 import javax.inject.Inject
 
 class AudioViewSampleCountStore @Inject constructor() {
@@ -31,7 +29,6 @@ class AudioViewSampleCountStore @Inject constructor() {
 
     fun updateMeasuredWidth(width: Int) {
         if ((!measuredWidth.hasValue() || measuredWidth.value != width) && width > 0) {
-            Timber.d("Measuredwidth will update to $width")
             measuredWidth.onNext(width)
         }
     }
@@ -52,7 +49,6 @@ class AudioViewSampleCountStore @Inject constructor() {
             fileSampleCountMap[audioFile.path] = numSamples.toInt()
         }
 
-        Timber.d("Samples map: $fileSampleCountMap")
         isFileSampleCountMapUpdated.onNext(true)
     }
     
