@@ -31,6 +31,7 @@ class AudioViewSampleCountStore @Inject constructor() {
 
     fun updateMeasuredWidth(width: Int) {
         if ((!measuredWidth.hasValue() || measuredWidth.value != width) && width > 0) {
+            Timber.d("Measuredwidth will update to $width")
             measuredWidth.onNext(width)
         }
     }

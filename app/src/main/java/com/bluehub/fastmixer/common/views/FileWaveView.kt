@@ -80,6 +80,7 @@ class FileWaveView @JvmOverloads constructor(
     fun setAudioViewSampleCountStore(audioViewSampleCountStore: AudioViewSampleCountStore) {
         mAudioViewSampleCountStore.onNext(audioViewSampleCountStore)
         mAudioViewSampleCountStore.value.isFileSampleCountMapUpdated.subscribe {
+            Timber.d("Again will request layout")
             requestLayout()
         }
     }
@@ -114,8 +115,6 @@ class FileWaveView @JvmOverloads constructor(
 
     private fun getPlotNumSamples(): Int {
         if (!mAudioViewSampleCountStore.hasValue() || !mAudioFile.hasValue()) return 0
-
-        Timber.d("PLOT PTS NUM: ${mAudioViewSampleCountStore.value.getSampleCount(mAudioFile.value.path)}")
 
         return mAudioViewSampleCountStore.value.getSampleCount(mAudioFile.value.path) ?: 0
     }
@@ -174,6 +173,7 @@ class FileWaveView @JvmOverloads constructor(
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
 
         if (mAudioViewSampleCountStore.hasValue()) {
+            Timber.d("Update measured width will be called with $measuredWidth")
             mAudioViewSampleCountStore.value.updateMeasuredWidth(measuredWidth)
         }
 
@@ -188,6 +188,13 @@ class FileWaveView @JvmOverloads constructor(
         }
 
         val roundedWidth = if (calculatedWidth < measuredWidth) measuredWidth else calculatedWidth
+
+        // If sizes are same but points are empty then still points has to be fetched
+        if (roundedWidth == mWidth.value
+            && measuredHeight == mHeight.value
+            && !mRawPoints.hasValue()) {
+            fetchPointsToPlot()
+        }
 
         setMeasuredDimension(roundedWidth, measuredHeight)
     }
