@@ -172,6 +172,7 @@ class FileWaveView @JvmOverloads constructor(
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
 
         if (mAudioViewSampleCountStore.hasValue()) {
+            Timber.d("Measured width being updated: $measuredWidth")
             mAudioViewSampleCountStore.value.updateMeasuredWidth(measuredWidth)
         }
 
