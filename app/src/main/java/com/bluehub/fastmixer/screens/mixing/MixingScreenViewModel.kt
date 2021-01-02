@@ -18,7 +18,7 @@ class MixingScreenViewModel @Inject constructor(override val context: Context,
                                                 override val permissionManager: PermissionManager,
                                                 val fileManager: FileManager,
                                                 val mixingRepository: MixingRepository,
-                                                val audioViewSampleCountStore: AudioViewSampleCountStore): PermissionViewModel(context) {
+                                                val fileWaveViewStore: FileWaveViewStore): PermissionViewModel(context) {
     var audioFiles: MutableList<AudioFile> = mutableListOf()
     val audioFilesLiveData = MutableLiveData<MutableList<AudioFile>>(mutableListOf())
 
@@ -40,7 +40,7 @@ class MixingScreenViewModel @Inject constructor(override val context: Context,
 
     init {
         mixingRepository.createMixingEngine()
-        audioViewSampleCountStore.setAudioFilesLiveData(audioFilesLiveData)
+        fileWaveViewStore.setAudioFilesLiveData(audioFilesLiveData)
     }
 
     fun onRecord() {
@@ -159,6 +159,6 @@ class MixingScreenViewModel @Inject constructor(override val context: Context,
     override fun onCleared() {
         super.onCleared()
         mixingRepository.deleteMixingEngine()
-        audioViewSampleCountStore.removeLivedataObservers()
+        fileWaveViewStore.removeLivedataObservers()
     }
 }

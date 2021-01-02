@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bluehub.fastmixer.databinding.ListItemAudioFileBinding
 import kotlinx.coroutines.Deferred
 
-class AudioFileListAdapter(private val clickListener: AudioFileEventListeners, private val audioViewSampleCountStore: AudioViewSampleCountStore)
+class AudioFileListAdapter(private val clickListener: AudioFileEventListeners, private val fileWaveViewStore: FileWaveViewStore)
     : ListAdapter<AudioFile, AudioFileListAdapter.ViewHolder>(AudioFileDiffCallback()) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val holder = ViewHolder.from(parent)
@@ -17,14 +17,14 @@ class AudioFileListAdapter(private val clickListener: AudioFileEventListeners, p
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(getItem(position)!!, clickListener, audioViewSampleCountStore)
+        holder.bind(getItem(position)!!, clickListener, fileWaveViewStore)
     }
 
     class ViewHolder private constructor(val binding: ListItemAudioFileBinding): RecyclerView.ViewHolder(binding.root) {
-        fun bind(item: AudioFile, clickListener: AudioFileEventListeners, audioViewSampleCountStore: AudioViewSampleCountStore) {
+        fun bind(item: AudioFile, clickListener: AudioFileEventListeners, fileWaveViewStore: FileWaveViewStore) {
             binding.audioFile = item
             binding.eventListener = clickListener
-            binding.audioViewSampleCountStore = audioViewSampleCountStore
+            binding.fileWaveViewStore = fileWaveViewStore
             binding.executePendingBindings()
         }
 

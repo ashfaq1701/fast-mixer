@@ -11,17 +11,16 @@ import androidx.databinding.BindingMethod
 import androidx.databinding.BindingMethods
 import com.bluehub.fastmixer.R
 import com.bluehub.fastmixer.screens.mixing.AudioFile
-import com.bluehub.fastmixer.screens.mixing.AudioViewSampleCountStore
+import com.bluehub.fastmixer.screens.mixing.FileWaveViewStore
 import io.reactivex.rxjava3.functions.Function
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import kotlinx.coroutines.*
-import timber.log.Timber
 
 
 @BindingMethods(value = [
     BindingMethod(type = FileWaveView::class, attribute = "samplesReader", method = "setSamplesReader"),
     BindingMethod(type = FileWaveView::class, attribute = "audioFile", method = "setAudioFile"),
-    BindingMethod(type = FileWaveView::class, attribute = "audioViewSampleCountStore", method = "setAudioViewSampleCountStore")
+    BindingMethod(type = FileWaveView::class, attribute = "fileWaveViewStore", method = "setFileWaveViewStore")
 ])
 class FileWaveView @JvmOverloads constructor(
     context: Context,
@@ -33,10 +32,8 @@ class FileWaveView @JvmOverloads constructor(
 
     private val mAudioFile: BehaviorSubject<AudioFile> = BehaviorSubject.create()
     var mSamplesReader: BehaviorSubject<Function<Int, Deferred<Array<Float>>>> = BehaviorSubject.create()
-    private val mAudioViewSampleCountStore: BehaviorSubject<AudioViewSampleCountStore> = BehaviorSubject.create()
+    private val mFileWaveViewStore: BehaviorSubject<FileWaveViewStore> = BehaviorSubject.create()
 
-    var mWidth: BehaviorSubject<Int> = BehaviorSubject.create()
-    var mHeight: BehaviorSubject<Int> = BehaviorSubject.create()
     var mRawPoints: BehaviorSubject<Array<Float>> = BehaviorSubject.create()
 
     private lateinit var mPlotPoints: Array<Float>
@@ -58,7 +55,7 @@ class FileWaveView @JvmOverloads constructor(
 
         mAudioFile.subscribe{ checkAttrs() }
         mSamplesReader.subscribe { checkAttrs() }
-        mAudioViewSampleCountStore.subscribe { checkAttrs() }
+        mFileWaveViewStore.subscribe { checkAttrs() }
     }
 
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
@@ -77,9 +74,9 @@ class FileWaveView @JvmOverloads constructor(
         mSamplesReader.onNext(samplesReader)
     }
 
-    fun setAudioViewSampleCountStore(audioViewSampleCountStore: AudioViewSampleCountStore) {
-        mAudioViewSampleCountStore.onNext(audioViewSampleCountStore)
-        mAudioViewSampleCountStore.value.isFileSampleCountMapUpdated.subscribe {
+    fun setFileWaveViewStore(fileWaveViewStore: FileWaveViewStore) {
+        mFileWaveViewStore.onNext(fileWaveViewStore)
+        mFileWaveViewStore.value.isFileSampleCountMapUpdated.subscribe {
             requestLayout()
         }
     }
@@ -99,10 +96,6 @@ class FileWaveView @JvmOverloads constructor(
     }
 
     private fun setupObservers() {
-        mWidth.subscribe {
-            fetchPointsToPlot()
-        }
-
         mRawPoints.subscribe { ptsArr ->
             processPlotPoints(ptsArr)
         }
@@ -113,9 +106,9 @@ class FileWaveView @JvmOverloads constructor(
     }
 
     private fun getPlotNumSamples(): Int {
-        if (!mAudioViewSampleCountStore.hasValue() || !mAudioFile.hasValue()) return 0
+        if (!mFileWaveViewStore.hasValue() || !mAudioFile.hasValue()) return 0
 
-        return mAudioViewSampleCountStore.value.getSampleCount(mAudioFile.value.path) ?: 0
+        return mFileWaveViewStore.value.getSampleCount(mAudioFile.value.path) ?: 0
     }
 
     private fun getPlotNumPts(): Int {
@@ -127,7 +120,7 @@ class FileWaveView @JvmOverloads constructor(
     }
 
     private fun fetchPointsToPlot() {
-        if (!attrsLoaded.hasValue() || !mWidth.hasValue() || mWidth.value == 0) return
+        if (!attrsLoaded.hasValue()) return
 
         val numPts = getPlotNumPts()
 
@@ -146,7 +139,7 @@ class FileWaveView @JvmOverloads constructor(
         val maximum = rawPts.maxOrNull()
 
         val maxLevelInSamples = maximum ?: 3 * mean
-        val maxToScale = mHeight.value * 0.95
+        val maxToScale = height * 0.95
 
         mPlotPoints = rawPts.map { current ->
             if (maxLevelInSamples != 0) {
@@ -159,7 +152,7 @@ class FileWaveView @JvmOverloads constructor(
 
     private fun checkAttrs() {
         if (mAudioFile.hasValue()
-            && mAudioViewSampleCountStore.hasValue()) {
+            && mFileWaveViewStore.hasValue()) {
             attrsLoaded.onNext(true)
         }
     }
@@ -171,14 +164,13 @@ class FileWaveView @JvmOverloads constructor(
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
 
-        if (mAudioViewSampleCountStore.hasValue()) {
-            Timber.d("Measured width being updated: $measuredWidth")
-            mAudioViewSampleCountStore.value.updateMeasuredWidth(measuredWidth)
+        if (mFileWaveViewStore.hasValue()) {
+            mFileWaveViewStore.value.updateMeasuredWidth(measuredWidth)
         }
 
         if (!mAudioFile.hasValue()) return
 
-        val samplesCount = mAudioViewSampleCountStore.value.getSampleCount(mAudioFile.value.path) ?: measuredWidth
+        val samplesCount = mFileWaveViewStore.value.getSampleCount(mAudioFile.value.path) ?: measuredWidth
 
         val calculatedWidth = if (zoomLevel.hasValue()) {
             zoomLevel.value * samplesCount
@@ -186,26 +178,13 @@ class FileWaveView @JvmOverloads constructor(
             samplesCount
         }
 
-        val roundedWidth = if (calculatedWidth < measuredWidth) measuredWidth else calculatedWidth
+        val roundedWidth = if (measuredWidth == 0 || calculatedWidth < measuredWidth) measuredWidth else calculatedWidth
 
-        val numPts = getPlotNumPts()
-
-        // If sizes are same but points are empty then still points has to be fetched
-        if (roundedWidth == mWidth.value
-            && measuredHeight == mHeight.value
-            && (!mRawPoints.hasValue() || numPts != mRawPoints.value.size)) {
+        if (roundedWidth > 0) {
             fetchPointsToPlot()
         }
 
         setMeasuredDimension(roundedWidth, measuredHeight)
-    }
-
-    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
-        if (mWidth.value != w) {
-            mWidth.onNext(w)
-        }
-        mHeight.onNext(h)
-        super.onSizeChanged(w, h, oldw, oldh)
     }
 
     override fun onDetachedFromWindow() {
@@ -225,8 +204,9 @@ class FileWaveView @JvmOverloads constructor(
         val ptsDistance: Int = if (widthPtRatio >= 1) widthPtRatio else 1
 
         var currentPoint = 0
+
         mPlotPoints.forEach { item ->
-            canvas.drawLine(currentPoint.toFloat(), mHeight.value.toFloat(), currentPoint.toFloat(), (mHeight.value - item), paint)
+            canvas.drawLine(currentPoint.toFloat(), height.toFloat(), currentPoint.toFloat(), (height - item), paint)
             currentPoint += ptsDistance
         }
     }

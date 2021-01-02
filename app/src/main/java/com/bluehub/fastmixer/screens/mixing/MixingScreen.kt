@@ -13,7 +13,6 @@ import com.bluehub.fastmixer.common.permissions.PermissionFragment
 import com.bluehub.fastmixer.common.utils.DialogManager
 import com.bluehub.fastmixer.common.utils.ViewModelType
 import com.bluehub.fastmixer.databinding.MixingScreenBinding
-import timber.log.Timber
 import javax.inject.Inject
 
 class MixingScreen : PermissionFragment<MixingScreenViewModel>(ViewModelType.NAV_SCOPED) {
@@ -52,7 +51,7 @@ class MixingScreen : PermissionFragment<MixingScreenViewModel>(ViewModelType.NAV
                     { filePath: String -> viewModel.readSamples(filePath) },
                     { filePath: String -> viewModel.deleteFile(filePath) }
             ),
-            viewModel.audioViewSampleCountStore
+            viewModel.fileWaveViewStore
         )
         dataBinding.audioFileListView.adapter = audioFileListAdapter
 

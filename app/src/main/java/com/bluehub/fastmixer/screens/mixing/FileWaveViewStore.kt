@@ -5,7 +5,7 @@ import androidx.lifecycle.Observer
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import javax.inject.Inject
 
-class AudioViewSampleCountStore @Inject constructor() {
+class FileWaveViewStore @Inject constructor() {
     private lateinit var mAudioFilesLiveData: LiveData<MutableList<AudioFile>>
 
     private val measuredWidth: BehaviorSubject<Int> = BehaviorSubject.create()
