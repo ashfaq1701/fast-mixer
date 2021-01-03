@@ -51,5 +51,18 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             tools:listitem="@layout/list_item_audio_file"/>
+
+        <com.bluehub.fastmixer.common.views.BottomDrawer
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+            <ImageButton
+                android:id="@+id/groupZoomOut"
+                style="@style/IconButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/zoom_out_button" />
+        </com.bluehub.fastmixer.common.views.BottomDrawer>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
