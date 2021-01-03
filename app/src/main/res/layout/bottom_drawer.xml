@@ -28,6 +28,8 @@
             android:background="@drawable/rect_transparent"
             android:orientation="horizontal"
             android:gravity="end"
-            android:visibility="gone" />
+            android:visibility="gone"
+            android:clickable="true"
+            android:focusable="true" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
