@@ -8,6 +8,9 @@ import android.view.*
 import androidx.databinding.DataBindingUtil
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import androidx.transition.Slide
+import androidx.transition.Transition
+import androidx.transition.TransitionManager
 import com.bluehub.fastmixer.R
 import com.bluehub.fastmixer.common.permissions.PermissionFragment
 import com.bluehub.fastmixer.common.utils.DialogManager
@@ -34,6 +37,8 @@ class MixingScreen : PermissionFragment<MixingScreenViewModel>(ViewModelType.NAV
     private val navArguments: MixingScreenArgs by navArgs()
 
     private lateinit var resolver: ContentResolver
+
+    private lateinit var transition: Transition
 
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,
@@ -62,12 +67,27 @@ class MixingScreen : PermissionFragment<MixingScreenViewModel>(ViewModelType.NAV
         resolver = requireContext().contentResolver
 
         setPermissionEvents()
-        initUI()
+        setupViewModel()
+        setupAnimations()
 
         return dataBinding.root
     }
 
-    private fun initUI() {
+    private fun setupViewModel() {
+        // Initially close bottom drawer
+        viewModel.closeBottomDrawer()
+
+        viewModel.eventDrawerOpen.observe(viewLifecycleOwner, { isOpen ->
+            TransitionManager.beginDelayedTransition(dataBinding.bottomDrawerContainer, transition)
+            if (isOpen) {
+                dataBinding.drawerContainer.visibility = View.VISIBLE
+                dataBinding.drawerControl.setImageResource(R.drawable.drawer_control_button_close)
+            } else {
+                dataBinding.drawerContainer.visibility = View.GONE
+                dataBinding.drawerControl.setImageResource(R.drawable.drawer_control_button_open)
+            }
+        })
+
         viewModel.eventRecord.observe(viewLifecycleOwner, { record ->
             if (record) {
                 findNavController().navigate(MixingScreenDirections.actionMixingScreenToRecordingScreen())
@@ -101,7 +121,13 @@ class MixingScreen : PermissionFragment<MixingScreenViewModel>(ViewModelType.NAV
         })
     }
 
-    fun openFilePicker() {
+    private fun setupAnimations() {
+        transition = Slide()
+        transition.duration = 400
+        transition.addTarget(R.id.drawerContainer)
+    }
+
+    private fun openFilePicker() {
         val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
             type = "*/*"
             val mimeTypes = arrayOf("audio/mpeg", "audio/x-wav")

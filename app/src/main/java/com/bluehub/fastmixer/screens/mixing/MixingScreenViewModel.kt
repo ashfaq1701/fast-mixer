@@ -9,6 +9,7 @@ import com.bluehub.fastmixer.common.permissions.PermissionViewModel
 import com.bluehub.fastmixer.common.utils.FileManager
 import com.bluehub.fastmixer.common.utils.PermissionManager
 import kotlinx.coroutines.*
+import timber.log.Timber
 import java.io.File
 import java.util.*
 import javax.inject.Inject
@@ -21,6 +22,10 @@ class MixingScreenViewModel @Inject constructor(override val context: Context,
                                                 val fileWaveViewStore: FileWaveViewStore): PermissionViewModel(context) {
     var audioFiles: MutableList<AudioFile> = mutableListOf()
     val audioFilesLiveData = MutableLiveData<MutableList<AudioFile>>(mutableListOf())
+
+    private val _eventDrawerOpen = MutableLiveData<Boolean>()
+    val eventDrawerOpen: LiveData<Boolean>
+        get() = _eventDrawerOpen
 
     private val _eventRecord = MutableLiveData<Boolean>()
     val eventRecord: LiveData<Boolean>
@@ -67,6 +72,16 @@ class MixingScreenViewModel @Inject constructor(override val context: Context,
         _itemAddedIdx.value = null
     }
 
+    fun toggleBottomDrawer() {
+        _eventDrawerOpen.value = _eventDrawerOpen.value == null || _eventDrawerOpen.value == false
+    }
+
+    fun closeBottomDrawer() {
+        if (_eventDrawerOpen.value == true) {
+            _eventDrawerOpen.value = false
+        }
+    }
+
     fun addRecordedFilePath(filePath: String) {
         if (!fileManager.fileExists(filePath)) return
 
@@ -111,7 +126,7 @@ class MixingScreenViewModel @Inject constructor(override val context: Context,
         }
     }
 
-    fun createImportedFileCacheDirectory(): String {
+    private fun createImportedFileCacheDirectory(): String {
         val cacheDir = "${context.cacheDir}/imported"
         val fileObj = File(cacheDir)
         if (!fileObj.exists()) {
@@ -154,7 +169,16 @@ class MixingScreenViewModel @Inject constructor(override val context: Context,
     }
 
 
-    fun getTotalSamples(filePath: String): Int = mixingRepository.getTotalSamples(filePath)
+    private fun getTotalSamples(filePath: String): Int = mixingRepository.getTotalSamples(filePath)
+
+    fun groupZoomIn() {
+    }
+
+    fun groupZoomOut() {
+    }
+
+    fun groupReset() {
+    }
 
     override fun onCleared() {
         super.onCleared()

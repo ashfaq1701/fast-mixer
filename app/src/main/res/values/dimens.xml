@@ -19,4 +19,6 @@
     <dimen name="bottom_drawer_margin_start">10dp</dimen>
 
     <dimen name="drawer_border_radius">8dp</dimen>
+
+    <dimen name="group_control_label_size">8sp</dimen>
 </resources>

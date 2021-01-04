@@ -8,4 +8,7 @@
     <color name="transparentBackground">#80000000</color>
     <color name="colorGlassTransparent">#CCE8FFFF</color>
     <color name="colorWhiteTransparent">#99FFFFFF</color>
+
+    <color name="colorBtnNormal">?attr/colorControlNormal</color>
+    <color name="colorBtnPressed">#434543</color>
 </resources>
