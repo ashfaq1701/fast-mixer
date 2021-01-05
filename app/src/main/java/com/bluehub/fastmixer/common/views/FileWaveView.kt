@@ -26,10 +26,6 @@ class FileWaveView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null
 ) : View(context, attrs) {
-    companion object {
-        const val ZOOM_STEP = 1
-    }
-
     private val mAudioFile: BehaviorSubject<AudioFile> = BehaviorSubject.create()
     var mSamplesReader: BehaviorSubject<Function<Int, Deferred<Array<Float>>>> = BehaviorSubject.create()
     private val mFileWaveViewStore: BehaviorSubject<FileWaveViewStore> = BehaviorSubject.create()
@@ -42,16 +38,13 @@ class FileWaveView @JvmOverloads constructor(
 
     private val coroutineScope = CoroutineScope(Job() + Dispatchers.Main)
 
-    private val zoomLevel: BehaviorSubject<Int> = BehaviorSubject.create()
-
     init {
         attrsLoaded.subscribe {
             if (it) {
                 setupObservers()
+                requestLayout()
             }
         }
-
-        zoomLevel.onNext(1)
 
         mAudioFile.subscribe{ checkAttrs() }
         mSamplesReader.subscribe { checkAttrs() }
@@ -81,27 +74,32 @@ class FileWaveView @JvmOverloads constructor(
         }
     }
 
+    private fun getZoomLevel(): Int {
+        if (!mFileWaveViewStore.hasValue() || !mAudioFile.hasValue()) return 1
+        return mFileWaveViewStore.value.getZoomLevel(mAudioFile.value.path) ?: 1
+    }
+
     fun zoomIn() {
         val numSamples = getPlotNumSamples()
 
-        if (zoomLevel.value * numSamples < mAudioFile.value.numSamples) {
-            zoomLevel.onNext(zoomLevel.value + ZOOM_STEP)
+        val zoomLevel = getZoomLevel()
+        if (zoomLevel * numSamples < mAudioFile.value.numSamples) {
+            mFileWaveViewStore.value.zoomIn(mAudioFile.value.path)
+            handleZoom()
         }
     }
 
     fun zoomOut() {
-        if (zoomLevel.value >= 1 + ZOOM_STEP) {
-            zoomLevel.onNext(zoomLevel.value - ZOOM_STEP)
+        val zoomLevel = getZoomLevel()
+        if (zoomLevel >= 1 + FileWaveViewStore.ZOOM_STEP) {
+            mFileWaveViewStore.value.zoomOut(mAudioFile.value.path)
+            handleZoom()
         }
     }
 
     private fun setupObservers() {
         mRawPoints.subscribe { ptsArr ->
             processPlotPoints(ptsArr)
-        }
-
-        zoomLevel.subscribe {
-            handleZoom()
         }
     }
 
@@ -114,9 +112,8 @@ class FileWaveView @JvmOverloads constructor(
     private fun getPlotNumPts(): Int {
         val numSamples = getPlotNumSamples()
 
-        return if (zoomLevel.hasValue()) {
-            zoomLevel.value * numSamples
-        } else numSamples
+        val zoomLevel = getZoomLevel()
+        return zoomLevel * numSamples
     }
 
     private fun fetchPointsToPlot() {
@@ -172,11 +169,8 @@ class FileWaveView @JvmOverloads constructor(
 
         val samplesCount = mFileWaveViewStore.value.getSampleCount(mAudioFile.value.path) ?: measuredWidth
 
-        val calculatedWidth = if (zoomLevel.hasValue()) {
-            zoomLevel.value * samplesCount
-        } else {
-            samplesCount
-        }
+        val zoomLevel = getZoomLevel()
+        val calculatedWidth = zoomLevel * samplesCount
 
         val roundedWidth = if (measuredWidth == 0 || calculatedWidth < measuredWidth) measuredWidth else calculatedWidth
 

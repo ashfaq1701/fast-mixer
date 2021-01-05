@@ -6,6 +6,10 @@ import io.reactivex.rxjava3.subjects.BehaviorSubject
 import javax.inject.Inject
 
 class FileWaveViewStore @Inject constructor() {
+    companion object {
+        const val ZOOM_STEP = 1
+    }
+
     private lateinit var mAudioFilesLiveData: LiveData<MutableList<AudioFile>>
 
     private val measuredWidth: BehaviorSubject<Int> = BehaviorSubject.create()
@@ -15,6 +19,8 @@ class FileWaveViewStore @Inject constructor() {
     private val fileListObserver: Observer<MutableList<AudioFile>> = Observer {
         calculateSampleCountEachView()
     }
+
+    private val fileZoomLevels: MutableMap<String, Int> = mutableMapOf()
     
     init {
         measuredWidth.subscribe { 
@@ -47,6 +53,10 @@ class FileWaveViewStore @Inject constructor() {
         mAudioFilesLiveData.value!!.forEach { audioFile ->
             val numSamples = (audioFile.numSamples.toFloat() / maxNumSamples.toFloat()) * measuredWidth.value
             fileSampleCountMap[audioFile.path] = numSamples.toInt()
+
+            if (!fileZoomLevels.containsKey(audioFile.path)) {
+                fileZoomLevels[audioFile.path] = 1
+            }
         }
 
         isFileSampleCountMapUpdated.onNext(true)
@@ -54,6 +64,24 @@ class FileWaveViewStore @Inject constructor() {
     
     fun getSampleCount(fileName: String): Int? {
         return fileSampleCountMap[fileName]
+    }
+
+    fun getZoomLevel(filePath: String): Int? {
+        return fileZoomLevels[filePath]
+    }
+
+    fun zoomIn(filePath: String) {
+        fileZoomLevels[filePath] = (fileZoomLevels[filePath] ?: 0) + ZOOM_STEP
+    }
+
+    fun zoomOut(filePath: String) {
+        fileZoomLevels[filePath] = fileZoomLevels[filePath]?.let {
+            if (it > 1) it - ZOOM_STEP else it
+        } ?: 1
+    }
+
+    fun resetZoomLevel(filePath: String) {
+        fileZoomLevels[filePath] = 1
     }
 
     fun removeLivedataObservers() {
