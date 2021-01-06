@@ -73,14 +73,29 @@ class FileWaveViewStore @Inject constructor() {
         return fileZoomLevels[filePath]
     }
 
-    fun zoomIn(filePath: String) {
-        fileZoomLevels[filePath] = (fileZoomLevels[filePath] ?: 0) + ZOOM_STEP
+    fun zoomIn(audioFile: AudioFile): Boolean {
+        val zoomLevel = getZoomLevel(audioFile.path)
+        val numSamples = getSampleCount(audioFile.path)
+
+        if (zoomLevel == null || numSamples == null) {
+            return false
+        }
+
+        return (zoomLevel * numSamples < audioFile.numSamples).also {
+            fileZoomLevels[audioFile.path] = zoomLevel + ZOOM_STEP
+        }
     }
 
-    fun zoomOut(filePath: String) {
-        fileZoomLevels[filePath] = fileZoomLevels[filePath]?.let {
-            if (it > 1) it - ZOOM_STEP else it
-        } ?: 1
+    fun zoomOut(audioFile: AudioFile): Boolean {
+        val zoomLevel = getZoomLevel(audioFile.path) ?: return false
+
+        val newZoomLevel = if (zoomLevel >= 1 + ZOOM_STEP) zoomLevel - ZOOM_STEP else zoomLevel
+
+        if (newZoomLevel != zoomLevel) {
+            fileZoomLevels[audioFile.path] = newZoomLevel
+            return true
+        }
+        return false
     }
 
     fun resetZoomLevel(filePath: String) {

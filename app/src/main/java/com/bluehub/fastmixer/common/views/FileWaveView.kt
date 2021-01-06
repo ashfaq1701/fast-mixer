@@ -79,24 +79,18 @@ class FileWaveView @JvmOverloads constructor(
     }
 
     fun zoomIn() {
-        val numSamples = getPlotNumSamples()
-
-        zoomLevel = getZoomLevel()
-        if (zoomLevel * numSamples < mAudioFile.value.numSamples) {
-            mFileWaveViewStore.value.zoomIn(mAudioFile.value.path)
+        if (mFileWaveViewStore.value.zoomIn(mAudioFile.value)) {
             handleZoom()
         }
     }
 
     fun zoomOut() {
-        zoomLevel = getZoomLevel()
-        if (zoomLevel >= 1 + FileWaveViewStore.ZOOM_STEP) {
-            mFileWaveViewStore.value.zoomOut(mAudioFile.value.path)
+        if (mFileWaveViewStore.value.zoomOut(mAudioFile.value)) {
             handleZoom()
         }
     }
 
-    fun resetZoom() {
+    private fun resetZoom() {
         if (mFileWaveViewStore.hasValue() && mAudioFile.hasValue()) {
             mFileWaveViewStore.value.resetZoomLevel(mAudioFile.value.path)
             handleZoom()
