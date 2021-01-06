@@ -113,5 +113,58 @@ class FileWaveViewStore @Inject constructor() {
         coroutineScope.cancel()
     }
 
+    fun groupZoomIn() {
+        val min = getMinZoomLevel()
+        if (!checkIfZoomLevelIsMaxAllowed(min)) {
+            groupSetZoomLevel(min + ZOOM_STEP)
+        } else {
+            groupSetZoomLevel(min)
+        }
+        fileZoomLevelsUpdated.onNext(true)
+    }
 
+    fun groupZoomOut() {
+        val min = getMinZoomLevel()
+        if (min >= 1 + ZOOM_STEP) {
+            groupSetZoomLevel(min - ZOOM_STEP)
+        } else {
+            groupSetZoomLevel(min)
+        }
+        fileZoomLevelsUpdated.onNext(true)
+    }
+
+    private fun getMinZoomLevel(): Int {
+        return fileZoomLevels.values.fold(Int.MAX_VALUE, { acc: Int, curr: Int ->
+            if (curr < acc) curr else acc
+        })
+    }
+
+    private fun checkIfZoomLevelIsMaxAllowed(zoomLevel: Int): Boolean {
+        var ifMaxAllowed = false
+        fileZoomLevels.forEach { (filePath: String, currentZoom: Int) ->
+            if (currentZoom == zoomLevel) {
+                val audioFile = mAudioFilesLiveData.value?.find {
+                    it.path == filePath
+                }
+                val numSamples = getSampleCount(filePath)
+                if (audioFile != null &&
+                    numSamples != null &&
+                    currentZoom * numSamples >= audioFile.numSamples) {
+                    ifMaxAllowed = ifMaxAllowed || true
+                }
+            }
+        }
+        return ifMaxAllowed
+    }
+
+    fun groupReset() {
+        groupSetZoomLevel(1)
+        fileZoomLevelsUpdated.onNext(true)
+    }
+
+    private fun groupSetZoomLevel(zoomLevel: Int) {
+        fileZoomLevels.forEach { (filePath: String, _) ->
+            fileZoomLevels[filePath] = zoomLevel
+        }
+    }
 }

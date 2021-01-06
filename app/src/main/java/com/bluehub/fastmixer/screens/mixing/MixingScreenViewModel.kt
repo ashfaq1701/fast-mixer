@@ -171,12 +171,15 @@ class MixingScreenViewModel @Inject constructor(override val context: Context,
     private fun getTotalSamples(filePath: String): Int = mixingRepository.getTotalSamples(filePath)
 
     fun groupZoomIn() {
+        fileWaveViewStore.groupZoomIn()
     }
 
     fun groupZoomOut() {
+        fileWaveViewStore.groupZoomOut()
     }
 
     fun groupReset() {
+        fileWaveViewStore.groupReset()
     }
 
     override fun onCleared() {
