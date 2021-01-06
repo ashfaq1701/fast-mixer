@@ -21,11 +21,14 @@ class FileWaveViewStore @Inject constructor() {
     }
 
     private val fileZoomLevels: MutableMap<String, Int> = mutableMapOf()
+    val fileZoomLevelsUpdated: BehaviorSubject<Boolean> = BehaviorSubject.create()
     
     init {
         measuredWidth.subscribe { 
             calculateSampleCountEachView()
         }
+
+        fileZoomLevelsUpdated.onNext(true)
     }
 
     fun setAudioFilesLiveData(audioFilesLiveData: LiveData<MutableList<AudioFile>>) {

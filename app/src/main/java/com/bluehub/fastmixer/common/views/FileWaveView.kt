@@ -42,7 +42,6 @@ class FileWaveView @JvmOverloads constructor(
         attrsLoaded.subscribe {
             if (it) {
                 setupObservers()
-                requestLayout()
             }
         }
 
@@ -69,9 +68,6 @@ class FileWaveView @JvmOverloads constructor(
 
     fun setFileWaveViewStore(fileWaveViewStore: FileWaveViewStore) {
         mFileWaveViewStore.onNext(fileWaveViewStore)
-        mFileWaveViewStore.value.isFileSampleCountMapUpdated.subscribe {
-            requestLayout()
-        }
     }
 
     private fun getZoomLevel(): Int {
@@ -100,6 +96,13 @@ class FileWaveView @JvmOverloads constructor(
     private fun setupObservers() {
         mRawPoints.subscribe { ptsArr ->
             processPlotPoints(ptsArr)
+        }
+
+        mFileWaveViewStore.value.isFileSampleCountMapUpdated.subscribe {
+            requestLayout()
+        }
+        mFileWaveViewStore.value.fileZoomLevelsUpdated.subscribe {
+            handleZoom()
         }
     }
 
