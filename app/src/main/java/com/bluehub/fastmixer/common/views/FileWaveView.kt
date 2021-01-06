@@ -1,6 +1,7 @@
 package com.bluehub.fastmixer.common.views
 
 import android.content.Context
+import android.content.res.Configuration
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Typeface
@@ -37,6 +38,8 @@ class FileWaveView @JvmOverloads constructor(
     private var attrsLoaded: BehaviorSubject<Boolean> = BehaviorSubject.create()
 
     private val coroutineScope = CoroutineScope(Job() + Dispatchers.Main)
+
+    private var zoomLevel: Int = 0
 
     init {
         attrsLoaded.subscribe {
@@ -78,7 +81,7 @@ class FileWaveView @JvmOverloads constructor(
     fun zoomIn() {
         val numSamples = getPlotNumSamples()
 
-        val zoomLevel = getZoomLevel()
+        zoomLevel = getZoomLevel()
         if (zoomLevel * numSamples < mAudioFile.value.numSamples) {
             mFileWaveViewStore.value.zoomIn(mAudioFile.value.path)
             handleZoom()
@@ -86,9 +89,16 @@ class FileWaveView @JvmOverloads constructor(
     }
 
     fun zoomOut() {
-        val zoomLevel = getZoomLevel()
+        zoomLevel = getZoomLevel()
         if (zoomLevel >= 1 + FileWaveViewStore.ZOOM_STEP) {
             mFileWaveViewStore.value.zoomOut(mAudioFile.value.path)
+            handleZoom()
+        }
+    }
+
+    fun resetZoom() {
+        if (mFileWaveViewStore.hasValue() && mAudioFile.hasValue()) {
+            mFileWaveViewStore.value.resetZoomLevel(mAudioFile.value.path)
             handleZoom()
         }
     }
@@ -115,7 +125,7 @@ class FileWaveView @JvmOverloads constructor(
     private fun getPlotNumPts(): Int {
         val numSamples = getPlotNumSamples()
 
-        val zoomLevel = getZoomLevel()
+        zoomLevel = getZoomLevel()
         return zoomLevel * numSamples
     }
 
@@ -158,7 +168,9 @@ class FileWaveView @JvmOverloads constructor(
     }
 
     private fun handleZoom() {
-        requestLayout()
+        if (getZoomLevel() != zoomLevel) {
+            requestLayout()
+        }
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -172,7 +184,7 @@ class FileWaveView @JvmOverloads constructor(
 
         val samplesCount = mFileWaveViewStore.value.getSampleCount(mAudioFile.value.path) ?: measuredWidth
 
-        val zoomLevel = getZoomLevel()
+        zoomLevel = getZoomLevel()
         val calculatedWidth = zoomLevel * samplesCount
 
         val roundedWidth = if (measuredWidth == 0 || calculatedWidth < measuredWidth) measuredWidth else calculatedWidth
@@ -182,6 +194,11 @@ class FileWaveView @JvmOverloads constructor(
         }
 
         setMeasuredDimension(roundedWidth, measuredHeight)
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration?) {
+        super.onConfigurationChanged(newConfig)
+        resetZoom()
     }
 
     override fun onDetachedFromWindow() {
