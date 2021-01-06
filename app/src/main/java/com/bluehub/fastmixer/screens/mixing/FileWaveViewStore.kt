@@ -3,6 +3,10 @@ package com.bluehub.fastmixer.screens.mixing
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import io.reactivex.rxjava3.subjects.BehaviorSubject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
 import javax.inject.Inject
 
 class FileWaveViewStore @Inject constructor() {
@@ -15,6 +19,8 @@ class FileWaveViewStore @Inject constructor() {
     private val measuredWidth: BehaviorSubject<Int> = BehaviorSubject.create()
     private val fileSampleCountMap: MutableMap<String, Int> = mutableMapOf()
     val isFileSampleCountMapUpdated: BehaviorSubject<Boolean> = BehaviorSubject.create()
+
+    val coroutineScope = CoroutineScope(Job() + Dispatchers.Main)
 
     private val fileListObserver: Observer<MutableList<AudioFile>> = Observer {
         calculateSampleCountEachView()
@@ -102,7 +108,10 @@ class FileWaveViewStore @Inject constructor() {
         fileZoomLevels[filePath] = 1
     }
 
-    fun removeLivedataObservers() {
+    fun cleanup() {
         mAudioFilesLiveData.removeObserver(fileListObserver)
+        coroutineScope.cancel()
     }
+
+
 }

@@ -15,7 +15,8 @@ import com.bluehub.fastmixer.screens.mixing.AudioFile
 import com.bluehub.fastmixer.screens.mixing.FileWaveViewStore
 import io.reactivex.rxjava3.functions.Function
 import io.reactivex.rxjava3.subjects.BehaviorSubject
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.launch
 
 
 @BindingMethods(value = [
@@ -36,8 +37,6 @@ class FileWaveView @JvmOverloads constructor(
     private lateinit var mPlotPoints: Array<Float>
 
     private var attrsLoaded: BehaviorSubject<Boolean> = BehaviorSubject.create()
-
-    private val coroutineScope = CoroutineScope(Job() + Dispatchers.Main)
 
     private var zoomLevel: Int = 0
 
@@ -128,7 +127,7 @@ class FileWaveView @JvmOverloads constructor(
 
         val numPts = getPlotNumPts()
 
-        coroutineScope.launch {
+        mFileWaveViewStore.value.coroutineScope.launch {
             mRawPoints.onNext(mSamplesReader.value.apply(numPts).await())
         }
     }
@@ -193,11 +192,6 @@ class FileWaveView @JvmOverloads constructor(
     override fun onConfigurationChanged(newConfig: Configuration?) {
         super.onConfigurationChanged(newConfig)
         resetZoom()
-    }
-
-    override fun onDetachedFromWindow() {
-        super.onDetachedFromWindow()
-        coroutineScope.cancel()
     }
 
     override fun onDraw(canvas: Canvas) {

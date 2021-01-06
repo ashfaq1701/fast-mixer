@@ -9,7 +9,6 @@ import com.bluehub.fastmixer.common.permissions.PermissionViewModel
 import com.bluehub.fastmixer.common.utils.FileManager
 import com.bluehub.fastmixer.common.utils.PermissionManager
 import kotlinx.coroutines.*
-import timber.log.Timber
 import java.io.File
 import java.util.*
 import javax.inject.Inject
@@ -183,6 +182,6 @@ class MixingScreenViewModel @Inject constructor(override val context: Context,
     override fun onCleared() {
         super.onCleared()
         mixingRepository.deleteMixingEngine()
-        fileWaveViewStore.removeLivedataObservers()
+        fileWaveViewStore.cleanup()
     }
 }
