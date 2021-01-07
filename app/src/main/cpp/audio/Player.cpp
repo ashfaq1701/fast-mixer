@@ -17,14 +17,18 @@
 #include "Player.h"
 #include "../logging_macros.h"
 
+void Player::addSource(shared_ptr<DataSource> source) {
+    mSourceList.push_back(source);
+}
+
 void Player::renderAudio(float *targetData, int32_t numFrames) {
-    const AudioProperties properties = mSource->getProperties();
+    const AudioProperties properties = mSourceList.at(0)->getProperties();
 
     if (mIsPlaying){
 
         int64_t framesToRenderFromData = numFrames;
-        int64_t totalSourceFrames = mSource->getSize() / properties.channelCount;
-        const float *data = mSource->getData();
+        int64_t totalSourceFrames = mSourceList.at(0)->getSize() / properties.channelCount;
+        const float *data = mSourceList.at(0)->getData();
 
         // Check whether we're about to reach the end of the recording
         if (!mIsLooping && mReadFrameIndex + numFrames >= totalSourceFrames){
@@ -61,15 +65,15 @@ void Player::renderSilence(float *start, int32_t numSamples){
 }
 
 void Player::setPlayHead(int32_t playHead) {
-    const AudioProperties properties = mSource->getProperties();
-    int64_t totalSourceFrames = mSource->getSize() / properties.channelCount;
+    const AudioProperties properties = mSourceList.at(0)->getProperties();
+    int64_t totalSourceFrames = mSourceList.at(0)->getSize() / properties.channelCount;
     if (playHead < totalSourceFrames) {
         mReadFrameIndex = playHead;
     }
 }
 
 int64_t Player::getTotalSampleFrames() {
-    const AudioProperties properties = mSource->getProperties();
-    int64_t totalSourceFrames = mSource->getSize() / properties.channelCount;
+    const AudioProperties properties = mSourceList.at(0)->getProperties();
+    int64_t totalSourceFrames = mSourceList.at(0)->getSize() / properties.channelCount;
     return totalSourceFrames;
 }

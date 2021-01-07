@@ -21,7 +21,7 @@ void MixingEngine::addFile(string filePath) {
         return;
     }
     shared_ptr<FileDataSource> source = mixingIO.readFile(filePath);
-    sourceMap.insert(pair<string, shared_ptr<FileDataSource>>(filePath, source));
+    sourceMap.insert(pair<string, shared_ptr<FileDataSource>>(filePath, move(source)));
     filePath.erase();
 }
 

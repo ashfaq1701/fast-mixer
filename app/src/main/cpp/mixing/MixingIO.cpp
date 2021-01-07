@@ -10,9 +10,7 @@ shared_ptr<FileDataSource> MixingIO::readFile(string filename) {
             .sampleRate = StreamConstants::mSampleRate
     };
 
-    shared_ptr<FileDataSource> source {
+    return shared_ptr<FileDataSource> {
         FileDataSource::newFromCompressedFile(filename.c_str(), targetProperties)
     };
-
-    return move(source);
 }

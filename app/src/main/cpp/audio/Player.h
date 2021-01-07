@@ -19,6 +19,7 @@
 
 #include <cstdint>
 #include <array>
+#include "vector"
 
 #include <chrono>
 #include <memory>
@@ -41,12 +42,19 @@ public:
      *
      * @param source
      */
+
     Player(shared_ptr<DataSource> source, function<void(void)> stopPlaybackCallback)
-        : mSource(source)
-    {
+        : mSource(source) {
         mStopPlaybackCallback = stopPlaybackCallback;
+        if (source) {
+            mSourceList.push_back(mSource);
+        }
     };
 
+    Player(function<void(void)> stopPlaybackCallback)
+        : Player { nullptr, stopPlaybackCallback } {};
+
+    void addSource(shared_ptr<DataSource> source);
     void renderAudio(float *targetData, int32_t numFrames);
     void resetPlayHead() { mReadFrameIndex = 0; };
     int32_t getPlayHead() { return mReadFrameIndex; }
@@ -60,7 +68,9 @@ private:
     atomic<bool> mIsPlaying { false };
     atomic<bool> mIsLooping { false };
     function<void(void)> mStopPlaybackCallback = nullptr;
+
     shared_ptr<DataSource> mSource;
+    vector<shared_ptr<DataSource>> mSourceList;
 
     void renderSilence(float*, int32_t);
 };
