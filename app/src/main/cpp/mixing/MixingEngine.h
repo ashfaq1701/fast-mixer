@@ -20,7 +20,7 @@ public:
     int64_t getAudioFileTotalSamples(string filePath);
 private:
     MixingIO mixingIO;
-    map<string, FileDataSource*> sourceMap;
+    map<string, shared_ptr<FileDataSource>> sourceMap;
 };
 
 

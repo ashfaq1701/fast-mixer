@@ -9,7 +9,7 @@
 MixingEngine::~MixingEngine() {
     auto it = sourceMap.begin();
     while (it != sourceMap.end()) {
-        delete it->second;
+        it->second.reset();
     }
     sourceMap.clear();
 }
@@ -20,8 +20,8 @@ void MixingEngine::addFile(string filePath) {
         filePath.erase();
         return;
     }
-    FileDataSource* source = mixingIO.readFile(filePath);
-    sourceMap.insert(pair<string, FileDataSource*>(filePath, source));
+    shared_ptr<FileDataSource> source = mixingIO.readFile(filePath);
+    sourceMap.insert(pair<string, shared_ptr<FileDataSource>>(filePath, source));
     filePath.erase();
 }
 
@@ -41,7 +41,7 @@ unique_ptr<buffer_data> MixingEngine::readSamples(string filePath, size_t countP
 void MixingEngine::deleteFile(string filePath) {
     auto it = sourceMap.find(filePath);
     if (it != sourceMap.end()) {
-        delete it->second;
+        it->second.reset();
         sourceMap.erase(filePath);
     }
     filePath.erase();

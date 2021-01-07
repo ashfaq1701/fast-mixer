@@ -4,11 +4,15 @@
 
 #include "MixingIO.h"
 
-FileDataSource* MixingIO::readFile(string filename) {
+shared_ptr<FileDataSource> MixingIO::readFile(string filename) {
     AudioProperties targetProperties{
             .channelCount = StreamConstants::mChannelCount,
             .sampleRate = StreamConstants::mSampleRate
     };
 
-    return FileDataSource::newFromCompressedFile(filename.c_str(), targetProperties);
+    shared_ptr<FileDataSource> source {
+        FileDataSource::newFromCompressedFile(filename.c_str(), targetProperties)
+    };
+
+    return move(source);
 }
