@@ -121,15 +121,16 @@ int64_t FFMpegExtractor::decodeOp(uint8_t *targetData, function<void(uint8_t *, 
     AVFormatContext *formatCtx = nullptr;
     AVCodecContext *codecCtx = nullptr;
 
-    AVStream *stream = nullptr;
+    AVStream *stream;
 
-    AVCodec *codec = nullptr;
+    AVCodec *codec;
 
-    int32_t outChannelLayout = 0;
+    int32_t outChannelLayout;
 
-    SwrContext *swr = nullptr;
+    SwrContext *swr;
 
-    int result = 0, bytesWritten = 0, bytesPerSample = 0;
+    int result, bytesPerSample;
+    int64_t bytesWritten = 0;
 
     AVPacket avPacket; // Stores compressed audio data
 
@@ -277,8 +278,6 @@ int64_t FFMpegExtractor::decodeOp(uint8_t *targetData, function<void(uint8_t *, 
     av_frame_free(&decodedFrame);
     LOGD("DECODE END");
 
-    returnValue = bytesWritten;
-
     cleanup:
     if (fp) {
         fclose(fp);
@@ -294,6 +293,9 @@ int64_t FFMpegExtractor::decodeOp(uint8_t *targetData, function<void(uint8_t *, 
     }
     if (codecCtx) {
         avcodec_free_context(&codecCtx);
+    }
+    if (bytesWritten > 0) {
+        returnValue = bytesWritten;
     }
     return returnValue;
 }
