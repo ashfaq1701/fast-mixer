@@ -63,7 +63,7 @@ FileDataSource* FileDataSource::newFromCompressedFile(
 
     return new FileDataSource(move(outputBuffer),
                               numSamples,
-                              targetProperties);
+                              move(targetProperties));
 }
 
 unique_ptr<buffer_data> FileDataSource::readData(size_t countPoints) {

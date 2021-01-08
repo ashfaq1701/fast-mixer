@@ -43,16 +43,13 @@ public:
      * @param source
      */
 
-    Player(shared_ptr<DataSource> source, function<void(void)> stopPlaybackCallback)
-        : mSource(source) {
+    Player(vector<shared_ptr<DataSource>> sourceList, function<void(void)> stopPlaybackCallback)
+        : mSourceList{ sourceList } {
         mStopPlaybackCallback = stopPlaybackCallback;
-        if (source) {
-            mSourceList.push_back(mSource);
-        }
     };
 
     Player(function<void(void)> stopPlaybackCallback)
-        : Player { nullptr, stopPlaybackCallback } {};
+        : Player { vector<shared_ptr<DataSource>>(), stopPlaybackCallback } {};
 
     void addSource(shared_ptr<DataSource> source);
     void renderAudio(float *targetData, int32_t numFrames);
@@ -68,8 +65,6 @@ private:
     atomic<bool> mIsPlaying { false };
     atomic<bool> mIsLooping { false };
     function<void(void)> mStopPlaybackCallback = nullptr;
-
-    shared_ptr<DataSource> mSource;
     vector<shared_ptr<DataSource>> mSourceList;
 
     void renderSilence(float*, int32_t);
