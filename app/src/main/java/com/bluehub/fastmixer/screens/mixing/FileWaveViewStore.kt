@@ -17,7 +17,9 @@ class FileWaveViewStore @Inject constructor() {
     private lateinit var mAudioFilesLiveData: LiveData<MutableList<AudioFile>>
 
     private val measuredWidth: BehaviorSubject<Int> = BehaviorSubject.create()
-    private val fileSampleCountMap: MutableMap<String, Int> = mutableMapOf()
+
+    private val audioFileUiStateList: MutableList<AudioFileUiState> = mutableListOf()
+
     val isFileSampleCountMapUpdated: BehaviorSubject<Boolean> = BehaviorSubject.create()
 
     val coroutineScope = CoroutineScope(Job() + Dispatchers.Main)
@@ -26,7 +28,6 @@ class FileWaveViewStore @Inject constructor() {
         calculateSampleCountEachView()
     }
 
-    private val fileZoomLevels: MutableMap<String, Int> = mutableMapOf()
     val fileZoomLevelsUpdated: BehaviorSubject<Boolean> = BehaviorSubject.create()
     
     init {
@@ -61,22 +62,33 @@ class FileWaveViewStore @Inject constructor() {
 
         mAudioFilesLiveData.value!!.forEach { audioFile ->
             val numSamples = (audioFile.numSamples.toFloat() / maxNumSamples.toFloat()) * measuredWidth.value
-            fileSampleCountMap[audioFile.path] = numSamples.toInt()
 
-            if (!fileZoomLevels.containsKey(audioFile.path)) {
-                fileZoomLevels[audioFile.path] = 1
+            if (findAudioFileUiState(audioFile.path) == null) {
+                val audioFileUiState = AudioFileUiState(
+                    path = audioFile.path,
+                    numSamples = audioFile.numSamples,
+                    displayPtsCount = numSamples.toInt(),
+                    zoomLevel = 1
+                )
+                audioFileUiStateList.add(audioFileUiState)
             }
         }
 
         isFileSampleCountMapUpdated.onNext(true)
     }
+
+    private fun findAudioFileUiState(audioFilePath: String) = audioFileUiStateList.find {
+        it.path == audioFilePath
+    }
     
-    fun getSampleCount(fileName: String): Int? {
-        return fileSampleCountMap[fileName]
+    fun getSampleCount(filePath: String): Int? {
+        val audioFileUiState = findAudioFileUiState(filePath)
+        return audioFileUiState?.displayPtsCount
     }
 
     fun getZoomLevel(filePath: String): Int? {
-        return fileZoomLevels[filePath]
+        val audioFileUiState = findAudioFileUiState(filePath)
+        return audioFileUiState?.zoomLevel
     }
 
     fun zoomIn(audioFile: AudioFile): Boolean {
@@ -88,7 +100,7 @@ class FileWaveViewStore @Inject constructor() {
         }
 
         return (zoomLevel * numSamples < audioFile.numSamples).also {
-            fileZoomLevels[audioFile.path] = zoomLevel + ZOOM_STEP
+            findAudioFileUiState(audioFile.path)?.zoomLevel = zoomLevel + ZOOM_STEP
         }
     }
 
@@ -98,14 +110,14 @@ class FileWaveViewStore @Inject constructor() {
         val newZoomLevel = if (zoomLevel >= 1 + ZOOM_STEP) zoomLevel - ZOOM_STEP else zoomLevel
 
         if (newZoomLevel != zoomLevel) {
-            fileZoomLevels[audioFile.path] = newZoomLevel
+            findAudioFileUiState(audioFile.path)?.zoomLevel = newZoomLevel
             return true
         }
         return false
     }
 
     fun resetZoomLevel(filePath: String) {
-        fileZoomLevels[filePath] = 1
+        findAudioFileUiState(filePath)?.zoomLevel = 1
     }
 
     fun cleanup() {
@@ -134,23 +146,17 @@ class FileWaveViewStore @Inject constructor() {
     }
 
     private fun getMinZoomLevel(): Int {
-        return fileZoomLevels.values.fold(Int.MAX_VALUE, { acc: Int, curr: Int ->
-            if (curr < acc) curr else acc
+        return audioFileUiStateList.fold(Int.MAX_VALUE, { acc: Int, curr: AudioFileUiState ->
+            if (curr.zoomLevel < acc) curr.zoomLevel else acc
         })
     }
 
-    private fun checkIfZoomLevelIsMaxAllowed(zoomLevel: Int): Boolean {
+    private fun checkIfZoomLevelIsMaxAllowed(zl: Int): Boolean {
         var ifMaxAllowed = false
-        fileZoomLevels.forEach { (filePath: String, currentZoom: Int) ->
-            if (currentZoom == zoomLevel) {
-                val audioFile = mAudioFilesLiveData.value?.find {
-                    it.path == filePath
-                }
-                val numSamples = getSampleCount(filePath)
-                if (audioFile != null &&
-                    numSamples != null &&
-                    currentZoom * numSamples >= audioFile.numSamples) {
-                    ifMaxAllowed = ifMaxAllowed || true
+        audioFileUiStateList.forEach { audioFileUiState ->
+            audioFileUiState.apply {
+                if (zoomLevel == zl) {
+                    ifMaxAllowed = ifMaxAllowed || (zoomLevel * displayPtsCount >= numSamples)
                 }
             }
         }
@@ -163,8 +169,8 @@ class FileWaveViewStore @Inject constructor() {
     }
 
     private fun groupSetZoomLevel(zoomLevel: Int) {
-        fileZoomLevels.forEach { (filePath: String, _) ->
-            fileZoomLevels[filePath] = zoomLevel
+        audioFileUiStateList.forEach {
+            it.zoomLevel = zoomLevel
         }
     }
 }

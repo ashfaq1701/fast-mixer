@@ -55,9 +55,9 @@ bool RecordingIO::setup_audio_source() {
         mRecordedTrack.reset();
     }
 
-    vector<shared_ptr<DataSource>> sourceList;
-    sourceList.push_back(audioSource);
-    mRecordedTrack = make_shared<Player>(sourceList, mStopPlaybackCallback);
+    map<string, shared_ptr<DataSource>> sourceMap;
+    sourceMap.insert(pair<string, shared_ptr<DataSource>>(mRecordingFilePath, audioSource));
+    mRecordedTrack = make_shared<Player>(sourceMap, mStopPlaybackCallback);
     mRecordedTrack->setPlayHead(playHead);
     mRecordedTrack->setPlaying(true);
 
