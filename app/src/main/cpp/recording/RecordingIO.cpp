@@ -34,8 +34,12 @@ bool RecordingIO::setup_audio_source() {
             .sampleRate = StreamConstants::mSampleRate
     };
 
+    auto dataSource = FileDataSource::newFromCompressedFile(mRecordingFilePath.c_str(), targetProperties);
+
+    if (dataSource == nullptr) return false;
+
     shared_ptr<FileDataSource> audioSource{
-            FileDataSource::newFromCompressedFile(mRecordingFilePath.c_str(), targetProperties)
+        dataSource
     };
 
     if (!audioSource) {
