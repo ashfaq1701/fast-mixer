@@ -120,16 +120,14 @@ int64_t FFMpegExtractor::decode(uint8_t *targetData) {
     {
         FILE *tmp;
         tmp = fopen(mFilePath, "rb");
-        fp.reset(tmp);
+        fp.reset(move(tmp));
     }
 
     std::unique_ptr<AVIOContext, void(*)(AVIOContext *)> ioContext {
             nullptr,
             [](AVIOContext *c) {
-                if (c) {
-                    if (c->buffer) av_free(c->buffer);
-                    avio_context_free(&c);
-                }
+                if (c->buffer) av_free(c->buffer);
+                avio_context_free(&c);
             }
     };
     {
@@ -172,9 +170,7 @@ int64_t FFMpegExtractor::decode(uint8_t *targetData) {
     std::unique_ptr<AVCodecContext, void(*)(AVCodecContext *)> codecContext {
             nullptr,
             [](AVCodecContext *c) {
-                if (c) {
-                    avcodec_free_context(&c);
-                }
+                avcodec_free_context(&c);
             }
     };
     {
