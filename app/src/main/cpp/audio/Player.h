@@ -48,13 +48,14 @@ public:
         mStopPlaybackCallback = stopPlaybackCallback;
     };
 
-    Player(function<void(void)> stopPlaybackCallback)
-        : Player { map<string, shared_ptr<DataSource>>(), stopPlaybackCallback } {};
+    Player()
+        : Player { map<string, shared_ptr<DataSource>>(), nullptr } {};
 
     void addSource(string key, shared_ptr<DataSource> source);
     void renderAudio(float *targetData, int32_t numFrames);
     void resetPlayHead() { mReadFrameIndex = 0; };
     int32_t getPlayHead() { return mReadFrameIndex; }
+
     void setPlayHead(int32_t playHead);
     void setPlaying(bool isPlaying) { mIsPlaying = isPlaying; };
     void setLooping(bool isLooping) { mIsLooping = isLooping; };

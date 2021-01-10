@@ -2,16 +2,14 @@ package com.bluehub.fastmixer.common.views
 
 import android.content.Context
 import android.content.res.Configuration
-import android.graphics.Canvas
-import android.graphics.Paint
-import android.graphics.Typeface
+import android.graphics.*
 import android.util.AttributeSet
 import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.databinding.BindingMethod
 import androidx.databinding.BindingMethods
 import com.bluehub.fastmixer.R
-import com.bluehub.fastmixer.screens.mixing.AudioFile
+import com.bluehub.fastmixer.screens.mixing.AudioFileUiState
 import com.bluehub.fastmixer.screens.mixing.FileWaveViewStore
 import io.reactivex.rxjava3.functions.Function
 import io.reactivex.rxjava3.subjects.BehaviorSubject
@@ -21,14 +19,14 @@ import kotlinx.coroutines.launch
 
 @BindingMethods(value = [
     BindingMethod(type = FileWaveView::class, attribute = "samplesReader", method = "setSamplesReader"),
-    BindingMethod(type = FileWaveView::class, attribute = "audioFile", method = "setAudioFile"),
+    BindingMethod(type = FileWaveView::class, attribute = "audioFileUiState", method = "setAudioFileUiState"),
     BindingMethod(type = FileWaveView::class, attribute = "fileWaveViewStore", method = "setFileWaveViewStore")
 ])
 class FileWaveView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null
 ) : View(context, attrs) {
-    private val mAudioFile: BehaviorSubject<AudioFile> = BehaviorSubject.create()
+    private val mAudioFileUiState: BehaviorSubject<AudioFileUiState> = BehaviorSubject.create()
     var mSamplesReader: BehaviorSubject<Function<Int, Deferred<Array<Float>>>> = BehaviorSubject.create()
     private val mFileWaveViewStore: BehaviorSubject<FileWaveViewStore> = BehaviorSubject.create()
 
@@ -38,8 +36,6 @@ class FileWaveView @JvmOverloads constructor(
 
     private var attrsLoaded: BehaviorSubject<Boolean> = BehaviorSubject.create()
 
-    private var zoomLevel: Int = 0
-
     init {
         attrsLoaded.subscribe {
             if (it) {
@@ -47,7 +43,7 @@ class FileWaveView @JvmOverloads constructor(
             }
         }
 
-        mAudioFile.subscribe{ checkAttrs() }
+        mAudioFileUiState.subscribe{ checkAttrs() }
         mSamplesReader.subscribe { checkAttrs() }
         mFileWaveViewStore.subscribe { checkAttrs() }
     }
@@ -60,8 +56,8 @@ class FileWaveView @JvmOverloads constructor(
         color = ContextCompat.getColor(context, R.color.colorAccent)
     }
 
-    fun setAudioFile(audioFile: AudioFile) {
-        mAudioFile.onNext(audioFile)
+    fun setAudioFileUiState(audioFileUiState: AudioFileUiState) {
+        mAudioFileUiState.onNext(audioFileUiState)
     }
 
     fun setSamplesReader(samplesReader: (Int) -> Deferred<Array<Float>>) {
@@ -73,25 +69,25 @@ class FileWaveView @JvmOverloads constructor(
     }
 
     private fun getZoomLevel(): Int {
-        if (!mFileWaveViewStore.hasValue() || !mAudioFile.hasValue()) return 1
-        return mFileWaveViewStore.value.getZoomLevel(mAudioFile.value.path) ?: 1
+        if (!mAudioFileUiState.hasValue()) return 1
+        return mAudioFileUiState.value.zoomLevelValue
     }
 
     fun zoomIn() {
-        if (mFileWaveViewStore.value.zoomIn(mAudioFile.value)) {
+        if (mFileWaveViewStore.value.zoomIn(mAudioFileUiState.value)) {
             handleZoom()
         }
     }
 
     fun zoomOut() {
-        if (mFileWaveViewStore.value.zoomOut(mAudioFile.value)) {
+        if (mFileWaveViewStore.value.zoomOut(mAudioFileUiState.value)) {
             handleZoom()
         }
     }
 
     private fun resetZoom() {
-        if (mFileWaveViewStore.hasValue() && mAudioFile.hasValue()) {
-            mFileWaveViewStore.value.resetZoomLevel(mAudioFile.value.path)
+        if (mFileWaveViewStore.hasValue() && mAudioFileUiState.hasValue()) {
+            mFileWaveViewStore.value.resetZoomLevel(mAudioFileUiState.value.path)
             handleZoom()
         }
     }
@@ -101,24 +97,24 @@ class FileWaveView @JvmOverloads constructor(
             processPlotPoints(ptsArr)
         }
 
-        mFileWaveViewStore.value.isFileSampleCountMapUpdated.subscribe {
+        mAudioFileUiState.value.displayPtsCount.subscribe {
             requestLayout()
         }
-        mFileWaveViewStore.value.fileZoomLevelsUpdated.subscribe {
+        mAudioFileUiState.value.zoomLevel.subscribe {
             handleZoom()
         }
     }
 
     private fun getPlotNumSamples(): Int {
-        if (!mFileWaveViewStore.hasValue() || !mAudioFile.hasValue()) return 0
+        if (!mAudioFileUiState.hasValue()) return 0
 
-        return mFileWaveViewStore.value.getSampleCount(mAudioFile.value.path) ?: 0
+        return mAudioFileUiState.value.displayPtsCountValue
     }
 
     private fun getPlotNumPts(): Int {
         val numSamples = getPlotNumSamples()
 
-        zoomLevel = getZoomLevel()
+        val zoomLevel = getZoomLevel()
         return zoomLevel * numSamples
     }
 
@@ -154,16 +150,14 @@ class FileWaveView @JvmOverloads constructor(
     }
 
     private fun checkAttrs() {
-        if (mAudioFile.hasValue()
+        if (mAudioFileUiState.hasValue()
             && mFileWaveViewStore.hasValue()) {
             attrsLoaded.onNext(true)
         }
     }
 
     private fun handleZoom() {
-        if (getZoomLevel() != zoomLevel) {
-            requestLayout()
-        }
+        requestLayout()
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -173,11 +167,11 @@ class FileWaveView @JvmOverloads constructor(
             mFileWaveViewStore.value.updateMeasuredWidth(measuredWidth)
         }
 
-        if (!mAudioFile.hasValue()) return
+        if (!mAudioFileUiState.hasValue()) return
 
-        val samplesCount = mFileWaveViewStore.value.getSampleCount(mAudioFile.value.path) ?: measuredWidth
+        val samplesCount = getPlotNumSamples()
 
-        zoomLevel = getZoomLevel()
+        val zoomLevel = getZoomLevel()
         val calculatedWidth = zoomLevel * samplesCount
 
         val roundedWidth = if (measuredWidth == 0 || calculatedWidth < measuredWidth) measuredWidth else calculatedWidth

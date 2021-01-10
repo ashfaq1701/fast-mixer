@@ -4,8 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools">
     <data>
         <variable
-            name="audioFile"
-            type="com.bluehub.fastmixer.screens.mixing.AudioFile" />
+            name="audioFileUiState"
+            type="com.bluehub.fastmixer.screens.mixing.AudioFileUiState" />
         <variable
             name="eventListener"
             type="com.bluehub.fastmixer.screens.mixing.AudioFileEventListeners" />
@@ -21,7 +21,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:layout_constraintTop_toTopOf="parent"
-            app:audioFile="@{audioFile}"
+            app:audioFileUiState="@{audioFileUiState}"
             app:audioFileEventListeners="@{eventListener}"
             app:fileWaveViewStore="@{fileWaveViewStore}"
             tools:layout_height="@dimen/audio_file_view_height"/>

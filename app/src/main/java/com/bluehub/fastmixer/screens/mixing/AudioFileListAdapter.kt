@@ -9,7 +9,7 @@ import com.bluehub.fastmixer.databinding.ListItemAudioFileBinding
 import kotlinx.coroutines.Deferred
 
 class AudioFileListAdapter(private val clickListener: AudioFileEventListeners, private val fileWaveViewStore: FileWaveViewStore)
-    : ListAdapter<AudioFile, AudioFileListAdapter.ViewHolder>(AudioFileDiffCallback()) {
+    : ListAdapter<AudioFileUiState, AudioFileListAdapter.ViewHolder>(AudioFileDiffCallback()) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val holder = ViewHolder.from(parent)
         holder.setIsRecyclable(false)
@@ -21,8 +21,8 @@ class AudioFileListAdapter(private val clickListener: AudioFileEventListeners, p
     }
 
     class ViewHolder private constructor(val binding: ListItemAudioFileBinding): RecyclerView.ViewHolder(binding.root) {
-        fun bind(item: AudioFile, clickListener: AudioFileEventListeners, fileWaveViewStore: FileWaveViewStore) {
-            binding.audioFile = item
+        fun bind(item: AudioFileUiState, clickListener: AudioFileEventListeners, fileWaveViewStore: FileWaveViewStore) {
+            binding.audioFileUiState = item
             binding.eventListener = clickListener
             binding.fileWaveViewStore = fileWaveViewStore
             binding.executePendingBindings()
@@ -50,12 +50,12 @@ class AudioFileListAdapter(private val clickListener: AudioFileEventListeners, p
     }
 }
 
-class AudioFileDiffCallback : DiffUtil.ItemCallback<AudioFile>() {
-    override fun areItemsTheSame(oldItem: AudioFile, newItem: AudioFile): Boolean {
+class AudioFileDiffCallback : DiffUtil.ItemCallback<AudioFileUiState>() {
+    override fun areItemsTheSame(oldItem: AudioFileUiState, newItem: AudioFileUiState): Boolean {
         return oldItem.path == newItem.path
     }
 
-    override fun areContentsTheSame(oldItem: AudioFile, newItem: AudioFile): Boolean {
+    override fun areContentsTheSame(oldItem: AudioFileUiState, newItem: AudioFileUiState): Boolean {
         return oldItem == newItem
     }
 }

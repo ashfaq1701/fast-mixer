@@ -7,18 +7,15 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.databinding.BindingMethod
 import androidx.databinding.BindingMethods
 import com.bluehub.fastmixer.databinding.FileWaveViewWidgetBinding
-import com.bluehub.fastmixer.screens.mixing.AudioFile
-import com.bluehub.fastmixer.screens.mixing.AudioFileEventListeners
-import com.bluehub.fastmixer.screens.mixing.FileWaveViewStore
+import com.bluehub.fastmixer.screens.mixing.*
 import io.reactivex.rxjava3.subjects.BehaviorSubject
-
 
 @BindingMethods(
     value = [
         BindingMethod(
             type = FileWaveViewWidget::class,
-            attribute = "audioFile",
-            method = "setAudioFile"
+            attribute = "audioFileUiState",
+            method = "setAudioFileUiState"
         ),
         BindingMethod(
             type = FileWaveViewWidget::class,
@@ -35,20 +32,20 @@ import io.reactivex.rxjava3.subjects.BehaviorSubject
 class FileWaveViewWidget(context: Context, attributeSet: AttributeSet?)
     : ConstraintLayout(context, attributeSet) {
 
-    private var mAudioFile: BehaviorSubject<AudioFile> = BehaviorSubject.create()
+    private var mAudioFileUiState: BehaviorSubject<AudioFileUiState> = BehaviorSubject.create()
     private val mAudioFileEventListeners: BehaviorSubject<AudioFileEventListeners> = BehaviorSubject.create()
     private val mFileWaveViewStore: BehaviorSubject<FileWaveViewStore> = BehaviorSubject.create()
 
     private lateinit var binding: FileWaveViewWidgetBinding
 
     init {
-        mAudioFile.subscribe { checkAndRenderView() }
+        mAudioFileUiState.subscribe { checkAndRenderView() }
         mAudioFileEventListeners.subscribe { checkAndRenderView() }
         mFileWaveViewStore.subscribe { checkAndRenderView() }
     }
 
-    fun setAudioFile(audioFile: AudioFile) {
-        mAudioFile.onNext(audioFile)
+    fun setAudioFileUiState(audioFileUiState: AudioFileUiState) {
+        mAudioFileUiState.onNext(audioFileUiState)
     }
 
     fun setAudioFileEventListeners(audioFileEventListeners: AudioFileEventListeners) {
@@ -60,7 +57,7 @@ class FileWaveViewWidget(context: Context, attributeSet: AttributeSet?)
     }
 
     private fun checkAndRenderView() {
-        if (mAudioFile.hasValue() && mAudioFileEventListeners.hasValue() && mFileWaveViewStore.hasValue()) {
+        if (mAudioFileUiState.hasValue() && mAudioFileEventListeners.hasValue() && mFileWaveViewStore.hasValue()) {
             val waveViewEventListeners = FileWaveViewEventListeners(
                 ::waveViewZoomIn,
                 ::waveViewZoomOut,
@@ -69,7 +66,7 @@ class FileWaveViewWidget(context: Context, attributeSet: AttributeSet?)
 
             val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
             binding = FileWaveViewWidgetBinding.inflate(inflater, this, true)
-            binding.audioFile = mAudioFile.value
+            binding.audioFileUiState = mAudioFileUiState.value
             binding.eventListener = mAudioFileEventListeners.value
             binding.waveViewEventListeners = waveViewEventListeners
             binding.fileWaveViewStore = mFileWaveViewStore.value
@@ -77,7 +74,7 @@ class FileWaveViewWidget(context: Context, attributeSet: AttributeSet?)
     }
 
     private fun waveViewDelete() {
-        mAudioFileEventListeners.value.deleteFileCallback(mAudioFile.value.path)
+        mAudioFileEventListeners.value.deleteFileCallback(mAudioFileUiState.value.path)
     }
 
     private fun waveViewZoomIn() {

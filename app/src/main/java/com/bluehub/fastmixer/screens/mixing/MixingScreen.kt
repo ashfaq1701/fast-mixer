@@ -16,6 +16,7 @@ import com.bluehub.fastmixer.common.permissions.PermissionFragment
 import com.bluehub.fastmixer.common.utils.DialogManager
 import com.bluehub.fastmixer.common.utils.ViewModelType
 import com.bluehub.fastmixer.databinding.MixingScreenBinding
+import timber.log.Timber
 import javax.inject.Inject
 
 class MixingScreen : PermissionFragment<MixingScreenViewModel>(ViewModelType.NAV_SCOPED) {
@@ -95,7 +96,7 @@ class MixingScreen : PermissionFragment<MixingScreenViewModel>(ViewModelType.NAV
             }
         })
 
-        viewModel.audioFilesLiveData.observe(viewLifecycleOwner, {
+        viewModel.fileWaveViewStore.audioFileUiStateListLiveData.observe(viewLifecycleOwner, {
             audioFileListAdapter.submitList(it)
         })
 
