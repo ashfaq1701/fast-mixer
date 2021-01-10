@@ -7,6 +7,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
+import timber.log.Timber
 import javax.inject.Inject
 
 class FileWaveViewStore @Inject constructor() {
@@ -61,13 +62,15 @@ class FileWaveViewStore @Inject constructor() {
         }
 
         mAudioFilesLiveData.value!!.forEach { audioFile ->
-            val numSamples = (audioFile.numSamples.toFloat() / maxNumSamples.toFloat()) * measuredWidth.value
+            val numPts = (audioFile.numSamples.toFloat() / maxNumSamples.toFloat()) * measuredWidth.value
 
-            if (findAudioFileUiState(audioFile.path) == null) {
+            findAudioFileUiState(audioFile.path)?.let {
+                it.displayPtsCount = numPts.toInt()
+            } ?: let {
                 val audioFileUiState = AudioFileUiState(
                     path = audioFile.path,
                     numSamples = audioFile.numSamples,
-                    displayPtsCount = numSamples.toInt(),
+                    displayPtsCount = numPts.toInt(),
                     zoomLevel = 1
                 )
                 audioFileUiStateList.add(audioFileUiState)
