@@ -5,6 +5,11 @@
 #include "MixingIO.h"
 #include "../utils/Utils.h"
 
+MixingIO::MixingIO() {
+    Player* player = new Player();
+    mPlayer.reset(move(player));
+}
+
 shared_ptr<FileDataSource> MixingIO::readFile(string filename) {
     AudioProperties targetProperties{
             .channelCount = StreamConstants::mChannelCount,

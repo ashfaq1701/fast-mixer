@@ -15,6 +15,7 @@ using namespace std;
 
 class MixingIO {
 public:
+    MixingIO();
     shared_ptr<FileDataSource> readFile(string filename);
     void read_playback(float *targetData, int32_t numSamples);
 

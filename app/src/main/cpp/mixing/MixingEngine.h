@@ -5,13 +5,17 @@
 #ifndef FAST_MIXER_MIXINGENGINE_H
 #define FAST_MIXER_MIXINGENGINE_H
 
-
+#include <oboe/Definitions.h>
+#include <oboe/AudioStream.h>
+#include "../logging_macros.h"
+#include "streams/PlaybackStream.h"
 #include "MixingIO.h"
 #include "map"
 
 using namespace std;
 
 class MixingEngine {
+
 public:
     ~MixingEngine();
     void addFile(string filePath);
@@ -19,9 +23,25 @@ public:
     void deleteFile(string filePath);
     int64_t getAudioFileTotalSamples(string filePath);
 
+    bool startPlayback();
+    void pausePlayback();
+
 private:
-    MixingIO mixingIO;
+
+    const char* TAG = "Mixing Engine:: %s";
+
+    MixingIO mMixingIO;
     map<string, shared_ptr<FileDataSource>> sourceMap;
+
+    mutex playbackStreamMtx;
+
+    PlaybackStream playbackStream = PlaybackStream(&mMixingIO);
+
+    bool startPlaybackCallable();
+
+    void stopPlaybackCallable();
+
+    void closePlaybackStream();
 };
 
 

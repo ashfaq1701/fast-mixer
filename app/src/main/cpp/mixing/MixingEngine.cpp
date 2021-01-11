@@ -20,7 +20,7 @@ void MixingEngine::addFile(string filePath) {
         filePath.erase();
         return;
     }
-    shared_ptr<FileDataSource> source = mixingIO.readFile(filePath);
+    shared_ptr<FileDataSource> source = mMixingIO.readFile(filePath);
     sourceMap.insert(pair<string, shared_ptr<FileDataSource>>(filePath, move(source)));
     filePath.erase();
 }
@@ -59,3 +59,39 @@ int64_t MixingEngine::getAudioFileTotalSamples(string filePath) {
     return it->second->getSampleSize();
 }
 
+bool MixingEngine::startPlayback() {
+    lock_guard<mutex> lock(playbackStreamMtx);
+    LOGD(TAG, "startPlayback(): ");
+
+    return startPlaybackCallable();
+}
+
+void MixingEngine::pausePlayback() {
+    lock_guard<mutex> lock(playbackStreamMtx);
+    LOGD(TAG, "pausePlayback(): ");
+    playbackStream.stopStream();
+}
+
+bool MixingEngine::startPlaybackCallable() {
+    if (!playbackStream.mStream) {
+        if (playbackStream.openStream() != oboe::Result::OK) {
+            return false;
+        }
+    }
+
+    return playbackStream.startStream() == oboe::Result::OK;
+}
+
+void MixingEngine::stopPlaybackCallable() {
+    closePlaybackStream();
+}
+
+void MixingEngine::closePlaybackStream() {
+    if (playbackStream.mStream) {
+        if (playbackStream.mStream->getState() != oboe::StreamState::Closed) {
+            playbackStream.stopStream();
+        } else {
+            playbackStream.resetStream();
+        }
+    }
+}
