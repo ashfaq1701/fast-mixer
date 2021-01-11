@@ -29,6 +29,7 @@ add_library( # Sets the name of the library.
         recording/streams/RecordingStream.cpp
         recording/streams/LivePlaybackStream.cpp
         recording/streams/PlaybackStream.cpp
+        recording/streams/RecordingBaseStream.cpp
         streams/BaseStream.cpp
 
         synthesizers/BaseSynthesizer.h
@@ -49,7 +50,10 @@ add_library( # Sets the name of the library.
         # Provides a relative path to your source file(s).
         mixing/MixingIO.cpp
         mixing/MixingEngine.cpp
-        mixing/conf/StreamConstants.cpp
+        mixing/streams/StreamConstants.cpp
+        mixing/streams/PlaybackStream.cpp
+        mixing/streams/MixingBaseStream.cpp
+        streams/BaseStream.cpp
 
         audio/FileDataSource.cpp
         audio/Player.cpp

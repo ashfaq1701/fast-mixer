@@ -9,6 +9,9 @@
 
 class StreamConstants {
 public:
+    static oboe::AudioApi mAudioApi;
+    static oboe::AudioFormat mFormat;
+    static int32_t mDeviceId;
     static int32_t mSampleRate;
     static int32_t mChannelCount;
 };

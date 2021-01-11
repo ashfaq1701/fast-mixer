@@ -5,10 +5,6 @@
 #include <cassert>
 #include "BaseStream.h"
 
-BaseStream::BaseStream(RecordingIO* recordingIO) {
-    mRecordingIO = recordingIO;
-}
-
 oboe::Result BaseStream::startStream() {
     LOGD(TAG, "startStream(): ");
 

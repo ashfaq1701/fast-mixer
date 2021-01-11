@@ -5,11 +5,11 @@
 #ifndef FAST_MIXER_RECORDINGSTREAM_H
 #define FAST_MIXER_RECORDINGSTREAM_H
 
-#include "../../streams/BaseStream.h"
+#include "RecordingBaseStream.h"
 
 using namespace std;
 
-class RecordingStream: public BaseStream, public oboe::AudioStreamDataCallback, public oboe::AudioStreamErrorCallback {
+class RecordingStream: public RecordingBaseStream, public oboe::AudioStreamDataCallback, public oboe::AudioStreamErrorCallback {
 public:
     RecordingStream(RecordingIO* recordingIO);
 

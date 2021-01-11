@@ -8,7 +8,7 @@ int32_t StreamConstants::mSampleRate = oboe::DefaultStreamValues::SampleRate;
 int32_t StreamConstants::mPlaybackSampleRate = StreamConstants::mSampleRate;
 int32_t StreamConstants::mInputChannelCount = oboe::ChannelCount::Stereo;
 int32_t StreamConstants::mOutputChannelCount = oboe::ChannelCount::Stereo;
-oboe::AudioApi  StreamConstants::mAudioApi = oboe::AudioApi::AAudio;
+oboe::AudioApi StreamConstants::mAudioApi = oboe::AudioApi::AAudio;
 oboe::AudioFormat StreamConstants::mFormat = oboe::AudioFormat::I16;
 int32_t StreamConstants::mPlaybackDeviceId = oboe::kUnspecified;
 int32_t StreamConstants::mFramesPerBurst{};

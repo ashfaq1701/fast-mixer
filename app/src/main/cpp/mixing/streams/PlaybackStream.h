@@ -1,17 +1,19 @@
 //
-// Created by asalehin on 7/30/20.
+// Created by Ashfaq Salehin on 11/1/2021 AD.
 //
 
 #ifndef FAST_MIXER_PLAYBACKSTREAM_H
 #define FAST_MIXER_PLAYBACKSTREAM_H
 
-#include "RecordingBaseStream.h"
+#include "MixingBaseStream.h"
 
 using namespace std;
 
-class PlaybackStream: public RecordingBaseStream, public oboe::AudioStreamDataCallback, public oboe::AudioStreamErrorCallback {
+class PlaybackStream : public MixingBaseStream, public oboe::AudioStreamDataCallback, public oboe::AudioStreamErrorCallback {
+
 public:
-    PlaybackStream(RecordingIO* recordingIO);
+
+    PlaybackStream(MixingIO* mixingIO);
 
     oboe::Result openStream();
 

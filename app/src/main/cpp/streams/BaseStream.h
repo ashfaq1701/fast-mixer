@@ -8,17 +8,12 @@
 #include "oboe/Definitions.h"
 #include "oboe/Utilities.h"
 #include "oboe/AudioStream.h"
-#include "../recording/streams/StreamConstants.h"
 #include "../logging_macros.h"
-#include "../recording/RecordingIO.h"
 
 using namespace std;
 
 class BaseStream {
 public:
-    BaseStream(RecordingIO* recordingIO);
-
-    RecordingIO* mRecordingIO;
 
     shared_ptr<oboe::AudioStream> mStream;
 
@@ -31,7 +26,6 @@ public:
 
 private:
     const char* TAG = "Stream Processor:: %s";
-
 
 };
 

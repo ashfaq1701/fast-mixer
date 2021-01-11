@@ -79,7 +79,7 @@ bool RecordingIO::validate_audio_file() {
     return !(mRecordingFilePath.empty() || (access(mRecordingFilePath.c_str(), F_OK) == -1));
 }
 
-void RecordingIO::read_playback(float *targetData, int32_t numFrames, int32_t channelCount) {
+void RecordingIO::read_playback(float *targetData, int32_t numFrames) {
     if (!validate_audio_file()) {
         mStopPlaybackCallback();
         return;

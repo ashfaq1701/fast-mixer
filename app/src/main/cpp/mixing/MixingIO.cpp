@@ -3,6 +3,7 @@
 //
 
 #include "MixingIO.h"
+#include "../utils/Utils.h"
 
 shared_ptr<FileDataSource> MixingIO::readFile(string filename) {
     AudioProperties targetProperties{
@@ -13,4 +14,8 @@ shared_ptr<FileDataSource> MixingIO::readFile(string filename) {
     return shared_ptr<FileDataSource> {
         FileDataSource::newFromCompressedFile(filename.c_str(), targetProperties)
     };
+}
+
+void MixingIO::read_playback(float *targetData, int32_t numSamples) {
+
 }

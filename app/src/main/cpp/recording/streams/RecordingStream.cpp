@@ -4,9 +4,8 @@
 
 #include <cassert>
 #include "RecordingStream.h"
-#include "../../streams/BaseStream.h"
 
-RecordingStream::RecordingStream(RecordingIO* recordingIO): BaseStream(recordingIO) {}
+RecordingStream::RecordingStream(RecordingIO* recordingIO): RecordingBaseStream(recordingIO) {}
 
 oboe::Result RecordingStream::openStream() {
     oboe::AudioStreamBuilder builder;
