@@ -18,7 +18,9 @@
 #include "streams/PlaybackStream.h"
 
 class RecordingEngine {
+
 public:
+
     RecordingEngine(string appDir, string recordingSessionId, bool recordingScreenViewModelPassed);
     ~RecordingEngine();
 
@@ -58,6 +60,7 @@ public:
     bool startPlaybackCallable();
 
 private:
+
     const char* TAG = "Recording Engine:: %s";
 
     string mRecordingSessionId = nullptr;

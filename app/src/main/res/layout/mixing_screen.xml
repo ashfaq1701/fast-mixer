@@ -89,7 +89,7 @@
                 tools:visibility="visible">
 
                 <com.bluehub.fastmixer.common.views.GroupControlButton
-                    android:id="@+id/group_zoom_in"
+                    android:id="@+id/groupPlayPause"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     app:btnDrawable="@{@drawable/group_zoom_in_button}"
@@ -97,7 +97,15 @@
                     app:clickListener="@{mixingScreenViewModel.groupZoomIn}" />
 
                 <com.bluehub.fastmixer.common.views.GroupControlButton
-                    android:id="@+id/group_zoom_out"
+                    android:id="@+id/groupZoomIn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:btnDrawable="@{@drawable/group_zoom_in_button}"
+                    app:btnLabel="@{@string/zoom_in}"
+                    app:clickListener="@{mixingScreenViewModel.groupZoomIn}" />
+
+                <com.bluehub.fastmixer.common.views.GroupControlButton
+                    android:id="@+id/groupZoomOut"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     app:btnDrawable="@{@drawable/group_zoom_out_button}"
@@ -105,7 +113,7 @@
                     app:clickListener="@{mixingScreenViewModel.groupZoomOut}" />
 
                 <com.bluehub.fastmixer.common.views.GroupControlButton
-                    android:id="@+id/group_reset"
+                    android:id="@+id/groupReset"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     app:btnDrawable="@{@drawable/group_reset_button}"
