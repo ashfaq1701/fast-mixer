@@ -12,6 +12,9 @@ class FileWaveViewStore @Inject constructor() {
 
     private lateinit var mAudioFilesLiveData: LiveData<MutableList<AudioFile>>
 
+    private lateinit var mIsPlayingLiveData: LiveData<Boolean>
+    val isPlayingObservable: BehaviorSubject<Boolean> = BehaviorSubject.createDefault(false)
+
     private val measuredWidthObservable: BehaviorSubject<Int> = BehaviorSubject.create()
 
     private var audioFileUiStateList: MutableList<AudioFileUiState> = mutableListOf()
@@ -23,6 +26,10 @@ class FileWaveViewStore @Inject constructor() {
     private val fileListObserver: Observer<MutableList<AudioFile>> = Observer {
         calculateSampleCountEachView()
     }
+
+    private val isPlayingObserver: Observer<Boolean> = Observer {
+        isPlayingObservable.onNext(it)
+    }
     
     init {
         measuredWidthObservable.subscribe {
@@ -33,6 +40,11 @@ class FileWaveViewStore @Inject constructor() {
     fun setAudioFilesLiveData(audioFilesLiveData: LiveData<MutableList<AudioFile>>) {
         mAudioFilesLiveData = audioFilesLiveData
         mAudioFilesLiveData.observeForever(fileListObserver)
+    }
+
+    fun setIsPlaying(isPlayingLiveData: LiveData<Boolean>) {
+        mIsPlayingLiveData = isPlayingLiveData
+        mIsPlayingLiveData.observeForever(isPlayingObserver)
     }
 
     fun updateMeasuredWidth(width: Int) {
@@ -56,7 +68,8 @@ class FileWaveViewStore @Inject constructor() {
                     path = audioFile.path,
                     numSamples = audioFile.numSamples,
                     displayPtsCount = BehaviorSubject.create(),
-                    zoomLevel = BehaviorSubject.create()
+                    zoomLevel = BehaviorSubject.create(),
+                    isPlaying = BehaviorSubject.createDefault(false)
                 )
                 audioFileUiStateList.add(audioFileUiState)
             }
@@ -132,11 +145,6 @@ class FileWaveViewStore @Inject constructor() {
         findAudioFileUiState(filePath)?.zoomLevel?.onNext(1)
     }
 
-    fun cleanup() {
-        mAudioFilesLiveData.removeObserver(fileListObserver)
-        coroutineScope.cancel()
-    }
-
     fun groupZoomIn() {
         val min = getMinZoomLevel()
         if (!checkIfZoomLevelIsMaxAllowed(min)) {
@@ -182,5 +190,11 @@ class FileWaveViewStore @Inject constructor() {
         audioFileUiStateList.forEach {
             it.zoomLevel.onNext(zoomLevel)
         }
+    }
+
+    fun cleanup() {
+        mAudioFilesLiveData.removeObserver(fileListObserver)
+        mIsPlayingLiveData.removeObserver(isPlayingObserver)
+        coroutineScope.cancel()
     }
 }

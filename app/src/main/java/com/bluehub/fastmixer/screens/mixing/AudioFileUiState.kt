@@ -7,7 +7,8 @@ data class AudioFileUiState(
     val path: String,
     val numSamples: Int,
     var displayPtsCount: BehaviorSubject<Int>,
-    var zoomLevel: BehaviorSubject<Int>) : Serializable {
+    var zoomLevel: BehaviorSubject<Int>,
+    var isPlaying: BehaviorSubject<Boolean>) : Serializable {
         val zoomLevelValue: Int
             get() = if (zoomLevel.hasValue()) {
                 zoomLevel.value

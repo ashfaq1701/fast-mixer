@@ -63,6 +63,7 @@ class AudioFileDiffCallback : DiffUtil.ItemCallback<AudioFileUiState>() {
 class AudioFileEventListeners(
     var readSamplesCallback: (String) -> (Int) -> Deferred<Array<Float>>,
     var deleteFileCallback: (String) -> Unit,
+    var togglePlayCallback: (String) -> Unit
 ) {
     fun readSamplesCallbackWithIndex(filePath: String): (Int)->Deferred<Array<Float>> = readSamplesCallback(filePath)
 }

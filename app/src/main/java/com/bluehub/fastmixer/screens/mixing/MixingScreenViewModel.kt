@@ -42,9 +42,14 @@ class MixingScreenViewModel @Inject constructor(override val context: Context,
     val itemAddedIdx: LiveData<Int>
         get() = _itemAddedIdx
 
+    private val _isPlaying = MutableLiveData<Boolean>()
+    val isPlaying: LiveData<Boolean>
+        get() = _isPlaying
+
     init {
         mixingRepository.createMixingEngine()
         fileWaveViewStore.setAudioFilesLiveData(audioFilesLiveData)
+        fileWaveViewStore.setIsPlaying(isPlaying)
     }
 
     fun onRecord() {
@@ -161,6 +166,10 @@ class MixingScreenViewModel @Inject constructor(override val context: Context,
                 _itemRemovedIdx.value = it
             }
         }
+    }
+
+    fun togglePlay(filePath: String) {
+
     }
 
     fun resetItemRemovedIdx() {

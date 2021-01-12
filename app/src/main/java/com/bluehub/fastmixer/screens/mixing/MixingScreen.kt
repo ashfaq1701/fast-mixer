@@ -54,8 +54,9 @@ class MixingScreen : PermissionFragment<MixingScreenViewModel>(ViewModelType.NAV
 
         audioFileListAdapter = AudioFileListAdapter(
             AudioFileEventListeners(
-                    { filePath: String -> viewModel.readSamples(filePath) },
-                    { filePath: String -> viewModel.deleteFile(filePath) }
+                { filePath: String -> viewModel.readSamples(filePath) },
+                { filePath: String -> viewModel.deleteFile(filePath) },
+                { filePath: String -> viewModel.togglePlay(filePath) }
             ),
             viewModel.fileWaveViewStore
         )
