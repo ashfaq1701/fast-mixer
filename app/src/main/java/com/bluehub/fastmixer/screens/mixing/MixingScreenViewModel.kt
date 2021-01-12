@@ -6,8 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.bluehub.fastmixer.common.permissions.PermissionViewModel
-import com.bluehub.fastmixer.common.utils.FileManager
-import com.bluehub.fastmixer.common.utils.PermissionManager
+import com.bluehub.fastmixer.common.utils.*
 import kotlinx.coroutines.*
 import java.io.File
 import java.util.*
@@ -45,6 +44,8 @@ class MixingScreenViewModel @Inject constructor(override val context: Context,
     private val _isPlaying = MutableLiveData<Boolean>()
     val isPlaying: LiveData<Boolean>
         get() = _isPlaying
+
+    private val playList: MutableList<String> = mutableListOf()
 
     init {
         mixingRepository.createMixingEngine()
@@ -147,7 +148,9 @@ class MixingScreenViewModel @Inject constructor(override val context: Context,
 
     fun deleteFile(filePath: String) {
         viewModelScope.launch {
-            mixingRepository.deleteFile(filePath)
+            withContext(Dispatchers.IO) {
+                mixingRepository.deleteFile(filePath)
+            }
 
             val idxToRemove = audioFiles.foldIndexed(listOf<Int>(), { idx, list, file ->
                 if (file.path == filePath) {
@@ -169,7 +172,31 @@ class MixingScreenViewModel @Inject constructor(override val context: Context,
     }
 
     fun togglePlay(filePath: String) {
+        if (_isPlaying.value == null || _isPlaying.value == false) {
+            playFile(filePath)
+        } else {
+            pauseFile()
+        }
+    }
 
+    private fun playFile(filePath: String) {
+        viewModelScope.launch {
+            val pathList = listOf(filePath)
+            if (!playList.areEqual(pathList)) {
+                mixingRepository.loadFiles(pathList)
+                playList.reInitList(listOf(filePath))
+            }
+
+            mixingRepository.startPlayback()
+            _isPlaying.value = true
+        }
+    }
+
+    private fun pauseFile() {
+        viewModelScope.launch {
+            mixingRepository.pausePlayback()
+            _isPlaying.value = false
+        }
     }
 
     fun resetItemRemovedIdx() {
@@ -193,6 +220,7 @@ class MixingScreenViewModel @Inject constructor(override val context: Context,
 
     override fun onCleared() {
         super.onCleared()
+        mixingRepository.clearSources()
         mixingRepository.deleteMixingEngine()
         fileWaveViewStore.cleanup()
     }

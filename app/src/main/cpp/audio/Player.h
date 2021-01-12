@@ -61,6 +61,8 @@ public:
     void setLooping(bool isLooping) { mIsLooping = isLooping; };
     int64_t getTotalSampleFrames();
 
+    void clearSources();
+
 private:
     int32_t mReadFrameIndex = 0;
     atomic<bool> mIsPlaying { false };

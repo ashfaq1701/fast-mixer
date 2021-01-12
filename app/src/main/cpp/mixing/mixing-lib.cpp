@@ -80,6 +80,24 @@ extern "C" {
         mixingEngine->deleteFile(move(filePathStr));
     }
 
+    JNIEXPORT void JNICALL
+    Java_com_bluehub_fastmixer_screens_mixing_MixingEngine_addSources(JNIEnv *env, jclass, jobjectArray filePaths) {
+        if (!mixingEngine) {
+            LOGE("addSources: mixingEngine is null, you must call create() method before calling this method");
+            return;
+        }
+        jint numElements = env->GetArrayLength(filePaths);
+        string strArr[numElements];
+
+        for (int i = 0; i < numElements; i++) {
+            jstring elem = (jstring) env->GetObjectArrayElement(filePaths, i);
+            strArr[i] = java_str_to_c_str(env, elem);
+        }
+
+        string* strPtr = strArr;
+        mixingEngine->addSourcesToPlayer(move(strPtr), numElements);
+    }
+
     JNIEXPORT jint JNICALL
     Java_com_bluehub_fastmixer_screens_mixing_MixingEngine_getTotalSamples(JNIEnv *env, jclass, jstring filePath) {
         if (!mixingEngine) {
@@ -88,6 +106,33 @@ extern "C" {
         }
         auto filePathStr = java_str_to_c_str(env, filePath);
         return mixingEngine->getAudioFileTotalSamples(move(filePathStr));
+    }
+
+    JNIEXPORT void JNICALL
+    Java_com_bluehub_fastmixer_screens_mixing_MixingEngine_clearPlayerSources(JNIEnv *env, jclass) {
+        if (!mixingEngine) {
+            LOGE("clearPlayerSources: mixingEngine is null, you must call create() method before calling this method");
+            return;
+        }
+        mixingEngine->clearPlayerSources();
+    }
+
+    JNIEXPORT void JNICALL
+    Java_com_bluehub_fastmixer_screens_mixing_MixingEngine_startPlayback(JNIEnv *env, jclass) {
+        if (!mixingEngine) {
+            LOGE("startPlayback: mixingEngine is null, you must call create() method before calling this method");
+            return;
+        }
+        mixingEngine->startPlayback();
+    }
+
+    JNIEXPORT void JNICALL
+    Java_com_bluehub_fastmixer_screens_mixing_MixingEngine_pausePlayback(JNIEnv *env, jclass) {
+        if (!mixingEngine) {
+            LOGE("pausePlayback: mixingEngine is null, you must call create() method before calling this method");
+            return;
+        }
+        mixingEngine->pausePlayback();
     }
 
     JNIEXPORT void JNICALL

@@ -48,6 +48,7 @@ class MixingScreen : PermissionFragment<MixingScreenViewModel>(ViewModelType.NAV
         dataBinding = DataBindingUtil
             .inflate(inflater, R.layout.mixing_screen, container, false)
 
+        FileWaveViewStore.setInstance(viewModel.fileWaveViewStore)
         dataBinding.mixingScreenViewModel = viewModel
 
         dataBinding.lifecycleOwner = viewLifecycleOwner

@@ -79,11 +79,13 @@ bool MixingEngine::startPlaybackCallable() {
         }
     }
 
+    mMixingIO.setPlaying(true);
     return playbackStream.startStream() == oboe::Result::OK;
 }
 
 void MixingEngine::stopPlaybackCallable() {
     closePlaybackStream();
+    mMixingIO.setPlaying(false);
 }
 
 void MixingEngine::closePlaybackStream() {
@@ -94,4 +96,23 @@ void MixingEngine::closePlaybackStream() {
             playbackStream.resetStream();
         }
     }
+}
+
+void MixingEngine::addSourcesToPlayer(string* strArr, int count) {
+    mMixingIO.clearPlayerSources();
+
+    for (int i = 0; i < count; i++) {
+        auto it = sourceMap.find(strArr[i]);
+        if (it != sourceMap.end()) {
+            mMixingIO.addSource(it->first, it->second);
+        }
+    }
+
+    for (int i = 0; i < count; i++) {
+        strArr[i].erase();
+    }
+}
+
+void MixingEngine::clearPlayerSources() {
+    mMixingIO.clearPlayerSources();
 }

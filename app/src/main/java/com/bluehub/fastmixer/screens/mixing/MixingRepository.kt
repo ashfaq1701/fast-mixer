@@ -17,9 +17,25 @@ class MixingRepository @Inject constructor(val mixingEngineProxy: MixingEnginePr
 
     fun getTotalSamples(filePath: String): Int = mixingEngineProxy.getTotalSamples(filePath)
 
-    suspend fun deleteFile(filePath: String) = withContext(Dispatchers.IO) {
+    fun deleteFile(filePath: String) {
         mixingEngineProxy.deleteFile(filePath)
     }
 
+    fun startPlayback() {
+        mixingEngineProxy.startPlayback()
+    }
+
+    fun pausePlayback() {
+        mixingEngineProxy.pausePlayback()
+    }
+
     fun deleteMixingEngine() = mixingEngineProxy.delete()
+
+    fun loadFiles(fileArr: List<String>) {
+        mixingEngineProxy.addSources(fileArr.toTypedArray())
+    }
+
+    fun clearSources() {
+        mixingEngineProxy.clearPlayerSources()
+    }
 }

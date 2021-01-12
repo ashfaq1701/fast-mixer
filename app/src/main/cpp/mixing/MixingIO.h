@@ -19,6 +19,12 @@ public:
     shared_ptr<FileDataSource> readFile(string filename);
     void read_playback(float *targetData, int32_t numSamples);
 
+    void setPlaying(bool setPlaying);
+
+    void clearPlayerSources();
+
+    void addSource(string key, shared_ptr<DataSource> source);
+
 private:
     shared_ptr<Player> mPlayer {nullptr};
 };

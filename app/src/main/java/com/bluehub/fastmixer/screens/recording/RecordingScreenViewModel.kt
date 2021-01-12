@@ -29,7 +29,7 @@ class RecordingScreenViewModel @Inject constructor (override val context: Contex
     companion object {
         private lateinit var instance: RecordingScreenViewModel
 
-        public fun setInstance(vmInstance: RecordingScreenViewModel) {
+        fun setInstance(vmInstance: RecordingScreenViewModel) {
             instance = vmInstance
         }
 

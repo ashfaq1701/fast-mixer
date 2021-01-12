@@ -14,6 +14,14 @@ class MixingEngine {
 
         @JvmStatic external fun deleteFile(filePath: String)
 
+        @JvmStatic external fun addSources(filePaths: Array<String>)
+
+        @JvmStatic external fun clearPlayerSources()
+
+        @JvmStatic external fun startPlayback()
+
+        @JvmStatic external fun pausePlayback()
+
         @JvmStatic external fun getTotalSamples(filePath: String): Int
 
         @JvmStatic external fun delete()

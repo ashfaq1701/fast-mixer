@@ -78,3 +78,7 @@ int64_t Player::getTotalSampleFrames() {
     int64_t totalSourceFrames = source->getSize() / properties.channelCount;
     return totalSourceFrames;
 }
+
+void Player::clearSources() {
+    mSourceMap.clear();
+}

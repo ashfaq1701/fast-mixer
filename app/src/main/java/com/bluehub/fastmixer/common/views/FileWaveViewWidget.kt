@@ -100,6 +100,12 @@ class FileWaveViewWidget(context: Context, attributeSet: AttributeSet?)
 
     private fun waveViewTogglePlay() {
         mAudioFileEventListeners.value.togglePlayCallback(mAudioFileUiState.value.path)
+        if (!mAudioFileUiState.value.isPlaying.hasValue()
+            || !mAudioFileUiState.value.isPlaying.value) {
+            mAudioFileUiState.value.isPlaying.onNext(true)
+        } else {
+            mAudioFileUiState.value.isPlaying.onNext(false)
+        }
     }
 
     private fun waveViewDelete() {

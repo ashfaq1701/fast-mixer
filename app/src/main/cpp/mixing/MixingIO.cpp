@@ -21,6 +21,19 @@ shared_ptr<FileDataSource> MixingIO::readFile(string filename) {
     };
 }
 
-void MixingIO::read_playback(float *targetData, int32_t numSamples) {
+void MixingIO::setPlaying(bool isPlaying) {
+    mPlayer->setPlaying(isPlaying);
+}
 
+void MixingIO::clearPlayerSources() {
+    mPlayer->resetPlayHead();
+    mPlayer->clearSources();
+}
+
+void MixingIO::addSource(string key, shared_ptr<DataSource> source) {
+    mPlayer->addSource(key, source);
+}
+
+void MixingIO::read_playback(float *targetData, int32_t numSamples) {
+    mPlayer->renderAudio(targetData, numSamples);
 }

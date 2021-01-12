@@ -1,6 +1,7 @@
 package com.bluehub.fastmixer.screens.mixing
 
 import androidx.lifecycle.*
+import com.bluehub.fastmixer.screens.recording.RecordingScreenViewModel
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import kotlinx.coroutines.*
 import javax.inject.Inject
@@ -8,6 +9,12 @@ import javax.inject.Inject
 class FileWaveViewStore @Inject constructor() {
     companion object {
         const val ZOOM_STEP = 1
+
+        private lateinit var instance: FileWaveViewStore
+
+        fun setInstance(vmInstance: FileWaveViewStore) {
+            instance = vmInstance
+        }
     }
 
     private lateinit var mAudioFilesLiveData: LiveData<MutableList<AudioFile>>

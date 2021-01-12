@@ -26,6 +26,10 @@ public:
     bool startPlayback();
     void pausePlayback();
 
+    void addSourcesToPlayer(string* strArr, int count);
+
+    void clearPlayerSources();
+
 private:
 
     const char* TAG = "Mixing Engine:: %s";
