@@ -32,8 +32,15 @@ void MixingIO::clearPlayerSources() {
 
 void MixingIO::addSource(string key, shared_ptr<DataSource> source) {
     mPlayer->addSource(key, source);
+    if (source->getPlayHead() > 0) {
+        mPlayer->setPlayHead(source->getPlayHead());
+    }
 }
 
 void MixingIO::read_playback(float *targetData, int32_t numSamples) {
     mPlayer->renderAudio(targetData, numSamples);
+}
+
+void MixingIO::setStopPlaybackCallback(function<void()> stopPlaybackCallback) {
+    mPlayer->setPlaybackCallback(stopPlaybackCallback);
 }

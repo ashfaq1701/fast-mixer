@@ -3,8 +3,14 @@
 //
 
 #include "MixingEngine.h"
-
+#include "mixing_jvm_env.h"
 #include <utility>
+
+MixingEngine::MixingEngine() {
+    mMixingIO.setStopPlaybackCallback([&] () {
+        setStopPlayback();
+    });
+}
 
 MixingEngine::~MixingEngine() {
     auto it = sourceMap.begin();
@@ -111,6 +117,14 @@ void MixingEngine::addSourcesToPlayer(string* strArr, int count) {
     for (int i = 0; i < count; i++) {
         strArr[i].erase();
     }
+}
+
+void MixingEngine::setStopPlayback() {
+    call_in_attached_thread([&](auto env) {
+        if (kotlinMethodIdsPtr) {
+            env->CallStaticVoidMethod(kotlinMethodIdsPtr->mixingScreenVM, kotlinMethodIdsPtr->mixingScreenVMSetStopPlayback);
+        }
+    });
 }
 
 void MixingEngine::clearPlayerSources() {

@@ -9,12 +9,6 @@ import javax.inject.Inject
 class FileWaveViewStore @Inject constructor() {
     companion object {
         const val ZOOM_STEP = 1
-
-        private lateinit var instance: FileWaveViewStore
-
-        fun setInstance(vmInstance: FileWaveViewStore) {
-            instance = vmInstance
-        }
     }
 
     private lateinit var mAudioFilesLiveData: LiveData<MutableList<AudioFile>>
@@ -197,6 +191,11 @@ class FileWaveViewStore @Inject constructor() {
         audioFileUiStateList.forEach {
             it.zoomLevel.onNext(zoomLevel)
         }
+    }
+
+    fun setFilePaused(filePath: String) {
+        val audioFileUiState = findAudioFileUiState(filePath)
+        audioFileUiState?.isPlaying?.onNext(false)
     }
 
     fun cleanup() {

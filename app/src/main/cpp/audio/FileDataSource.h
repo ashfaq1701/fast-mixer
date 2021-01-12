@@ -35,6 +35,9 @@ public:
     const float* getData() const override { return mBuffer.get(); }
     int64_t getSampleSize() { return mBufferSize / mProperties.channelCount; };
 
+    void setPlayHead(int64_t playHead);
+    int64_t getPlayHead();
+
     static FileDataSource* newFromCompressedFile(
             const char *filename,
             const AudioProperties targetProperties);
@@ -54,5 +57,6 @@ private:
     const int64_t mBufferSize;
     const AudioProperties mProperties;
     int64_t currentPtr = 0;
+    int64_t mPlayHead = 0;
 };
 #endif //RHYTHMGAME_AASSETDATASOURCE_H

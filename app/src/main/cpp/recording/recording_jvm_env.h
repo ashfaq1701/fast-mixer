@@ -7,7 +7,7 @@
 
 #include <jni.h>
 #include "../logging_macros.h"
-#include "../Constants.h"
+#include "utils/structs.h"
 
 using namespace std;
 

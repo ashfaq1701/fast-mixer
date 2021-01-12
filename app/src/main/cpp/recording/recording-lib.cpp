@@ -53,10 +53,10 @@ extern "C" {
 
     JNIEXPORT void JNICALL
     Java_com_bluehub_fastmixer_screens_recording_RecordingEngine_delete(JNIEnv *env, jclass) {
-        delete_kotlin_global_refs(env);
         if (!recordingEngine) {
             return;
         }
+        delete_kotlin_global_refs(env);
         delete recordingEngine;
         recordingEngine = nullptr;
     }

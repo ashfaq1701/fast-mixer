@@ -17,6 +17,7 @@ using namespace std;
 class MixingEngine {
 
 public:
+    MixingEngine();
     ~MixingEngine();
     void addFile(string filePath);
     unique_ptr<buffer_data> readSamples(string filePath, size_t countPoints);
@@ -46,6 +47,8 @@ private:
     void stopPlaybackCallable();
 
     void closePlaybackStream();
+
+    void setStopPlayback();
 };
 
 

@@ -4,10 +4,13 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
 import androidx.databinding.BindingMethod
 import androidx.databinding.BindingMethods
+import com.bluehub.fastmixer.R
 import com.bluehub.fastmixer.databinding.FileWaveViewWidgetBinding
 import com.bluehub.fastmixer.screens.mixing.*
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 
@@ -58,10 +61,7 @@ class FileWaveViewWidget(context: Context, attributeSet: AttributeSet?)
     private fun setupObservers() {
         mAudioFileUiState.subscribe { checkAndRenderView() }
         mAudioFileEventListeners.subscribe { checkAndRenderView() }
-        mFileWaveViewStore.subscribe {
-            checkAndRenderView()
-            setupStoreObservers()
-        }
+        mFileWaveViewStore.subscribe { checkAndRenderView() }
     }
 
     private fun setupStoreObservers() {
@@ -70,14 +70,26 @@ class FileWaveViewWidget(context: Context, attributeSet: AttributeSet?)
                 mAudioFileUiState.value.isPlaying.map { uiStateIsPlaying ->
                     isPlaying == uiStateIsPlaying
                 }
-            }.subscribeBy(
-                onNext =  {
-                    binding.wavePlayPause.isEnabled = it
-                },
-                onError = {
-                    binding.wavePlayPause.isEnabled = true
+            }.observeOn(
+                AndroidSchedulers.mainThread()
+            ).subscribe {
+                binding.wavePlayPause.isEnabled = it
+            }
+    }
+
+    private fun setupUiStateObservers() {
+        mAudioFileUiState.value.isPlaying
+            .subscribe {
+                if (it) {
+                    binding.wavePlayPause.setImageDrawable(
+                        ContextCompat.getDrawable(context, R.drawable.pause_button)
+                    )
+                } else {
+                    binding.wavePlayPause.setImageDrawable(
+                        ContextCompat.getDrawable(context, R.drawable.play_button)
+                    )
                 }
-            )
+            }
     }
 
     private fun checkAndRenderView() {
@@ -95,6 +107,9 @@ class FileWaveViewWidget(context: Context, attributeSet: AttributeSet?)
             binding.eventListener = mAudioFileEventListeners.value
             binding.waveViewEventListeners = waveViewEventListeners
             binding.fileWaveViewStore = mFileWaveViewStore.value
+
+            setupStoreObservers()
+            setupUiStateObservers()
         }
     }
 

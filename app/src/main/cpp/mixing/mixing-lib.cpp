@@ -16,6 +16,26 @@ const char *TAG = "mixing-lib: %s";
 static MixingEngine *mixingEngine = nullptr;
 
 extern "C" {
+    void prepare_kotlin_method_ids(JNIEnv *env) {
+        jclass recordingVMClass = env->FindClass("com/bluehub/fastmixer/screens/mixing/MixingScreenViewModel");
+        auto recordingVmGlobal = env->NewGlobalRef(recordingVMClass);
+        jmethodID setStopPlayback = env->GetStaticMethodID(static_cast<jclass>(recordingVmGlobal), "setStopPlay", "()V");
+
+        method_ids kotlinMethodIds {
+            .mixingScreenVM = static_cast<jclass>(env->NewGlobalRef(recordingVmGlobal)),
+            .mixingScreenVMSetStopPlayback = setStopPlayback
+        };
+        kotlinMethodIdsPtr = make_shared<method_ids>(kotlinMethodIds);
+    }
+
+    void delete_kotlin_global_refs(JNIEnv *env) {
+        if (kotlinMethodIdsPtr && kotlinMethodIdsPtr->mixingScreenVM) {
+            env->DeleteGlobalRef(kotlinMethodIdsPtr->mixingScreenVM);
+            kotlinMethodIdsPtr.reset();
+            kotlinMethodIdsPtr = nullptr;
+        }
+    }
+
     extern "C" JNIEXPORT jint JNI_OnLoad(JavaVM* vm, void* reserved) {
         java_mixing_machine = vm;
         return  JNI_VERSION_1_6;
@@ -24,9 +44,20 @@ extern "C" {
     JNIEXPORT jboolean JNICALL
     Java_com_bluehub_fastmixer_screens_mixing_MixingEngine_create(JNIEnv *env, jclass) {
         if (!mixingEngine) {
+            prepare_kotlin_method_ids(env);
             mixingEngine = new MixingEngine();
         }
         return (mixingEngine != nullptr);
+    }
+
+    JNIEXPORT void JNICALL
+    Java_com_bluehub_fastmixer_screens_mixing_MixingEngine_delete(JNIEnv *env, jclass) {
+        if (!mixingEngine) {
+            LOGE("delete: mixingEngine is null, you must call create() method before calling this method");
+            return;
+        }
+        delete_kotlin_global_refs(env);
+        mixingEngine = nullptr;
     }
 
     JNIEXPORT void JNICALL
@@ -133,14 +164,5 @@ extern "C" {
             return;
         }
         mixingEngine->pausePlayback();
-    }
-
-    JNIEXPORT void JNICALL
-    Java_com_bluehub_fastmixer_screens_mixing_MixingEngine_delete(JNIEnv *env, jclass) {
-        if (!mixingEngine) {
-            LOGE("delete: mixingEngine is null, you must call create() method before calling this method");
-            return;
-        }
-        mixingEngine = nullptr;
     }
 }

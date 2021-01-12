@@ -21,6 +21,10 @@ void Player::addSource(string key, shared_ptr<DataSource> source) {
     mSourceMap.insert(pair<string, shared_ptr<DataSource>>(key, source));
 }
 
+void Player::setPlaybackCallback(function<void ()> stopPlaybackCallback) {
+    mStopPlaybackCallback = stopPlaybackCallback;
+}
+
 void Player::renderAudio(float *targetData, int32_t numFrames) {
     const AudioProperties properties = mSourceMap.begin()->second->getProperties();
 
@@ -45,7 +49,9 @@ void Player::renderAudio(float *targetData, int32_t numFrames) {
             }
 
             // Increment and handle wraparound
-            if (++mReadFrameIndex >= totalSourceFrames) mReadFrameIndex = 0;
+            if (++mReadFrameIndex >= totalSourceFrames) {
+                mReadFrameIndex = 0;
+            }
         }
 
         if (framesToRenderFromData < numFrames) {
@@ -53,6 +59,7 @@ void Player::renderAudio(float *targetData, int32_t numFrames) {
             renderSilence(&targetData[framesToRenderFromData], numFrames * properties.channelCount);
         }
 
+        mSourceMap.begin()->second->setPlayHead(mReadFrameIndex);
     } else {
         renderSilence(targetData, numFrames * properties.channelCount);
     }

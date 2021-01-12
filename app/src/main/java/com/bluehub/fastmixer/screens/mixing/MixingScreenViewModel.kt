@@ -7,6 +7,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.bluehub.fastmixer.common.permissions.PermissionViewModel
 import com.bluehub.fastmixer.common.utils.*
+import com.bluehub.fastmixer.screens.recording.RecordingScreenViewModel
 import kotlinx.coroutines.*
 import java.io.File
 import java.util.*
@@ -18,6 +19,22 @@ class MixingScreenViewModel @Inject constructor(override val context: Context,
                                                 val fileManager: FileManager,
                                                 val mixingRepository: MixingRepository,
                                                 val fileWaveViewStore: FileWaveViewStore): PermissionViewModel(context) {
+    companion object {
+        private lateinit var instance: MixingScreenViewModel
+
+        fun setInstance(vmInstance: MixingScreenViewModel) {
+            instance = vmInstance
+        }
+
+        @JvmStatic
+        public fun setStopPlay() {
+            if (::instance.isInitialized) {
+                instance.pauseAudio()
+                instance.setFilesPaused()
+            }
+        }
+    }
+
     var audioFiles: MutableList<AudioFile> = mutableListOf()
     val audioFilesLiveData = MutableLiveData<MutableList<AudioFile>>(mutableListOf())
 
@@ -173,13 +190,13 @@ class MixingScreenViewModel @Inject constructor(override val context: Context,
 
     fun togglePlay(filePath: String) {
         if (_isPlaying.value == null || _isPlaying.value == false) {
-            playFile(filePath)
+            playAudioFile(filePath)
         } else {
-            pauseFile()
+            pauseAudio()
         }
     }
 
-    private fun playFile(filePath: String) {
+    private fun playAudioFile(filePath: String) {
         viewModelScope.launch {
             val pathList = listOf(filePath)
             if (!playList.areEqual(pathList)) {
@@ -192,10 +209,16 @@ class MixingScreenViewModel @Inject constructor(override val context: Context,
         }
     }
 
-    private fun pauseFile() {
+    private fun pauseAudio() {
         viewModelScope.launch {
             mixingRepository.pausePlayback()
             _isPlaying.value = false
+        }
+    }
+
+    private fun setFilesPaused() {
+        playList.forEach { filePath ->
+            fileWaveViewStore.setFilePaused(filePath)
         }
     }
 

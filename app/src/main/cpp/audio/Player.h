@@ -52,6 +52,7 @@ public:
         : Player { map<string, shared_ptr<DataSource>>(), nullptr } {};
 
     void addSource(string key, shared_ptr<DataSource> source);
+    void setPlaybackCallback(function<void(void)> stopPlaybackCallback);
     void renderAudio(float *targetData, int32_t numFrames);
     void resetPlayHead() { mReadFrameIndex = 0; };
     int32_t getPlayHead() { return mReadFrameIndex; }

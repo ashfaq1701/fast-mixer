@@ -25,6 +25,8 @@ public:
 
     void addSource(string key, shared_ptr<DataSource> source);
 
+    void setStopPlaybackCallback(function<void(void)> stopPlaybackCallback);
+
 private:
     shared_ptr<Player> mPlayer {nullptr};
 };

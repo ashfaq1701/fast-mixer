@@ -17,9 +17,4 @@ struct buffer_data {
     size_t countPoints; ///< size left in the buffer
 };
 
-struct method_ids {
-    jclass recordingScreenVM;
-    jmethodID recordingScreenVMTogglePlay;
-};
-
 #endif //FAST_MIXER_CONSTANTS_H

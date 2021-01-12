@@ -100,3 +100,11 @@ unique_ptr<buffer_data> FileDataSource::readData(size_t countPoints) {
     };
     return make_unique<buffer_data>(buff);
 }
+
+void FileDataSource::setPlayHead(int64_t playHead) {
+    mPlayHead = playHead;
+}
+
+int64_t FileDataSource::getPlayHead() {
+    return mPlayHead;
+}
