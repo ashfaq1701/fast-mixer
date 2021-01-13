@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <View
+            android:id="@+id/sliderLine"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/audio_view_slider_line_height"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:background="@drawable/audio_widget_slider_line"/>
+        <View
+            android:layout_width="@dimen/audio_view_slider_triangle_dimen"
+            android:layout_height="@dimen/audio_view_slider_triangle_dimen"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/sliderLine"
+            android:background="@drawable/audio_widget_slider_triangle_button" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

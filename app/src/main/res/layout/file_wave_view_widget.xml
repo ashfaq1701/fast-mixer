@@ -35,22 +35,30 @@
             android:fillViewport="true"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
-
-            <com.bluehub.fastmixer.common.views.FileWaveView
-                android:id="@+id/fileWaveView"
+            <FrameLayout
                 android:layout_width="wrap_content"
-                android:layout_height="@dimen/audio_file_view_height"
-                app:audioFileUiState="@{audioFileUiState}"
-                app:samplesReader="@{eventListener.readSamplesCallbackWithIndex(audioFileUiState.path)}"
-                app:fileWaveViewStore="@{fileWaveViewStore}"
-                tools:layout_height="120dp" />
+                android:layout_height="wrap_content">
+                <com.bluehub.fastmixer.common.views.FileWaveView
+                    android:id="@+id/fileWaveView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/audio_file_view_height"
+                    app:audioFileUiState="@{audioFileUiState}"
+                    app:samplesReader="@{eventListener.readSamplesCallbackWithIndex(audioFileUiState.path)}"
+                    app:fileWaveViewStore="@{fileWaveViewStore}"
+                    tools:layout_height="120dp" />
+
+                <com.bluehub.fastmixer.common.views.AudioWidgetSlider
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+            </FrameLayout>
         </HorizontalScrollView>
 
         <View
             android:id="@+id/waveViewControlDivider"
             android:layout_width="match_parent"
             android:layout_height="@dimen/horizontal_line_height"
-            android:layout_marginVertical="@dimen/divider_margin"
+            android:layout_marginBottom="@dimen/divider_margin"
             android:background="@color/borderColor"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/fileWaveViewScroll" />

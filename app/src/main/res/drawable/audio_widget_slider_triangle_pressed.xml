@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="@dimen/audio_view_slider_triangle_dimen"
+    android:height="@dimen/audio_view_slider_triangle_dimen"
+    android:viewportHeight="@dimen/audio_view_slider_triangle_viewport_dimen"
+    android:viewportWidth="@dimen/audio_view_slider_triangle_viewport_dimen">
+    <group
+        android:name="triangleGroup"
+        android:pivotY="0"
+        android:scaleY="1.5">
+        <path
+            android:name="triangle"
+            android:fillColor="@color/colorAudioWaveViewSliderPressed"
+            android:pathData="m 7,0 l 7,7 -14,0 z" />
+    </group>
+</vector>
