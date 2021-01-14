@@ -5,6 +5,7 @@ import android.content.res.Configuration
 import android.graphics.*
 import android.util.AttributeSet
 import android.view.View
+import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.databinding.BindingMethod
 import androidx.databinding.BindingMethods
@@ -15,6 +16,8 @@ import io.reactivex.rxjava3.functions.Function
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.launch
+import timber.log.Timber
+import kotlin.math.ceil
 
 
 @BindingMethods(value = [
@@ -25,10 +28,12 @@ import kotlinx.coroutines.launch
 class FileWaveView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null
-) : View(context, attrs) {
+) : ViewGroup(context, attrs) {
     private val mAudioFileUiState: BehaviorSubject<AudioFileUiState> = BehaviorSubject.create()
     var mSamplesReader: BehaviorSubject<Function<Int, Deferred<Array<Float>>>> = BehaviorSubject.create()
     private val mFileWaveViewStore: BehaviorSubject<FileWaveViewStore> = BehaviorSubject.create()
+
+    private lateinit var mAudioWidgetSlider: AudioWidgetSlider
 
     var mRawPoints: BehaviorSubject<Array<Float>> = BehaviorSubject.create()
 
@@ -46,6 +51,8 @@ class FileWaveView @JvmOverloads constructor(
         mAudioFileUiState.subscribe{ checkAttrs() }
         mSamplesReader.subscribe { checkAttrs() }
         mFileWaveViewStore.subscribe { checkAttrs() }
+
+        setWillNotDraw(false)
     }
 
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
@@ -160,6 +167,19 @@ class FileWaveView @JvmOverloads constructor(
         requestLayout()
     }
 
+    override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
+        if (::mAudioWidgetSlider.isInitialized) {
+            val sliderLeft = 0
+            val sliderTop = 0
+            mAudioWidgetSlider.layout(
+                sliderLeft,
+                sliderTop,
+                sliderLeft + mAudioWidgetSlider.measuredWidth,
+                sliderTop + mAudioWidgetSlider.measuredHeight
+            )
+        }
+    }
+
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
 
@@ -168,6 +188,21 @@ class FileWaveView @JvmOverloads constructor(
         }
 
         if (!mAudioFileUiState.hasValue()) return
+
+        if (childCount == 1) {
+            val child = getChildAt(0)
+            if (child is AudioWidgetSlider && !::mAudioWidgetSlider.isInitialized) {
+                mAudioWidgetSlider = child
+            }
+        }
+
+        if (::mAudioWidgetSlider.isInitialized) {
+            val sliderWidth = context.resources.getDimension(R.dimen.audio_view_slider_line_width)
+            mAudioWidgetSlider.measure(
+                MeasureSpec.makeMeasureSpec(ceil(sliderWidth).toInt(), MeasureSpec.EXACTLY),
+                measuredHeight
+            )
+        }
 
         val samplesCount = getPlotNumSamples()
 

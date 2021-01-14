@@ -21,9 +21,6 @@
     <dimen name="drawer_border_radius">8dp</dimen>
 
     <dimen name="group_control_label_size">8sp</dimen>
-
-    <dimen name="audio_view_slider_triangle_dimen">14dp</dimen>
-    <dimen name="audio_view_slider_triangle_viewport_dimen">14</dimen>
     <dimen name="audio_view_slider_line_width">1dp</dimen>
     <dimen name="audio_view_slider_line_height">120dp</dimen>
 
