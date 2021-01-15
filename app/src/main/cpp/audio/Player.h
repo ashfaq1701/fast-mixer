@@ -63,6 +63,7 @@ public:
     int64_t getTotalSampleFrames();
 
     void clearSources();
+    void syncPlayHeads();
 
 private:
     int32_t mReadFrameIndex = 0;

@@ -15,6 +15,10 @@ class MixingEngineProxy @Inject constructor() {
 
     fun addSources(filePaths: Array<String>) = MixingEngine.addSources(filePaths)
 
+    fun setPlayerHead(playHead: Int) = MixingEngine.setPlayerHead(playHead)
+
+    fun setSourcePlayHead(filePath: String, playHead: Int) = MixingEngine.setSourcePlayHead(filePath, playHead)
+
     fun clearPlayerSources() = MixingEngine.clearPlayerSources()
 
     fun startPlayback() = MixingEngine.startPlayback()

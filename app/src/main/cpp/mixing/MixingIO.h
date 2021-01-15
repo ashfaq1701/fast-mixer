@@ -25,9 +25,13 @@ public:
 
     void addSource(string key, shared_ptr<DataSource> source);
 
+    void syncPlayHeads();
+
     void setStopPlaybackCallback(function<void(void)> stopPlaybackCallback);
 
     int getCurrentPlaybackProgress();
+
+    void setPlayHead(int position);
 
 private:
     shared_ptr<Player> mPlayer {nullptr};

@@ -158,6 +158,26 @@ extern "C" {
     }
 
     JNIEXPORT void JNICALL
+    Java_com_bluehub_fastmixer_screens_mixing_MixingEngine_setPlayerHead(JNIEnv *env, jclass, jint position) {
+        if (!mixingEngine) {
+            LOGE("setPlayerHead: mixingEngine is null, you must call create() method before calling this method");
+            return;
+        }
+        mixingEngine->setPlayerHead(position);
+    }
+
+    JNIEXPORT void JNICALL
+    Java_com_bluehub_fastmixer_screens_mixing_MixingEngine_setSourcePlayHead(JNIEnv *env, jclass, jstring filePath, jint position) {
+        if (!mixingEngine) {
+            LOGE("setSourcePlayHead: mixingEngine is null, you must call create() method before calling this method");
+            return;
+        }
+
+        auto filePathStr = java_str_to_c_str(env, filePath);
+        mixingEngine->setSourcePlayHead(move(filePathStr), position);
+    }
+
+    JNIEXPORT void JNICALL
     Java_com_bluehub_fastmixer_screens_mixing_MixingEngine_startPlayback(JNIEnv *env, jclass) {
         if (!mixingEngine) {
             LOGE("startPlayback: mixingEngine is null, you must call create() method before calling this method");

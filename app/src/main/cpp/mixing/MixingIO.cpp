@@ -32,9 +32,11 @@ void MixingIO::clearPlayerSources() {
 
 void MixingIO::addSource(string key, shared_ptr<DataSource> source) {
     mPlayer->addSource(key, source);
-    if (source->getPlayHead() > 0) {
-        mPlayer->setPlayHead(source->getPlayHead());
-    }
+    syncPlayHeads();
+}
+
+void MixingIO::syncPlayHeads() {
+    mPlayer->syncPlayHeads();
 }
 
 void MixingIO::read_playback(float *targetData, int32_t numSamples) {
@@ -47,4 +49,8 @@ void MixingIO::setStopPlaybackCallback(function<void()> stopPlaybackCallback) {
 
 int MixingIO::getCurrentPlaybackProgress() {
     return mPlayer->getPlayHead();
+}
+
+void MixingIO::setPlayHead(int position) {
+    mPlayer->setPlayHead(position);
 }

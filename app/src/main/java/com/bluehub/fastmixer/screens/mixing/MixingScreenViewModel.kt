@@ -69,6 +69,8 @@ class MixingScreenViewModel @Inject constructor(override val context: Context,
         fileWaveViewStore.setAudioFilesLiveData(audioFilesLiveData)
         fileWaveViewStore.setIsPlaying(isPlaying)
         fileWaveViewStore.setCurrentPlaybackProgressGetter { getCurrentPlaybackProgress() }
+        fileWaveViewStore.setPlayerHeadSetter { playHead: Int -> setPlayerHead(playHead) }
+        fileWaveViewStore.setSourcePlayHeadSetter { filePath: String, playHead: Int -> setSourcePlayHead(filePath, playHead) }
     }
 
     fun onRecord() {
@@ -231,6 +233,10 @@ class MixingScreenViewModel @Inject constructor(override val context: Context,
     private fun getTotalSamples(filePath: String): Int = mixingRepository.getTotalSamples(filePath)
 
     private fun getCurrentPlaybackProgress(): Int = mixingRepository.getCurrentPlaybackProgress()
+
+    private fun setPlayerHead(playHead: Int) = mixingRepository.setPlayerHead(playHead)
+
+    private fun setSourcePlayHead(filePath: String, playHead: Int) = mixingRepository.setSourcePlayHead(filePath, playHead)
 
     fun groupZoomIn() {
         fileWaveViewStore.groupZoomIn()

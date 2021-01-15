@@ -89,3 +89,9 @@ int64_t Player::getTotalSampleFrames() {
 void Player::clearSources() {
     mSourceMap.clear();
 }
+
+void Player::syncPlayHeads() {
+    if (mSourceMap.size() == 1) {
+        setPlayHead(mSourceMap.begin()->second->getPlayHead());
+    }
+}

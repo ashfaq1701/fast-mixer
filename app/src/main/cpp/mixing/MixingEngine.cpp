@@ -85,6 +85,7 @@ bool MixingEngine::startPlaybackCallable() {
         }
     }
 
+    mMixingIO.syncPlayHeads();
     mMixingIO.setPlaying(true);
     return playbackStream.startStream() == oboe::Result::OK;
 }
@@ -133,4 +134,16 @@ void MixingEngine::clearPlayerSources() {
 
 int MixingEngine::getCurrentPlaybackProgress() {
     return mMixingIO.getCurrentPlaybackProgress();
+}
+
+void MixingEngine::setPlayerHead(int playHead) {
+    mMixingIO.setPlayHead(playHead);
+}
+
+void MixingEngine::setSourcePlayHead(string filePath, int playHead) {
+    auto it = sourceMap.find(filePath);
+    filePath.erase();
+    if (it != sourceMap.end()) {
+        it->second->setPlayHead(playHead);
+    }
 }

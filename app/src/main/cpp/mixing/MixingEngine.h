@@ -33,6 +33,10 @@ public:
 
     int getCurrentPlaybackProgress();
 
+    void setPlayerHead(int playHead);
+
+    void setSourcePlayHead(string filePath, int playHead);
+
 private:
 
     const char* TAG = "Mixing Engine:: %s";

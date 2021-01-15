@@ -2,8 +2,10 @@ package com.bluehub.fastmixer.screens.mixing
 
 import androidx.lifecycle.*
 import androidx.lifecycle.Observer
+import io.reactivex.rxjava3.functions.*
 import io.reactivex.rxjava3.functions.Function
 import io.reactivex.rxjava3.subjects.BehaviorSubject
+import io.reactivex.rxjava3.subjects.SingleSubject
 import kotlinx.coroutines.*
 import java.util.*
 import javax.inject.Inject
@@ -24,7 +26,11 @@ class FileWaveViewStore @Inject constructor() {
     val audioFileUiStateListLiveData =
         MutableLiveData<MutableList<AudioFileUiState>>(mutableListOf())
 
-    private val mCurrentPlaybackProgressGetter: BehaviorSubject<Function<Unit, Int>> =  BehaviorSubject.create()
+    private val mCurrentPlaybackProgressGetter: SingleSubject<Function<Unit, Int>> =  SingleSubject.create()
+
+    private val mPlayerHeadSetter: SingleSubject<Function<Int, Unit>> = SingleSubject.create()
+
+    private val mSourcePlayHeadSetter: SingleSubject<BiFunction<String, Int, Unit>> = SingleSubject.create()
 
     val coroutineScope = CoroutineScope(Job() + Dispatchers.Main)
 
@@ -53,7 +59,15 @@ class FileWaveViewStore @Inject constructor() {
     }
 
     fun setCurrentPlaybackProgressGetter(currentPlaybackProgressGetter: Function<Unit, Int>) {
-        mCurrentPlaybackProgressGetter.onNext(currentPlaybackProgressGetter)
+        mCurrentPlaybackProgressGetter.onSuccess(currentPlaybackProgressGetter)
+    }
+
+    fun setPlayerHeadSetter(playerHeadSetter: Function<Int, Unit>) {
+        mPlayerHeadSetter.onSuccess(playerHeadSetter)
+    }
+
+    fun setSourcePlayHeadSetter(sourcePlayHeadSetter: BiFunction<String, Int, Unit>) {
+        mSourcePlayHeadSetter.onSuccess(sourcePlayHeadSetter)
     }
 
     fun updateMeasuredWidth(width: Int) {

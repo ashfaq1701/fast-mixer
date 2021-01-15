@@ -37,6 +37,10 @@ class MixingRepository @Inject constructor(val mixingEngineProxy: MixingEnginePr
 
     fun getCurrentPlaybackProgress() = mixingEngineProxy.getCurrentPlaybackProgress()
 
+    fun setPlayerHead(playHead: Int) = mixingEngineProxy.setPlayerHead(playHead)
+
+    fun setSourcePlayHead(filePath: String, playHead: Int) = mixingEngineProxy.setSourcePlayHead(filePath, playHead)
+
     fun clearSources() {
         mixingEngineProxy.clearPlayerSources()
     }

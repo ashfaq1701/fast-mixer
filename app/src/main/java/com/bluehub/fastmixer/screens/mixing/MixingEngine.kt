@@ -18,6 +18,10 @@ class MixingEngine {
 
         @JvmStatic external fun clearPlayerSources()
 
+        @JvmStatic external fun setPlayerHead(playHead: Int)
+
+        @JvmStatic external fun setSourcePlayHead(filePath: String, playHead: Int)
+
         @JvmStatic external fun startPlayback()
 
         @JvmStatic external fun pausePlayback()
