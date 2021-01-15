@@ -35,6 +35,8 @@ class MixingRepository @Inject constructor(val mixingEngineProxy: MixingEnginePr
         mixingEngineProxy.addSources(fileArr.toTypedArray())
     }
 
+    fun getCurrentPlaybackProgress() = mixingEngineProxy.getCurrentPlaybackProgress()
+
     fun clearSources() {
         mixingEngineProxy.clearPlayerSources()
     }

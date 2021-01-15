@@ -139,6 +139,15 @@ extern "C" {
         return mixingEngine->getAudioFileTotalSamples(move(filePathStr));
     }
 
+    JNIEXPORT jint JNICALL
+    Java_com_bluehub_fastmixer_screens_mixing_MixingEngine_getCurrentPlaybackProgress(JNIEnv *env, jclass) {
+        if (!mixingEngine) {
+            LOGE("getCurrentPlaybackProgress: mixingEngine is null, you must call create() method before calling this method");
+            return 0;
+        }
+        return mixingEngine->getCurrentPlaybackProgress();
+    }
+
     JNIEXPORT void JNICALL
     Java_com_bluehub_fastmixer_screens_mixing_MixingEngine_clearPlayerSources(JNIEnv *env, jclass) {
         if (!mixingEngine) {

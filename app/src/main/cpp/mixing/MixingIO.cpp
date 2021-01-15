@@ -44,3 +44,7 @@ void MixingIO::read_playback(float *targetData, int32_t numSamples) {
 void MixingIO::setStopPlaybackCallback(function<void()> stopPlaybackCallback) {
     mPlayer->setPlaybackCallback(stopPlaybackCallback);
 }
+
+int MixingIO::getCurrentPlaybackProgress() {
+    return mPlayer->getPlayHead();
+}

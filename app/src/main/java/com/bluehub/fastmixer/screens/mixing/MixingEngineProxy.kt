@@ -11,6 +11,8 @@ class MixingEngineProxy @Inject constructor() {
 
     fun getTotalSamples(filePath: String): Int = MixingEngine.getTotalSamples(filePath)
 
+    fun getCurrentPlaybackProgress(): Int = MixingEngine.getCurrentPlaybackProgress()
+
     fun addSources(filePaths: Array<String>) = MixingEngine.addSources(filePaths)
 
     fun clearPlayerSources() = MixingEngine.clearPlayerSources()

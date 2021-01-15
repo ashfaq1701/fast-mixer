@@ -27,6 +27,8 @@ public:
 
     void setStopPlaybackCallback(function<void(void)> stopPlaybackCallback);
 
+    int getCurrentPlaybackProgress();
+
 private:
     shared_ptr<Player> mPlayer {nullptr};
 };

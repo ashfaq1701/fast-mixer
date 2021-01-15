@@ -130,3 +130,7 @@ void MixingEngine::setStopPlayback() {
 void MixingEngine::clearPlayerSources() {
     mMixingIO.clearPlayerSources();
 }
+
+int MixingEngine::getCurrentPlaybackProgress() {
+    return mMixingIO.getCurrentPlaybackProgress();
+}

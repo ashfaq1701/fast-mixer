@@ -1,9 +1,11 @@
 package com.bluehub.fastmixer.screens.mixing
 
 import androidx.lifecycle.*
-import com.bluehub.fastmixer.screens.recording.RecordingScreenViewModel
+import androidx.lifecycle.Observer
+import io.reactivex.rxjava3.functions.Function
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import kotlinx.coroutines.*
+import java.util.*
 import javax.inject.Inject
 
 class FileWaveViewStore @Inject constructor() {
@@ -21,6 +23,8 @@ class FileWaveViewStore @Inject constructor() {
     private var audioFileUiStateList: MutableList<AudioFileUiState> = mutableListOf()
     val audioFileUiStateListLiveData =
         MutableLiveData<MutableList<AudioFileUiState>>(mutableListOf())
+
+    private val mCurrentPlaybackProgressGetter: BehaviorSubject<Function<Unit, Int>> =  BehaviorSubject.create()
 
     val coroutineScope = CoroutineScope(Job() + Dispatchers.Main)
 
@@ -48,6 +52,10 @@ class FileWaveViewStore @Inject constructor() {
         mIsPlayingLiveData.observeForever(isPlayingObserver)
     }
 
+    fun setCurrentPlaybackProgressGetter(currentPlaybackProgressGetter: Function<Unit, Int>) {
+        mCurrentPlaybackProgressGetter.onNext(currentPlaybackProgressGetter)
+    }
+
     fun updateMeasuredWidth(width: Int) {
         if ((!measuredWidthObservable.hasValue() || measuredWidthObservable.value != width) && width > 0) {
             measuredWidthObservable.onNext(width)
@@ -70,7 +78,9 @@ class FileWaveViewStore @Inject constructor() {
                     numSamples = audioFile.numSamples,
                     displayPtsCount = BehaviorSubject.create(),
                     zoomLevel = BehaviorSubject.create(),
-                    isPlaying = BehaviorSubject.createDefault(false)
+                    isPlaying = BehaviorSubject.createDefault(false),
+                    playSliderPosition = BehaviorSubject.create(),
+                    playTimer = null
                 )
                 audioFileUiStateList.add(audioFileUiState)
             }
@@ -195,7 +205,44 @@ class FileWaveViewStore @Inject constructor() {
 
     fun setFilePaused(filePath: String) {
         val audioFileUiState = findAudioFileUiState(filePath)
-        audioFileUiState?.isPlaying?.onNext(false)
+        audioFileUiState?.let { setPaused(it) }
+    }
+
+    fun togglePlayFlag(filePath: String) {
+        val audioFileUiState = findAudioFileUiState(filePath) ?: return
+        if (!audioFileUiState.isPlaying.hasValue()
+            || !audioFileUiState.isPlaying.value) {
+            setPlaying(audioFileUiState)
+        } else {
+            setPaused(audioFileUiState)
+        }
+    }
+
+    private fun getSliderPosition(audioFileUiState: AudioFileUiState) = audioFileUiState.run {
+        if (mCurrentPlaybackProgressGetter.hasValue()) {
+            val perSample = mCurrentPlaybackProgressGetter.value.apply(Unit).toFloat() / numSamples.toFloat()
+            (perSample * numPtsToPlot).toInt()
+        } else 0
+    }
+
+    private fun setPlaying(audioFileUiState: AudioFileUiState) {
+        audioFileUiState.isPlaying.onNext(true)
+        val playTimer = Timer()
+        playTimer.schedule(object: TimerTask() {
+            override fun run() {
+                val sliderPos = getSliderPosition(audioFileUiState)
+                audioFileUiState.playSliderPosition.onNext(
+                    sliderPos
+                )
+            }
+        }, 0, 10)
+        audioFileUiState.playTimer = playTimer
+    }
+
+    private fun setPaused(audioFileUiState: AudioFileUiState) {
+        audioFileUiState.isPlaying.onNext(false)
+        audioFileUiState.playTimer?.cancel()
+        audioFileUiState.playTimer = null
     }
 
     fun cleanup() {

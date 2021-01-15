@@ -31,6 +31,8 @@ public:
 
     void clearPlayerSources();
 
+    int getCurrentPlaybackProgress();
+
 private:
 
     const char* TAG = "Mixing Engine:: %s";

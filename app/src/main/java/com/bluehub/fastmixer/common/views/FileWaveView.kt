@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.res.Configuration
 import android.graphics.*
 import android.util.AttributeSet
-import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.databinding.BindingMethod
@@ -12,11 +11,11 @@ import androidx.databinding.BindingMethods
 import com.bluehub.fastmixer.R
 import com.bluehub.fastmixer.screens.mixing.AudioFileUiState
 import com.bluehub.fastmixer.screens.mixing.FileWaveViewStore
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.functions.Function
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import kotlin.math.ceil
 
 
@@ -75,11 +74,6 @@ class FileWaveView @JvmOverloads constructor(
         mFileWaveViewStore.onNext(fileWaveViewStore)
     }
 
-    private fun getZoomLevel(): Int {
-        if (!mAudioFileUiState.hasValue()) return 1
-        return mAudioFileUiState.value.zoomLevelValue
-    }
-
     fun zoomIn() {
         if (mFileWaveViewStore.value.zoomIn(mAudioFileUiState.value)) {
             handleZoom()
@@ -110,28 +104,28 @@ class FileWaveView @JvmOverloads constructor(
         mAudioFileUiState.value.zoomLevel.subscribe {
             handleZoom()
         }
+        mAudioFileUiState.value.playSliderPosition
+            .observeOn(
+                AndroidSchedulers.mainThread()
+            )
+            .subscribe {
+                requestLayout()
+            }
     }
 
-    private fun getPlotNumSamples(): Int {
-        if (!mAudioFileUiState.hasValue()) return 0
-
-        return mAudioFileUiState.value.displayPtsCountValue
-    }
-
-    private fun getPlotNumPts(): Int {
-        val numSamples = getPlotNumSamples()
-
-        val zoomLevel = getZoomLevel()
-        return zoomLevel * numSamples
-    }
+    private fun getNumPtsToPlot() = if (mAudioFileUiState.hasValue()) {
+        mAudioFileUiState.value.numPtsToPlot
+    } else 0
 
     private fun fetchPointsToPlot() {
         if (!attrsLoaded.hasValue()) return
 
-        val numPts = getPlotNumPts()
+        val numPts = getNumPtsToPlot()
 
-        mFileWaveViewStore.value.coroutineScope.launch {
-            mRawPoints.onNext(mSamplesReader.value.apply(numPts).await())
+        if (!mRawPoints.hasValue() || mRawPoints.value.size != numPts) {
+            mFileWaveViewStore.value.coroutineScope.launch {
+                mRawPoints.onNext(mSamplesReader.value.apply(numPts).await())
+            }
         }
     }
 
@@ -167,10 +161,17 @@ class FileWaveView @JvmOverloads constructor(
         requestLayout()
     }
 
+    private fun getSliderLeftPosition() = if (mAudioFileUiState.hasValue()) {
+        if (mAudioFileUiState.value.playSliderPosition.hasValue()) {
+            mAudioFileUiState.value.playSliderPosition.value
+        } else 0
+    } else 0
+
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         if (::mAudioWidgetSlider.isInitialized) {
-            val sliderLeft = 0
+            val sliderLeft = getSliderLeftPosition()
             val sliderTop = 0
+
             mAudioWidgetSlider.layout(
                 sliderLeft,
                 sliderTop,
@@ -204,10 +205,7 @@ class FileWaveView @JvmOverloads constructor(
             )
         }
 
-        val samplesCount = getPlotNumSamples()
-
-        val zoomLevel = getZoomLevel()
-        val calculatedWidth = zoomLevel * samplesCount
+        val calculatedWidth = mAudioFileUiState.value.numPtsToPlot
 
         val roundedWidth = if (measuredWidth == 0 || calculatedWidth < measuredWidth) measuredWidth else calculatedWidth
 
@@ -230,7 +228,7 @@ class FileWaveView @JvmOverloads constructor(
             return
         }
 
-        val numPts = getPlotNumPts()
+        val numPts = getNumPtsToPlot()
         val widthPtRatio = numPts / mPlotPoints.size
         val ptsDistance: Int = if (widthPtRatio >= 1) widthPtRatio else 1
 
