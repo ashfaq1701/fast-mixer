@@ -7,6 +7,7 @@ import io.reactivex.rxjava3.functions.Function
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import io.reactivex.rxjava3.subjects.SingleSubject
 import kotlinx.coroutines.*
+import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
 
@@ -141,6 +142,18 @@ class FileWaveViewStore @Inject constructor() {
         return audioFileUiState?.zoomLevelValue
     }
 
+    private fun recalculatePlaySliderPosition(audioFileUiState: AudioFileUiState, newZoomLevel: Int): Int {
+        return audioFileUiState.run {
+            (playSliderPositionValue.toFloat() / zoomLevelValue.toFloat()) * newZoomLevel
+        }.toInt()
+    }
+
+    private fun setZoomLevel(audioFileUiState: AudioFileUiState, zoomLevel: Int) {
+        val newSliderPos = recalculatePlaySliderPosition(audioFileUiState, zoomLevel)
+        setPlaySliderPosition(audioFileUiState, newSliderPos)
+        audioFileUiState.zoomLevel.onNext(zoomLevel)
+    }
+
     fun zoomIn(audioFileUiState: AudioFileUiState): Boolean {
         val zoomLevel = getZoomLevel(audioFileUiState.path)
         val numSamples = getSampleCount(audioFileUiState.path)
@@ -150,7 +163,9 @@ class FileWaveViewStore @Inject constructor() {
         }
 
         return (zoomLevel * numSamples < audioFileUiState.numSamples).also {
-            findAudioFileUiState(audioFileUiState.path)?.zoomLevel?.onNext(zoomLevel + ZOOM_STEP)
+            findAudioFileUiState(audioFileUiState.path)?.let {
+                setZoomLevel(it, zoomLevel + ZOOM_STEP)
+            }
         }
     }
 
@@ -160,14 +175,18 @@ class FileWaveViewStore @Inject constructor() {
         val newZoomLevel = if (zoomLevel >= 1 + ZOOM_STEP) zoomLevel - ZOOM_STEP else zoomLevel
 
         if (newZoomLevel != zoomLevel) {
-            findAudioFileUiState(audioFileUiState.path)?.zoomLevel?.onNext(newZoomLevel)
+            findAudioFileUiState(audioFileUiState.path)?.let {
+                setZoomLevel(it, newZoomLevel)
+            }
             return true
         }
         return false
     }
 
     fun resetZoomLevel(filePath: String) {
-        findAudioFileUiState(filePath)?.zoomLevel?.onNext(1)
+        findAudioFileUiState(filePath)?.let {
+            setZoomLevel(it, 1)
+        }
     }
 
     fun groupZoomIn() {
@@ -213,7 +232,7 @@ class FileWaveViewStore @Inject constructor() {
 
     private fun groupSetZoomLevel(zoomLevel: Int) {
         audioFileUiStateList.forEach {
-            it.zoomLevel.onNext(zoomLevel)
+            setZoomLevel(it, zoomLevel)
         }
     }
 
@@ -245,9 +264,7 @@ class FileWaveViewStore @Inject constructor() {
         playTimer.schedule(object: TimerTask() {
             override fun run() {
                 val sliderPos = getSliderPosition(audioFileUiState)
-                audioFileUiState.playSliderPosition.onNext(
-                    sliderPos
-                )
+                setPlaySliderPosition(audioFileUiState, sliderPos)
             }
         }, 0, 10)
         audioFileUiState.playTimer = playTimer
@@ -257,6 +274,33 @@ class FileWaveViewStore @Inject constructor() {
         audioFileUiState.isPlaying.onNext(false)
         audioFileUiState.playTimer?.cancel()
         audioFileUiState.playTimer = null
+    }
+
+    fun setPlayHead(filePath: String, playHeadPointer: Int) {
+        val audioFileUiState = findAudioFileUiState(filePath) ?: return
+
+        if (audioFileUiState.displayPtsCountValue == 0) return
+
+        val playHead = audioFileUiState.run {
+            (playHeadPointer.toFloat() / numPtsToPlot.toFloat()) * numSamples
+        }
+
+        if (!audioFileUiState.isPlaying.hasValue() || !audioFileUiState.isPlaying.value) {
+            if (mSourcePlayHeadSetter.hasValue()) {
+                mSourcePlayHeadSetter.value.apply(filePath, playHead.toInt())
+                setPlaySliderPosition(audioFileUiState, playHeadPointer)
+            }
+
+
+        } else {
+            if (mPlayerHeadSetter.hasValue()) {
+                mPlayerHeadSetter.value.apply(playHead.toInt())
+            }
+        }
+    }
+
+    private fun setPlaySliderPosition(audioFileUiState: AudioFileUiState, playSliderPosition: Int) {
+        audioFileUiState.playSliderPosition.onNext(playSliderPosition)
     }
 
     fun cleanup() {

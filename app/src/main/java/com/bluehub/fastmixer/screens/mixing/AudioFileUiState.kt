@@ -12,6 +12,12 @@ data class AudioFileUiState(
     var isPlaying: BehaviorSubject<Boolean>,
     var playSliderPosition: BehaviorSubject<Int>,
     var playTimer: Timer?) : Serializable {
+
+        val playSliderPositionValue: Int
+            get() = if (playSliderPosition.hasValue()) {
+                playSliderPosition.value
+            } else 0
+
         val zoomLevelValue: Int
             get() = if (zoomLevel.hasValue()) {
                 zoomLevel.value

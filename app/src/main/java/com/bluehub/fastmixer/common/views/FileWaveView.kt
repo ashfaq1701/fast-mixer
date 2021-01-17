@@ -3,7 +3,9 @@ package com.bluehub.fastmixer.common.views
 import android.content.Context
 import android.content.res.Configuration
 import android.graphics.*
+import android.os.*
 import android.util.AttributeSet
+import android.view.MotionEvent
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.databinding.BindingMethod
@@ -16,6 +18,7 @@ import io.reactivex.rxjava3.functions.Function
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.launch
+import java.util.*
 import kotlin.math.ceil
 
 
@@ -28,6 +31,13 @@ class FileWaveView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null
 ) : ViewGroup(context, attrs) {
+
+    companion object {
+        const val MAX_CLICK_DURATION = 200
+    }
+
+    private var mStartClickTime: Long = 0
+
     private val mAudioFileUiState: BehaviorSubject<AudioFileUiState> = BehaviorSubject.create()
     var mSamplesReader: BehaviorSubject<Function<Int, Deferred<Array<Float>>>> = BehaviorSubject.create()
     private val mFileWaveViewStore: BehaviorSubject<FileWaveViewStore> = BehaviorSubject.create()
@@ -166,6 +176,47 @@ class FileWaveView @JvmOverloads constructor(
             mAudioFileUiState.value.playSliderPosition.value
         } else 0
     } else 0
+
+    private fun vibrateDevice() {
+        val v = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            v.vibrate(
+                VibrationEffect.createOneShot(
+                    250,
+                    VibrationEffect.DEFAULT_AMPLITUDE
+                )
+            )
+        } else {
+            v.vibrate(250)
+        }
+    }
+
+    private fun handleLongClick(xPosition: Float) {
+        mFileWaveViewStore.value.setPlayHead(mAudioFileUiState.value.path, xPosition.toInt())
+        vibrateDevice()
+    }
+
+    override fun onTouchEvent(event: MotionEvent?): Boolean {
+        event ?: return false
+
+        val x = event.x
+        when (event.action) {
+            MotionEvent.ACTION_DOWN -> {
+                mStartClickTime = Calendar.getInstance().timeInMillis
+            }
+            MotionEvent.ACTION_UP -> {
+                val clickDuration = Calendar.getInstance().timeInMillis - mStartClickTime
+
+                return if (clickDuration > MAX_CLICK_DURATION) {
+                    handleLongClick(x)
+                    true
+                } else {
+                    super.onTouchEvent(event)
+                }
+            }
+        }
+        return true
+    }
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         if (::mAudioWidgetSlider.isInitialized) {

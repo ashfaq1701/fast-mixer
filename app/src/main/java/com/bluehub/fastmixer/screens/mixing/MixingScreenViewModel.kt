@@ -252,6 +252,7 @@ class MixingScreenViewModel @Inject constructor(override val context: Context,
 
     override fun onCleared() {
         super.onCleared()
+        mixingRepository.pausePlayback()
         mixingRepository.clearSources()
         mixingRepository.deleteMixingEngine()
         fileWaveViewStore.cleanup()
