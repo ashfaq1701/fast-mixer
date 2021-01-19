@@ -108,16 +108,20 @@ void MixingEngine::closePlaybackStream() {
 void MixingEngine::addSourcesToPlayer(string* strArr, int count) {
     mMixingIO.clearPlayerSources();
 
+    map<string, shared_ptr<DataSource>> playMap;
+
     for (int i = 0; i < count; i++) {
         auto it = sourceMap.find(strArr[i]);
         if (it != sourceMap.end()) {
-            mMixingIO.addSource(it->first, it->second);
+            playMap.insert(pair<string, shared_ptr<FileDataSource>>(it->first, it->second));
         }
     }
 
     for (int i = 0; i < count; i++) {
         strArr[i].erase();
     }
+
+    mMixingIO.addSourceMap(playMap);
 }
 
 void MixingEngine::setStopPlayback() {

@@ -26,6 +26,7 @@ public:
     virtual int64_t getSize() const = 0;
     virtual void setPlayHead(int64_t playHead) = 0;
     virtual int64_t getPlayHead() = 0;
+    virtual float getMaxSampleValue() = 0;
     virtual AudioProperties getProperties() const  = 0;
     virtual const float* getData() const = 0;
 };

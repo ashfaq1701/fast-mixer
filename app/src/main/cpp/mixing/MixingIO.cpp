@@ -35,6 +35,11 @@ void MixingIO::addSource(string key, shared_ptr<DataSource> source) {
     syncPlayHeads();
 }
 
+void MixingIO::addSourceMap(map<string, shared_ptr<DataSource>> playMap) {
+    mPlayer->addSourceMap(playMap);
+    syncPlayHeads();
+}
+
 void MixingIO::syncPlayHeads() {
     mPlayer->syncPlayHeads();
 }

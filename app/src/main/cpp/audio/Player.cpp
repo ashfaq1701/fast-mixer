@@ -21,22 +21,49 @@ void Player::addSource(string key, shared_ptr<DataSource> source) {
     mSourceMap.insert(pair<string, shared_ptr<DataSource>>(key, source));
 }
 
+void Player::addSourceMap(map<string, shared_ptr<DataSource>> playMap) {
+    for (auto it = playMap.begin(); it != playMap.end(); it++) {
+        mSourceMap.insert(pair<string, shared_ptr<DataSource>>(it->first, it->second));
+    }
+
+    if (mSourceMap.size() > 1) {
+        updateAddedMax();
+    } else {
+        addedMaxSampleValue = FLT_MIN;
+    }
+}
+
 void Player::setPlaybackCallback(function<void ()> stopPlaybackCallback) {
     mStopPlaybackCallback = stopPlaybackCallback;
 }
 
 void Player::renderAudio(float *targetData, int32_t numFrames) {
+    if (mSourceMap.size() == 0) return;
+
+    // All the sources should have the same properties
     const AudioProperties properties = mSourceMap.begin()->second->getProperties();
 
-    if (mIsPlaying){
+    if (mIsPlaying) {
+
+        float allMaxValue = 0.0;
+        int64_t maxTotalSourceFrames = INT64_MIN;
+
+        for (auto it = mSourceMap.begin(); it != mSourceMap.end(); it++) {
+            if (it->second->getMaxSampleValue() < allMaxValue) {
+                allMaxValue = it->second->getMaxSampleValue();
+            }
+
+            int64_t totalSourceFrames = it->second->getSize() / it->second->getProperties().channelCount;
+
+            if (totalSourceFrames > maxTotalSourceFrames) {
+                maxTotalSourceFrames = totalSourceFrames;
+            }
+        }
 
         int64_t framesToRenderFromData = numFrames;
-        int64_t totalSourceFrames = mSourceMap.begin()->second->getSize() / properties.channelCount;
-        const float *data = mSourceMap.begin()->second->getData();
 
-        // Check whether we're about to reach the end of the recording
-        if (!mIsLooping && mReadFrameIndex + numFrames >= totalSourceFrames){
-            framesToRenderFromData = totalSourceFrames - mReadFrameIndex;
+        if (!mIsLooping && mReadFrameIndex + numFrames >= maxTotalSourceFrames) {
+            framesToRenderFromData = maxTotalSourceFrames - mReadFrameIndex;
             mIsPlaying = false;
             if (mStopPlaybackCallback) {
                 mStopPlaybackCallback();
@@ -44,12 +71,30 @@ void Player::renderAudio(float *targetData, int32_t numFrames) {
         }
 
         for (int i = 0; i < framesToRenderFromData; ++i) {
+
             for (int j = 0; j < properties.channelCount; ++j) {
-                targetData[(i*properties.channelCount)+j] = data[(mReadFrameIndex*properties.channelCount)+j];
+
+                float audioFrame = 0.0;
+
+                for (auto it = mSourceMap.begin(); it != mSourceMap.end(); it++) {
+
+                    const float *data = it->second->getData();
+
+                    if ((mReadFrameIndex * properties.channelCount + j) < it->second->getSize()) {
+                        audioFrame += data[mReadFrameIndex * properties.channelCount + j];
+                    }
+                }
+
+                float scaledAudioFrame = audioFrame;
+
+                if (addedMaxSampleValue != 0 && addedMaxSampleValue != FLT_MIN) {
+                    scaledAudioFrame = (scaledAudioFrame / addedMaxSampleValue) * allMaxValue;
+                }
+
+                targetData[i * properties.channelCount + j] = scaledAudioFrame;
             }
 
-            // Increment and handle wraparound
-            if (++mReadFrameIndex >= totalSourceFrames) {
+            if (++mReadFrameIndex >= maxTotalSourceFrames) {
                 mReadFrameIndex = 0;
             }
         }
@@ -59,7 +104,10 @@ void Player::renderAudio(float *targetData, int32_t numFrames) {
             renderSilence(&targetData[framesToRenderFromData], numFrames * properties.channelCount);
         }
 
-        mSourceMap.begin()->second->setPlayHead(mReadFrameIndex);
+        if (mSourceMap.size() == 1) {
+            mSourceMap.begin()->second->setPlayHead(mReadFrameIndex);
+        }
+
     } else {
         renderSilence(targetData, numFrames * properties.channelCount);
     }
@@ -93,5 +141,30 @@ void Player::clearSources() {
 void Player::syncPlayHeads() {
     if (mSourceMap.size() == 1) {
         setPlayHead(mSourceMap.begin()->second->getPlayHead());
+    }
+}
+
+void Player::updateAddedMax() {
+    addedMaxSampleValue = FLT_MIN;
+
+    int64_t maxSize = INT64_MIN;
+    for (auto it = mSourceMap.begin(); it != mSourceMap.end(); it++) {
+        if (it->second->getSize() > maxSize) {
+            maxSize = it->second->getSize();
+        }
+    }
+
+    for (int i = 0; i < maxSize; i++) {
+        float totalSampleValue = 0.0;
+
+        for (auto it = mSourceMap.begin(); it != mSourceMap.end(); it++) {
+            if (i < it->second->getSize()) {
+                totalSampleValue += 0;
+            }
+        }
+
+        if (abs(totalSampleValue) > addedMaxSampleValue) {
+            addedMaxSampleValue = abs(totalSampleValue);
+        }
     }
 }

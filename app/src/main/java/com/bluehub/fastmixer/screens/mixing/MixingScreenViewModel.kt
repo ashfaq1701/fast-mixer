@@ -9,6 +9,7 @@ import com.bluehub.fastmixer.common.permissions.PermissionViewModel
 import com.bluehub.fastmixer.common.utils.*
 import com.bluehub.fastmixer.screens.recording.RecordingScreenViewModel
 import kotlinx.coroutines.*
+import timber.log.Timber
 import java.io.File
 import java.util.*
 import javax.inject.Inject
@@ -202,6 +203,7 @@ class MixingScreenViewModel @Inject constructor(override val context: Context,
     private fun playAudioFile(filePath: String) {
         viewModelScope.launch {
             val pathList = listOf(filePath)
+
             if (!playList.areEqual(pathList)) {
                 mixingRepository.loadFiles(pathList)
                 playList.reInitList(listOf(filePath))

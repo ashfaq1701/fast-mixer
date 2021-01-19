@@ -26,6 +26,19 @@
 
 constexpr int kMaxCompressionRatio { 12 };
 
+FileDataSource::FileDataSource (
+        unique_ptr<float[]> data,
+        size_t size,
+        const AudioProperties properties) :
+        mBuffer(move(data)), mBufferSize(size), mProperties(properties) {
+
+    for (int i = 0; i < mBufferSize; i++) {
+        if (abs(mBuffer[i]) > mMaxSampleValue) {
+            mMaxSampleValue = abs(mBuffer[i]);
+        }
+    }
+}
+
 FileDataSource* FileDataSource::newFromCompressedFile(
         const char *filename,
         const AudioProperties targetProperties) {

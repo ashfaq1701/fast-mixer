@@ -25,6 +25,8 @@ public:
 
     void addSource(string key, shared_ptr<DataSource> source);
 
+    void addSourceMap(map<string, shared_ptr<DataSource>> playMap);
+
     void syncPlayHeads();
 
     void setStopPlaybackCallback(function<void(void)> stopPlaybackCallback);
