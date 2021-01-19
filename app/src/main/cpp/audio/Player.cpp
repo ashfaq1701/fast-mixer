@@ -159,7 +159,7 @@ void Player::updateAddedMax() {
 
         for (auto it = mSourceMap.begin(); it != mSourceMap.end(); it++) {
             if (i < it->second->getSize()) {
-                totalSampleValue += 0;
+                totalSampleValue += it->second->getData()[i];
             }
         }
 
