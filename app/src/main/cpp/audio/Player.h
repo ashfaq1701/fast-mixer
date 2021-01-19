@@ -46,7 +46,10 @@ public:
     Player(map<string, shared_ptr<DataSource>> sourceMap, function<void(void)> stopPlaybackCallback)
         : mSourceMap{ sourceMap } {
         mStopPlaybackCallback = stopPlaybackCallback;
-        updateAddedMax();
+
+        if (mSourceMap.size() > 1) {
+            updateAddedMax();
+        }
     };
 
     Player()
@@ -77,6 +80,8 @@ private:
 
     void updateAddedMax();
     void renderSilence(float*, int32_t);
+    int64_t getMaxTotalSourceFrames();
+    float getMaxValueAcrossSources();
 };
 
 #endif //RHYTHMGAME_SOUNDRECORDING_H

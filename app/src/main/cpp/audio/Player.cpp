@@ -45,20 +45,8 @@ void Player::renderAudio(float *targetData, int32_t numFrames) {
 
     if (mIsPlaying) {
 
-        float allMaxValue = 0.0;
-        int64_t maxTotalSourceFrames = INT64_MIN;
-
-        for (auto it = mSourceMap.begin(); it != mSourceMap.end(); it++) {
-            if (it->second->getMaxSampleValue() < allMaxValue) {
-                allMaxValue = it->second->getMaxSampleValue();
-            }
-
-            int64_t totalSourceFrames = it->second->getSize() / it->second->getProperties().channelCount;
-
-            if (totalSourceFrames > maxTotalSourceFrames) {
-                maxTotalSourceFrames = totalSourceFrames;
-            }
-        }
+        float allMaxValue = getMaxValueAcrossSources();
+        int64_t maxTotalSourceFrames = getMaxTotalSourceFrames();
 
         int64_t framesToRenderFromData = numFrames;
 
@@ -119,19 +107,39 @@ void Player::renderSilence(float *start, int32_t numSamples){
     }
 }
 
+int64_t Player::getMaxTotalSourceFrames() {
+    int64_t maxTotalSourceFrames = INT64_MIN;
+
+    for (auto it = mSourceMap.begin(); it != mSourceMap.end(); it++) {
+        int64_t totalSourceFrames = it->second->getSize() / it->second->getProperties().channelCount;
+
+        if (totalSourceFrames > maxTotalSourceFrames) {
+            maxTotalSourceFrames = totalSourceFrames;
+        }
+    }
+
+    return maxTotalSourceFrames;
+}
+
+float Player::getMaxValueAcrossSources() {
+    float allMaxValue = 0.0;
+    for (auto it = mSourceMap.begin(); it != mSourceMap.end(); it++) {
+        if (it->second->getMaxSampleValue() < allMaxValue) {
+            allMaxValue = it->second->getMaxSampleValue();
+        }
+    }
+    return allMaxValue;
+}
+
 void Player::setPlayHead(int32_t playHead) {
-    const AudioProperties properties = mSourceMap.begin()->second->getProperties();
-    int64_t totalSourceFrames = mSourceMap.begin()->second->getSize() / properties.channelCount;
-    if (playHead < totalSourceFrames) {
+    int64_t maxTotalSourceFrames = getMaxTotalSourceFrames();
+    if (playHead < maxTotalSourceFrames) {
         mReadFrameIndex = playHead;
     }
 }
 
 int64_t Player::getTotalSampleFrames() {
-    auto source = mSourceMap.begin()->second;
-    const AudioProperties properties = source->getProperties();
-    int64_t totalSourceFrames = source->getSize() / properties.channelCount;
-    return totalSourceFrames;
+    return getMaxTotalSourceFrames();
 }
 
 void Player::clearSources() {
