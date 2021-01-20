@@ -7,7 +7,6 @@ import io.reactivex.rxjava3.functions.Function
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import io.reactivex.rxjava3.subjects.SingleSubject
 import kotlinx.coroutines.*
-import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
 
@@ -129,7 +128,12 @@ class FileWaveViewStore @Inject constructor() {
 
         audioFileUiStateList.forEach { audioFileUiState ->
             val numPts = (audioFileUiState.numSamples.toFloat() / maxNumSamples.toFloat()) * measuredWidth
+
+            val newSliderPos = recalculatePlaySliderPositionByDisplayPtsCount(audioFileUiState, numPts.toInt())
+            setPlaySliderPosition(audioFileUiState, newSliderPos)
+
             audioFileUiState.displayPtsCount.onNext(numPts.toInt())
+
         }
     }
 
@@ -153,14 +157,21 @@ class FileWaveViewStore @Inject constructor() {
         return audioFileUiState?.zoomLevelValue
     }
 
-    private fun recalculatePlaySliderPosition(audioFileUiState: AudioFileUiState, newZoomLevel: Int): Int {
+    private fun recalculatePlaySliderPositionByZoomLevel(audioFileUiState: AudioFileUiState, newZoomLevel: Int): Int {
         return audioFileUiState.run {
             (playSliderPositionValue.toFloat() / zoomLevelValue.toFloat()) * newZoomLevel
         }.toInt()
     }
 
+    private fun recalculatePlaySliderPositionByDisplayPtsCount(audioFileUiState: AudioFileUiState, newDisplayPtsCount: Int): Int {
+        if (audioFileUiState.displayPtsCountValue == 0) return 0
+        return audioFileUiState.run {
+            (playSliderPositionValue.toFloat() / displayPtsCountValue.toFloat()) * newDisplayPtsCount
+        }.toInt()
+    }
+
     private fun setZoomLevel(audioFileUiState: AudioFileUiState, zoomLevel: Int) {
-        val newSliderPos = recalculatePlaySliderPosition(audioFileUiState, zoomLevel)
+        val newSliderPos = recalculatePlaySliderPositionByZoomLevel(audioFileUiState, zoomLevel)
         setPlaySliderPosition(audioFileUiState, newSliderPos)
         audioFileUiState.zoomLevel.onNext(zoomLevel)
     }
