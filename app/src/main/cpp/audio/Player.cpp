@@ -16,6 +16,10 @@
 
 #include "Player.h"
 #include "../logging_macros.h"
+#include "thread"
+#include "vector"
+
+mutex addedMaxMtx;
 
 void Player::addSource(string key, shared_ptr<DataSource> source) {
     mSourceMap.insert(pair<string, shared_ptr<DataSource>>(key, source));
@@ -124,7 +128,7 @@ int64_t Player::getMaxTotalSourceFrames() {
 float Player::getMaxValueAcrossSources() {
     float allMaxValue = 0.0;
     for (auto it = mSourceMap.begin(); it != mSourceMap.end(); it++) {
-        if (it->second->getMaxSampleValue() < allMaxValue) {
+        if (it->second->getMaxSampleValue() > allMaxValue) {
             allMaxValue = it->second->getMaxSampleValue();
         }
     }
@@ -159,6 +163,15 @@ void Player::syncPlayHeads() {
 void Player::updateAddedMax() {
     addedMaxSampleValue = FLT_MIN;
 
+    if (mSourceMap.size() == 0) return;
+
+    // All the sources should have the same properties
+    const AudioProperties properties = mSourceMap.begin()->second->getProperties();
+
+    // 30 seconds of audio
+    int64_t samplesToHandlePerThread = properties.sampleRate * 2 * 30;
+
+    // Get maximum width of all loaded sources
     int64_t maxSize = INT64_MIN;
     for (auto it = mSourceMap.begin(); it != mSourceMap.end(); it++) {
         if (it->second->getSize() > maxSize) {
@@ -166,19 +179,56 @@ void Player::updateAddedMax() {
         }
     }
 
-    for (int i = 0; i < maxSize; i++) {
-        float totalSampleValue = 0.0;
+    // Number of threads, while each will handle 30 seconds audio at max
+    auto numThreads = (int) ceil((float) maxSize / (float) samplesToHandlePerThread);
 
-        for (auto it = mSourceMap.begin(); it != mSourceMap.end(); it++) {
-            if (i < it->second->getSize()) {
-                totalSampleValue += it->second->getData()[i];
+    vector<thread> workers;
+
+    for (int t = 0; t < numThreads; t++) {
+        auto start = t * samplesToHandlePerThread;
+        auto end = (t + 1) * samplesToHandlePerThread - 1;
+
+        if (end >= maxSize) {
+            end = maxSize - 1;
+        }
+
+        // Lambda to calculate max from segments
+        auto addedMaxCaller = [start,
+                               end,
+                               &mSourceMap = mSourceMap,
+                               &addedMaxSampleValue = addedMaxSampleValue]() {
+            float localMaxValue = FLT_MIN;
+
+            for (int i = start; i <= end; i++) {
+                float totalSampleValue = 0.0;
+
+                for (auto it = mSourceMap.begin(); it != mSourceMap.end(); it++) {
+                    if (i < it->second->getSize()) {
+                        totalSampleValue += it->second->getData()[i];
+                    }
+                }
+
+                if (abs(totalSampleValue) > localMaxValue) {
+                    localMaxValue = abs(totalSampleValue);
+                }
+
             }
-        }
 
-        if (abs(totalSampleValue) > addedMaxSampleValue) {
-            addedMaxSampleValue = abs(totalSampleValue);
-        }
+            addedMaxMtx.lock();
+            if (localMaxValue > addedMaxSampleValue) {
+                addedMaxSampleValue = localMaxValue;
+            }
+            addedMaxMtx.unlock();
+        };
+
+        // Save worker threads
+        workers.push_back(thread (
+                        addedMaxCaller
+                        ));
     }
 
-    LOGD("ADDED MAX SAMPLE VALUE: %f", addedMaxSampleValue);
+    // Wait for all worker to finish
+    for (auto it = workers.begin(); it != workers.end(); ++it) {
+        it->join();
+    }
 }
