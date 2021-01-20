@@ -214,6 +214,7 @@ void Player::updateAddedMax() {
 
             }
 
+            // Only allow a single thread to perform this operation
             addedMaxMtx.lock();
             if (localMaxValue > addedMaxSampleValue) {
                 addedMaxSampleValue = localMaxValue;
