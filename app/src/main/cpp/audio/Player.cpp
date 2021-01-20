@@ -169,7 +169,7 @@ void Player::updateAddedMax() {
     const AudioProperties properties = mSourceMap.begin()->second->getProperties();
 
     // 30 seconds of audio
-    int64_t samplesToHandlePerThread = properties.sampleRate * 2 * 30;
+    int64_t samplesToHandlePerThread = properties.sampleRate * properties.channelCount * 30;
 
     // Get maximum width of all loaded sources
     int64_t maxSize = INT64_MIN;
