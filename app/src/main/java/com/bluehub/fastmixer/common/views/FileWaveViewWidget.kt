@@ -71,7 +71,13 @@ class FileWaveViewWidget(context: Context, attributeSet: AttributeSet?)
                 mAudioFileUiState.value.isPlaying.map { uiStateIsPlaying ->
                     isPlaying == uiStateIsPlaying
                 }
-            }.observeOn(
+            }
+            .flatMap { isPlayingEnabled ->
+                mFileWaveViewStore.value.isGroupPlayingObservable.map { isGroupPlaying ->
+                    isPlayingEnabled && !isGroupPlaying
+                }
+            }
+            .observeOn(
                 AndroidSchedulers.mainThread()
             ).subscribe {
                 binding.wavePlayPause.isEnabled = it

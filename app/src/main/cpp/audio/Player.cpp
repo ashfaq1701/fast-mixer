@@ -149,6 +149,10 @@ void Player::clearSources() {
 void Player::syncPlayHeads() {
     if (mSourceMap.size() == 1) {
         setPlayHead(mSourceMap.begin()->second->getPlayHead());
+    } else {
+        for (auto it = mSourceMap.begin(); it != mSourceMap.end(); it++) {
+
+        }
     }
 }
 
@@ -175,4 +179,6 @@ void Player::updateAddedMax() {
             addedMaxSampleValue = abs(totalSampleValue);
         }
     }
+
+    LOGD("ADDED MAX SAMPLE VALUE: %f", addedMaxSampleValue);
 }

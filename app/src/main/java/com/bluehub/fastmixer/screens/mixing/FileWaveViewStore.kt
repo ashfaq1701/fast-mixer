@@ -19,7 +19,9 @@ class FileWaveViewStore @Inject constructor() {
     private lateinit var mAudioFilesLiveData: LiveData<MutableList<AudioFile>>
 
     private lateinit var mIsPlayingLiveData: LiveData<Boolean>
+    private lateinit var mIsGroupPlayingLiveData: LiveData<Boolean>
     val isPlayingObservable: BehaviorSubject<Boolean> = BehaviorSubject.createDefault(false)
+    val isGroupPlayingObservable: BehaviorSubject<Boolean> = BehaviorSubject.createDefault(false)
 
     private val measuredWidthObservable: BehaviorSubject<Int> = BehaviorSubject.create()
 
@@ -42,6 +44,10 @@ class FileWaveViewStore @Inject constructor() {
     private val isPlayingObserver: Observer<Boolean> = Observer {
         isPlayingObservable.onNext(it)
     }
+
+    private val isGroupPlayingObserver: Observer<Boolean> = Observer {
+        isGroupPlayingObservable.onNext(it)
+    }
     
     init {
         measuredWidthObservable.subscribe {
@@ -57,6 +63,11 @@ class FileWaveViewStore @Inject constructor() {
     fun setIsPlaying(isPlayingLiveData: LiveData<Boolean>) {
         mIsPlayingLiveData = isPlayingLiveData
         mIsPlayingLiveData.observeForever(isPlayingObserver)
+    }
+
+    fun setIsGroupPlaying(isGroupPlayingLiveData: LiveData<Boolean>) {
+        mIsGroupPlayingLiveData = isGroupPlayingLiveData
+        mIsGroupPlayingLiveData.observeForever(isGroupPlayingObserver)
     }
 
     fun setCurrentPlaybackProgressGetter(currentPlaybackProgressGetter: Function<Unit, Int>) {

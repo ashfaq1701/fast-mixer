@@ -5,6 +5,7 @@ import android.content.ContentResolver
 import android.content.Intent
 import android.os.Bundle
 import android.view.*
+import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -121,6 +122,28 @@ class MixingScreen : PermissionFragment<MixingScreenViewModel>(ViewModelType.NAV
                 openFilePicker()
                 viewModel.resetReadFromDisk()
             }
+        })
+
+        viewModel.isGroupPlaying.observe(viewLifecycleOwner, {
+            if (it) {
+                dataBinding.groupPlayPause.setBtnDrawable(
+                    ContextCompat.getDrawable(requireContext(), R.drawable.group_pause_button)
+                )
+                dataBinding.groupPlayPause.setBtnLabel(
+                    requireContext().getString(R.string.pause)
+                )
+            } else {
+                dataBinding.groupPlayPause.setBtnDrawable(
+                    ContextCompat.getDrawable(requireContext(), R.drawable.group_play_button)
+                )
+                dataBinding.groupPlayPause.setBtnLabel(
+                    requireContext().getString(R.string.play)
+                )
+            }
+        })
+
+        viewModel.isPlaying.observe(viewLifecycleOwner, {
+            dataBinding.groupPlayPause.setBtnEnabled(!it)
         })
     }
 

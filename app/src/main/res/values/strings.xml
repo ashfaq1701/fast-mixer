@@ -17,4 +17,7 @@
 
     <string name="zoom_in">Zoom In</string>
     <string name="zoom_out">Zoom Out</string>
+
+    <string name="play">Play</string>
+    <string name="pause">Pause</string>
 </resources>

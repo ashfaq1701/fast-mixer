@@ -92,9 +92,9 @@
                     android:id="@+id/groupPlayPause"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    app:btnDrawable="@{@drawable/group_zoom_in_button}"
-                    app:btnLabel="@{@string/zoom_in}"
-                    app:clickListener="@{mixingScreenViewModel.groupZoomIn}" />
+                    app:btnDrawable="@{@drawable/group_play_button}"
+                    app:btnLabel="@{@string/play}"
+                    app:clickListener="@{mixingScreenViewModel.toggleGroupPlay}" />
 
                 <com.bluehub.fastmixer.common.views.GroupControlButton
                     android:id="@+id/groupZoomIn"

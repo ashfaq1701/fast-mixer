@@ -63,12 +63,17 @@ class MixingScreenViewModel @Inject constructor(override val context: Context,
     val isPlaying: LiveData<Boolean>
         get() = _isPlaying
 
+    private val _isGroupPlaying = MutableLiveData<Boolean>()
+    val isGroupPlaying: LiveData<Boolean>
+        get() = _isGroupPlaying
+
     private val playList: MutableList<String> = mutableListOf()
 
     init {
         mixingRepository.createMixingEngine()
         fileWaveViewStore.setAudioFilesLiveData(audioFilesLiveData)
         fileWaveViewStore.setIsPlaying(isPlaying)
+        fileWaveViewStore.setIsGroupPlaying(isGroupPlaying)
         fileWaveViewStore.setCurrentPlaybackProgressGetter { getCurrentPlaybackProgress() }
         fileWaveViewStore.setPlayerHeadSetter { playHead: Int -> setPlayerHead(playHead) }
         fileWaveViewStore.setSourcePlayHeadSetter { filePath: String, playHead: Int -> setSourcePlayHead(filePath, playHead) }
@@ -201,7 +206,7 @@ class MixingScreenViewModel @Inject constructor(override val context: Context,
     }
 
     private fun playAudioFile(filePath: String) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             val pathList = listOf(filePath)
 
             if (!playList.areEqual(pathList)) {
@@ -210,14 +215,14 @@ class MixingScreenViewModel @Inject constructor(override val context: Context,
             }
 
             mixingRepository.startPlayback()
-            _isPlaying.value = true
+            _isPlaying.postValue(true)
         }
     }
 
     private fun pauseAudio() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             mixingRepository.pausePlayback()
-            _isPlaying.value = false
+            _isPlaying.postValue(false)
         }
     }
 
@@ -250,6 +255,33 @@ class MixingScreenViewModel @Inject constructor(override val context: Context,
 
     fun groupReset() {
         fileWaveViewStore.groupReset()
+    }
+
+    private fun groupPlay() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val pathList = audioFiles.map { it.path }
+            if (!playList.areEqual(pathList)) {
+                mixingRepository.loadFiles(pathList)
+                playList.reInitList(pathList)
+            }
+            mixingRepository.startPlayback()
+            _isGroupPlaying.postValue(true)
+        }
+    }
+
+    private fun groupPause() {
+        viewModelScope.launch(Dispatchers.IO) {
+            mixingRepository.pausePlayback()
+            _isGroupPlaying.postValue(false)
+        }
+    }
+
+    fun toggleGroupPlay() {
+        if (_isGroupPlaying.value == null || _isGroupPlaying.value == false) {
+            groupPlay()
+        } else {
+            groupPause()
+        }
     }
 
     override fun onCleared() {

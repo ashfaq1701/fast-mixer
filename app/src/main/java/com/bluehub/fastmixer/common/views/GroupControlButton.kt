@@ -39,12 +39,16 @@ class GroupControlButton(context: Context, attributeSet: AttributeSet?)
         binding = GroupControlButtonBinding.inflate(inflater, this, true)
     }
 
-    fun setBtnDrawable(drawable: Drawable) {
-        binding.imgButton.setImageDrawable(drawable)
+    fun setBtnDrawable(drawable: Drawable?) {
+        drawable?.let { binding.imgButton.setImageDrawable(it) }
     }
 
     fun setBtnLabel(str: String) {
         binding.imgTxt.text = str
+    }
+
+    fun setBtnEnabled(isEnabled: Boolean) {
+        binding.imgButton.isEnabled = isEnabled
     }
 
     fun setClickListener(clickListener: () -> Unit) {
