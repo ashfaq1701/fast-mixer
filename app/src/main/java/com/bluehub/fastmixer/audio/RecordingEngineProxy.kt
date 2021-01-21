@@ -1,5 +1,6 @@
-package com.bluehub.fastmixer.screens.recording
+package com.bluehub.fastmixer.audio
 
+import com.bluehub.fastmixer.audio.RecordingEngine
 import javax.inject.Inject
 
 class RecordingEngineProxy @Inject constructor(){

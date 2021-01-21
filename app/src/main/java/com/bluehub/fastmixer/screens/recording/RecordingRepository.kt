@@ -3,6 +3,7 @@ package com.bluehub.fastmixer.screens.recording
 import android.content.Context
 import android.os.Build
 import android.os.Environment
+import com.bluehub.fastmixer.audio.RecordingEngineProxy
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Paths

@@ -1,4 +1,4 @@
-package com.bluehub.fastmixer.screens.recording
+package com.bluehub.fastmixer.audio
 
 import com.bluehub.fastmixer.screens.recording.RecordingScreenViewModel
 

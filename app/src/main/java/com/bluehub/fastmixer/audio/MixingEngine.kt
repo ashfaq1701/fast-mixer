@@ -1,4 +1,4 @@
-package com.bluehub.fastmixer.screens.mixing
+package com.bluehub.fastmixer.audio
 
 class MixingEngine {
     companion object {
