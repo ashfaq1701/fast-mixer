@@ -46,6 +46,10 @@ class RecordingScreenViewModel @Inject constructor (override val context: Contex
     private var seekbarTimer: Timer? = null
     private var recordingTimer: Timer?  = null
 
+    private val _isLoading = MutableLiveData<Boolean>(false)
+    val isLoading: LiveData<Boolean>
+        get() = _isLoading
+
     private val _eventIsRecording = MutableLiveData<Boolean>(false)
     val eventIsRecording: LiveData<Boolean>
         get() = _eventIsRecording

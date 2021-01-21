@@ -103,5 +103,8 @@
             app:layout_constraintEnd_toEndOf="parent"
             android:gravity="center"
             android:textSize="@dimen/recording_timer_text_size" />
+
+        <include layout="@layout/view_loading" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

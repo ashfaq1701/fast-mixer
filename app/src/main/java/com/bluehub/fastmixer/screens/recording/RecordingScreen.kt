@@ -13,6 +13,7 @@ import com.bluehub.fastmixer.common.utils.ScreenConstants
 import com.bluehub.fastmixer.common.utils.ViewModelType
 import com.bluehub.fastmixer.databinding.RecordingScreenBinding
 import com.visualizer.amplitude.AudioRecordView
+import kotlinx.android.synthetic.main.view_loading.*
 import javax.inject.Inject
 
 
@@ -116,6 +117,14 @@ class RecordingScreen : PermissionFragment<RecordingScreenViewModel>(ViewModelTy
 
         viewModel.seekbarProgress.observe(viewLifecycleOwner, {
             recordingSeekbar.progress = it
+        })
+
+        viewModel.isLoading.observe(viewLifecycleOwner, {
+            if (it) {
+                pbLoading.visibility = View.VISIBLE
+            } else {
+                pbLoading.visibility = View.GONE
+            }
         })
 
         recordingSeekbar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
