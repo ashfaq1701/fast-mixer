@@ -17,9 +17,12 @@ import javax.inject.Inject
 
 class MixingScreenViewModel @Inject constructor(override val context: Context,
                                                 override val permissionManager: PermissionManager,
-                                                val fileManager: FileManager,
-                                                val mixingRepository: MixingRepository,
-                                                val fileWaveViewStore: FileWaveViewStore): PermissionViewModel(context) {
+                                                private val fileManager: FileManager,
+                                                private val mixingRepository: MixingRepository,
+                                                private val audioFileStore: AudioFileStore,
+                                                val fileWaveViewStore: FileWaveViewStore)
+    : PermissionViewModel(context) {
+
     companion object {
         private lateinit var instance: MixingScreenViewModel
 
@@ -36,8 +39,7 @@ class MixingScreenViewModel @Inject constructor(override val context: Context,
         }
     }
 
-    var audioFiles: MutableList<AudioFile> = mutableListOf()
-    val audioFilesLiveData = MutableLiveData<MutableList<AudioFile>>(mutableListOf())
+    private val audioFilesLiveData = MutableLiveData<MutableList<AudioFile>>(mutableListOf())
 
     private val _eventDrawerOpen = MutableLiveData<Boolean>()
     val eventDrawerOpen: LiveData<Boolean>
@@ -76,7 +78,9 @@ class MixingScreenViewModel @Inject constructor(override val context: Context,
         fileWaveViewStore.setIsGroupPlaying(isGroupPlaying)
         fileWaveViewStore.setCurrentPlaybackProgressGetter { getCurrentPlaybackProgress() }
         fileWaveViewStore.setPlayerHeadSetter { playHead: Int -> setPlayerHead(playHead) }
-        fileWaveViewStore.setSourcePlayHeadSetter { filePath: String, playHead: Int -> setSourcePlayHead(filePath, playHead) }
+        fileWaveViewStore.setSourcePlayHeadSetter { filePath: String, playHead: Int ->
+            setSourcePlayHead(filePath, playHead)
+        }
     }
 
     fun onRecord() {
@@ -116,17 +120,19 @@ class MixingScreenViewModel @Inject constructor(override val context: Context,
     fun addRecordedFilePath(filePath: String) {
         if (!fileManager.fileExists(filePath)) return
 
-        if (audioFiles.filter {
-            it.path == filePath
-        }.count() == 0) {
-            viewModelScope.launch {
-                withContext(Dispatchers.IO) {
-                    mixingRepository.addFile(filePath)
-                    val totalSamples = getTotalSamples(filePath)
-                    audioFiles.add(AudioFile(filePath, totalSamples, AudioFileType.RECORDED))
+        audioFileStore.run {
+            if (audioFiles.filter {
+                    it.path == filePath
+                }.count() == 0) {
+                viewModelScope.launch {
+                    withContext(Dispatchers.IO) {
+                        mixingRepository.addFile(filePath)
+                        val totalSamples = getTotalSamples(filePath)
+                        audioFiles.add(AudioFile(filePath, totalSamples, AudioFileType.RECORDED))
+                    }
+                    audioFilesLiveData.value = audioFiles
+                    _itemAddedIdx.value = audioFiles.size - 1
                 }
-                audioFilesLiveData.value = audioFiles
-                _itemAddedIdx.value = audioFiles.size - 1
             }
         }
     }
@@ -147,11 +153,14 @@ class MixingScreenViewModel @Inject constructor(override val context: Context,
             newFilePath?.let { newPath ->
                 mixingRepository.addFile(newPath)
                 val totalSamples = getTotalSamples(newPath)
-                audioFiles.add(AudioFile(newPath, totalSamples, AudioFileType.IMPORTED))
 
-                withContext(Dispatchers.Main) {
-                    audioFilesLiveData.value = audioFiles
-                    _itemAddedIdx.value = audioFiles.size - 1
+                audioFileStore.run {
+                    audioFiles.add(AudioFile(newPath, totalSamples, AudioFileType.IMPORTED))
+
+                    withContext(Dispatchers.Main) {
+                        audioFilesLiveData.value = audioFiles
+                        _itemAddedIdx.value = audioFiles.size - 1
+                    }
                 }
             }
         }
@@ -178,21 +187,23 @@ class MixingScreenViewModel @Inject constructor(override val context: Context,
                 mixingRepository.deleteFile(filePath)
             }
 
-            val idxToRemove = audioFiles.foldIndexed(listOf<Int>(), { idx, list, file ->
-                if (file.path == filePath) {
-                    list + idx
-                } else {
-                    list
+            audioFileStore.run {
+                val idxToRemove = audioFiles.foldIndexed(listOf<Int>(), { idx, list, file ->
+                    if (file.path == filePath) {
+                        list + idx
+                    } else {
+                        list
+                    }
+                })
+
+                val firstIdx = idxToRemove.firstOrNull()
+
+                firstIdx?.let {
+                    val removedFile = audioFiles.removeAt(it)
+                    fileManager.removeFile(removedFile.path)
+                    audioFilesLiveData.value = audioFiles
+                    _itemRemovedIdx.value = it
                 }
-            })
-
-            val firstIdx = idxToRemove.firstOrNull()
-
-            firstIdx?.let {
-                val removedFile = audioFiles.removeAt(it)
-                fileManager.removeFile(removedFile.path)
-                audioFilesLiveData.value = audioFiles
-                _itemRemovedIdx.value = it
             }
         }
     }
@@ -243,7 +254,8 @@ class MixingScreenViewModel @Inject constructor(override val context: Context,
 
     private fun setPlayerHead(playHead: Int) = mixingRepository.setPlayerHead(playHead)
 
-    private fun setSourcePlayHead(filePath: String, playHead: Int) = mixingRepository.setSourcePlayHead(filePath, playHead)
+    private fun setSourcePlayHead(filePath: String, playHead: Int) =
+        mixingRepository.setSourcePlayHead(filePath, playHead)
 
     fun groupZoomIn() {
         fileWaveViewStore.groupZoomIn()
@@ -259,7 +271,7 @@ class MixingScreenViewModel @Inject constructor(override val context: Context,
 
     private fun groupPlay() {
         viewModelScope.launch(Dispatchers.IO) {
-            val pathList = audioFiles.map { it.path }
+            val pathList = audioFileStore.audioFiles.map { it.path }
             if (!playList.areEqual(pathList)) {
                 mixingRepository.loadFiles(pathList)
                 playList.reInitList(pathList)

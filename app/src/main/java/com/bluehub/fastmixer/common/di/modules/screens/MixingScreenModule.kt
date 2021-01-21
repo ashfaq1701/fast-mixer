@@ -1,8 +1,8 @@
-package com.bluehub.fastmixer.common.dependencyinjection.modules.screens
+package com.bluehub.fastmixer.common.di.modules.screens
 
 import androidx.lifecycle.ViewModel
-import com.bluehub.fastmixer.common.dependencyinjection.FragmentScope
-import com.bluehub.fastmixer.common.dependencyinjection.ViewModelKey
+import com.bluehub.fastmixer.common.di.FragmentScope
+import com.bluehub.fastmixer.common.di.ViewModelKey
 import com.bluehub.fastmixer.screens.mixing.MixingScreenViewModel
 import dagger.Binds
 import dagger.Module

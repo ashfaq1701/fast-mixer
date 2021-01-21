@@ -1,11 +1,14 @@
-package com.bluehub.fastmixer.common.dependencyinjection.modules
+package com.bluehub.fastmixer.common.di.modules
 
 import android.content.Context
 import com.bluehub.fastmixer.activities.MainActivity
-import com.bluehub.fastmixer.common.dependencyinjection.ActivityScope
+import com.bluehub.fastmixer.common.di.ActivityScope
+import com.bluehub.fastmixer.common.di.ApplicationScope
+import com.bluehub.fastmixer.screens.mixing.AudioFileStore
 import dagger.Module
 import dagger.Provides
 import dagger.android.ContributesAndroidInjector
+import javax.inject.Singleton
 
 @Module
 interface ActivityModule {

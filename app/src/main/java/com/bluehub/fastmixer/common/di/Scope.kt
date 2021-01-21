@@ -1,4 +1,4 @@
-package com.bluehub.fastmixer.common.dependencyinjection
+package com.bluehub.fastmixer.common.di
 
 import javax.inject.Scope
 

@@ -1,6 +1,6 @@
 package com.bluehub.fastmixer
 
-import com.bluehub.fastmixer.common.dependencyinjection.components.DaggerApplicationComponent
+import com.bluehub.fastmixer.common.di.components.DaggerApplicationComponent
 import dagger.android.AndroidInjector
 import dagger.android.support.DaggerApplication
 import timber.log.Timber

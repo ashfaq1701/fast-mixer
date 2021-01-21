@@ -1,10 +1,10 @@
-package com.bluehub.fastmixer.common.dependencyinjection.components
+package com.bluehub.fastmixer.common.di.components
 
 import android.app.Application
 import com.bluehub.fastmixer.MixerApplication
-import com.bluehub.fastmixer.common.dependencyinjection.ApplicationScope
-import com.bluehub.fastmixer.common.dependencyinjection.modules.ActivityModule
-import com.bluehub.fastmixer.common.dependencyinjection.modules.AppModule
+import com.bluehub.fastmixer.common.di.ApplicationScope
+import com.bluehub.fastmixer.common.di.modules.ActivityModule
+import com.bluehub.fastmixer.common.di.modules.AppModule
 import dagger.BindsInstance
 import dagger.Component
 import dagger.android.AndroidInjectionModule

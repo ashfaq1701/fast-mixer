@@ -1,8 +1,8 @@
-package com.bluehub.fastmixer.common.dependencyinjection.modules
+package com.bluehub.fastmixer.common.di.modules
 
-import com.bluehub.fastmixer.common.dependencyinjection.FragmentScope
-import com.bluehub.fastmixer.common.dependencyinjection.modules.screens.MixingScreenModule
-import com.bluehub.fastmixer.common.dependencyinjection.modules.screens.RecordingScreenModule
+import com.bluehub.fastmixer.common.di.FragmentScope
+import com.bluehub.fastmixer.common.di.modules.screens.MixingScreenModule
+import com.bluehub.fastmixer.common.di.modules.screens.RecordingScreenModule
 import com.bluehub.fastmixer.screens.mixing.MixingScreen
 import com.bluehub.fastmixer.screens.recording.RecordingScreen
 import dagger.Module

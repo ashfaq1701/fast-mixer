@@ -12,6 +12,7 @@ import com.bluehub.fastmixer.common.utils.DialogManager
 import com.bluehub.fastmixer.common.utils.ScreenConstants
 import com.bluehub.fastmixer.common.utils.ViewModelType
 import com.bluehub.fastmixer.databinding.RecordingScreenBinding
+import com.bluehub.fastmixer.screens.recording.RecordingScreenDirections.actionRecordingScreenToMixingScreen
 import com.visualizer.amplitude.AudioRecordView
 import kotlinx.android.synthetic.main.view_loading.*
 import javax.inject.Inject
@@ -85,7 +86,7 @@ class RecordingScreen : PermissionFragment<RecordingScreenViewModel>(ViewModelTy
 
         viewModel.eventGoBack.observe(viewLifecycleOwner, { goBack ->
             if (goBack) {
-                val action = RecordingScreenDirections.actionRecordingScreenToMixingScreen()
+                val action = actionRecordingScreenToMixingScreen()
                 action.recordedFilePath = viewModel.repository.getRecordedFilePath()
                 viewModel.resetGoBack()
                 findNavController().navigate(action)

@@ -15,6 +15,7 @@ import com.bluehub.fastmixer.common.permissions.PermissionFragment
 import com.bluehub.fastmixer.common.utils.DialogManager
 import com.bluehub.fastmixer.common.utils.ViewModelType
 import com.bluehub.fastmixer.databinding.MixingScreenBinding
+import com.bluehub.fastmixer.screens.mixing.MixingScreenDirections.actionMixingScreenToRecordingScreen
 import javax.inject.Inject
 
 class MixingScreen : PermissionFragment<MixingScreenViewModel>(ViewModelType.NAV_SCOPED) {
@@ -91,7 +92,7 @@ class MixingScreen : PermissionFragment<MixingScreenViewModel>(ViewModelType.NAV
 
         viewModel.eventRecord.observe(viewLifecycleOwner, { record ->
             if (record) {
-                findNavController().navigate(MixingScreenDirections.actionMixingScreenToRecordingScreen())
+                findNavController().navigate(actionMixingScreenToRecordingScreen())
                 viewModel.onRecordNavigated()
             }
         })
