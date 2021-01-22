@@ -41,7 +41,7 @@ bool RecordingIO::setup_audio_source() {
             .sampleRate = RecordingStreamConstants::mSampleRate
     };
 
-    mDataSource.reset(
+    mDataSource = shared_ptr<FileDataSource>(
             FileDataSource::newFromCompressedFile(mRecordingFilePath.c_str(), targetProperties)
             );
 
@@ -74,6 +74,7 @@ void RecordingIO::pause_audio_source() {
 void RecordingIO::clear_audio_source() {
     pause_audio_source();
     mPlayer->clearSources();
+    mDataSource.reset();
 }
 
 bool RecordingIO::validate_audio_file() {
