@@ -23,6 +23,8 @@ RecordingEngine::RecordingEngine(
         setStopPlayback();
     });
     mRecordingScreenViewModelPassed = recordingScreenViewModelPassed;
+
+    mSourceMapStore = SourceMapStore::getInstance();
 }
 
 RecordingEngine::~RecordingEngine() {

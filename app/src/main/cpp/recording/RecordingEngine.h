@@ -12,6 +12,7 @@
 #include <oboe/Definitions.h>
 #include <oboe/AudioStream.h>
 #include "../logging_macros.h"
+#include "../SourceMapStore.h"
 #include "RecordingIO.h"
 #include "streams/RecordingStream.h"
 #include "streams/LivePlaybackStream.h"
@@ -71,6 +72,7 @@ private:
     mutex livePlaybackStreamMtx;
     mutex playbackStreamMtx;
 
+    SourceMapStore* mSourceMapStore;
     RecordingIO mRecordingIO;
 
     RecordingStream recordingStream = RecordingStream(&mRecordingIO);

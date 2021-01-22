@@ -9,11 +9,13 @@
 #include <memory>
 #include <jni.h>
 #include "MixingEngine.h"
+#include "../SourceMapStore.h"
 #include "../logging_macros.h"
 #include "mixing_jvm_env.h"
 
 const char *TAG = "mixing-lib: %s";
 static MixingEngine *mixingEngine = nullptr;
+static SourceMapStore *sourceMapStore = nullptr;
 
 extern "C" {
     void prepare_kotlin_method_ids(JNIEnv *env) {
@@ -45,7 +47,9 @@ extern "C" {
     Java_com_bluehub_fastmixer_audio_MixingEngine_create(JNIEnv *env, jclass) {
         if (!mixingEngine) {
             prepare_kotlin_method_ids(env);
-            mixingEngine = new MixingEngine();
+
+            sourceMapStore = SourceMapStore::getInstance();
+            mixingEngine = new MixingEngine(sourceMapStore);
         }
         return (mixingEngine != nullptr);
     }

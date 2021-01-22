@@ -23,6 +23,7 @@ add_library( # Sets the name of the library.
         SHARED
 
         # Provides a relative path to your source file(s).
+        SourceMapStore.cpp
         recording/RecordingIO.cpp
         recording/RecordingEngine.cpp
         recording/streams/StreamConstants.cpp
@@ -48,6 +49,7 @@ add_library( # Sets the name of the library.
         SHARED
 
         # Provides a relative path to your source file(s).
+        SourceMapStore.cpp
         mixing/MixingIO.cpp
         mixing/MixingEngine.cpp
         mixing/streams/StreamConstants.cpp
