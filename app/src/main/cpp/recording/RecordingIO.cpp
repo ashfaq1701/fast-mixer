@@ -19,6 +19,13 @@ mutex RecordingIO::mtx;
 condition_variable RecordingIO::reallocated;
 bool RecordingIO::is_reallocated = false;
 
+RecordingIO::RecordingIO() {
+    Player* player = new Player();
+    mPlayer.reset(move(player));
+
+    taskQueue = new TaskQueue();
+}
+
 bool RecordingIO::check_if_reallocated() {
     return is_reallocated;
 }
@@ -46,33 +53,31 @@ bool RecordingIO::setup_audio_source() {
         return false;
     }
 
-    int32_t playHead = 0;
-    if (mRecordedTrack) {
-        playHead = mRecordedTrack->getPlayHead();
-        if (playHead >= mRecordedTrack->getTotalSampleFrames()) {
-            playHead = 0;
-        }
-        mRecordedTrack.reset();
-    }
+    mPlayer->clearSources();
 
     map<string, shared_ptr<DataSource>> sourceMap;
     sourceMap.insert(pair<string, shared_ptr<DataSource>>(mRecordingFilePath, audioSource));
-    mRecordedTrack = make_shared<Player>(sourceMap, mStopPlaybackCallback);
-    mRecordedTrack->setPlayHead(playHead);
-    mRecordedTrack->setPlaying(true);
+    mPlayer->addSourceMap(sourceMap);
+    mPlayer->setPlaying(true);
+
+    int32_t playHead = mPlayer->getPlayHead();
+    if (playHead >= mPlayer->getTotalSampleFrames()) {
+        playHead = 0;
+        mPlayer->setPlayHead(playHead);
+    }
 
     return true;
 }
 
 void RecordingIO::pause_audio_source() {
-    if (mRecordedTrack) {
-        mRecordedTrack->setPlaying(false);
+    if (mPlayer) {
+        mPlayer->setPlaying(false);
     }
 }
 
 void RecordingIO::clear_audio_source() {
     pause_audio_source();
-    mRecordedTrack.reset();
+    mPlayer->clearSources();
 }
 
 bool RecordingIO::validate_audio_file() {
@@ -85,12 +90,12 @@ void RecordingIO::read_playback(float *targetData, int32_t numFrames) {
         return;
     }
 
-    if (!mRecordedTrack) {
+    if (!mPlayer) {
         mStopPlaybackCallback();
         return;
     }
 
-    mRecordedTrack->renderAudio(targetData, numFrames);
+    mPlayer->renderAudio(targetData, numFrames);
 }
 
 void RecordingIO::flush_to_file(int16_t* buffer, int32_t length, const string& recordingFilePath, shared_ptr<SndfileHandle>& recordingFile) {
@@ -234,25 +239,26 @@ void RecordingIO::resetCurrentMax() {
 
 void RecordingIO::setStopPlaybackCallback(function<void()> stopPlaybackCallback) {
     mStopPlaybackCallback = stopPlaybackCallback;
+    mPlayer->setPlaybackCallback(mStopPlaybackCallback);
 }
 
 int RecordingIO::getTotalRecordedFrames() {
-    if (mRecordedTrack) {
-        return mRecordedTrack->getTotalSampleFrames();
+    if (mPlayer) {
+        return mPlayer->getTotalSampleFrames();
     }
     return 0;
 }
 
 int32_t RecordingIO::getCurrentPlaybackProgress() {
-    if (mRecordedTrack) {
-        return mRecordedTrack->getPlayHead();
+    if (mPlayer) {
+        return mPlayer->getPlayHead();
     }
     return 0;
 }
 
 void RecordingIO::setPlayHead(int position) {
-    if (mRecordedTrack) {
-        mRecordedTrack->setPlayHead(position);
+    if (mPlayer) {
+        mPlayer->setPlayHead(position);
     }
 }
 
@@ -262,8 +268,8 @@ int RecordingIO::getDurationInSeconds() {
 
 void RecordingIO::resetProperties() {
     taskQueue->clear_queue();
-    mRecordedTrack.reset();
-    mRecordedTrack.reset();
+    mPlayer.reset();
+    mPlayer.reset();
     mRecordingFile.reset();
     mTotalSamples = 0;
     mIteration = 1;

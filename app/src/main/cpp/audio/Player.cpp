@@ -153,10 +153,6 @@ void Player::clearSources() {
 void Player::syncPlayHeads() {
     if (mSourceMap.size() == 1) {
         setPlayHead(mSourceMap.begin()->second->getPlayHead());
-    } else {
-        for (auto it = mSourceMap.begin(); it != mSourceMap.end(); it++) {
-
-        }
     }
 }
 

@@ -22,9 +22,8 @@ const int kMaxSamples = 60 * oboe::DefaultStreamValues::SampleRate * oboe::Chann
 
 class RecordingIO {
 public:
-    RecordingIO() {
-        taskQueue = new TaskQueue();
-    }
+
+    RecordingIO();
 
     ~RecordingIO() {
         taskQueue->stop_queue();
@@ -64,7 +63,7 @@ public:
 
     void resetProperties();
 
-    shared_ptr<Player> mRecordedTrack {nullptr};
+    shared_ptr<Player> mPlayer {nullptr};
 
 private:
     const char* TAG = "RecordingIO:: %d";
