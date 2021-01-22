@@ -43,10 +43,20 @@
             android:id="@+id/live_playback_enabled"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:checked="@={viewModel.livePlaybackEnabled}"
+            android:checked="@={viewModel.livePlaybackActive}"
             android:text="@string/live_playback_enabled"
             app:layout_constraintTop_toBottomOf="@id/recording_seekbar"
             app:layout_constraintStart_toStartOf="@id/recording_seekbar" />
+
+        <CheckBox
+            android:id="@+id/mixing_play_enabled"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/recording_screen_checkbox_margin_start"
+            android:checked="@={viewModel.mixingPlayActive}"
+            android:text="@string/mixing_play_enabled"
+            app:layout_constraintStart_toEndOf="@id/live_playback_enabled"
+            app:layout_constraintTop_toBottomOf="@id/recording_seekbar" />
 
         <Button
             android:id="@+id/toggle_record"

@@ -2,22 +2,22 @@
 // Created by Ashfaq Salehin on 11/1/2021 AD.
 //
 
-#ifndef FAST_MIXER_PLAYBACKSTREAM_H
-#define FAST_MIXER_PLAYBACKSTREAM_H
+#ifndef FAST_MIXER_MixingPlaybackStream_H
+#define FAST_MIXER_MixingPlaybackStream_H
 
 #include "MixingBaseStream.h"
 
 using namespace std;
 
-class PlaybackStream : public MixingBaseStream, public oboe::AudioStreamDataCallback, public oboe::AudioStreamErrorCallback {
+class MixingPlaybackStream : public MixingBaseStream, public oboe::AudioStreamDataCallback, public oboe::AudioStreamErrorCallback {
 
 public:
 
-    PlaybackStream(MixingIO* mixingIO);
+    MixingPlaybackStream(MixingIO* mixingIO);
 
     oboe::Result openStream();
 
-    oboe::AudioStreamBuilder* setupPlaybackStreamParameters(oboe::AudioStreamBuilder *builder,
+    oboe::AudioStreamBuilder* setupMixingPlaybackStreamParameters(oboe::AudioStreamBuilder *builder,
                                                             oboe::AudioApi audioApi, oboe::AudioFormat audioFormat,
                                                             oboe::AudioStreamDataCallback *audioStreamCallback,
                                                             int32_t deviceId, int32_t sampleRate, int channelCount);
@@ -35,4 +35,4 @@ private:
 };
 
 
-#endif //FAST_MIXER_PLAYBACKSTREAM_H
+#endif //FAST_MIXER_MixingPlaybackStreamStreamConstants_H

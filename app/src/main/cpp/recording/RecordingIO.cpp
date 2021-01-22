@@ -37,26 +37,22 @@ bool RecordingIO::setup_audio_source() {
     }
 
     AudioProperties targetProperties{
-            .channelCount = StreamConstants::mOutputChannelCount,
-            .sampleRate = StreamConstants::mSampleRate
+            .channelCount = RecordingStreamConstants::mOutputChannelCount,
+            .sampleRate = RecordingStreamConstants::mSampleRate
     };
 
-    auto dataSource = FileDataSource::newFromCompressedFile(mRecordingFilePath.c_str(), targetProperties);
+    mDataSource.reset(
+            FileDataSource::newFromCompressedFile(mRecordingFilePath.c_str(), targetProperties)
+            );
 
-    if (dataSource == nullptr) return false;
-
-    shared_ptr<FileDataSource> audioSource{
-        dataSource
-    };
-
-    if (!audioSource) {
+    if (!mDataSource) {
         return false;
     }
 
     mPlayer->clearSources();
 
     map<string, shared_ptr<DataSource>> sourceMap;
-    sourceMap.insert(pair<string, shared_ptr<DataSource>>(mRecordingFilePath, audioSource));
+    sourceMap.insert(pair<string, shared_ptr<DataSource>>(mRecordingFilePath, mDataSource));
     mPlayer->addSourceMap(sourceMap);
     mPlayer->setPlaying(true);
 
@@ -101,7 +97,7 @@ void RecordingIO::read_playback(float *targetData, int32_t numFrames) {
 void RecordingIO::flush_to_file(int16_t* buffer, int32_t length, const string& recordingFilePath, shared_ptr<SndfileHandle>& recordingFile) {
     if (!recordingFile) {
         int format = SF_FORMAT_WAV | SF_FORMAT_PCM_16;
-        SndfileHandle file = SndfileHandle(recordingFilePath, SFM_WRITE, format, StreamConstants::mInputChannelCount, StreamConstants::mSampleRate);
+        SndfileHandle file = SndfileHandle(recordingFilePath, SFM_WRITE, format, RecordingStreamConstants::mInputChannelCount, RecordingStreamConstants::mSampleRate);
         recordingFile = make_shared<SndfileHandle>(file);
     }
     if (!buffer) {
@@ -263,7 +259,16 @@ void RecordingIO::setPlayHead(int position) {
 }
 
 int RecordingIO::getDurationInSeconds() {
-    return (int) mTotalSamples / (StreamConstants::mInputChannelCount * StreamConstants::mSampleRate);
+    return (int) mTotalSamples / (RecordingStreamConstants::mInputChannelCount * RecordingStreamConstants::mSampleRate);
+}
+
+void RecordingIO::clearPlayerSources() {
+    mPlayer->resetPlayHead();
+    mPlayer->clearSources();
+}
+
+void RecordingIO::addSourceMap(map<string, shared_ptr<DataSource>> playMap) {
+    mPlayer->addSourceMap(playMap);
 }
 
 void RecordingIO::resetProperties() {

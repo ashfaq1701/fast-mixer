@@ -20,4 +20,5 @@
 
     <string name="play">Play</string>
     <string name="pause">Pause</string>
+    <string name="mixing_play_enabled">Mixing Play Enabled</string>
 </resources>

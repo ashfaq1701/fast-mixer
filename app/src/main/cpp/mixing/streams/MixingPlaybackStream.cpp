@@ -3,41 +3,41 @@
 //
 
 #include <cassert>
-#include "PlaybackStream.h"
+#include "MixingPlaybackStream.h"
 
-PlaybackStream::PlaybackStream(MixingIO* mixingIO): MixingBaseStream(mixingIO) {}
+MixingPlaybackStream::MixingPlaybackStream(MixingIO* mixingIO): MixingBaseStream(mixingIO) {}
 
-oboe::Result PlaybackStream::openStream() {
-    LOGD(TAG, "openPlaybackStream(): ");
+oboe::Result MixingPlaybackStream::openStream() {
+    LOGD(TAG, "openMixingPlaybackStream(): ");
     oboe::AudioStreamBuilder builder;
-    setupPlaybackStreamParameters(
+    setupMixingPlaybackStreamParameters(
             &builder,
-            StreamConstants::mAudioApi,
-            StreamConstants::mFormat,
+            MixingStreamConstants::mAudioApi,
+            MixingStreamConstants::mFormat,
             this,
-            StreamConstants::mDeviceId,
-            StreamConstants::mSampleRate,
-            StreamConstants::mChannelCount
+            MixingStreamConstants::mDeviceId,
+            MixingStreamConstants::mSampleRate,
+            MixingStreamConstants::mChannelCount
     );
     oboe::Result result = builder.openStream(mStream);
     if (result == oboe::Result::OK && mStream) {
-        assert(mStream->getChannelCount() == StreamConstants::mChannelCount);
-        assert(mStream->getFormat() == StreamConstants::mFormat);
+        assert(mStream->getChannelCount() == MixingStreamConstants::mChannelCount);
+        assert(mStream->getFormat() == MixingStreamConstants::mFormat);
         int32_t mFramesPerBurst = mStream->getFramesPerBurst();
         mStream->setBufferSizeInFrames(mFramesPerBurst);
     } else {
-        LOGE(TAG, "openPlaybackStream(): Failed to create playback stream. Error: %s",
+        LOGE(TAG, "openMixingPlaybackStream(): Failed to create playback stream. Error: %s",
              oboe::convertToText(result));
     }
     return result;
 }
 
 oboe::AudioStreamBuilder *
-PlaybackStream::setupPlaybackStreamParameters(oboe::AudioStreamBuilder *builder,
+MixingPlaybackStream::setupMixingPlaybackStreamParameters(oboe::AudioStreamBuilder *builder,
                                               oboe::AudioApi audioApi, oboe::AudioFormat audioFormat,
                                               oboe::AudioStreamDataCallback *audioStreamCallback,
                                               int32_t deviceId, int32_t sampleRate, int channelCount) {
-    LOGD(TAG, "setupPlaybackStreamParameters()");
+    LOGD(TAG, "setupMixingPlaybackStreamParameters()");
     builder->setAudioApi(audioApi)
             ->setFormat(audioFormat)
             ->setSharingMode(oboe::SharingMode::Exclusive)
@@ -52,7 +52,7 @@ PlaybackStream::setupPlaybackStreamParameters(oboe::AudioStreamBuilder *builder,
 }
 
 oboe::DataCallbackResult
-PlaybackStream::onAudioReady(oboe::AudioStream *audioStream, void *audioData,
+MixingPlaybackStream::onAudioReady(oboe::AudioStream *audioStream, void *audioData,
                              int32_t numFrames) {
     if (audioStream && audioStream->getState() != oboe::StreamState::Closed) {
         return processPlaybackFrame(audioStream, static_cast<float_t *>(audioData), numFrames,
@@ -62,13 +62,13 @@ PlaybackStream::onAudioReady(oboe::AudioStream *audioStream, void *audioData,
 }
 
 oboe::DataCallbackResult
-PlaybackStream::processPlaybackFrame(oboe::AudioStream *audioStream, float *audioData,
+MixingPlaybackStream::processPlaybackFrame(oboe::AudioStream *audioStream, float *audioData,
                                      int32_t numFrames, int32_t channelCount) {
     fillArrayWithZeros(audioData, numFrames);
     mMixingIO->read_playback(audioData, numFrames);
     return oboe::DataCallbackResult::Continue;
 }
 
-void PlaybackStream::onErrorAfterClose(oboe::AudioStream *audioStream, oboe::Result result) {
+void MixingPlaybackStream::onErrorAfterClose(oboe::AudioStream *audioStream, oboe::Result result) {
     mStream.reset();
 }

@@ -100,10 +100,12 @@ class RecordingScreenViewModel @Inject constructor (override val context: Contex
 
     private val _livePlaybackPermitted = MutableLiveData<Boolean>(false)
 
+    val mixingPlayActive = MutableLiveData<Boolean>(false)
+
     val headphoneConnectedCallback: () -> Unit = {
         if (_eventLivePlaybackSet.value == true) {
             _eventLivePlaybackSet.value = audioRepository.isHeadphoneConnected()
-            notifyPropertyChanged(BR.livePlaybackEnabled)
+            notifyPropertyChanged(BR.livePlaybackActive)
         }
         _livePlaybackPermitted.value = audioRepository.isHeadphoneConnected()
     }
@@ -134,6 +136,7 @@ class RecordingScreenViewModel @Inject constructor (override val context: Contex
             withContext(Dispatchers.IO) {
                 repository.createCacheDirectory(context.cacheDir.absolutePath)
                 repository.createAudioEngine()
+                loadMixerFiles()
             }
 
             audioRepository.audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
@@ -152,17 +155,17 @@ class RecordingScreenViewModel @Inject constructor (override val context: Contex
     }
 
     @Bindable
-    fun getLivePlaybackEnabled(): Boolean {
+    fun getLivePlaybackActive(): Boolean {
         return _eventLivePlaybackSet.value!!
     }
 
-    fun setLivePlaybackEnabled(value: Boolean) {
+    fun setLivePlaybackActive(value: Boolean) {
         if (_eventLivePlaybackSet.value != value) {
             if (!value || (_eventIsRecording.value == true && _livePlaybackPermitted.value == true)) {
                 _eventLivePlaybackSet.value = value
                 toggleLivePlayback()
             }
-            notifyPropertyChanged(BR.livePlaybackEnabled)
+            notifyPropertyChanged(BR.livePlaybackActive)
         }
     }
 
@@ -244,6 +247,18 @@ class RecordingScreenViewModel @Inject constructor (override val context: Contex
             withContext(Dispatchers.IO) {
                 repository.stopPlaying()
             }
+        }
+    }
+
+    private fun loadMixerFiles() {
+        val audioFilePaths = audioFileStore.audioFiles.map { it.path }
+
+        viewModelScope.launch(Dispatchers.IO) {
+            _isLoading.postValue(true)
+
+            repository.loadFiles(audioFilePaths)
+
+            _isLoading.postValue(false)
         }
     }
 

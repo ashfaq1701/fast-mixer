@@ -3,7 +3,7 @@
 //
 
 #include "MixingEngine.h"
-#include "mixing_jvm_env.h"
+#include "../jvm_env.h"
 #include <utility>
 
 MixingEngine::MixingEngine(SourceMapStore* sourceMapStore) : mSourceMapStore(sourceMapStore) {
@@ -118,8 +118,8 @@ void MixingEngine::addSourcesToPlayer(string* strArr, int count) {
 
 void MixingEngine::setStopPlayback() {
     call_in_attached_thread([&](auto env) {
-        if (kotlinMethodIdsPtr) {
-            env->CallStaticVoidMethod(kotlinMethodIdsPtr->mixingScreenVM, kotlinMethodIdsPtr->mixingScreenVMSetStopPlayback);
+        if (kotlinMixingMethodIdsPtr) {
+            env->CallStaticVoidMethod(kotlinMixingMethodIdsPtr->mixingScreenVM, kotlinMixingMethodIdsPtr->mixingScreenVMSetStopPlayback);
         }
     });
 }

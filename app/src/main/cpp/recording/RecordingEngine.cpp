@@ -6,7 +6,7 @@
 
 #include <cassert>
 #include <utility>
-#include "recording_jvm_env.h"
+#include "../jvm_env.h"
 #include "RecordingEngine.h"
 #include "../logging_macros.h"
 
@@ -15,7 +15,7 @@ RecordingEngine::RecordingEngine(
         string recordingSessionId,
         bool recordingScreenViewModelPassed): mAppDir(move(appDir)), mRecordingSessionId(move(recordingSessionId)) {
 
-    assert(StreamConstants::mInputChannelCount == StreamConstants::mOutputChannelCount);
+    assert(RecordingStreamConstants::mInputChannelCount == RecordingStreamConstants::mOutputChannelCount);
     auto recordingFilePath = mAppDir + "/recording.wav";
 
     mRecordingIO.setRecordingFilePath(recordingFilePath);
@@ -149,10 +149,30 @@ void RecordingEngine::resetCurrentMax() {
     mRecordingIO.resetCurrentMax();
 }
 
+void RecordingEngine::addSourcesToPlayer(string* strArr, int count) {
+    mRecordingIO.clearPlayerSources();
+
+    map<string, shared_ptr<DataSource>> playMap;
+
+    for (int i = 0; i < count; i++) {
+        auto it = mSourceMapStore->sourceMap.find(strArr[i]);
+        if (it != mSourceMapStore->sourceMap.end()) {
+            playMap.insert(pair<string, shared_ptr<FileDataSource>>(it->first, it->second));
+        }
+    }
+
+    for (int i = 0; i < count; i++) {
+        strArr[i].erase();
+    }
+
+    mRecordingIO.addSourceMap(playMap);
+}
+
 void RecordingEngine::setStopPlayback() {
     call_in_attached_thread([&](auto env) {
-        if (mRecordingScreenViewModelPassed && kotlinMethodIdsPtr) {
-            env->CallStaticVoidMethod(kotlinMethodIdsPtr->recordingScreenVM, kotlinMethodIdsPtr->recordingScreenVMTogglePlay);
+        if (mRecordingScreenViewModelPassed && kotlinRecordingMethodIdsPtr) {
+            env->CallStaticVoidMethod(kotlinRecordingMethodIdsPtr->recordingScreenVM,
+                                      kotlinRecordingMethodIdsPtr->recordingScreenVMTogglePlay);
         }
     });
 }

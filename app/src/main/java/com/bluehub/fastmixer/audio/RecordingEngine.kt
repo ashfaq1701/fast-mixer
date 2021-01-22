@@ -1,12 +1,10 @@
 package com.bluehub.fastmixer.audio
 
-import com.bluehub.fastmixer.screens.recording.RecordingScreenViewModel
-
 
 class RecordingEngine {
     companion object {
         init {
-            System.loadLibrary("recordingEngine")
+            System.loadLibrary("audioEngine")
         }
 
         @JvmStatic external fun create(
@@ -45,6 +43,8 @@ class RecordingEngine {
         @JvmStatic external fun setPlayHead(position: Int)
 
         @JvmStatic external fun getDurationInSeconds(): Int
+
+        @JvmStatic external fun addSources(filePaths: Array<String>)
 
         @JvmStatic external fun resetRecordingEngine()
     }

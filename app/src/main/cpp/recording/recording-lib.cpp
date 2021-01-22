@@ -6,36 +6,30 @@
 #include <string>
 #include "RecordingEngine.h"
 #include "../logging_macros.h"
-#include "recording_jvm_env.h"
+#include "../jvm_env.h"
 #include <android/asset_manager_jni.h>
 
-const char *TAG = "native-lib: %s";
 static RecordingEngine *recordingEngine = nullptr;
 
 extern "C" {
-    void prepare_kotlin_method_ids(JNIEnv *env) {
+    void prepare_kotlin_recording_method_ids(JNIEnv *env) {
         jclass recordingVMClass = env->FindClass("com/bluehub/fastmixer/screens/recording/RecordingScreenViewModel");
         auto recordingVmGlobal = env->NewGlobalRef(recordingVMClass);
         jmethodID togglePlay = env->GetStaticMethodID(static_cast<jclass>(recordingVmGlobal), "setStopPlay", "()V");
 
-        method_ids kotlinMethodIds {
+        recording_method_ids kotlinMethodIds {
             .recordingScreenVM = static_cast<jclass>(env->NewGlobalRef(recordingVmGlobal)),
             .recordingScreenVMTogglePlay = togglePlay
         };
-        kotlinMethodIdsPtr = make_shared<method_ids>(kotlinMethodIds);
+        kotlinRecordingMethodIdsPtr = make_shared<recording_method_ids>(kotlinMethodIds);
     }
 
-    void delete_kotlin_global_refs(JNIEnv *env) {
-        if (kotlinMethodIdsPtr && kotlinMethodIdsPtr->recordingScreenVM) {
-            env->DeleteGlobalRef(kotlinMethodIdsPtr->recordingScreenVM);
-            kotlinMethodIdsPtr.reset();
-            kotlinMethodIdsPtr = nullptr;
+    void delete_kotlin_recording_global_refs(JNIEnv *env) {
+        if (kotlinRecordingMethodIdsPtr && kotlinRecordingMethodIdsPtr->recordingScreenVM) {
+            env->DeleteGlobalRef(kotlinRecordingMethodIdsPtr->recordingScreenVM);
+            kotlinRecordingMethodIdsPtr.reset();
+            kotlinRecordingMethodIdsPtr = nullptr;
         }
-    }
-
-    extern "C" JNIEXPORT jint JNI_OnLoad(JavaVM* vm, void* reserved) {
-        java_recording_machine = vm;
-        return  JNI_VERSION_1_6;
     }
 
     JNIEXPORT jboolean JNICALL
@@ -44,7 +38,7 @@ extern "C" {
             auto appDir = java_str_to_c_str(env, appDirStr);
             auto recordingSessionId = java_str_to_c_str(env, recordingSessionIdStr);
 
-            prepare_kotlin_method_ids(env);
+            prepare_kotlin_recording_method_ids(env);
 
             recordingEngine = new RecordingEngine(appDir, recordingSessionId, recordingScreenViewModelPassed);
         }
@@ -56,7 +50,7 @@ extern "C" {
         if (!recordingEngine) {
             return;
         }
-        delete_kotlin_global_refs(env);
+        delete_kotlin_recording_global_refs(env);
         delete recordingEngine;
         recordingEngine = nullptr;
     }
@@ -194,6 +188,24 @@ extern "C" {
             return 0;
         }
         return recordingEngine->getDurationInSeconds();
+    }
+
+    JNIEXPORT void JNICALL
+    Java_com_bluehub_fastmixer_audio_RecordingEngine_addSources(JNIEnv *env, jclass, jobjectArray filePaths) {
+        if (!recordingEngine) {
+            LOGE("addSources: recordingEngine is null, you must call create() method before calling this method");
+            return;
+        }
+        jint numElements = env->GetArrayLength(filePaths);
+        string strArr[numElements];
+
+        for (int i = 0; i < numElements; i++) {
+            jstring elem = (jstring) env->GetObjectArrayElement(filePaths, i);
+            strArr[i] = java_str_to_c_str(env, elem);
+        }
+
+        string* strPtr = strArr;
+        recordingEngine->addSourcesToPlayer(move(strPtr), numElements);
     }
 
     JNIEXPORT void JNICALL

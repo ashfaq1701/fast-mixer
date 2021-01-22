@@ -60,6 +60,8 @@ public:
 
     bool startPlaybackCallable();
 
+    void addSourcesToPlayer(string* strArr, int count);
+
 private:
 
     const char* TAG = "Recording Engine:: %s";

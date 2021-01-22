@@ -65,6 +65,7 @@ class RecordingScreen : PermissionFragment<RecordingScreenViewModel>(ViewModelTy
 
     fun initUI() {
         viewModel.eventIsRecording.observe(viewLifecycleOwner, { isRecording ->
+            dataBinding.mixingPlayEnabled.isEnabled = !isRecording
             if (isRecording) {
                 viewModel.startDrawingVisualizer()
                 viewModel.startUpdatingTimer()

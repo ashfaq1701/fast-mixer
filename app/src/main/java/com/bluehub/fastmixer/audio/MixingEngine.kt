@@ -3,7 +3,7 @@ package com.bluehub.fastmixer.audio
 class MixingEngine {
     companion object {
         init {
-            System.loadLibrary("mixingEngine")
+            System.loadLibrary("audioEngine")
         }
 
         @JvmStatic external fun create(): Boolean

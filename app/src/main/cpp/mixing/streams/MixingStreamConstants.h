@@ -7,7 +7,7 @@
 
 #include "oboe/Definitions.h"
 
-class StreamConstants {
+class MixingStreamConstants {
 public:
     static oboe::AudioApi mAudioApi;
     static oboe::AudioFormat mFormat;

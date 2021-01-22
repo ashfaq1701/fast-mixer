@@ -7,7 +7,12 @@
 
 #include <jni.h>
 
-struct method_ids {
+struct mixing_method_ids {
+    jclass mixingScreenVM;
+    jmethodID mixingScreenVMSetStopPlayback;
+};
+
+struct recording_method_ids {
     jclass recordingScreenVM;
     jmethodID recordingScreenVMTogglePlay;
 };

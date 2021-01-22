@@ -53,7 +53,6 @@ void Player::renderAudio(float *targetData, int32_t numFrames) {
         int64_t maxTotalSourceFrames = getMaxTotalSourceFrames();
 
         int64_t framesToRenderFromData = numFrames;
-
         if (!mIsLooping && mReadFrameIndex + numFrames >= maxTotalSourceFrames) {
             framesToRenderFromData = maxTotalSourceFrames - mReadFrameIndex;
             mIsPlaying = false;

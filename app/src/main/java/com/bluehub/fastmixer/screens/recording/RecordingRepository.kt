@@ -3,18 +3,15 @@ package com.bluehub.fastmixer.screens.recording
 import android.content.Context
 import android.os.Build
 import android.os.Environment
-import com.bluehub.fastmixer.audio.MixingEngineProxy
 import com.bluehub.fastmixer.audio.RecordingEngineProxy
 import java.io.File
-import java.nio.file.Files
-import java.nio.file.Paths
-import java.nio.file.StandardCopyOption
+import java.nio.file.*
 import java.util.*
 import javax.inject.Inject
 
-class RecordingRepository @Inject constructor(
-    private val recordingEngineProxy: RecordingEngineProxy,
-    private val mixingEngineProxy: MixingEngineProxy) {
+class RecordingRepository @Inject
+    constructor(private val recordingEngineProxy: RecordingEngineProxy) {
+
     private val recordingSessionId = UUID.randomUUID().toString()
     private lateinit var cacheDir: String
 
@@ -83,6 +80,10 @@ class RecordingRepository @Inject constructor(
                 )
             }
         }
+    }
+
+    fun loadFiles(fileArr: List<String>) {
+        recordingEngineProxy.addSources(fileArr.toTypedArray())
     }
 
     fun getCurrentMax() = recordingEngineProxy.getCurrentMax()

@@ -11,42 +11,41 @@
 #include "MixingEngine.h"
 #include "../SourceMapStore.h"
 #include "../logging_macros.h"
-#include "mixing_jvm_env.h"
+#include "../jvm_env.h"
 
-const char *TAG = "mixing-lib: %s";
 static MixingEngine *mixingEngine = nullptr;
 static SourceMapStore *sourceMapStore = nullptr;
 
 extern "C" {
-    void prepare_kotlin_method_ids(JNIEnv *env) {
+    extern "C" JNIEXPORT jint JNI_OnLoad(JavaVM* vm, void* reserved) {
+        java_machine = vm;
+        return  JNI_VERSION_1_6;
+    }
+
+    void prepare_kotlin_mixing_method_ids(JNIEnv *env) {
         jclass recordingVMClass = env->FindClass("com/bluehub/fastmixer/screens/mixing/MixingScreenViewModel");
         auto recordingVmGlobal = env->NewGlobalRef(recordingVMClass);
         jmethodID setStopPlayback = env->GetStaticMethodID(static_cast<jclass>(recordingVmGlobal), "setStopPlay", "()V");
 
-        method_ids kotlinMethodIds {
+        mixing_method_ids kotlinMethodIds {
             .mixingScreenVM = static_cast<jclass>(env->NewGlobalRef(recordingVmGlobal)),
             .mixingScreenVMSetStopPlayback = setStopPlayback
         };
-        kotlinMethodIdsPtr = make_shared<method_ids>(kotlinMethodIds);
+        kotlinMixingMethodIdsPtr = make_shared<mixing_method_ids>(kotlinMethodIds);
     }
 
-    void delete_kotlin_global_refs(JNIEnv *env) {
-        if (kotlinMethodIdsPtr && kotlinMethodIdsPtr->mixingScreenVM) {
-            env->DeleteGlobalRef(kotlinMethodIdsPtr->mixingScreenVM);
-            kotlinMethodIdsPtr.reset();
-            kotlinMethodIdsPtr = nullptr;
+    void delete_kotlin_mixing_global_refs(JNIEnv *env) {
+        if (kotlinMixingMethodIdsPtr && kotlinMixingMethodIdsPtr->mixingScreenVM) {
+            env->DeleteGlobalRef(kotlinMixingMethodIdsPtr->mixingScreenVM);
+            kotlinMixingMethodIdsPtr.reset();
+            kotlinMixingMethodIdsPtr = nullptr;
         }
-    }
-
-    extern "C" JNIEXPORT jint JNI_OnLoad(JavaVM* vm, void* reserved) {
-        java_mixing_machine = vm;
-        return  JNI_VERSION_1_6;
     }
 
     JNIEXPORT jboolean JNICALL
     Java_com_bluehub_fastmixer_audio_MixingEngine_create(JNIEnv *env, jclass) {
         if (!mixingEngine) {
-            prepare_kotlin_method_ids(env);
+            prepare_kotlin_mixing_method_ids(env);
 
             sourceMapStore = SourceMapStore::getInstance();
             mixingEngine = new MixingEngine(sourceMapStore);
@@ -60,7 +59,7 @@ extern "C" {
             LOGE("delete: mixingEngine is null, you must call create() method before calling this method");
             return;
         }
-        delete_kotlin_global_refs(env);
+        delete_kotlin_mixing_global_refs(env);
         mixingEngine = nullptr;
     }
 

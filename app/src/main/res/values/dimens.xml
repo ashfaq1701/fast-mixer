@@ -16,6 +16,8 @@
     <dimen name="recording_visualizer_chunk_max_width">160dp</dimen>
     <dimen name="recording_visualizer_chunk_min_width">0dp</dimen>
 
+    <dimen name="recording_screen_checkbox_margin_start">20dp</dimen>
+
     <dimen name="card_view_elevation">10dp</dimen>
 
     <dimen name="bottom_drawer_height">100dp</dimen>

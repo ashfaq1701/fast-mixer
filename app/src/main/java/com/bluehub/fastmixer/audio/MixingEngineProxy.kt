@@ -1,6 +1,5 @@
 package com.bluehub.fastmixer.audio
 
-import com.bluehub.fastmixer.audio.MixingEngine
 import javax.inject.Inject
 
 class MixingEngineProxy @Inject constructor() {

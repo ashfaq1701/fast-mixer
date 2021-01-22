@@ -7,7 +7,7 @@
 
 #include "oboe/Definitions.h"
 
-class StreamConstants {
+class RecordingStreamConstants {
 public:
     static int32_t mSampleRate;
     static int32_t mPlaybackSampleRate;

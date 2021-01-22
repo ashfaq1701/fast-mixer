@@ -241,6 +241,10 @@ class MixingScreenViewModel @Inject constructor(override val context: Context,
         playList.forEach { filePath ->
             fileWaveViewStore.setFilePaused(filePath)
         }
+
+        if (_isGroupPlaying.value == true) {
+            _isGroupPlaying.postValue(false)
+        }
     }
 
     fun resetItemRemovedIdx() {

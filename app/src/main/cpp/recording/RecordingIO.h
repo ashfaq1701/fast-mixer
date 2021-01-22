@@ -10,7 +10,7 @@
 #include "../audio/Player.h"
 #include "../taskqueue/TaskQueue.h"
 #include "oboe/Definitions.h"
-#include "streams/StreamConstants.h"
+#include "streams/RecordingStreamConstants.h"
 
 #ifndef MODULE_NAME
 #define MODULE_NAME  "RecordingIO"
@@ -63,7 +63,9 @@ public:
 
     void resetProperties();
 
-    shared_ptr<Player> mPlayer {nullptr};
+    void clearPlayerSources();
+
+    void addSourceMap(map<string, shared_ptr<DataSource>> playMap);
 
 private:
     const char* TAG = "RecordingIO:: %d";
@@ -73,6 +75,8 @@ private:
     string mRecordingFilePath;
 
     shared_ptr<SndfileHandle> mRecordingFile {nullptr};
+    shared_ptr<Player> mPlayer {nullptr};
+    shared_ptr<FileDataSource> mDataSource {nullptr};
 
     int32_t mTotalSamples = 0;
     int32_t mIteration = 1;

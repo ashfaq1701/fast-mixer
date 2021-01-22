@@ -41,5 +41,7 @@ class RecordingEngineProxy @Inject constructor(){
 
     fun getDurationInSeconds(): Int = RecordingEngine.getDurationInSeconds()
 
+    fun addSources(filePaths: Array<String>) = RecordingEngine.addSources(filePaths)
+
     fun resetRecordingEngine() = RecordingEngine.resetRecordingEngine()
 }

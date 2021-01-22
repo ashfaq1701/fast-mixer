@@ -9,7 +9,7 @@
 #include <oboe/AudioStream.h>
 #include "../SourceMapStore.h"
 #include "../logging_macros.h"
-#include "streams/PlaybackStream.h"
+#include "streams/MixingPlaybackStream.h"
 #include "MixingIO.h"
 #include "map"
 
@@ -47,7 +47,7 @@ private:
 
     mutex playbackStreamMtx;
 
-    PlaybackStream playbackStream = PlaybackStream(&mMixingIO);
+    MixingPlaybackStream playbackStream = MixingPlaybackStream(&mMixingIO);
 
     bool startPlaybackCallable();
 
