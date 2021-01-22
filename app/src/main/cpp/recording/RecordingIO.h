@@ -36,10 +36,11 @@ public:
     void flush_buffer();
 
     void setRecordingFilePath(string recordingFilePath) {
-        mRecordingFilePath = recordingFilePath;
+        mRecordingFilePath = move(recordingFilePath);
     }
 
-    bool setup_audio_source();
+    shared_ptr<FileDataSource> setup_audio_source();
+    void add_source_to_player(shared_ptr<DataSource> fileDataSource);
     void clear_audio_source();
     void pause_audio_source();
 
@@ -76,7 +77,6 @@ private:
 
     shared_ptr<SndfileHandle> mRecordingFile {nullptr};
     shared_ptr<Player> mPlayer {nullptr};
-    shared_ptr<FileDataSource> mDataSource {nullptr};
 
     int32_t mTotalSamples = 0;
     int32_t mIteration = 1;

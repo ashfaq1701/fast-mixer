@@ -60,13 +60,14 @@ bool RecordingEngine::startPlaybackCallable() {
         }
     }
 
-    auto setupSourceResult = mRecordingIO.setup_audio_source();
+    mDataSource = move(mRecordingIO.setup_audio_source());
 
-    if (setupSourceResult) {
+    if (mDataSource) {
+        mRecordingIO.add_source_to_player(mDataSource);
         return playbackStream.startStream() == oboe::Result::OK;
     }
 
-    return setupSourceResult;
+    return false;
 }
 
 bool RecordingEngine::startPlayback() {
@@ -80,6 +81,7 @@ void RecordingEngine::stopAndResetPlayback() {
     lock_guard<mutex> lock(playbackStreamMtx);
     LOGD(TAG, "stopAndResetPlayback()");
     mRecordingIO.clear_audio_source();
+    mDataSource.reset();
     closePlaybackStream();
 }
 

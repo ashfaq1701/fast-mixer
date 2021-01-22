@@ -77,6 +77,8 @@ private:
     SourceMapStore* mSourceMapStore;
     RecordingIO mRecordingIO;
 
+    shared_ptr<FileDataSource> mDataSource {nullptr};
+
     RecordingStream recordingStream = RecordingStream(&mRecordingIO);
     LivePlaybackStream livePlaybackStream = LivePlaybackStream(&mRecordingIO);
     PlaybackStream playbackStream = PlaybackStream(&mRecordingIO);

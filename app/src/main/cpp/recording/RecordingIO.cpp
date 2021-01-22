@@ -30,10 +30,10 @@ bool RecordingIO::check_if_reallocated() {
     return is_reallocated;
 }
 
-bool RecordingIO::setup_audio_source() {
+shared_ptr<FileDataSource> RecordingIO::setup_audio_source() {
     if (!validate_audio_file()) {
         mStopPlaybackCallback();
-        return false;
+        return nullptr;
     }
 
     AudioProperties targetProperties{
@@ -41,18 +41,16 @@ bool RecordingIO::setup_audio_source() {
             .sampleRate = RecordingStreamConstants::mSampleRate
     };
 
-    mDataSource = shared_ptr<FileDataSource>(
+    return shared_ptr<FileDataSource> {
             FileDataSource::newFromCompressedFile(mRecordingFilePath.c_str(), targetProperties)
-            );
+    };
+}
 
-    if (!mDataSource) {
-        return false;
-    }
-
+void RecordingIO::add_source_to_player(shared_ptr<DataSource> fileDataSource) {
     mPlayer->clearSources();
 
     map<string, shared_ptr<DataSource>> sourceMap;
-    sourceMap.insert(pair<string, shared_ptr<DataSource>>(mRecordingFilePath, mDataSource));
+    sourceMap.insert(pair<string, shared_ptr<DataSource>>(mRecordingFilePath, fileDataSource));
     mPlayer->addSourceMap(sourceMap);
     mPlayer->setPlaying(true);
 
@@ -61,8 +59,6 @@ bool RecordingIO::setup_audio_source() {
         playHead = 0;
         mPlayer->setPlayHead(playHead);
     }
-
-    return true;
 }
 
 void RecordingIO::pause_audio_source() {
@@ -74,7 +70,6 @@ void RecordingIO::pause_audio_source() {
 void RecordingIO::clear_audio_source() {
     pause_audio_source();
     mPlayer->clearSources();
-    mDataSource.reset();
 }
 
 bool RecordingIO::validate_audio_file() {
