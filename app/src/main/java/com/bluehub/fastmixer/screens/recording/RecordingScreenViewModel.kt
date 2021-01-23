@@ -242,7 +242,9 @@ class RecordingScreenViewModel @Inject constructor (override val context: Contex
     }
 
     fun stopPlay() {
-        _eventIsPlaying.postValue(false)
+        if (_eventIsPlaying.value == true) {
+            _eventIsPlaying.postValue(false)
+        }
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 repository.stopPlaying()

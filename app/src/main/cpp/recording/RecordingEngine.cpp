@@ -60,7 +60,10 @@ bool RecordingEngine::startPlaybackCallable() {
         }
     }
 
-    mDataSource = move(mRecordingIO.setup_audio_source());
+    mDataSource.reset();
+    mDataSource = shared_ptr<FileDataSource> {
+        move(mRecordingIO.setup_audio_source())
+    };
 
     if (mDataSource) {
         mRecordingIO.add_source_to_player(mDataSource);
@@ -80,8 +83,6 @@ bool RecordingEngine::startPlayback() {
 void RecordingEngine::stopAndResetPlayback() {
     lock_guard<mutex> lock(playbackStreamMtx);
     LOGD(TAG, "stopAndResetPlayback()");
-    mRecordingIO.clear_audio_source();
-    mDataSource.reset();
     closePlaybackStream();
 }
 
