@@ -19,7 +19,6 @@ import com.bluehub.fastmixer.screens.mixing.AudioFileStore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
 
@@ -62,6 +61,10 @@ class RecordingScreenViewModel @Inject constructor (override val context: Contex
     private val _eventIsPlaying = MutableLiveData<Boolean>(false)
     val eventIsPlaying: LiveData<Boolean>
         get() = _eventIsPlaying
+
+    private val _eventIsPlayingWithMixingTracks = MutableLiveData<Boolean>(false)
+    val eventIsPlayingWithMixingTracks: LiveData<Boolean>
+        get() = _eventIsPlayingWithMixingTracks
 
     private val _eventLivePlaybackSet = MutableLiveData<Boolean>(false)
     val eventLivePlayback: LiveData<Boolean>
@@ -129,6 +132,14 @@ class RecordingScreenViewModel @Inject constructor (override val context: Contex
                 }
             }
         }
+
+        if (_eventIsPlayingWithMixingTracks.value == true) {
+            viewModelScope.launch {
+                withContext(Dispatchers.IO) {
+                    repository.restartPlaybackWithMixingTracks()
+                }
+            }
+        }
     }
 
     init {
@@ -183,7 +194,7 @@ class RecordingScreenViewModel @Inject constructor (override val context: Contex
                     repository.resetCurrentMax()
 
                     if (mixingPlayActive.value == true) {
-                        repository.startMixingScreenPlaying()
+                        repository.startMixingTracksPlaying()
                     }
 
                     repository.startRecording()
@@ -230,6 +241,8 @@ class RecordingScreenViewModel @Inject constructor (override val context: Contex
     fun togglePlay() {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
+                _isLoading.postValue(true)
+
                 if(_eventIsPlaying.value == false) {
                     if (repository.startPlaying()) {
                         _eventIsPlaying.postValue(true)
@@ -238,6 +251,27 @@ class RecordingScreenViewModel @Inject constructor (override val context: Contex
                     repository.pausePlaying()
                     _eventIsPlaying.postValue(false)
                 }
+
+                _isLoading.postValue(false)
+            }
+        }
+    }
+
+    fun togglePlayWithMixingTracks() {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                _isLoading.postValue(true)
+
+                if(_eventIsPlayingWithMixingTracks.value == false) {
+                    if (repository.startPlayingWithMixingTracks()) {
+                        _eventIsPlayingWithMixingTracks.postValue(true)
+                    }
+                } else {
+                    repository.pausePlaying()
+                    _eventIsPlayingWithMixingTracks.postValue(false)
+                }
+
+                _isLoading.postValue(false)
             }
         }
     }
@@ -245,7 +279,19 @@ class RecordingScreenViewModel @Inject constructor (override val context: Contex
     fun startPlayback() {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
+                _isLoading.postValue(true)
                 repository.startPlaying()
+                _isLoading.postValue(false)
+            }
+        }
+    }
+
+    fun startPlaybackWithMixingTracks() {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                _isLoading.postValue(true)
+                repository.startPlayingWithMixingTracksWithoutSetup()
+                _isLoading.postValue(false)
             }
         }
     }
@@ -261,6 +307,9 @@ class RecordingScreenViewModel @Inject constructor (override val context: Contex
     fun stopPlay() {
         if (_eventIsPlaying.value == true) {
             _eventIsPlaying.postValue(false)
+        }
+        if (_eventIsPlayingWithMixingTracks.value == true) {
+            _eventIsPlayingWithMixingTracks.postValue(false)
         }
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
@@ -314,6 +363,12 @@ class RecordingScreenViewModel @Inject constructor (override val context: Contex
                     if (it) {
                         repository.stopPlaying()
                         _eventIsPlaying.postValue(false)
+                    }
+                }
+                _eventIsPlayingWithMixingTracks.value?.let {
+                    if (it) {
+                        repository.stopPlaying()
+                        _eventIsPlayingWithMixingTracks.postValue(false)
                     }
                 }
                 repository.copyRecordedFile(context)

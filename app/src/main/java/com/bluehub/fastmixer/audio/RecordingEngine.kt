@@ -24,6 +24,10 @@ class RecordingEngine {
 
         @JvmStatic external fun startPlayback(): Boolean
 
+        @JvmStatic external fun startPlaybackWithMixingTracks(): Boolean
+
+        @JvmStatic external fun startPlayingWithMixingTracksWithoutSetup()
+
         @JvmStatic external fun startMixingTracksPlayback(): Boolean
 
         @JvmStatic external fun stopMixingTracksPlayback()
@@ -35,6 +39,8 @@ class RecordingEngine {
         @JvmStatic external fun flushWriteBuffer()
 
         @JvmStatic external fun restartPlayback()
+
+        @JvmStatic external fun restartPlaybackWithMixingTracks()
 
         @JvmStatic external fun getCurrentMax(): Int
 

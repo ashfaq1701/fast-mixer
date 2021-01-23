@@ -60,6 +60,27 @@ bool RecordingEngine::startPlayback() {
     return startPlaybackCallable();
 }
 
+bool RecordingEngine::startPlaybackWithMixingTracks() {
+    lock_guard<mutex> lock(playbackStreamMtx);
+    LOGD(TAG, "startPlaybackWithMixingTracks(): ");
+
+    return startPlaybackWithMixingTracksCallable();
+}
+
+void RecordingEngine::startPlayingWithMixingTracksWithoutSetup() {
+    lock_guard<mutex> lock(playbackStreamMtx);
+    LOGD(TAG, "startPlayingWithMixingTracksWithoutSetup(): ");
+
+    if (!playbackStream.mStream) {
+        if (playbackStream.openStream() != oboe::Result::OK) {
+            return;
+        }
+    }
+
+    mRecordingIO.setPlaybackPlaying(true);
+    playbackStream.startStream();
+}
+
 bool RecordingEngine::startPlaybackCallable() {
     if (!playbackStream.mStream) {
         if (playbackStream.openStream() != oboe::Result::OK) {
@@ -73,11 +94,45 @@ bool RecordingEngine::startPlaybackCallable() {
     };
 
     if (mDataSource) {
+        mRecordingIO.clearPlayerSources();
         mRecordingIO.add_source_to_player(mDataSource);
         return playbackStream.startStream() == oboe::Result::OK;
     }
 
     return false;
+}
+
+bool RecordingEngine::startPlaybackWithMixingTracksCallable() {
+    if (!playbackStream.mStream) {
+        if (playbackStream.openStream() != oboe::Result::OK) {
+            return false;
+        }
+    }
+
+    mDataSource.reset();
+    mDataSource = shared_ptr<FileDataSource> {
+            move(mRecordingIO.setup_audio_source())
+    };
+
+    map<string, shared_ptr<DataSource>> sourceMap;
+    for (auto it = mSourceMapStore->sourceMap.begin(); it != mSourceMapStore->sourceMap.end(); it++) {
+        sourceMap.insert(pair<string, shared_ptr<DataSource>>(it->first, it->second));
+    }
+
+    mRecordingIO.clearPlayerSources();
+
+    if (mDataSource) {
+        mRecordingIO.addSourceMapWithRecordedSource(sourceMap, mDataSource);
+    } else {
+        mRecordingIO.addSourceMap(sourceMap);
+    }
+
+    if (sourceMap.size() == 0 && mDataSource == nullptr) {
+        return false;
+    }
+
+    mRecordingIO.setPlaybackPlaying(true);
+    return playbackStream.startStream() == oboe::Result::OK;
 }
 
 bool RecordingEngine::startMixingTracksPlayback() {
@@ -103,6 +158,7 @@ bool RecordingEngine::startMixingTracksPlaybackCallable() {
 
     bool checkResult = mRecordingIO.checkPlayerSources(sourceMap);
     if (!checkResult) {
+        mRecordingIO.clearPlayerSources();
         mRecordingIO.addSourceMap(sourceMap);
     }
 
@@ -172,7 +228,7 @@ void RecordingEngine::closePlaybackStream() {
 void RecordingEngine::pausePlayback() {
     lock_guard<mutex> lock(playbackStreamMtx);
     LOGD(TAG, "pausePlayback(): ");
-    mRecordingIO.pause_audio_source();
+    mRecordingIO.setPlaybackPlaying(false);
     playbackStream.stopStream();
 }
 
@@ -200,6 +256,12 @@ void RecordingEngine::restartPlayback() {
     lock_guard<mutex> lock(playbackStreamMtx);
     stopPlaybackCallable();
     startPlaybackCallable();
+}
+
+void RecordingEngine::restartPlaybackWithMixingTracks() {
+    lock_guard<mutex> lock(playbackStreamMtx);
+    stopPlaybackCallable();
+    startPlaybackWithMixingTracksCallable();
 }
 
 void RecordingEngine::flushWriteBuffer() {

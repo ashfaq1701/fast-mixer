@@ -85,6 +85,16 @@ class RecordingScreen : PermissionFragment<RecordingScreenViewModel>(ViewModelTy
             }
         })
 
+        viewModel.eventIsPlayingWithMixingTracks.observe(viewLifecycleOwner, { isPlaying ->
+            if (!isPlaying) {
+                dataBinding.togglePlayWithMixingTracks.text = getString(R.string.play_mixed_label)
+                viewModel.stopTrackingSeekbarTimer()
+            } else {
+                dataBinding.togglePlayWithMixingTracks.text = getString(R.string.pause_label)
+                viewModel.startTrackingSeekbar()
+            }
+        })
+
         viewModel.eventGoBack.observe(viewLifecycleOwner, { goBack ->
             if (goBack) {
                 val action = actionRecordingScreenToMixingScreen()
@@ -137,7 +147,8 @@ class RecordingScreen : PermissionFragment<RecordingScreenViewModel>(ViewModelTy
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar) {
-                if (viewModel.eventIsPlaying.value == true) {
+                if (viewModel.eventIsPlaying.value == true
+                    || viewModel.eventIsPlayingWithMixingTracks.value == true) {
                     viewModel.pausePlayback()
                 }
             }
@@ -145,6 +156,8 @@ class RecordingScreen : PermissionFragment<RecordingScreenViewModel>(ViewModelTy
             override fun onStopTrackingTouch(seekBar: SeekBar) {
                 if (viewModel.eventIsPlaying.value == true) {
                     viewModel.startPlayback()
+                } else if (viewModel.eventIsPlayingWithMixingTracks.value == true) {
+                    viewModel.startPlaybackWithMixingTracks()
                 }
             }
         })

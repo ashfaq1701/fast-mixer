@@ -31,7 +31,15 @@ class RecordingRepository @Inject
         return recordingEngineProxy.startPlayback()
     }
 
-    fun startMixingScreenPlaying(): Boolean {
+    fun startPlayingWithMixingTracks(): Boolean {
+        return recordingEngineProxy.startPlaybackWithMixingTracks()
+    }
+
+    fun startPlayingWithMixingTracksWithoutSetup() {
+        recordingEngineProxy.startPlayingWithMixingTracksWithoutSetup()
+    }
+
+    fun startMixingTracksPlaying(): Boolean {
         return recordingEngineProxy.startMixingTracksPlayback()
     }
 
@@ -57,6 +65,10 @@ class RecordingRepository @Inject
 
     fun restartPlayback() {
         recordingEngineProxy.restartPlayback()
+    }
+
+    fun restartPlaybackWithMixingTracks() {
+        recordingEngineProxy.restartPlaybackWithMixingTracks()
     }
 
     fun deleteAudioEngine() {

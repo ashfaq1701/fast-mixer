@@ -44,8 +44,6 @@ FileDataSource* RecordingIO::setup_audio_source() {
 }
 
 void RecordingIO::add_source_to_player(shared_ptr<DataSource> fileDataSource) {
-    mPlayer->clearSources();
-
     map<string, shared_ptr<DataSource>> sourceMap;
     sourceMap.insert(pair<string, shared_ptr<DataSource>>(mRecordingFilePath, fileDataSource));
     mPlayer->addSourceMap(sourceMap);
@@ -56,17 +54,6 @@ void RecordingIO::add_source_to_player(shared_ptr<DataSource> fileDataSource) {
         playHead = 0;
         mPlayer->setPlayHead(playHead);
     }
-}
-
-void RecordingIO::pause_audio_source() {
-    if (mPlayer) {
-        mPlayer->setPlaying(false);
-    }
-}
-
-void RecordingIO::clear_audio_source() {
-    pause_audio_source();
-    mPlayer->clearSources();
 }
 
 bool RecordingIO::validate_audio_file() {
@@ -237,9 +224,7 @@ int32_t RecordingIO::getCurrentPlaybackProgress() {
 }
 
 void RecordingIO::setPlayHead(int position) {
-    if (mPlayer) {
-        mPlayer->setPlayHead(position);
-    }
+    mPlayer->setPlayHead(position);
 }
 
 int RecordingIO::getDurationInSeconds() {
@@ -247,7 +232,6 @@ int RecordingIO::getDurationInSeconds() {
 }
 
 void RecordingIO::clearPlayerSources() {
-    mPlayer->resetPlayHead();
     mPlayer->clearSources();
 }
 
@@ -256,6 +240,11 @@ void RecordingIO::setPlaybackPlaying(bool playing) {
 }
 
 void RecordingIO::addSourceMap(map<string, shared_ptr<DataSource>> playMap) {
+    mPlayer->addSourceMap(playMap);
+}
+
+void RecordingIO::addSourceMapWithRecordedSource(map<string, shared_ptr<DataSource>> playMap, shared_ptr<DataSource> recordedSource) {
+    playMap.insert(pair<string, shared_ptr<DataSource>>(mRecordingFilePath, recordedSource));
     mPlayer->addSourceMap(playMap);
 }
 

@@ -76,6 +76,17 @@
             android:onClick="@{() -> viewModel.togglePlay()}"
             android:text="@string/play_label"
             app:layout_constraintStart_toEndOf="@id/toggle_record"
+            app:layout_constraintEnd_toStartOf="@+id/toggle_play_with_mixing_tracks"
+            app:layout_constraintBottom_toTopOf="@id/go_back" />
+
+        <Button
+            android:id="@+id/toggle_play_with_mixing_tracks"
+            android:layout_width="@dimen/record_button_width"
+            android:layout_height="@dimen/record_button_height"
+            android:textSize="@dimen/button_text_size"
+            android:onClick="@{() -> viewModel.togglePlayWithMixingTracks()}"
+            android:text="@string/play_mixed_label"
+            app:layout_constraintStart_toEndOf="@id/toggle_play"
             app:layout_constraintEnd_toStartOf="@+id/reset"
             app:layout_constraintBottom_toTopOf="@id/go_back" />
 

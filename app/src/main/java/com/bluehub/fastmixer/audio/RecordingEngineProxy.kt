@@ -21,6 +21,10 @@ class RecordingEngineProxy @Inject constructor(){
 
     fun startPlayback(): Boolean = RecordingEngine.startPlayback()
 
+    fun startPlaybackWithMixingTracks(): Boolean = RecordingEngine.startPlaybackWithMixingTracks()
+
+    fun startPlayingWithMixingTracksWithoutSetup() = RecordingEngine.startPlayingWithMixingTracksWithoutSetup()
+
     fun startMixingTracksPlayback(): Boolean = RecordingEngine.startMixingTracksPlayback()
 
     fun stopMixingTracksPlayback() = RecordingEngine.stopMixingTracksPlayback()
@@ -32,6 +36,8 @@ class RecordingEngineProxy @Inject constructor(){
     fun flushWriteBuffer() = RecordingEngine.flushWriteBuffer()
 
     fun restartPlayback() = RecordingEngine.restartPlayback()
+
+    fun restartPlaybackWithMixingTracks() = RecordingEngine.restartPlaybackWithMixingTracks()
 
     fun getCurrentMax(): Int = RecordingEngine.getCurrentMax()
 

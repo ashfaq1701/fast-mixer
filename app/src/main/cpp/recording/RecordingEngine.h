@@ -32,6 +32,8 @@ public:
     void stopLivePlayback();
 
     bool startPlayback();
+    bool startPlaybackWithMixingTracks();
+    void startPlayingWithMixingTracksWithoutSetup();
     bool startMixingTracksPlayback();
     void stopMixingTracksPlayback();
     void stopAndResetPlayback();
@@ -39,6 +41,7 @@ public:
 
     void flushWriteBuffer();
     void restartPlayback();
+    void restartPlaybackWithMixingTracks();
 
     int getCurrentMax();
 
@@ -61,6 +64,8 @@ public:
     void stopPlaybackCallable();
 
     bool startPlaybackCallable();
+
+    bool startPlaybackWithMixingTracksCallable();
 
     bool startMixingTracksPlaybackCallable();
 

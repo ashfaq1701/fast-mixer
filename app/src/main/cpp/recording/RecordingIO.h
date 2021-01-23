@@ -42,7 +42,6 @@ public:
     FileDataSource* setup_audio_source();
     void add_source_to_player(shared_ptr<DataSource> fileDataSource);
     void clear_audio_source();
-    void pause_audio_source();
 
     void sync_live_playback();
 
@@ -71,6 +70,8 @@ public:
     void setPlaybackPlaying(bool playing);
 
     void addSourceMap(map<string, shared_ptr<DataSource>> playMap);
+
+    void addSourceMapWithRecordedSource(map<string, shared_ptr<DataSource>> playMap, shared_ptr<DataSource> recordedSource);
 
     bool checkPlayerSources(map<string, shared_ptr<DataSource>> playMap);
 
