@@ -50,6 +50,8 @@ public:
 
     int getCurrentMax();
 
+    int64_t getPlayerMaxTotalSourceFrames();
+
     void resetCurrentMax();
 
     void setStopPlaybackCallback(function<void(void)> stopPlaybackCallback);
@@ -66,7 +68,11 @@ public:
 
     void clearPlayerSources();
 
+    void setPlaybackPlaying(bool playing);
+
     void addSourceMap(map<string, shared_ptr<DataSource>> playMap);
+
+    bool checkPlayerSources(map<string, shared_ptr<DataSource>> playMap);
 
 private:
     const char* TAG = "RecordingIO:: %d";

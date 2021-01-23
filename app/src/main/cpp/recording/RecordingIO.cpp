@@ -32,7 +32,6 @@ bool RecordingIO::check_if_reallocated() {
 
 FileDataSource* RecordingIO::setup_audio_source() {
     if (!validate_audio_file()) {
-        mStopPlaybackCallback();
         return nullptr;
     }
 
@@ -75,16 +74,6 @@ bool RecordingIO::validate_audio_file() {
 }
 
 void RecordingIO::read_playback(float *targetData, int32_t numFrames) {
-    if (!validate_audio_file()) {
-        mStopPlaybackCallback();
-        return;
-    }
-
-    if (!mPlayer) {
-        mStopPlaybackCallback();
-        return;
-    }
-
     mPlayer->renderAudio(targetData, numFrames);
 }
 
@@ -223,6 +212,10 @@ int RecordingIO::getCurrentMax() {
     return temp;
 }
 
+int64_t RecordingIO::getPlayerMaxTotalSourceFrames() {
+    return mPlayer->getMaxTotalSourceFrames();
+}
+
 void RecordingIO::resetCurrentMax() {
     currentMax = 0;
 }
@@ -240,10 +233,7 @@ int RecordingIO::getTotalRecordedFrames() {
 }
 
 int32_t RecordingIO::getCurrentPlaybackProgress() {
-    if (mPlayer) {
-        return mPlayer->getPlayHead();
-    }
-    return 0;
+    return mPlayer->getPlayHead();
 }
 
 void RecordingIO::setPlayHead(int position) {
@@ -261,8 +251,16 @@ void RecordingIO::clearPlayerSources() {
     mPlayer->clearSources();
 }
 
+void RecordingIO::setPlaybackPlaying(bool playing) {
+    mPlayer->setPlaying(playing);
+}
+
 void RecordingIO::addSourceMap(map<string, shared_ptr<DataSource>> playMap) {
     mPlayer->addSourceMap(playMap);
+}
+
+bool RecordingIO::checkPlayerSources(map<string, shared_ptr<DataSource>> playMap) {
+    return mPlayer->checkPlayerSources(playMap);
 }
 
 void RecordingIO::resetProperties() {

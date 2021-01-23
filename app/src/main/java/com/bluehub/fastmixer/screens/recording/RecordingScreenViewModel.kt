@@ -177,22 +177,39 @@ class RecordingScreenViewModel @Inject constructor (override val context: Contex
 
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
+                _isLoading.postValue(true)
+
                 if (_eventIsRecording.value == false) {
                     repository.resetCurrentMax()
+
+                    if (mixingPlayActive.value == true) {
+                        repository.startMixingScreenPlaying()
+                    }
+
                     repository.startRecording()
+
                     _eventLivePlaybackSet.value?.let {
                         if (it) {
                             repository.startLivePlayback()
                         }
                     }
+
                 } else {
+
+                    if (mixingPlayActive.value == true) {
+                        repository.stopMixingScreenPlaying()
+                    }
+
                     _eventLivePlaybackSet.value?.let {
                         if (it) {
                             repository.stopLivePlayback()
                         }
                     }
+
                     repository.stopRecording()
                 }
+
+                _isLoading.postValue(false)
             }
             _eventIsRecording.value = !_eventIsRecording.value!!
         }

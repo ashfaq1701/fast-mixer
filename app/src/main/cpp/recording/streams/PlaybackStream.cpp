@@ -33,6 +33,7 @@ oboe::Result PlaybackStream::openStream() {
         LOGE(TAG, "openPlaybackStream(): Failed to create playback stream. Error: %s",
              oboe::convertToText(result));
     }
+
     return result;
 }
 
@@ -44,7 +45,7 @@ PlaybackStream::setupPlaybackStreamParameters(oboe::AudioStreamBuilder *builder,
     LOGD(TAG, "setupPlaybackStreamParameters()");
     builder->setAudioApi(audioApi)
             ->setFormat(audioFormat)
-            ->setSharingMode(oboe::SharingMode::Exclusive)
+            ->setSharingMode(oboe::SharingMode::Shared)
             ->setPerformanceMode(oboe::PerformanceMode::LowLatency)
             ->setDataCallback(audioStreamCallback)
             ->setErrorCallback(reinterpret_cast<AudioStreamErrorCallback *>(audioStreamCallback))

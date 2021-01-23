@@ -21,6 +21,10 @@ class RecordingEngineProxy @Inject constructor(){
 
     fun startPlayback(): Boolean = RecordingEngine.startPlayback()
 
+    fun startMixingTracksPlayback(): Boolean = RecordingEngine.startMixingTracksPlayback()
+
+    fun stopMixingTracksPlayback() = RecordingEngine.stopMixingTracksPlayback()
+
     fun stopPlayback() = RecordingEngine.stopPlayback()
 
     fun pausePlayback() = RecordingEngine.pausePlayback()

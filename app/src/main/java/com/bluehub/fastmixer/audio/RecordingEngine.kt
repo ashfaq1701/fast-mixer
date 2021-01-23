@@ -24,6 +24,10 @@ class RecordingEngine {
 
         @JvmStatic external fun startPlayback(): Boolean
 
+        @JvmStatic external fun startMixingTracksPlayback(): Boolean
+
+        @JvmStatic external fun stopMixingTracksPlayback()
+
         @JvmStatic external fun stopPlayback()
 
         @JvmStatic external fun pausePlayback()

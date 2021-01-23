@@ -31,6 +31,14 @@ class RecordingRepository @Inject
         return recordingEngineProxy.startPlayback()
     }
 
+    fun startMixingScreenPlaying(): Boolean {
+        return recordingEngineProxy.startMixingTracksPlayback()
+    }
+
+    fun stopMixingScreenPlaying() {
+        return recordingEngineProxy.stopMixingTracksPlayback()
+    }
+
     fun pausePlaying() {
         recordingEngineProxy.pausePlayback()
     }

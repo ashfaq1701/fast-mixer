@@ -73,6 +73,24 @@ extern "C" {
     }
 
     JNIEXPORT jboolean JNICALL
+    Java_com_bluehub_fastmixer_audio_RecordingEngine_startMixingTracksPlayback(JNIEnv * env, jclass) {
+        if (!recordingEngine) {
+            LOGE("startMixingTracksPlayback: recordingEngine is null, you must call create() method before calling this method");
+            return false;
+        }
+        return recordingEngine->startMixingTracksPlayback();
+    }
+
+    JNIEXPORT void JNICALL
+    Java_com_bluehub_fastmixer_audio_RecordingEngine_stopMixingTracksPlayback(JNIEnv *env, jclass) {
+        if (!recordingEngine) {
+            LOGE("stopMixingTracksPlayback: recordingEngine is null, you must call create() method before calling this method");
+            return;
+        }
+        recordingEngine->stopMixingTracksPlayback();
+    }
+
+    JNIEXPORT jboolean JNICALL
     Java_com_bluehub_fastmixer_audio_RecordingEngine_startPlayback(JNIEnv * env, jclass) {
         if (!recordingEngine) {
             LOGE("startPlayback: recordingEngine is null, you must call create() method before calling this method");

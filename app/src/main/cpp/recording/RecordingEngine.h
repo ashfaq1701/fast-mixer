@@ -32,6 +32,8 @@ public:
     void stopLivePlayback();
 
     bool startPlayback();
+    bool startMixingTracksPlayback();
+    void stopMixingTracksPlayback();
     void stopAndResetPlayback();
     void pausePlayback();
 
@@ -60,6 +62,8 @@ public:
 
     bool startPlaybackCallable();
 
+    bool startMixingTracksPlaybackCallable();
+
     void addSourcesToPlayer(string* strArr, int count);
 
 private:
@@ -69,6 +73,8 @@ private:
     string mRecordingSessionId = nullptr;
     string mAppDir = nullptr;
     bool mPlayback = true;
+
+    int bakPlayHead = 0;
 
     mutex recordingStreamMtx;
     mutex livePlaybackStreamMtx;

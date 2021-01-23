@@ -52,6 +52,7 @@ private:
                    const AudioProperties properties);
 
     const unique_ptr<float[]> mBuffer;
+    float* transformedBuffer = nullptr;
     const int64_t mBufferSize;
     const AudioProperties mProperties;
     int64_t currentPtr = 0;

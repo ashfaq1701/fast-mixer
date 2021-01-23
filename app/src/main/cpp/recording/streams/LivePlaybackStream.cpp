@@ -45,7 +45,7 @@ LivePlaybackStream::setupLivePlaybackStreamParameters(oboe::AudioStreamBuilder *
     LOGD(TAG, "setupLivePlaybackStreamParameters()");
     builder->setAudioApi(audioApi)
             ->setFormat(audioFormat)
-            ->setSharingMode(oboe::SharingMode::Exclusive)
+            ->setSharingMode(oboe::SharingMode::Shared)
             ->setPerformanceMode(oboe::PerformanceMode::LowLatency)
             ->setDataCallback(audioStreamCallback)
             ->setDeviceId(deviceId)

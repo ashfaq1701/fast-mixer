@@ -31,7 +31,7 @@ oboe::AudioStreamBuilder *
 RecordingStream::setupRecordingStreamParameters(oboe::AudioStreamBuilder *builder) {
     builder->setAudioApi(RecordingStreamConstants::mAudioApi)
             ->setFormat(RecordingStreamConstants::mFormat)
-            ->setSharingMode(oboe::SharingMode::Exclusive)
+            ->setSharingMode(oboe::SharingMode::Shared)
             ->setPerformanceMode(oboe::PerformanceMode::LowLatency)
             ->setDataCallback(this)
             ->setErrorCallback(this)

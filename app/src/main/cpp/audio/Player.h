@@ -56,11 +56,13 @@ public:
         : Player { map<string, shared_ptr<DataSource>>(), nullptr } {};
 
     void addSource(string key, shared_ptr<DataSource> source);
+    bool checkPlayerSources(map<string, shared_ptr<DataSource>> playMap);
     void addSourceMap(map<string, shared_ptr<DataSource>> playMap);
     void setPlaybackCallback(function<void(void)> stopPlaybackCallback);
     void renderAudio(float *targetData, int32_t numFrames);
     void resetPlayHead() { mReadFrameIndex = 0; };
     int32_t getPlayHead() { return mReadFrameIndex; }
+    int64_t getMaxTotalSourceFrames();
 
     void setPlayHead(int32_t playHead);
     void setPlaying(bool isPlaying) { mIsPlaying = isPlaying; };
@@ -80,7 +82,6 @@ private:
 
     void updateAddedMax();
     void renderSilence(float*, int32_t);
-    int64_t getMaxTotalSourceFrames();
     float getMaxValueAcrossSources();
 };
 

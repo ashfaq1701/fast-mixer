@@ -25,6 +25,20 @@ void Player::addSource(string key, shared_ptr<DataSource> source) {
     mSourceMap.insert(pair<string, shared_ptr<DataSource>>(key, source));
 }
 
+bool Player::checkPlayerSources(map<string, shared_ptr<DataSource>> playMap) {
+    if (playMap.size() != mSourceMap.size()) return false;
+
+    bool isSame = true;
+
+    for (auto i = playMap.begin(), j = mSourceMap.begin();
+        i != playMap.end(); i++, j++) {
+
+        isSame = isSame && (strcmp(i->first.c_str(), j->first.c_str()) == 0);
+    }
+
+    return isSame;
+}
+
 void Player::addSourceMap(map<string, shared_ptr<DataSource>> playMap) {
     for (auto it = playMap.begin(); it != playMap.end(); it++) {
         mSourceMap.insert(pair<string, shared_ptr<DataSource>>(it->first, it->second));
@@ -61,6 +75,8 @@ void Player::renderAudio(float *targetData, int32_t numFrames) {
             }
         }
 
+        if (framesToRenderFromData <= 0) return;
+
         for (int i = 0; i < framesToRenderFromData; ++i) {
 
             for (int j = 0; j < properties.channelCount; ++j) {
@@ -92,7 +108,8 @@ void Player::renderAudio(float *targetData, int32_t numFrames) {
 
         if (framesToRenderFromData < numFrames) {
             // fill the rest of the buffer with silence
-            renderSilence(&targetData[framesToRenderFromData], numFrames * properties.channelCount);
+            renderSilence(&targetData[framesToRenderFromData],
+                    (numFrames - framesToRenderFromData) * properties.channelCount);
         }
 
         if (mSourceMap.size() == 1) {
