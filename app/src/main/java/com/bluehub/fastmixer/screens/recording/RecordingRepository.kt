@@ -43,7 +43,7 @@ class RecordingRepository @Inject
         return recordingEngineProxy.startMixingTracksPlayback()
     }
 
-    fun stopMixingScreenPlaying() {
+    fun stopMixingTracksPlay() {
         return recordingEngineProxy.stopMixingTracksPlayback()
     }
 
@@ -86,20 +86,6 @@ class RecordingRepository @Inject
 
     fun createAudioEngine() {
         recordingEngineProxy.create(cacheDir, recordingSessionId, true)
-    }
-
-    fun copyRecordedFile(context: Context) {
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.O) {
-            val externalPath = context.getExternalFilesDir(Environment.DIRECTORY_MUSIC)
-            val cacheFile = File("$cacheDir/recording.wav")
-            if (cacheFile.exists()) {
-                Files.copy(
-                    Paths.get("$cacheDir/recording.wav"),
-                    Paths.get(externalPath!!.path + "/$recordingSessionId.wav"),
-                    StandardCopyOption.REPLACE_EXISTING
-                )
-            }
-        }
     }
 
     fun loadFiles(fileArr: List<String>) {

@@ -19,6 +19,7 @@ import com.bluehub.fastmixer.screens.mixing.AudioFileStore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
 
@@ -208,7 +209,7 @@ class RecordingScreenViewModel @Inject constructor (override val context: Contex
                 } else {
 
                     if (mixingPlayActive.value == true) {
-                        repository.stopMixingScreenPlaying()
+                        repository.stopMixingTracksPlay()
                     }
 
                     _eventLivePlaybackSet.value?.let {
@@ -349,29 +350,45 @@ class RecordingScreenViewModel @Inject constructor (override val context: Contex
     }
 
     fun setGoBack() {
+
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
+
+                // Stop Recording
                 repository.stopRecording()
                 _eventIsRecording.postValue(false)
+
+                // Stop Live playback if active
                 _eventLivePlaybackSet.value?.let {
                     if (it) {
                         repository.stopLivePlayback()
                         _eventLivePlaybackSet.postValue(false)
                     }
                 }
+
+                // Stop play if active
                 _eventIsPlaying.value?.let {
                     if (it) {
                         repository.stopPlaying()
                         _eventIsPlaying.postValue(false)
                     }
                 }
+
+                // Stop play with mixing tacks if active
                 _eventIsPlayingWithMixingTracks.value?.let {
                     if (it) {
                         repository.stopPlaying()
                         _eventIsPlayingWithMixingTracks.postValue(false)
                     }
                 }
-                repository.copyRecordedFile(context)
+
+                // Stop playing mixing tracks if active
+                mixingPlayActive.value?.let {
+                    if (it) {
+                        repository.stopMixingTracksPlay()
+                        mixingPlayActive.postValue(false)
+                    }
+                }
             }
             _eventGoBack.value = true
         }
@@ -452,12 +469,12 @@ class RecordingScreenViewModel @Inject constructor (override val context: Contex
         recordingTimer = null
     }
 
-    fun stopTrackingVisualizerTimer() {
+    private fun stopTrackingVisualizerTimer() {
         visualizerTimer?.cancel()
         visualizerTimer = null
     }
 
-    fun stopAllTimers() {
+    private fun stopAllTimers() {
         stopTrackingSeekbarTimer()
         stopTrackingRecordingTimer()
         stopTrackingVisualizerTimer()

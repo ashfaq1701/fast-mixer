@@ -3,6 +3,7 @@ package com.bluehub.fastmixer.screens.recording
 import android.os.Bundle
 import android.view.*
 import android.widget.SeekBar
+import androidx.activity.*
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
@@ -15,6 +16,7 @@ import com.bluehub.fastmixer.databinding.RecordingScreenBinding
 import com.bluehub.fastmixer.screens.recording.RecordingScreenDirections.actionRecordingScreenToMixingScreen
 import com.visualizer.amplitude.AudioRecordView
 import kotlinx.android.synthetic.main.view_loading.*
+import timber.log.Timber
 import javax.inject.Inject
 
 
@@ -37,8 +39,15 @@ class RecordingScreen : PermissionFragment<RecordingScreenViewModel>(ViewModelTy
 
     private lateinit var audioRecordView: AudioRecordView
 
+    private val onBackPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            viewModel.setGoBack()
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        requireActivity().onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
     }
 
     override fun onCreateView(
