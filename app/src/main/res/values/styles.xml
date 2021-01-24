@@ -11,4 +11,14 @@
         <item name="android:backgroundTint">@android:color/transparent</item>
     </style>
 
+    <style name="ProgressBar">
+        <item name="android:indeterminateOnly">true</item>
+        <item name="android:indeterminateDrawable">@drawable/bg_loading_progress</item>
+        <item name="android:indeterminateBehavior">repeat</item>
+        <item name="android:indeterminateDuration">@integer/progress_indeterminate_duration</item>
+        <item name="android:minWidth">@dimen/progress_bar_min_width</item>
+        <item name="android:minHeight">@dimen/progress_bar_min_height</item>
+        <item name="android:mirrorForRtl">false</item>
+    </style>
+
 </resources>

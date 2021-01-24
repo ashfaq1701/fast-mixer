@@ -4,8 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.bluehub.fastmixer.R
-import com.bluehub.fastmixer.common.dependencyinjection.DaggerFragment
-import com.bluehub.fastmixer.common.dependencyinjection.FragmentViewModelFactory
+import com.bluehub.fastmixer.common.di.DaggerFragment
+import com.bluehub.fastmixer.common.di.FragmentViewModelFactory
 import com.bluehub.fastmixer.common.utils.ViewModelType
 import javax.inject.Inject
 import kotlin.reflect.KClass

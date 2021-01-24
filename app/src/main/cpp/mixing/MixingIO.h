@@ -8,7 +8,7 @@
 
 #include <memory>
 #include <FileDataSource.h>
-#include "streams/StreamConstants.h"
+#include "streams/MixingStreamConstants.h"
 #include "../audio/Player.h"
 
 using namespace std;

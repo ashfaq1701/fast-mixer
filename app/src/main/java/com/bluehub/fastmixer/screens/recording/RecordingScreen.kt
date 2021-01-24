@@ -3,6 +3,7 @@ package com.bluehub.fastmixer.screens.recording
 import android.os.Bundle
 import android.view.*
 import android.widget.SeekBar
+import androidx.activity.*
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
@@ -12,7 +13,10 @@ import com.bluehub.fastmixer.common.utils.DialogManager
 import com.bluehub.fastmixer.common.utils.ScreenConstants
 import com.bluehub.fastmixer.common.utils.ViewModelType
 import com.bluehub.fastmixer.databinding.RecordingScreenBinding
+import com.bluehub.fastmixer.screens.recording.RecordingScreenDirections.actionRecordingScreenToMixingScreen
 import com.visualizer.amplitude.AudioRecordView
+import kotlinx.android.synthetic.main.view_loading.*
+import timber.log.Timber
 import javax.inject.Inject
 
 
@@ -35,8 +39,15 @@ class RecordingScreen : PermissionFragment<RecordingScreenViewModel>(ViewModelTy
 
     private lateinit var audioRecordView: AudioRecordView
 
+    private val onBackPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            viewModel.setGoBack()
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        requireActivity().onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
     }
 
     override fun onCreateView(
@@ -63,6 +74,7 @@ class RecordingScreen : PermissionFragment<RecordingScreenViewModel>(ViewModelTy
 
     fun initUI() {
         viewModel.eventIsRecording.observe(viewLifecycleOwner, { isRecording ->
+            dataBinding.mixingPlayEnabled.isEnabled = !isRecording
             if (isRecording) {
                 viewModel.startDrawingVisualizer()
                 viewModel.startUpdatingTimer()
@@ -82,9 +94,19 @@ class RecordingScreen : PermissionFragment<RecordingScreenViewModel>(ViewModelTy
             }
         })
 
+        viewModel.eventIsPlayingWithMixingTracks.observe(viewLifecycleOwner, { isPlaying ->
+            if (!isPlaying) {
+                dataBinding.togglePlayWithMixingTracks.text = getString(R.string.play_mixed_label)
+                viewModel.stopTrackingSeekbarTimer()
+            } else {
+                dataBinding.togglePlayWithMixingTracks.text = getString(R.string.pause_label)
+                viewModel.startTrackingSeekbar()
+            }
+        })
+
         viewModel.eventGoBack.observe(viewLifecycleOwner, { goBack ->
             if (goBack) {
-                val action = RecordingScreenDirections.actionRecordingScreenToMixingScreen()
+                val action = actionRecordingScreenToMixingScreen()
                 action.recordedFilePath = viewModel.repository.getRecordedFilePath()
                 viewModel.resetGoBack()
                 findNavController().navigate(action)
@@ -118,6 +140,14 @@ class RecordingScreen : PermissionFragment<RecordingScreenViewModel>(ViewModelTy
             recordingSeekbar.progress = it
         })
 
+        viewModel.isLoading.observe(viewLifecycleOwner, {
+            if (it) {
+                pbLoading.visibility = View.VISIBLE
+            } else {
+                pbLoading.visibility = View.GONE
+            }
+        })
+
         recordingSeekbar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
                 if (fromUser) {
@@ -126,7 +156,8 @@ class RecordingScreen : PermissionFragment<RecordingScreenViewModel>(ViewModelTy
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar) {
-                if (viewModel.eventIsPlaying.value == true) {
+                if (viewModel.eventIsPlaying.value == true
+                    || viewModel.eventIsPlayingWithMixingTracks.value == true) {
                     viewModel.pausePlayback()
                 }
             }
@@ -134,6 +165,8 @@ class RecordingScreen : PermissionFragment<RecordingScreenViewModel>(ViewModelTy
             override fun onStopTrackingTouch(seekBar: SeekBar) {
                 if (viewModel.eventIsPlaying.value == true) {
                     viewModel.startPlayback()
+                } else if (viewModel.eventIsPlayingWithMixingTracks.value == true) {
+                    viewModel.startPlaybackWithMixingTracks()
                 }
             }
         })

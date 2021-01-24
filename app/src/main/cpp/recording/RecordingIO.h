@@ -10,7 +10,7 @@
 #include "../audio/Player.h"
 #include "../taskqueue/TaskQueue.h"
 #include "oboe/Definitions.h"
-#include "streams/StreamConstants.h"
+#include "streams/RecordingStreamConstants.h"
 
 #ifndef MODULE_NAME
 #define MODULE_NAME  "RecordingIO"
@@ -22,9 +22,8 @@ const int kMaxSamples = 60 * oboe::DefaultStreamValues::SampleRate * oboe::Chann
 
 class RecordingIO {
 public:
-    RecordingIO() {
-        taskQueue = new TaskQueue();
-    }
+
+    RecordingIO();
 
     ~RecordingIO() {
         taskQueue->stop_queue();
@@ -37,18 +36,20 @@ public:
     void flush_buffer();
 
     void setRecordingFilePath(string recordingFilePath) {
-        mRecordingFilePath = recordingFilePath;
+        mRecordingFilePath = move(recordingFilePath);
     }
 
-    bool setup_audio_source();
+    FileDataSource* setup_audio_source();
+    void add_source_to_player(shared_ptr<DataSource> fileDataSource);
     void clear_audio_source();
-    void pause_audio_source();
 
     void sync_live_playback();
 
     void setLivePlaybackEnabled(bool livePlaybackEnabled);
 
     int getCurrentMax();
+
+    int64_t getPlayerMaxTotalSourceFrames();
 
     void resetCurrentMax();
 
@@ -64,7 +65,15 @@ public:
 
     void resetProperties();
 
-    shared_ptr<Player> mRecordedTrack {nullptr};
+    void clearPlayerSources();
+
+    void setPlaybackPlaying(bool playing);
+
+    void addSourceMap(map<string, shared_ptr<DataSource>> playMap);
+
+    void addSourceMapWithRecordedSource(map<string, shared_ptr<DataSource>> playMap, shared_ptr<DataSource> recordedSource);
+
+    bool checkPlayerSources(map<string, shared_ptr<DataSource>> playMap);
 
 private:
     const char* TAG = "RecordingIO:: %d";
@@ -74,6 +83,7 @@ private:
     string mRecordingFilePath;
 
     shared_ptr<SndfileHandle> mRecordingFile {nullptr};
+    shared_ptr<Player> mPlayer {nullptr};
 
     int32_t mTotalSamples = 0;
     int32_t mIteration = 1;

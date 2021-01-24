@@ -7,8 +7,9 @@
 
 #include <oboe/Definitions.h>
 #include <oboe/AudioStream.h>
+#include "../SourceMapStore.h"
 #include "../logging_macros.h"
-#include "streams/PlaybackStream.h"
+#include "streams/MixingPlaybackStream.h"
 #include "MixingIO.h"
 #include "map"
 
@@ -17,8 +18,7 @@ using namespace std;
 class MixingEngine {
 
 public:
-    MixingEngine();
-    ~MixingEngine();
+    MixingEngine(SourceMapStore* sourceMapStore);
     void addFile(string filePath);
     unique_ptr<buffer_data> readSamples(string filePath, size_t countPoints);
     void deleteFile(string filePath);
@@ -42,11 +42,12 @@ private:
     const char* TAG = "Mixing Engine:: %s";
 
     MixingIO mMixingIO;
-    map<string, shared_ptr<FileDataSource>> sourceMap;
+
+    SourceMapStore* mSourceMapStore;
 
     mutex playbackStreamMtx;
 
-    PlaybackStream playbackStream = PlaybackStream(&mMixingIO);
+    MixingPlaybackStream playbackStream = MixingPlaybackStream(&mMixingIO);
 
     bool startPlaybackCallable();
 

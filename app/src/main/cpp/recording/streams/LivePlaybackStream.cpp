@@ -10,13 +10,13 @@ LivePlaybackStream::LivePlaybackStream(RecordingIO *recordingIO): RecordingBaseS
 oboe::Result LivePlaybackStream::openStream() {
     LOGD(TAG, "openLivePlaybackStream(): ");
     oboe::AudioStreamBuilder builder;
-    setupLivePlaybackStreamParameters(&builder, StreamConstants::mAudioApi, StreamConstants::mFormat, this,
-                                      StreamConstants::mPlaybackDeviceId, StreamConstants::mSampleRate, StreamConstants::mOutputChannelCount);
+    setupLivePlaybackStreamParameters(&builder, RecordingStreamConstants::mAudioApi, RecordingStreamConstants::mFormat, this,
+                                      RecordingStreamConstants::mPlaybackDeviceId, RecordingStreamConstants::mSampleRate, RecordingStreamConstants::mOutputChannelCount);
     oboe::Result result = builder.openStream(mStream);
     if (result == oboe::Result::OK) {
-        assert(mStream->getChannelCount() == StreamConstants::mOutputChannelCount);
+        assert(mStream->getChannelCount() == RecordingStreamConstants::mOutputChannelCount);
 //        assert(mStream->getSampleRate() == mSampleRate);
-        assert(mStream->getFormat() == StreamConstants::mFormat);
+        assert(mStream->getFormat() == RecordingStreamConstants::mFormat);
 
         auto sampleRate = mStream->getSampleRate();
         LOGV(TAG, "openLivePlaybackStream(): mSampleRate = ");
@@ -45,14 +45,14 @@ LivePlaybackStream::setupLivePlaybackStreamParameters(oboe::AudioStreamBuilder *
     LOGD(TAG, "setupLivePlaybackStreamParameters()");
     builder->setAudioApi(audioApi)
             ->setFormat(audioFormat)
-            ->setSharingMode(oboe::SharingMode::Exclusive)
+            ->setSharingMode(oboe::SharingMode::Shared)
             ->setPerformanceMode(oboe::PerformanceMode::LowLatency)
             ->setDataCallback(audioStreamCallback)
             ->setDeviceId(deviceId)
             ->setDirection(oboe::Direction::Output)
             ->setSampleRate(sampleRate)
             ->setChannelCount(channelCount)
-            ->setFramesPerDataCallback(StreamConstants::mLivePlaybackFramesPerCallback);
+            ->setFramesPerDataCallback(RecordingStreamConstants::mLivePlaybackFramesPerCallback);
     return builder;
 }
 

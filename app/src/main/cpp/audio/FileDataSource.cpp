@@ -32,9 +32,25 @@ FileDataSource::FileDataSource (
         const AudioProperties properties) :
         mBuffer(move(data)), mBufferSize(size), mProperties(properties) {
 
+    int minValue = FLT_MAX;
+
     for (int i = 0; i < mBufferSize; i++) {
         if (abs(mBuffer[i]) > mMaxSampleValue) {
             mMaxSampleValue = abs(mBuffer[i]);
+        }
+
+        if (mBuffer[i] < minValue) {
+            minValue = mBuffer[i];
+        }
+    }
+
+    transformedBuffer = new float [mBufferSize];
+
+    for (int i = 0; i < mBufferSize; i++) {
+        if (minValue < 0) {
+            transformedBuffer[i] = mBuffer[i] - minValue;
+        } else {
+            transformedBuffer[i] = mBuffer[i];
         }
     }
 }
@@ -89,21 +105,30 @@ unique_ptr<buffer_data> FileDataSource::readData(size_t countPoints) {
     size_t samplesToHandle;
 
     if (countPoints * channelCount > mBufferSize) {
-        samplesToHandle = (int) (mBufferSize / channelCount);
+        samplesToHandle = floor((float) mBufferSize / (float) channelCount);
     } else {
         samplesToHandle = countPoints;
     }
 
-    int ptsDistance = (int) (mBufferSize / (samplesToHandle * channelCount));
+    int ptsDistance = (int) ((float) mBufferSize / (float) (samplesToHandle * channelCount));
 
     auto selectedSamples = new float [samplesToHandle];
     for (int i = 0; i < samplesToHandle; i++) {
         float maxValue = 0;
         for (int j = i * ptsDistance; j < (i + 1) * ptsDistance; j += channelCount) {
-            if (abs(mBuffer[j]) > maxValue) {
-                maxValue = abs(mBuffer[j]);
+            float sample = 0.0;
+
+            for (int k = j; k < j + channelCount; k++) {
+                sample += transformedBuffer[k];
+            }
+
+            float avgSample = sample / channelCount;
+
+            if (avgSample > maxValue) {
+                maxValue = avgSample;
             }
         }
+
         selectedSamples[i] = maxValue;
     }
 

@@ -12,18 +12,18 @@ oboe::Result PlaybackStream::openStream() {
     oboe::AudioStreamBuilder builder;
     setupPlaybackStreamParameters(
             &builder,
-            StreamConstants::mAudioApi,
-            StreamConstants::mPlaybackFormat,
+            RecordingStreamConstants::mAudioApi,
+            RecordingStreamConstants::mPlaybackFormat,
             this,
-            StreamConstants::mPlaybackDeviceId,
-            StreamConstants::mPlaybackSampleRate,
-            StreamConstants::mOutputChannelCount
+            RecordingStreamConstants::mPlaybackDeviceId,
+            RecordingStreamConstants::mPlaybackSampleRate,
+            RecordingStreamConstants::mOutputChannelCount
             );
     oboe::Result result = builder.openStream(mStream);
     if (result == oboe::Result::OK && mStream) {
-        assert(mStream->getChannelCount() == StreamConstants::mOutputChannelCount);
+        assert(mStream->getChannelCount() == RecordingStreamConstants::mOutputChannelCount);
 //        assert(mStream->getSampleRate() == mSampleRate);
-        assert(mStream->getFormat() == StreamConstants::mPlaybackFormat);
+        assert(mStream->getFormat() == RecordingStreamConstants::mPlaybackFormat);
 
         int32_t mFramesPerBurst = mStream->getFramesPerBurst();
 
@@ -33,6 +33,7 @@ oboe::Result PlaybackStream::openStream() {
         LOGE(TAG, "openPlaybackStream(): Failed to create playback stream. Error: %s",
              oboe::convertToText(result));
     }
+
     return result;
 }
 
@@ -44,7 +45,7 @@ PlaybackStream::setupPlaybackStreamParameters(oboe::AudioStreamBuilder *builder,
     LOGD(TAG, "setupPlaybackStreamParameters()");
     builder->setAudioApi(audioApi)
             ->setFormat(audioFormat)
-            ->setSharingMode(oboe::SharingMode::Exclusive)
+            ->setSharingMode(oboe::SharingMode::Shared)
             ->setPerformanceMode(oboe::PerformanceMode::LowLatency)
             ->setDataCallback(audioStreamCallback)
             ->setErrorCallback(reinterpret_cast<AudioStreamErrorCallback *>(audioStreamCallback))

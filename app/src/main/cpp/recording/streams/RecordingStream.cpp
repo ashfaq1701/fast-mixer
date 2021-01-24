@@ -13,7 +13,7 @@ oboe::Result RecordingStream::openStream() {
     oboe::Result result = builder.openStream(mStream);
 
     if (result == oboe::Result::OK && mStream) {
-        assert(mStream->getChannelCount() == StreamConstants::mInputChannelCount);
+        assert(mStream->getChannelCount() == RecordingStreamConstants::mInputChannelCount);
         auto sampleRate = mStream->getSampleRate();
         auto format = mStream->getFormat();
         LOGV(TAG, "openRecordingStream(): mSampleRate = ");
@@ -29,16 +29,16 @@ oboe::Result RecordingStream::openStream() {
 
 oboe::AudioStreamBuilder *
 RecordingStream::setupRecordingStreamParameters(oboe::AudioStreamBuilder *builder) {
-    builder->setAudioApi(StreamConstants::mAudioApi)
-            ->setFormat(StreamConstants::mFormat)
-            ->setSharingMode(oboe::SharingMode::Exclusive)
+    builder->setAudioApi(RecordingStreamConstants::mAudioApi)
+            ->setFormat(RecordingStreamConstants::mFormat)
+            ->setSharingMode(oboe::SharingMode::Shared)
             ->setPerformanceMode(oboe::PerformanceMode::LowLatency)
             ->setDataCallback(this)
             ->setErrorCallback(this)
-            ->setDeviceId(StreamConstants::mRecordingDeviceId)
+            ->setDeviceId(RecordingStreamConstants::mRecordingDeviceId)
             ->setDirection(oboe::Direction::Input)
-            ->setChannelCount(StreamConstants::mInputChannelCount)
-            ->setFramesPerDataCallback(StreamConstants::mRecordingFramesPerCallback);
+            ->setChannelCount(RecordingStreamConstants::mInputChannelCount)
+            ->setFramesPerDataCallback(RecordingStreamConstants::mRecordingFramesPerCallback);
 
     return builder;
 }

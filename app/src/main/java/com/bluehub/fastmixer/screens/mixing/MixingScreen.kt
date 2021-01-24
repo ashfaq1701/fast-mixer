@@ -9,15 +9,13 @@ import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import androidx.transition.Slide
-import androidx.transition.Transition
-import androidx.transition.TransitionManager
+import androidx.transition.*
 import com.bluehub.fastmixer.R
 import com.bluehub.fastmixer.common.permissions.PermissionFragment
 import com.bluehub.fastmixer.common.utils.DialogManager
 import com.bluehub.fastmixer.common.utils.ViewModelType
 import com.bluehub.fastmixer.databinding.MixingScreenBinding
-import timber.log.Timber
+import com.bluehub.fastmixer.screens.mixing.MixingScreenDirections.actionMixingScreenToRecordingScreen
 import javax.inject.Inject
 
 class MixingScreen : PermissionFragment<MixingScreenViewModel>(ViewModelType.NAV_SCOPED) {
@@ -94,7 +92,7 @@ class MixingScreen : PermissionFragment<MixingScreenViewModel>(ViewModelType.NAV
 
         viewModel.eventRecord.observe(viewLifecycleOwner, { record ->
             if (record) {
-                findNavController().navigate(MixingScreenDirections.actionMixingScreenToRecordingScreen())
+                findNavController().navigate(actionMixingScreenToRecordingScreen())
                 viewModel.onRecordNavigated()
             }
         })

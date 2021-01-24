@@ -17,19 +17,28 @@ include_directories(audio)
 # Gradle automatically packages shared libraries with your APK.
 
 add_library( # Sets the name of the library.
-        recordingEngine
+        audioEngine
 
         # Sets the library as a shared library.
         SHARED
 
         # Provides a relative path to your source file(s).
+        SourceMapStore.cpp
+
         recording/RecordingIO.cpp
         recording/RecordingEngine.cpp
-        recording/streams/StreamConstants.cpp
+        recording/streams/RecordingStreamConstants.cpp
         recording/streams/RecordingStream.cpp
         recording/streams/LivePlaybackStream.cpp
         recording/streams/PlaybackStream.cpp
         recording/streams/RecordingBaseStream.cpp
+
+        mixing/MixingIO.cpp
+        mixing/MixingEngine.cpp
+        mixing/streams/MixingStreamConstants.cpp
+        mixing/streams/MixingPlaybackStream.cpp
+        mixing/streams/MixingBaseStream.cpp
+
         streams/BaseStream.cpp
 
         synthesizers/BaseSynthesizer.h
@@ -39,25 +48,7 @@ add_library( # Sets the name of the library.
         audio/FileDataSource.cpp
         audio/Player.cpp
         audio/FFMpegExtractor.cpp
-        recording/recording-lib.cpp)
-
-add_library( # Sets the name of the library.
-        mixingEngine
-
-        #Sets the library as a shared library.
-        SHARED
-
-        # Provides a relative path to your source file(s).
-        mixing/MixingIO.cpp
-        mixing/MixingEngine.cpp
-        mixing/streams/StreamConstants.cpp
-        mixing/streams/PlaybackStream.cpp
-        mixing/streams/MixingBaseStream.cpp
-        streams/BaseStream.cpp
-
-        audio/FileDataSource.cpp
-        audio/Player.cpp
-        audio/FFMpegExtractor.cpp
+        recording/recording-lib.cpp
         mixing/mixing-lib.cpp)
 
 # Build the Oboe library
@@ -117,37 +108,17 @@ set_target_properties(avfilter PROPERTIES IMPORTED_LOCATION
 # build script, prebuilt third-party libraries, or system libraries.
 
 if(USEHWASAN)
-    target_compile_options(recordingEngine PUBLIC -fsanitize=hwaddress -fno-omit-frame-pointer)
-    set_target_properties(recordingEngine PROPERTIES LINK_FLAGS -fsanitize=hwaddress)
-
-    target_compile_options(mixingEngine PUBLIC -fsanitize=hwaddress -fno-omit-frame-pointer)
-    set_target_properties(mixingEngine PROPERTIES LINK_FLAGS -fsanitize=hwaddress)
+    target_compile_options(audioEngine PUBLIC -fsanitize=hwaddress -fno-omit-frame-pointer)
+    set_target_properties(audioEngine PROPERTIES LINK_FLAGS -fsanitize=hwaddress)
 endif(USEHWASAN)
 
 if(USEASAN)
-    target_compile_options(recordingEngine PUBLIC -fsanitize=address -fno-omit-frame-pointer)
-    set_target_properties(recordingEngine PROPERTIES LINK_FLAGS -fsanitize=address)
-
-    target_compile_options(mixingEngine PUBLIC -fsanitize=address -fno-omit-frame-pointer)
-    set_target_properties(mixingEngine PROPERTIES LINK_FLAGS -fsanitize=address)
+    target_compile_options(audioEngine PUBLIC -fsanitize=address -fno-omit-frame-pointer)
+    set_target_properties(audioEngine PROPERTIES LINK_FLAGS -fsanitize=address)
 endif(USEASAN)
 
 target_link_libraries(
-        recordingEngine
-        ${log-lib}
-        oboe
-        android
-        sndfile
-        kissfft
-        avformat
-        avutil
-        avcodec
-        swresample
-        avfilter
-)
-
-target_link_libraries(
-        mixingEngine
+        audioEngine
         ${log-lib}
         oboe
         android

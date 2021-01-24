@@ -12,8 +12,8 @@ MixingIO::MixingIO() {
 
 shared_ptr<FileDataSource> MixingIO::readFile(string filename) {
     AudioProperties targetProperties{
-            .channelCount = StreamConstants::mChannelCount,
-            .sampleRate = StreamConstants::mSampleRate
+            .channelCount = MixingStreamConstants::mChannelCount,
+            .sampleRate = MixingStreamConstants::mSampleRate
     };
 
     return shared_ptr<FileDataSource> {

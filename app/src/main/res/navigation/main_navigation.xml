@@ -12,20 +12,24 @@
             android:name="com.bluehub.fastmixer.screens.mixing.MixingScreen"
             android:label="MixingScreen"
             tools:layout="@layout/mixing_screen">
+
             <action
                 android:id="@+id/action_mixingScreen_to_recordingScreen"
                 app:destination="@id/recordingScreen" />
+
             <argument
                 android:name="recordedFilePath"
                 android:defaultValue=""
                 app:argType="string"
                 app:nullable="true" />
         </fragment>
+
         <fragment
             android:id="@+id/recordingScreen"
             android:name="com.bluehub.fastmixer.screens.recording.RecordingScreen"
             android:label="RecordingScreen"
             tools:layout="@layout/recording_screen">
+
             <action
                 android:id="@+id/action_recordingScreen_to_mixingScreen"
                 app:destination="@id/mixingScreen"

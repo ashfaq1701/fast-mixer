@@ -7,7 +7,7 @@
 
 #include "../../streams/BaseStream.h"
 #include "../MixingIO.h"
-#include "StreamConstants.h"
+#include "MixingStreamConstants.h"
 
 class MixingBaseStream : public BaseStream {
 public:

@@ -12,6 +12,7 @@
 #include <oboe/Definitions.h>
 #include <oboe/AudioStream.h>
 #include "../logging_macros.h"
+#include "../SourceMapStore.h"
 #include "RecordingIO.h"
 #include "streams/RecordingStream.h"
 #include "streams/LivePlaybackStream.h"
@@ -31,11 +32,16 @@ public:
     void stopLivePlayback();
 
     bool startPlayback();
+    bool startPlaybackWithMixingTracks();
+    void startPlayingWithMixingTracksWithoutSetup();
+    bool startMixingTracksPlayback();
+    void stopMixingTracksPlayback();
     void stopAndResetPlayback();
     void pausePlayback();
 
     void flushWriteBuffer();
     void restartPlayback();
+    void restartPlaybackWithMixingTracks();
 
     int getCurrentMax();
 
@@ -59,6 +65,12 @@ public:
 
     bool startPlaybackCallable();
 
+    bool startPlaybackWithMixingTracksCallable();
+
+    bool startMixingTracksPlaybackCallable();
+
+    void addSourcesToPlayer(string* strArr, int count);
+
 private:
 
     const char* TAG = "Recording Engine:: %s";
@@ -67,11 +79,16 @@ private:
     string mAppDir = nullptr;
     bool mPlayback = true;
 
+    int bakPlayHead = 0;
+
     mutex recordingStreamMtx;
     mutex livePlaybackStreamMtx;
     mutex playbackStreamMtx;
 
+    SourceMapStore* mSourceMapStore;
     RecordingIO mRecordingIO;
+
+    shared_ptr<FileDataSource> mDataSource {nullptr};
 
     RecordingStream recordingStream = RecordingStream(&mRecordingIO);
     LivePlaybackStream livePlaybackStream = LivePlaybackStream(&mRecordingIO);

@@ -43,10 +43,20 @@
             android:id="@+id/live_playback_enabled"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:checked="@={viewModel.livePlaybackEnabled}"
+            android:checked="@={viewModel.livePlaybackActive}"
             android:text="@string/live_playback_enabled"
             app:layout_constraintTop_toBottomOf="@id/recording_seekbar"
             app:layout_constraintStart_toStartOf="@id/recording_seekbar" />
+
+        <CheckBox
+            android:id="@+id/mixing_play_enabled"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/recording_screen_checkbox_margin_start"
+            android:checked="@={viewModel.mixingPlayActive}"
+            android:text="@string/mixing_play_enabled"
+            app:layout_constraintStart_toEndOf="@id/live_playback_enabled"
+            app:layout_constraintTop_toBottomOf="@id/recording_seekbar" />
 
         <Button
             android:id="@+id/toggle_record"
@@ -66,6 +76,17 @@
             android:onClick="@{() -> viewModel.togglePlay()}"
             android:text="@string/play_label"
             app:layout_constraintStart_toEndOf="@id/toggle_record"
+            app:layout_constraintEnd_toStartOf="@+id/toggle_play_with_mixing_tracks"
+            app:layout_constraintBottom_toTopOf="@id/go_back" />
+
+        <Button
+            android:id="@+id/toggle_play_with_mixing_tracks"
+            android:layout_width="@dimen/record_button_width"
+            android:layout_height="@dimen/record_button_height"
+            android:textSize="@dimen/button_text_size"
+            android:onClick="@{() -> viewModel.togglePlayWithMixingTracks()}"
+            android:text="@string/play_mixed_label"
+            app:layout_constraintStart_toEndOf="@id/toggle_play"
             app:layout_constraintEnd_toStartOf="@+id/reset"
             app:layout_constraintBottom_toTopOf="@id/go_back" />
 
@@ -103,5 +124,8 @@
             app:layout_constraintEnd_toEndOf="parent"
             android:gravity="center"
             android:textSize="@dimen/recording_timer_text_size" />
+
+        <include layout="@layout/view_loading" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

@@ -19,60 +19,41 @@ mutex RecordingIO::mtx;
 condition_variable RecordingIO::reallocated;
 bool RecordingIO::is_reallocated = false;
 
+RecordingIO::RecordingIO() {
+    Player* player = new Player();
+    mPlayer.reset(move(player));
+
+    taskQueue = new TaskQueue();
+}
+
 bool RecordingIO::check_if_reallocated() {
     return is_reallocated;
 }
 
-bool RecordingIO::setup_audio_source() {
+FileDataSource* RecordingIO::setup_audio_source() {
     if (!validate_audio_file()) {
-        mStopPlaybackCallback();
-        return false;
+        return nullptr;
     }
 
     AudioProperties targetProperties{
-            .channelCount = StreamConstants::mOutputChannelCount,
-            .sampleRate = StreamConstants::mSampleRate
+            .channelCount = RecordingStreamConstants::mOutputChannelCount,
+            .sampleRate = RecordingStreamConstants::mSampleRate
     };
 
-    auto dataSource = FileDataSource::newFromCompressedFile(mRecordingFilePath.c_str(), targetProperties);
+    return FileDataSource::newFromCompressedFile(mRecordingFilePath.c_str(), targetProperties);
+}
 
-    if (dataSource == nullptr) return false;
-
-    shared_ptr<FileDataSource> audioSource{
-        dataSource
-    };
-
-    if (!audioSource) {
-        return false;
-    }
-
-    int32_t playHead = 0;
-    if (mRecordedTrack) {
-        playHead = mRecordedTrack->getPlayHead();
-        if (playHead >= mRecordedTrack->getTotalSampleFrames()) {
-            playHead = 0;
-        }
-        mRecordedTrack.reset();
-    }
-
+void RecordingIO::add_source_to_player(shared_ptr<DataSource> fileDataSource) {
     map<string, shared_ptr<DataSource>> sourceMap;
-    sourceMap.insert(pair<string, shared_ptr<DataSource>>(mRecordingFilePath, audioSource));
-    mRecordedTrack = make_shared<Player>(sourceMap, mStopPlaybackCallback);
-    mRecordedTrack->setPlayHead(playHead);
-    mRecordedTrack->setPlaying(true);
+    sourceMap.insert(pair<string, shared_ptr<DataSource>>(mRecordingFilePath, fileDataSource));
+    mPlayer->addSourceMap(sourceMap);
+    mPlayer->setPlaying(true);
 
-    return true;
-}
-
-void RecordingIO::pause_audio_source() {
-    if (mRecordedTrack) {
-        mRecordedTrack->setPlaying(false);
+    int32_t playHead = mPlayer->getPlayHead();
+    if (playHead >= mPlayer->getTotalSampleFrames()) {
+        playHead = 0;
+        mPlayer->setPlayHead(playHead);
     }
-}
-
-void RecordingIO::clear_audio_source() {
-    pause_audio_source();
-    mRecordedTrack.reset();
 }
 
 bool RecordingIO::validate_audio_file() {
@@ -80,23 +61,13 @@ bool RecordingIO::validate_audio_file() {
 }
 
 void RecordingIO::read_playback(float *targetData, int32_t numFrames) {
-    if (!validate_audio_file()) {
-        mStopPlaybackCallback();
-        return;
-    }
-
-    if (!mRecordedTrack) {
-        mStopPlaybackCallback();
-        return;
-    }
-
-    mRecordedTrack->renderAudio(targetData, numFrames);
+    mPlayer->renderAudio(targetData, numFrames);
 }
 
 void RecordingIO::flush_to_file(int16_t* buffer, int32_t length, const string& recordingFilePath, shared_ptr<SndfileHandle>& recordingFile) {
     if (!recordingFile) {
         int format = SF_FORMAT_WAV | SF_FORMAT_PCM_16;
-        SndfileHandle file = SndfileHandle(recordingFilePath, SFM_WRITE, format, StreamConstants::mInputChannelCount, StreamConstants::mSampleRate);
+        SndfileHandle file = SndfileHandle(recordingFilePath, SFM_WRITE, format, RecordingStreamConstants::mInputChannelCount, RecordingStreamConstants::mSampleRate);
         recordingFile = make_shared<SndfileHandle>(file);
     }
     if (!buffer) {
@@ -228,42 +199,63 @@ int RecordingIO::getCurrentMax() {
     return temp;
 }
 
+int64_t RecordingIO::getPlayerMaxTotalSourceFrames() {
+    return mPlayer->getMaxTotalSourceFrames();
+}
+
 void RecordingIO::resetCurrentMax() {
     currentMax = 0;
 }
 
 void RecordingIO::setStopPlaybackCallback(function<void()> stopPlaybackCallback) {
     mStopPlaybackCallback = stopPlaybackCallback;
+    mPlayer->setPlaybackCallback(mStopPlaybackCallback);
 }
 
 int RecordingIO::getTotalRecordedFrames() {
-    if (mRecordedTrack) {
-        return mRecordedTrack->getTotalSampleFrames();
+    if (mPlayer) {
+        return mPlayer->getTotalSampleFrames();
     }
     return 0;
 }
 
 int32_t RecordingIO::getCurrentPlaybackProgress() {
-    if (mRecordedTrack) {
-        return mRecordedTrack->getPlayHead();
-    }
-    return 0;
+    return mPlayer->getPlayHead();
 }
 
 void RecordingIO::setPlayHead(int position) {
-    if (mRecordedTrack) {
-        mRecordedTrack->setPlayHead(position);
-    }
+    mPlayer->setPlayHead(position);
 }
 
 int RecordingIO::getDurationInSeconds() {
-    return (int) mTotalSamples / (StreamConstants::mInputChannelCount * StreamConstants::mSampleRate);
+    return (int) mTotalSamples / (RecordingStreamConstants::mInputChannelCount * RecordingStreamConstants::mSampleRate);
+}
+
+void RecordingIO::clearPlayerSources() {
+    mPlayer->clearSources();
+}
+
+void RecordingIO::setPlaybackPlaying(bool playing) {
+    mPlayer->setPlaying(playing);
+}
+
+void RecordingIO::addSourceMap(map<string, shared_ptr<DataSource>> playMap) {
+    mPlayer->addSourceMap(playMap);
+}
+
+void RecordingIO::addSourceMapWithRecordedSource(map<string, shared_ptr<DataSource>> playMap, shared_ptr<DataSource> recordedSource) {
+    playMap.insert(pair<string, shared_ptr<DataSource>>(mRecordingFilePath, recordedSource));
+    mPlayer->addSourceMap(playMap);
+}
+
+bool RecordingIO::checkPlayerSources(map<string, shared_ptr<DataSource>> playMap) {
+    return mPlayer->checkPlayerSources(playMap);
 }
 
 void RecordingIO::resetProperties() {
     taskQueue->clear_queue();
-    mRecordedTrack.reset();
-    mRecordedTrack.reset();
+    mPlayer.reset();
+    mPlayer.reset();
     mRecordingFile.reset();
     mTotalSamples = 0;
     mIteration = 1;

@@ -6,8 +6,8 @@
 #define FAST_MIXER_RECORDINGBASESTREAM_H
 
 #include "../../streams/BaseStream.h"
-#include "..//RecordingIO.h"
-#include "StreamConstants.h"
+#include "../RecordingIO.h"
+#include "RecordingStreamConstants.h"
 
 class RecordingBaseStream : public BaseStream {
 public:

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="record_button_width">130dp</dimen>
+
+    <dimen name="record_button_width">100dp</dimen>
     <dimen name="record_button_height">50dp</dimen>
     <dimen name="button_text_size">12sp</dimen>
     <dimen name="recording_timer_text_size">25sp</dimen>
@@ -15,6 +16,10 @@
     <dimen name="recording_visualizer_chunk_max_width">160dp</dimen>
     <dimen name="recording_visualizer_chunk_min_width">0dp</dimen>
 
+    <dimen name="recording_screen_checkbox_margin_start">20dp</dimen>
+
+    <dimen name="card_view_elevation">10dp</dimen>
+
     <dimen name="bottom_drawer_height">100dp</dimen>
     <dimen name="bottom_drawer_margin_start">10dp</dimen>
 
@@ -23,5 +28,8 @@
     <dimen name="group_control_label_size">8sp</dimen>
     <dimen name="audio_view_slider_line_width">1dp</dimen>
     <dimen name="audio_view_slider_line_height">120dp</dimen>
+
+    <dimen name="progress_bar_min_width">70dp</dimen>
+    <dimen name="progress_bar_min_height">70dp</dimen>
 
 </resources>
