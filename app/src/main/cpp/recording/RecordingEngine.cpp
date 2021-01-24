@@ -88,7 +88,6 @@ bool RecordingEngine::startPlaybackCallable() {
         }
     }
 
-    mDataSource.reset();
     mDataSource = shared_ptr<FileDataSource> {
             move(mRecordingIO.setup_audio_source())
     };
@@ -109,7 +108,6 @@ bool RecordingEngine::startPlaybackWithMixingTracksCallable() {
         }
     }
 
-    mDataSource.reset();
     mDataSource = shared_ptr<FileDataSource> {
             move(mRecordingIO.setup_audio_source())
     };
@@ -162,7 +160,6 @@ bool RecordingEngine::startMixingTracksPlaybackCallable() {
         mRecordingIO.addSourceMap(sourceMap);
     }
 
-    mDataSource.reset();
     mDataSource = shared_ptr<FileDataSource> {
             move(mRecordingIO.setup_audio_source())
     };
