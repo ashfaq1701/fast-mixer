@@ -2,13 +2,14 @@ package com.bluehub.fastmixer.screens.mixing
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ListAdapter
-import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.*
+import com.bluehub.fastmixer.common.models.AudioFileUiState
 import com.bluehub.fastmixer.databinding.ListItemAudioFileBinding
 import kotlinx.coroutines.Deferred
 
-class AudioFileListAdapter(private val clickListener: AudioFileEventListeners, private val fileWaveViewStore: FileWaveViewStore)
+class AudioFileListAdapter(
+    private val clickListener: AudioFileEventListeners,
+    private val fileWaveViewStore: FileWaveViewStore)
     : ListAdapter<AudioFileUiState, AudioFileListAdapter.ViewHolder>(AudioFileDiffCallback()) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val holder = ViewHolder.from(parent)

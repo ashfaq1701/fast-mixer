@@ -11,7 +11,7 @@ import androidx.core.content.ContextCompat
 import androidx.databinding.BindingMethod
 import androidx.databinding.BindingMethods
 import com.bluehub.fastmixer.R
-import com.bluehub.fastmixer.screens.mixing.AudioFileUiState
+import com.bluehub.fastmixer.common.models.AudioFileUiState
 import com.bluehub.fastmixer.screens.mixing.FileWaveViewStore
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.functions.Function

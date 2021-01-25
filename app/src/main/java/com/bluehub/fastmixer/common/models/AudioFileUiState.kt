@@ -1,4 +1,4 @@
-package com.bluehub.fastmixer.screens.mixing
+package com.bluehub.fastmixer.common.models
 
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import java.io.Serializable

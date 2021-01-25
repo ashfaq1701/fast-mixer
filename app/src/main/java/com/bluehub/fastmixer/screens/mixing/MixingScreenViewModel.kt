@@ -5,11 +5,10 @@ import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.bluehub.fastmixer.common.models.AudioViewAction
 import com.bluehub.fastmixer.common.permissions.PermissionViewModel
 import com.bluehub.fastmixer.common.utils.*
-import com.bluehub.fastmixer.screens.recording.RecordingScreenViewModel
 import kotlinx.coroutines.*
-import timber.log.Timber
 import java.io.File
 import java.util.*
 import javax.inject.Inject
@@ -71,11 +70,16 @@ class MixingScreenViewModel @Inject constructor(override val context: Context,
 
     private val playList: MutableList<String> = mutableListOf()
 
+    val audioViewAction: MutableLiveData<AudioViewAction?> = MutableLiveData<AudioViewAction?>()
+
     init {
         mixingRepository.createMixingEngine()
+
         fileWaveViewStore.setAudioFilesLiveData(audioFilesLiveData)
-        fileWaveViewStore.setIsPlaying(isPlaying)
-        fileWaveViewStore.setIsGroupPlaying(isGroupPlaying)
+        fileWaveViewStore.setIsPlayingLiveData(isPlaying)
+        fileWaveViewStore.setIsGroupPlayingLiveData(isGroupPlaying)
+        fileWaveViewStore.audioViewActionLiveData = audioViewAction
+
         fileWaveViewStore.setCurrentPlaybackProgressGetter { getCurrentPlaybackProgress() }
         fileWaveViewStore.setPlayerHeadSetter { playHead: Int -> setPlayerHead(playHead) }
         fileWaveViewStore.setSourcePlayHeadSetter { filePath: String, playHead: Int ->
@@ -298,6 +302,10 @@ class MixingScreenViewModel @Inject constructor(override val context: Context,
         } else {
             groupPause()
         }
+    }
+
+    fun resetStates() {
+        audioViewAction.value = null
     }
 
     override fun onCleared() {

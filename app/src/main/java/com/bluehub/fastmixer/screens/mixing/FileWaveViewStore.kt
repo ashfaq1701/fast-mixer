@@ -2,6 +2,8 @@ package com.bluehub.fastmixer.screens.mixing
 
 import androidx.lifecycle.*
 import androidx.lifecycle.Observer
+import com.bluehub.fastmixer.common.models.AudioFileUiState
+import com.bluehub.fastmixer.common.models.AudioViewAction
 import io.reactivex.rxjava3.functions.*
 import io.reactivex.rxjava3.functions.Function
 import io.reactivex.rxjava3.subjects.BehaviorSubject
@@ -19,6 +21,8 @@ class FileWaveViewStore @Inject constructor() {
 
     private lateinit var mIsPlayingLiveData: LiveData<Boolean>
     private lateinit var mIsGroupPlayingLiveData: LiveData<Boolean>
+    lateinit var audioViewActionLiveData: MutableLiveData<AudioViewAction?>
+
     val isPlayingObservable: BehaviorSubject<Boolean> = BehaviorSubject.createDefault(false)
     val isGroupPlayingObservable: BehaviorSubject<Boolean> = BehaviorSubject.createDefault(false)
 
@@ -59,12 +63,12 @@ class FileWaveViewStore @Inject constructor() {
         mAudioFilesLiveData.observeForever(fileListObserver)
     }
 
-    fun setIsPlaying(isPlayingLiveData: LiveData<Boolean>) {
+    fun setIsPlayingLiveData(isPlayingLiveData: LiveData<Boolean>) {
         mIsPlayingLiveData = isPlayingLiveData
         mIsPlayingLiveData.observeForever(isPlayingObserver)
     }
 
-    fun setIsGroupPlaying(isGroupPlayingLiveData: LiveData<Boolean>) {
+    fun setIsGroupPlayingLiveData(isGroupPlayingLiveData: LiveData<Boolean>) {
         mIsGroupPlayingLiveData = isGroupPlayingLiveData
         mIsGroupPlayingLiveData.observeForever(isGroupPlayingObserver)
     }
