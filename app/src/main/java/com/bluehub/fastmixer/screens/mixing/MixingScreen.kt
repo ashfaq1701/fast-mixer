@@ -11,20 +11,18 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.transition.*
 import com.bluehub.fastmixer.R
-import com.bluehub.fastmixer.common.permissions.PermissionFragment
+import com.bluehub.fastmixer.common.models.AudioViewActionType
+import com.bluehub.fastmixer.common.permissions.PermissionControlFragment
 import com.bluehub.fastmixer.common.utils.DialogManager
-import com.bluehub.fastmixer.common.utils.ViewModelType
+import com.bluehub.fastmixer.common.models.ViewModelType
 import com.bluehub.fastmixer.databinding.MixingScreenBinding
 import com.bluehub.fastmixer.screens.mixing.MixingScreenDirections.actionMixingScreenToRecordingScreen
-import timber.log.Timber
 import javax.inject.Inject
 
-class MixingScreen : PermissionFragment<MixingScreenViewModel>(ViewModelType.NAV_SCOPED) {
+class MixingScreen : PermissionControlFragment<MixingScreenViewModel>(ViewModelType.NAV_SCOPED) {
     companion object {
         fun newInstance() = MixingScreen()
     }
-
-    override var TAG: String = javaClass.simpleName
 
     override val viewModelClass = MixingScreenViewModel::class
 
@@ -148,7 +146,9 @@ class MixingScreen : PermissionFragment<MixingScreenViewModel>(ViewModelType.NAV
 
         viewModel.audioViewAction.observe(viewLifecycleOwner, {
             it?.let {
-                Timber.d("Action is this value: $it")
+                when(it.actionType) {
+                    AudioViewActionType.GAIN_ADJUSTMENT -> showGainControlFragment()
+                }
             }
         })
     }
@@ -177,6 +177,11 @@ class MixingScreen : PermissionFragment<MixingScreenViewModel>(ViewModelType.NAV
                 viewModel.addReadFile(documentUri)
             }
         }
+    }
+
+    fun showGainControlFragment() {
+        val gainAdjustmentDialog = GainAdjustmentDialog()
+        gainAdjustmentDialog.show(requireActivity().supportFragmentManager, "gain_control")
     }
 }
 

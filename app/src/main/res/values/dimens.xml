@@ -32,4 +32,9 @@
     <dimen name="progress_bar_min_width">70dp</dimen>
     <dimen name="progress_bar_min_height">70dp</dimen>
 
+    <dimen name="dialog_min_width">500dp</dimen>
+    <dimen name="dialog_min_height">370dp</dimen>
+
+    <dimen name="dialog_button_margin">15dp</dimen>
+
 </resources>

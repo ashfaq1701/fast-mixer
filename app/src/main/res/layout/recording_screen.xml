@@ -7,7 +7,7 @@
     <data>
         <variable
             name="viewModel"
-            type="com.bluehub.fastmixer.screens.recording.RecordingScreenViewModel" />
+            type="com.bluehub.fastmixer.screens.recording.RecordingScreenControlViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

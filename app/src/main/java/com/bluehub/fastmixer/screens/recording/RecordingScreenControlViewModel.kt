@@ -11,7 +11,7 @@ import androidx.lifecycle.viewModelScope
 import com.bluehub.fastmixer.BR
 import com.bluehub.fastmixer.R
 import com.bluehub.fastmixer.broadcastReceivers.AudioDeviceChangeListener
-import com.bluehub.fastmixer.common.permissions.PermissionViewModel
+import com.bluehub.fastmixer.common.permissions.PermissionControlViewModel
 import com.bluehub.fastmixer.common.repositories.AudioRepository
 import com.bluehub.fastmixer.common.utils.PermissionManager
 import com.bluehub.fastmixer.common.utils.ScreenConstants
@@ -19,22 +19,21 @@ import com.bluehub.fastmixer.screens.mixing.AudioFileStore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
 
-class RecordingScreenViewModel @Inject constructor (override val context: Context,
-                                                    override val permissionManager: PermissionManager,
-                                                    val repository: RecordingRepository,
-                                                    private val audioRepository: AudioRepository,
-                                                    private val audioFileStore: AudioFileStore,
-                                                    private val audioDeviceChangeListener: AudioDeviceChangeListener)
-    : PermissionViewModel(context) {
+class RecordingScreenControlViewModel @Inject constructor (override val context: Context,
+                                                           override val permissionManager: PermissionManager,
+                                                           val repository: RecordingRepository,
+                                                           private val audioRepository: AudioRepository,
+                                                           private val audioFileStore: AudioFileStore,
+                                                           private val audioDeviceChangeListener: AudioDeviceChangeListener)
+    : PermissionControlViewModel(context) {
 
     companion object {
-        private lateinit var instance: RecordingScreenViewModel
+        private lateinit var instance: RecordingScreenControlViewModel
 
-        fun setInstance(vmInstance: RecordingScreenViewModel) {
+        fun setInstance(vmInstance: RecordingScreenControlViewModel) {
             instance = vmInstance
         }
 
