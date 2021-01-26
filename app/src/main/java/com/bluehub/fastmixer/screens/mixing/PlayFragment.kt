@@ -39,7 +39,7 @@ class PlayFragment(private val audioFile: AudioFile) : BaseFragment<PlayViewMode
             }
         })
 
-        viewModel.isPlaying.observe(viewLifecycleOwner, {
+        viewModel.isGroupPlaying.observe(viewLifecycleOwner, {
             if (it) {
                 binding.playAll.text = getString(R.string.pause_label)
             } else {
