@@ -6,6 +6,7 @@ import androidx.databinding.DataBindingUtil
 import com.bluehub.fastmixer.R
 import com.bluehub.fastmixer.common.fragments.BaseFragment
 import com.bluehub.fastmixer.databinding.PlayFragmentBinding
+import kotlinx.android.synthetic.main.view_loading.*
 
 class PlayFragment(private val audioFile: AudioFile) : BaseFragment<PlayViewModel>() {
 
@@ -23,6 +24,35 @@ class PlayFragment(private val audioFile: AudioFile) : BaseFragment<PlayViewMode
 
         viewModel.selectedAudioFile = audioFile
 
+        setupViewViewModel()
+
         return binding.root
+    }
+
+    private fun setupViewViewModel() {
+
+        viewModel.isPlaying.observe(viewLifecycleOwner, {
+            if (it) {
+                binding.playSingle.text = getString(R.string.pause_label)
+            } else {
+                binding.playSingle.text = getString(R.string.play_label)
+            }
+        })
+
+        viewModel.isPlaying.observe(viewLifecycleOwner, {
+            if (it) {
+                binding.playAll.text = getString(R.string.pause_label)
+            } else {
+                binding.playAll.text = getString(R.string.play_mixed_label)
+            }
+        })
+
+        viewModel.isLoading.observe(viewLifecycleOwner, {
+            if (it) {
+                pbLoading.visibility = View.VISIBLE
+            } else {
+                pbLoading.visibility = View.GONE
+            }
+        })
     }
 }

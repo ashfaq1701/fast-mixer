@@ -19,6 +19,7 @@ class MixingScreenViewModel @Inject constructor(override val context: Context,
                                                 private val fileManager: FileManager,
                                                 private val mixingRepository: MixingRepository,
                                                 private val audioFileStore: AudioFileStore,
+                                                private val playFlagStore: PlayFlagStore,
                                                 val fileWaveViewStore: FileWaveViewStore)
     : PermissionControlViewModel(context) {
 
@@ -60,13 +61,11 @@ class MixingScreenViewModel @Inject constructor(override val context: Context,
     val itemAddedIdx: LiveData<Int>
         get() = _itemAddedIdx
 
-    private val _isPlaying = MutableLiveData<Boolean>()
     val isPlaying: LiveData<Boolean>
-        get() = _isPlaying
+        get() = playFlagStore.isPlaying
 
-    private val _isGroupPlaying = MutableLiveData<Boolean>()
     val isGroupPlaying: LiveData<Boolean>
-        get() = _isGroupPlaying
+        get() = playFlagStore.isGroupPlaying
 
     private val playList: MutableList<String> = mutableListOf()
 
@@ -213,7 +212,7 @@ class MixingScreenViewModel @Inject constructor(override val context: Context,
     }
 
     fun togglePlay(filePath: String) {
-        if (_isPlaying.value == null || _isPlaying.value == false) {
+        if (playFlagStore.isPlaying.value == null || playFlagStore.isPlaying.value == false) {
             playAudioFile(filePath)
         } else {
             pauseAudio()
@@ -230,14 +229,14 @@ class MixingScreenViewModel @Inject constructor(override val context: Context,
             }
 
             mixingRepository.startPlayback()
-            _isPlaying.postValue(true)
+            playFlagStore.isPlaying.postValue(true)
         }
     }
 
     private fun pauseAudio() {
         viewModelScope.launch(Dispatchers.IO) {
             mixingRepository.pausePlayback()
-            _isPlaying.postValue(false)
+            playFlagStore.isPlaying.postValue(false)
         }
     }
 
@@ -246,8 +245,12 @@ class MixingScreenViewModel @Inject constructor(override val context: Context,
             fileWaveViewStore.setFilePaused(filePath)
         }
 
-        if (_isGroupPlaying.value == true) {
-            _isGroupPlaying.postValue(false)
+        if (playFlagStore.isPlaying.value == true) {
+            playFlagStore.isPlaying.postValue(false)
+        }
+
+        if (playFlagStore.isGroupPlaying.value == true) {
+            playFlagStore.isGroupPlaying.postValue(false)
         }
     }
 
@@ -285,19 +288,19 @@ class MixingScreenViewModel @Inject constructor(override val context: Context,
                 playList.reInitList(pathList)
             }
             mixingRepository.startPlayback()
-            _isGroupPlaying.postValue(true)
+            playFlagStore.isGroupPlaying.postValue(true)
         }
     }
 
     private fun groupPause() {
         viewModelScope.launch(Dispatchers.IO) {
             mixingRepository.pausePlayback()
-            _isGroupPlaying.postValue(false)
+            playFlagStore.isGroupPlaying.postValue(false)
         }
     }
 
     fun toggleGroupPlay() {
-        if (_isGroupPlaying.value == null || _isGroupPlaying.value == false) {
+        if (playFlagStore.isGroupPlaying.value == null || playFlagStore.isGroupPlaying.value == false) {
             groupPlay()
         } else {
             groupPause()

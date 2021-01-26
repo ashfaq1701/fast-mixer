@@ -4,6 +4,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <data>
+        <variable
+            name="viewModel"
+            type="com.bluehub.fastmixer.screens.mixing.PlayViewModel" />
+    </data>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="@dimen/play_fragment_height"
@@ -28,14 +34,18 @@
                 android:id="@+id/playSingle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/play" />
+                android:text="@string/play"
+                android:onClick="@{() -> viewModel.togglePlay()}"/>
 
             <Button
                 android:id="@+id/playAll"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/play_mixed_label" />
+                android:text="@string/play_mixed_label"
+                android:onClick="@{() -> viewModel.toggleGroupPlay()}" />
         </LinearLayout>
+
+        <include layout="@layout/view_loading" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
