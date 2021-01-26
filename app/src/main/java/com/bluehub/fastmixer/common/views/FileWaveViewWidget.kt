@@ -97,6 +97,17 @@ class FileWaveViewWidget(context: Context, attributeSet: AttributeSet?)
             ).subscribe {
                 binding.wavePlayPause.isEnabled = it
             }
+
+        mFileWaveViewStore.value.isPlayingObservable
+            .flatMap {  isPlaying ->
+                mFileWaveViewStore.value.isGroupPlayingObservable.map { isGroupPlaying ->
+                    isPlaying || isGroupPlaying
+                }
+            }
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe {
+                menu.menu.getItem(0).isEnabled = !it
+            }
     }
 
     private fun setupUiStateObservers() {

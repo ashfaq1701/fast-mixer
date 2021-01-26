@@ -297,9 +297,11 @@ class FileWaveViewStore @Inject constructor() {
     }
 
     private fun setPaused(audioFileUiState: AudioFileUiState) {
-        audioFileUiState.isPlaying.onNext(false)
-        audioFileUiState.playTimer?.cancel()
-        audioFileUiState.playTimer = null
+        if (audioFileUiState.isPlaying.hasValue() && audioFileUiState.isPlaying.value == true) {
+            audioFileUiState.isPlaying.onNext(false)
+            audioFileUiState.playTimer?.cancel()
+            audioFileUiState.playTimer = null
+        }
     }
 
     fun setPlayHead(filePath: String, playHeadPointer: Int) {

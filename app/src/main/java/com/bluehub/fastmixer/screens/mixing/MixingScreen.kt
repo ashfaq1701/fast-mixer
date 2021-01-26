@@ -147,7 +147,11 @@ class MixingScreen : PermissionControlFragment<MixingScreenViewModel>(ViewModelT
         viewModel.audioViewAction.observe(viewLifecycleOwner, {
             it?.let {
                 when(it.actionType) {
-                    AudioViewActionType.GAIN_ADJUSTMENT -> showGainControlFragment()
+                    AudioViewActionType.GAIN_ADJUSTMENT -> {
+                        viewModel.findAudioFileByPath(it.filePath)?.let { audioFile ->
+                            showGainControlFragment(audioFile)
+                        }
+                    }
                 }
             }
         })
@@ -179,8 +183,8 @@ class MixingScreen : PermissionControlFragment<MixingScreenViewModel>(ViewModelT
         }
     }
 
-    fun showGainControlFragment() {
-        val gainAdjustmentDialog = GainAdjustmentDialog()
+    fun showGainControlFragment(audioFile: AudioFile) {
+        val gainAdjustmentDialog = GainAdjustmentDialog(audioFile)
         gainAdjustmentDialog.show(requireActivity().supportFragmentManager, "gain_control")
     }
 }
