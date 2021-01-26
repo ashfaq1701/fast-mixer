@@ -76,10 +76,29 @@ class PlayViewModel @Inject constructor(
     }
 
     private fun groupPlay() {
+        viewModelScope.launch(Dispatchers.IO) {
+            _isLoading.postValue(true)
 
+            val pathList = audioFileStore.audioFiles.map { it.path }
+            if (!playList.areEqual(pathList)) {
+                mixingRepository.loadFiles(pathList)
+                playList.reInitList(pathList)
+            }
+            mixingRepository.startPlayback()
+            playFlagStore.isGroupPlaying.postValue(true)
+
+            _isLoading.postValue(false)
+        }
     }
 
     private fun groupPause() {
+        viewModelScope.launch(Dispatchers.IO) {
+            _isLoading.postValue(true)
 
+            mixingRepository.pausePlayback()
+            playFlagStore.isGroupPlaying.postValue(false)
+
+            _isLoading.postValue(false)
+        }
     }
 }
