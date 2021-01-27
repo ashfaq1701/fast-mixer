@@ -31,6 +31,8 @@ public:
 
     void setStopPlaybackCallback(function<void(void)> stopPlaybackCallback);
 
+    int getTotalSampleFrames();
+
     int getCurrentPlaybackProgress();
 
     void setPlayHead(int position);

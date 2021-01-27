@@ -200,12 +200,12 @@ extern "C" {
     }
 
     JNIEXPORT jint JNICALL
-    Java_com_bluehub_fastmixer_audio_RecordingEngine_getTotalRecordedFrames(JNIEnv * env, jclass) {
+    Java_com_bluehub_fastmixer_audio_RecordingEngine_getTotalSampleFrames(JNIEnv * env, jclass) {
         if (!recordingEngine) {
             LOGE("getTotalRecordedFrames: recordingEngine is null, you must call create() method before calling this method");
             return 0;
         }
-        return recordingEngine->getTotalRecordedFrames();
+        return recordingEngine->getTotalSampleFrames();
     }
 
     JNIEXPORT jint JNICALL

@@ -28,6 +28,8 @@ class MixingEngine {
 
         @JvmStatic external fun getTotalSamples(filePath: String): Int
 
+        @JvmStatic external fun getTotalSampleFrames(): Int
+
         @JvmStatic external fun getCurrentPlaybackProgress(): Int
 
         @JvmStatic external fun delete()

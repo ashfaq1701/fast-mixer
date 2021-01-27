@@ -7,6 +7,7 @@ import com.bluehub.fastmixer.common.utils.reInitList
 import com.bluehub.fastmixer.common.viewmodel.BaseViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.util.*
 import javax.inject.Inject
 
 class PlayViewModel @Inject constructor(
@@ -29,6 +30,21 @@ class PlayViewModel @Inject constructor(
 
     private val playList: MutableList<String> = mutableListOf()
 
+    private var seekbarTimer: Timer? = null
+
+    private val _seekbarProgress = MutableLiveData<Int>(0)
+    val seekbarProgress: LiveData<Int>
+        get() = _seekbarProgress
+
+    private val _seekbarMaxValue = MutableLiveData<Int>(0)
+    val seekbarMaxValue: LiveData<Int>
+        get() = _seekbarMaxValue
+
+    fun setAudioFile(audioFile: AudioFile) {
+        selectedAudioFile = audioFile
+        loadSource()
+    }
+
     fun togglePlay() {
         if (isPlaying.value == null || isPlaying.value == false) {
             playAudio()
@@ -42,6 +58,20 @@ class PlayViewModel @Inject constructor(
             groupPlay()
         } else {
             groupPause()
+        }
+    }
+
+    private fun loadSource() {
+        viewModelScope.launch(Dispatchers.IO) {
+
+            _isLoading.postValue(true)
+
+            val pathList = listOf(selectedAudioFile.path)
+            mixingRepository.loadFiles(pathList)
+
+            _seekbarMaxValue.postValue(mixingRepository.getTotalSampleFrames())
+
+            _isLoading.postValue(false)
         }
     }
 
@@ -99,6 +129,51 @@ class PlayViewModel @Inject constructor(
             playFlagStore.isGroupPlaying.postValue(false)
 
             _isLoading.postValue(false)
+        }
+    }
+
+    fun startPlayback() {
+        viewModelScope.launch(Dispatchers.IO) {
+            _isLoading.postValue(true)
+            mixingRepository.startPlayback()
+            _isLoading.postValue(false)
+        }
+    }
+
+    fun pausePlayback() {
+        viewModelScope.launch(Dispatchers.IO) {
+            _isLoading.postValue(true)
+            mixingRepository.pausePlayback()
+            _isLoading.postValue(false)
+        }
+    }
+
+    fun startTrackingSeekbarTimer() {
+        _seekbarProgress.value = 0
+        _seekbarMaxValue.value = mixingRepository.getTotalSampleFrames()
+        stopTrackingSeekbarTimer()
+        seekbarTimer = Timer()
+        seekbarTimer?.schedule(object: TimerTask() {
+            override fun run() {
+                _seekbarProgress.postValue(mixingRepository.getCurrentPlaybackProgress())
+            }
+        }, 0, 10)
+    }
+
+    fun stopTrackingSeekbarTimer() {
+        seekbarTimer?.cancel()
+        seekbarTimer = null
+    }
+
+    fun setPlayerHead(playHead: Int) = mixingRepository.setPlayerHead(playHead)
+
+    fun setTrackPlayHead(playHead: Int) = mixingRepository.setSourcePlayHead(selectedAudioFile.path, playHead)
+
+    override fun onCleared() {
+        super.onCleared()
+
+        if (isPlaying.value == true || isGroupPlaying.value == true) {
+            mixingRepository.pausePlayback()
         }
     }
 }

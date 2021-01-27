@@ -128,6 +128,10 @@ void MixingEngine::clearPlayerSources() {
     mMixingIO.clearPlayerSources();
 }
 
+int MixingEngine::getTotalSampleFrames() {
+    return mMixingIO.getTotalSampleFrames();
+}
+
 int MixingEngine::getCurrentPlaybackProgress() {
     return mMixingIO.getCurrentPlaybackProgress();
 }

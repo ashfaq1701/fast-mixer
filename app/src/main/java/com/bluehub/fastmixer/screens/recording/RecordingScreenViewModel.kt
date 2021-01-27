@@ -22,18 +22,18 @@ import kotlinx.coroutines.withContext
 import java.util.*
 import javax.inject.Inject
 
-class RecordingScreenControlViewModel @Inject constructor (override val context: Context,
-                                                           override val permissionManager: PermissionManager,
-                                                           val repository: RecordingRepository,
-                                                           private val audioRepository: AudioRepository,
-                                                           private val audioFileStore: AudioFileStore,
-                                                           private val audioDeviceChangeListener: AudioDeviceChangeListener)
+class RecordingScreenViewModel @Inject constructor (override val context: Context,
+                                                    override val permissionManager: PermissionManager,
+                                                    val repository: RecordingRepository,
+                                                    private val audioRepository: AudioRepository,
+                                                    private val audioFileStore: AudioFileStore,
+                                                    private val audioDeviceChangeListener: AudioDeviceChangeListener)
     : PermissionControlViewModel(context) {
 
     companion object {
-        private lateinit var instance: RecordingScreenControlViewModel
+        private lateinit var instance: RecordingScreenViewModel
 
-        fun setInstance(vmInstance: RecordingScreenControlViewModel) {
+        fun setInstance(vmInstance: RecordingScreenViewModel) {
             instance = vmInstance
         }
 
@@ -416,7 +416,7 @@ class RecordingScreenControlViewModel @Inject constructor (override val context:
 
     fun startTrackingSeekbar() {
         _seekbarProgress.value = 0
-        _seekbarMaxValue.value = repository.getTotalRecordedFrames()
+        _seekbarMaxValue.value = repository.getTotalSampleFrames()
         stopTrackingSeekbarTimer()
         seekbarTimer = Timer()
         seekbarTimer?.schedule(object: TimerTask() {

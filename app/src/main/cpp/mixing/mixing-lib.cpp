@@ -143,6 +143,15 @@ extern "C" {
     }
 
     JNIEXPORT jint JNICALL
+    Java_com_bluehub_fastmixer_audio_MixingEngine_getTotalSampleFrames(JNIEnv * env, jclass) {
+        if (!mixingEngine) {
+            LOGE("getTotalRecordedFrames: mixingEngine is null, you must call create() method before calling this method");
+            return 0;
+        }
+        return mixingEngine->getTotalSampleFrames();
+    }
+
+    JNIEXPORT jint JNICALL
     Java_com_bluehub_fastmixer_audio_MixingEngine_getCurrentPlaybackProgress(JNIEnv *env, jclass) {
         if (!mixingEngine) {
             LOGE("getCurrentPlaybackProgress: mixingEngine is null, you must call create() method before calling this method");

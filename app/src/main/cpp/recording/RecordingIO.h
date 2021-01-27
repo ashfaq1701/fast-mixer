@@ -55,7 +55,7 @@ public:
 
     void setStopPlaybackCallback(function<void(void)> stopPlaybackCallback);
 
-    int getTotalRecordedFrames();
+    int getTotalSampleFrames();
 
     int getCurrentPlaybackProgress();
 

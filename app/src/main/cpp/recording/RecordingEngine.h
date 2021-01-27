@@ -49,7 +49,7 @@ public:
 
     void setStopPlayback();
 
-    int getTotalRecordedFrames();
+    int getTotalSampleFrames();
 
     int getCurrentPlaybackProgress();
 

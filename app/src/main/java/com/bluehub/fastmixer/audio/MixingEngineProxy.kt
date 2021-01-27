@@ -9,6 +9,8 @@ class MixingEngineProxy @Inject constructor() {
 
     fun readSamples(filePath: String, countPoints: Int) = MixingEngine.readSamples(filePath, countPoints)
 
+    fun getTotalSampleFrames() = MixingEngine.getTotalSampleFrames()
+
     fun getTotalSamples(filePath: String): Int = MixingEngine.getTotalSamples(filePath)
 
     fun getCurrentPlaybackProgress(): Int = MixingEngine.getCurrentPlaybackProgress()

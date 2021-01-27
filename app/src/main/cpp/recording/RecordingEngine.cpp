@@ -301,8 +301,8 @@ void RecordingEngine::setStopPlayback() {
     });
 }
 
-int RecordingEngine::getTotalRecordedFrames() {
-    return mRecordingIO.getTotalRecordedFrames();
+int RecordingEngine::getTotalSampleFrames() {
+    return mRecordingIO.getTotalSampleFrames();
 }
 
 int RecordingEngine::getCurrentPlaybackProgress() {

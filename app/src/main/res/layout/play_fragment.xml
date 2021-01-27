@@ -16,7 +16,7 @@
         tools:context=".screens.mixing.PlayFragment">
 
         <SeekBar
-            android:id="@+id/play_seekbar"
+            android:id="@+id/playSeekbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:layout_constraintTop_toTopOf="parent"
@@ -28,7 +28,7 @@
             android:layout_height="wrap_content"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/play_seekbar">
+            app:layout_constraintTop_toBottomOf="@id/playSeekbar">
 
             <Button
                 android:id="@+id/playSingle"

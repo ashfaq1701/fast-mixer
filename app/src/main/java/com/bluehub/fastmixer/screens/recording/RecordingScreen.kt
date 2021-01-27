@@ -18,13 +18,13 @@ import kotlinx.android.synthetic.main.view_loading.*
 import javax.inject.Inject
 
 
-class RecordingScreen : PermissionControlFragment<RecordingScreenControlViewModel>(ViewModelType.FRAGMENT_SCOPED) {
+class RecordingScreen : PermissionControlFragment<RecordingScreenViewModel>(ViewModelType.FRAGMENT_SCOPED) {
 
     companion object {
         fun newInstance() = RecordingScreen()
     }
 
-    override val viewModelClass = RecordingScreenControlViewModel::class
+    override val viewModelClass = RecordingScreenViewModel::class
 
     @Inject
     override lateinit var dialogManager: DialogManager
@@ -57,7 +57,7 @@ class RecordingScreen : PermissionControlFragment<RecordingScreenControlViewMode
 
         recordingSeekbar = dataBinding.recordingSeekbar
 
-        RecordingScreenControlViewModel.setInstance(viewModel)
+        RecordingScreenViewModel.setInstance(viewModel)
         dataBinding.viewModel = viewModel
 
         dataBinding.lifecycleOwner = viewLifecycleOwner

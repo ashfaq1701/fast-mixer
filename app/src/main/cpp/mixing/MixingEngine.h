@@ -31,6 +31,8 @@ public:
 
     void clearPlayerSources();
 
+    int getTotalSampleFrames();
+
     int getCurrentPlaybackProgress();
 
     void setPlayerHead(int playHead);
