@@ -32,23 +32,32 @@ FileDataSource::FileDataSource (
         const AudioProperties properties) :
         mBuffer(move(data)), mBufferSize(size), mProperties(properties) {
 
-    int minValue = FLT_MAX;
+    calculateProperties();
+}
 
-    for (int i = 0; i < mBufferSize; i++) {
-        if (abs(mBuffer[i]) > mMaxSampleValue) {
-            mMaxSampleValue = abs(mBuffer[i]);
+void FileDataSource::calculateProperties() {
+    auto data = getData();
+    auto bufferSize = getSize();
+
+    for (int i = 0; i < bufferSize; i++) {
+        if (abs(data[i]) > mMaxAbsSampleValue) {
+            mMaxAbsSampleValue = abs(data[i]);
         }
 
-        if (mBuffer[i] < minValue) {
-            minValue = mBuffer[i];
+        if (data[i] < mMinSampleValue) {
+            mMinSampleValue = mBuffer[i];
+        }
+
+        if (data[i] > mMaxSampleValue) {
+            mMaxSampleValue = data[i];
         }
     }
 
-    transformedBuffer = new float [mBufferSize];
+    transformedBuffer = new float [bufferSize];
 
     for (int i = 0; i < mBufferSize; i++) {
-        if (minValue < 0) {
-            transformedBuffer[i] = mBuffer[i] - minValue;
+        if (mMinSampleValue < 0) {
+            transformedBuffer[i] = mBuffer[i] - mMinSampleValue;
         } else {
             transformedBuffer[i] = mBuffer[i];
         }
@@ -139,10 +148,67 @@ unique_ptr<buffer_data> FileDataSource::readData(size_t countPoints) {
     return make_unique<buffer_data>(buff);
 }
 
+const float* FileDataSource::getMainBufferData() {
+    return mBuffer.get();
+}
+
+int64_t FileDataSource::getMainBufferSize() {
+    return mBufferSize;
+}
+
+const float* FileDataSource::getData() const {
+    if (mBackupBuffer) {
+        mBackupBuffer.get();
+    }
+    return mBuffer.get();
+}
+
+float FileDataSource::getAbsMaxSampleValue() const {
+    return mMaxAbsSampleValue;
+}
+
+float FileDataSource::getMaxSampleValue() const {
+    return mMaxSampleValue;
+}
+
+float FileDataSource::getMinSampleValue() const {
+    return mMinSampleValue;
+}
+
 void FileDataSource::setPlayHead(int64_t playHead) {
     mPlayHead = playHead;
 }
 
 int64_t FileDataSource::getPlayHead() {
     return mPlayHead;
+}
+
+void FileDataSource::setBackupBufferData(float* data, int64_t numSamples) {
+    mBackupBuffer = unique_ptr<float[]>(move(data));
+    mBackupBufferSize = numSamples;
+}
+
+int64_t FileDataSource::getSize() const {
+    if (mBackupBuffer) {
+        return mBackupBufferSize;
+    }
+    return mBufferSize;
+}
+
+int64_t FileDataSource::getSampleSize() {
+    if (mBackupBuffer) {
+        return mBackupBufferSize / mProperties.channelCount;
+    }
+
+    return mBufferSize / mProperties.channelCount;
+}
+
+void FileDataSource::resetBackupBufferData() {
+    mBackupBuffer = unique_ptr<float[]> {nullptr};
+}
+
+void FileDataSource::applyBackupBufferData() {
+    mBuffer.swap(mBackupBuffer);
+    resetBackupBufferData();
+    calculateProperties();
 }

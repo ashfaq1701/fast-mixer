@@ -144,8 +144,8 @@ int64_t Player::getMaxTotalSourceFrames() {
 float Player::getMaxValueAcrossSources() {
     float allMaxValue = 0.0;
     for (auto it = mSourceMap.begin(); it != mSourceMap.end(); it++) {
-        if (it->second->getMaxSampleValue() > allMaxValue) {
-            allMaxValue = it->second->getMaxSampleValue();
+        if (it->second->getAbsMaxSampleValue() > allMaxValue) {
+            allMaxValue = it->second->getAbsMaxSampleValue();
         }
     }
     return allMaxValue;

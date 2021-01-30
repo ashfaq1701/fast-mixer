@@ -32,6 +32,12 @@ class MixingEngine {
 
         @JvmStatic external fun getCurrentPlaybackProgress(): Int
 
+        @JvmStatic external fun gainSourceByDb(filePath: String, db: Int)
+
+        @JvmStatic external fun applySourceTransformation(filePath: String)
+
+        @JvmStatic external fun clearSourceTransformation(filePath: String)
+
         @JvmStatic external fun delete()
     }
 }

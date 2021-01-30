@@ -30,15 +30,26 @@ using namespace std;
 class FileDataSource : public DataSource {
 
 public:
-    int64_t getSize() const override { return mBufferSize; }
+    int64_t getMainBufferSize();
+    int64_t getSize() const override;
+
     AudioProperties getProperties() const override { return mProperties; }
-    const float* getData() const override { return mBuffer.get(); }
-    int64_t getSampleSize() { return mBufferSize / mProperties.channelCount; };
+
+    const float* getMainBufferData();
+    const float* getData() const override;
+
+    void setBackupBufferData(float* data, int64_t numSamples);
+
+    int64_t getSampleSize();
 
     void setPlayHead(int64_t playHead);
     int64_t getPlayHead();
 
-    float getMaxSampleValue() { return mMaxSampleValue; }
+    float getAbsMaxSampleValue() const override;
+
+    float getMaxSampleValue() const override;
+
+    float getMinSampleValue() const override;
 
     static FileDataSource* newFromCompressedFile(
             const char *filename,
@@ -46,17 +57,30 @@ public:
 
     unique_ptr<buffer_data> readData(size_t numSamples);
 
+    void applyBackupBufferData();
+    void resetBackupBufferData();
+
 private:
 
     FileDataSource(unique_ptr<float[]> data, size_t size,
                    const AudioProperties properties);
 
-    const unique_ptr<float[]> mBuffer;
+    void calculateProperties();
+
+    unique_ptr<float[]> mBuffer;
+    unique_ptr<float[]> mBackupBuffer {nullptr};
+
     float* transformedBuffer = nullptr;
+
     const int64_t mBufferSize;
+    int64_t mBackupBufferSize = 0;
+
     const AudioProperties mProperties;
     int64_t currentPtr = 0;
     int64_t mPlayHead = 0;
+
+    float mMaxAbsSampleValue = FLT_MIN;
     float mMaxSampleValue = FLT_MIN;
+    float mMinSampleValue = FLT_MAX;
 };
 #endif //RHYTHMGAME_AASSETDATASOURCE_H

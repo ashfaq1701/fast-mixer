@@ -41,9 +41,7 @@ add_library( # Sets the name of the library.
 
         streams/BaseStream.cpp
 
-        synthesizers/BaseSynthesizer.h
-        synthesizers/HighPassFilter.cpp
-        synthesizers/LowPassFilter.cpp
+        synthesizers/GainAdjustment.cpp
 
         audio/FileDataSource.cpp
         audio/Player.cpp
