@@ -4,13 +4,14 @@ import android.os.Bundle
 import android.view.*
 import android.widget.SeekBar
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.MutableLiveData
 import com.bluehub.fastmixer.R
 import com.bluehub.fastmixer.common.fragments.BaseFragment
 import com.bluehub.fastmixer.databinding.PlayFragmentBinding
 import kotlinx.android.synthetic.main.play_fragment.*
 import kotlinx.android.synthetic.main.view_loading.*
 
-class PlayFragment(private val audioFile: AudioFile) : BaseFragment<PlayViewModel>() {
+class PlayFragment(private val audioFile: AudioFile, val isLoading: MutableLiveData<Boolean>) : BaseFragment<PlayViewModel>() {
 
     private lateinit var binding: PlayFragmentBinding
     override val viewModelClass = PlayViewModel::class
@@ -34,6 +35,7 @@ class PlayFragment(private val audioFile: AudioFile) : BaseFragment<PlayViewMode
     }
 
     private fun setupViewViewModel() {
+        viewModel.setIsLoadingLiveData(isLoading)
 
         viewModel.isPlaying.observe(viewLifecycleOwner, {
             if (it) {
@@ -52,14 +54,6 @@ class PlayFragment(private val audioFile: AudioFile) : BaseFragment<PlayViewMode
             } else {
                 binding.playAll.text = getString(R.string.play_mixed_label)
                 viewModel.stopTrackingSeekbarTimer()
-            }
-        })
-
-        viewModel.isLoading.observe(viewLifecycleOwner, {
-            if (it) {
-                pbLoading.visibility = View.VISIBLE
-            } else {
-                pbLoading.visibility = View.GONE
             }
         })
 

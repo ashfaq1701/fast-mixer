@@ -149,7 +149,7 @@ void MixingEngine::setSourcePlayHead(string filePath, int playHead) {
     }
 }
 
-void MixingEngine::gainSourceByDb(string filePath, int db) {
+void MixingEngine::gainSourceByDb(string filePath, float db) {
     auto it = mSourceMapStore->sourceMap.find(filePath);
     if (it == mSourceMapStore->sourceMap.end()) {
         return;

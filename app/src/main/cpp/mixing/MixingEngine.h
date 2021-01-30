@@ -27,7 +27,7 @@ public:
     bool startPlayback();
     void pausePlayback();
 
-    void gainSourceByDb(string filePath, int db);
+    void gainSourceByDb(string filePath, float db);
 
     void applySourceTransformation(string filePath);
 

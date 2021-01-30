@@ -6,6 +6,7 @@ import android.view.*
 import com.bluehub.fastmixer.R
 import com.bluehub.fastmixer.common.fragments.BaseDialogFragment
 import com.bluehub.fastmixer.databinding.GainAdjustmentDialogBinding
+import kotlinx.android.synthetic.main.view_loading.*
 
 class GainAdjustmentDialog(private val audioFile: AudioFile) : BaseDialogFragment<GainAdjustmentViewModel>() {
 
@@ -17,6 +18,8 @@ class GainAdjustmentDialog(private val audioFile: AudioFile) : BaseDialogFragmen
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        setupViewViewModel()
+
         return binding.root
     }
 
@@ -35,7 +38,7 @@ class GainAdjustmentDialog(private val audioFile: AudioFile) : BaseDialogFragmen
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        val playFragment = PlayFragment(audioFile)
+        val playFragment = PlayFragment(audioFile, viewModel.isLoading)
         val transaction = childFragmentManager.beginTransaction()
         transaction.replace(R.id.fragmentContainer, playFragment).commit()
     }
@@ -44,6 +47,16 @@ class GainAdjustmentDialog(private val audioFile: AudioFile) : BaseDialogFragmen
         binding.closeDialog.setOnClickListener {
             closeDialog()
         }
+    }
+
+    private fun setupViewViewModel() {
+        viewModel.isLoading.observe(viewLifecycleOwner, {
+            if (it) {
+                pbLoading.visibility = View.VISIBLE
+            } else {
+                pbLoading.visibility = View.GONE
+            }
+        })
     }
 
 }

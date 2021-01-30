@@ -24,9 +24,7 @@ class PlayViewModel @Inject constructor(
     val isGroupPlaying: LiveData<Boolean>
         get() = playFlagStore.isGroupPlaying
 
-    private val _isLoading = MutableLiveData<Boolean>(false)
-    val isLoading: LiveData<Boolean>
-        get() = _isLoading
+    private lateinit var _isLoading: MutableLiveData<Boolean>
 
     private val playList: MutableList<String> = mutableListOf()
 
@@ -39,6 +37,10 @@ class PlayViewModel @Inject constructor(
     private val _seekbarMaxValue = MutableLiveData<Int>(0)
     val seekbarMaxValue: LiveData<Int>
         get() = _seekbarMaxValue
+
+    fun setIsLoadingLiveData(isLoading: MutableLiveData<Boolean>) {
+        _isLoading = isLoading
+    }
 
     fun setAudioFile(audioFile: AudioFile) {
         selectedAudioFile = audioFile
@@ -64,21 +66,21 @@ class PlayViewModel @Inject constructor(
     private fun loadSource() {
         viewModelScope.launch(Dispatchers.IO) {
 
-            _isLoading.postValue(true)
+            setIsLoading()
 
             val pathList = listOf(selectedAudioFile.path)
             mixingRepository.loadFiles(pathList)
 
             _seekbarMaxValue.postValue(mixingRepository.getTotalSampleFrames())
 
-            _isLoading.postValue(false)
+            cancelIsLoading()
         }
     }
 
     private fun playAudio() {
         viewModelScope.launch(Dispatchers.IO) {
 
-            _isLoading.postValue(true)
+            setIsLoading()
 
             val pathList = listOf(selectedAudioFile.path)
 
@@ -90,24 +92,24 @@ class PlayViewModel @Inject constructor(
             mixingRepository.startPlayback()
             playFlagStore.isPlaying.postValue(true)
 
-            _isLoading.postValue(false)
+            cancelIsLoading()
         }
     }
 
     private fun pauseAudio() {
         viewModelScope.launch(Dispatchers.IO) {
-            _isLoading.postValue(true)
+            setIsLoading()
 
             mixingRepository.pausePlayback()
             playFlagStore.isPlaying.postValue(false)
 
-            _isLoading.postValue(false)
+            cancelIsLoading()
         }
     }
 
     private fun groupPlay() {
         viewModelScope.launch(Dispatchers.IO) {
-            _isLoading.postValue(true)
+            setIsLoading()
 
             val pathList = audioFileStore.audioFiles.map { it.path }
             if (!playList.areEqual(pathList)) {
@@ -117,34 +119,34 @@ class PlayViewModel @Inject constructor(
             mixingRepository.startPlayback()
             playFlagStore.isGroupPlaying.postValue(true)
 
-            _isLoading.postValue(false)
+            cancelIsLoading()
         }
     }
 
     private fun groupPause() {
         viewModelScope.launch(Dispatchers.IO) {
-            _isLoading.postValue(true)
+            setIsLoading()
 
             mixingRepository.pausePlayback()
             playFlagStore.isGroupPlaying.postValue(false)
 
-            _isLoading.postValue(false)
+            cancelIsLoading()
         }
     }
 
     fun startPlayback() {
         viewModelScope.launch(Dispatchers.IO) {
-            _isLoading.postValue(true)
+            setIsLoading()
             mixingRepository.startPlayback()
-            _isLoading.postValue(false)
+            cancelIsLoading()
         }
     }
 
     fun pausePlayback() {
         viewModelScope.launch(Dispatchers.IO) {
-            _isLoading.postValue(true)
+            setIsLoading()
             mixingRepository.pausePlayback()
-            _isLoading.postValue(false)
+            cancelIsLoading()
         }
     }
 
@@ -168,6 +170,18 @@ class PlayViewModel @Inject constructor(
     fun setPlayerHead(playHead: Int) = mixingRepository.setPlayerHead(playHead)
 
     fun setTrackPlayHead(playHead: Int) = mixingRepository.setSourcePlayHead(selectedAudioFile.path, playHead)
+
+    fun setIsLoading() {
+        if (::_isLoading.isInitialized) {
+            _isLoading.postValue(true)
+        }
+    }
+
+    fun cancelIsLoading() {
+        if (::_isLoading.isInitialized) {
+            _isLoading.postValue(false)
+        }
+    }
 
     override fun onCleared() {
         super.onCleared()

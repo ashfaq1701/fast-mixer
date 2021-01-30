@@ -29,7 +29,7 @@ class MixingEngineProxy @Inject constructor() {
 
     fun deleteFile(filePath: String) = MixingEngine.deleteFile(filePath)
 
-    fun gainSourceByDb(filePath: String, db: Int) = MixingEngine.gainSourceByDb(filePath, db)
+    fun gainSourceByDb(filePath: String, db: Float) = MixingEngine.gainSourceByDb(filePath, db)
 
     fun gainSourceByDb(filePath: String) = MixingEngine.applySourceTransformation(filePath)
 

@@ -11,12 +11,33 @@
         android:minHeight="@dimen/dialog_min_height"
         tools:context=".screens.mixing.GainAdjustmentDialog">
 
+        <SeekBar
+            android:id="@+id/gainValuePicker"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="@dimen/gain_seekbar_fixed_height"
+            android:maxHeight="@dimen/gain_seekbar_fixed_height"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:progressDrawable="@drawable/gain_selector"
+            android:layout_marginVertical="@dimen/gain_picker_seekbar_margin" />
+
+        <Button
+            android:id="@+id/applyGain"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/gainValuePicker"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginBottom="@dimen/apply_gain_buttom_margin_bottom"
+            android:text="@string/common_apply"/>
+
         <FrameLayout
             android:id="@+id/fragmentContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"/>
+            app:layout_constraintTop_toBottomOf="@id/applyGain"/>
 
         <Button
             android:id="@+id/closeDialog"
@@ -27,6 +48,8 @@
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginBottom="@dimen/dialog_button_margin"
             android:layout_marginEnd="@dimen/dialog_button_margin"/>
+
+        <include layout="@layout/view_loading" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

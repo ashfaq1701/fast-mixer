@@ -208,7 +208,7 @@ extern "C" {
     }
 
     JNIEXPORT void JNICALL
-    Java_com_bluehub_fastmixer_audio_MixingEngine_gainSourceByDb(JNIEnv *env, jclass, jstring filePath, jint db) {
+    Java_com_bluehub_fastmixer_audio_MixingEngine_gainSourceByDb(JNIEnv *env, jclass, jstring filePath, jfloat db) {
         if (!mixingEngine) {
             LOGE("setSourcePlayHead: mixingEngine is null, you must call create() method before calling this method");
             return;

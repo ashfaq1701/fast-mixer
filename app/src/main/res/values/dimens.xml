@@ -41,4 +41,10 @@
 
     <dimen name="play_screen_seekbar_margin">20dp</dimen>
 
+    <dimen name="gain_picker_seekbar_margin">40dp</dimen>
+
+    <dimen name="apply_gain_buttom_margin_bottom">40dp</dimen>
+
+    <dimen name="gain_seekbar_fixed_height">2dp</dimen>
+
 </resources>

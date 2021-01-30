@@ -45,7 +45,5 @@
                 android:onClick="@{() -> viewModel.toggleGroupPlay()}" />
         </LinearLayout>
 
-        <include layout="@layout/view_loading" />
-
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
