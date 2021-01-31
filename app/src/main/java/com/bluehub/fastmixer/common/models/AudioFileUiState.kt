@@ -13,6 +13,8 @@ data class AudioFileUiState(
     var playSliderPosition: BehaviorSubject<Int>,
     var playTimer: Timer?) : Serializable {
 
+        val reRender: BehaviorSubject<Boolean> = BehaviorSubject.create()
+
         val playSliderPositionValue: Int
             get() = if (playSliderPosition.hasValue()) {
                 playSliderPosition.value

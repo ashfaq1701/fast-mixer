@@ -157,7 +157,7 @@ int64_t FileDataSource::getMainBufferSize() {
 
 const float* FileDataSource::getData() const {
     if (mBackupBuffer) {
-        mBackupBuffer.get();
+        return mBackupBuffer.get();
     }
     return mBuffer.get();
 }
@@ -203,11 +203,15 @@ int64_t FileDataSource::getSampleSize() {
 }
 
 void FileDataSource::resetBackupBufferData() {
-    mBackupBuffer = unique_ptr<float[]> {nullptr};
+    if (mBackupBuffer) {
+        mBackupBuffer = unique_ptr<float[]>{nullptr};
+    }
 }
 
 void FileDataSource::applyBackupBufferData() {
-    mBuffer.swap(mBackupBuffer);
+    if (mBackupBuffer) {
+        mBuffer.swap(mBackupBuffer);
+    }
     resetBackupBufferData();
     calculateProperties();
 }

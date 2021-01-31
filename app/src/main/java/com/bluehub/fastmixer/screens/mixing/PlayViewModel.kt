@@ -189,5 +189,13 @@ class PlayViewModel @Inject constructor(
         if (isPlaying.value == true || isGroupPlaying.value == true) {
             mixingRepository.pausePlayback()
         }
+
+        if (isPlaying.value == true) {
+            playFlagStore.isPlaying.value = false
+        }
+
+        if (isGroupPlaying.value == true) {
+            playFlagStore.isGroupPlaying.value = false
+        }
     }
 }

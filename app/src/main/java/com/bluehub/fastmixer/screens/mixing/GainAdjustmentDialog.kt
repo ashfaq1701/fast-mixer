@@ -6,6 +6,7 @@ import android.view.*
 import com.bluehub.fastmixer.R
 import com.bluehub.fastmixer.common.fragments.BaseDialogFragment
 import com.bluehub.fastmixer.databinding.GainAdjustmentDialogBinding
+import com.warkiz.widget.*
 import kotlinx.android.synthetic.main.view_loading.*
 
 class GainAdjustmentDialog(private val audioFile: AudioFile) : BaseDialogFragment<GainAdjustmentViewModel>() {
@@ -18,7 +19,7 @@ class GainAdjustmentDialog(private val audioFile: AudioFile) : BaseDialogFragmen
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        setupViewViewModel()
+        setupViewModel()
 
         return binding.root
     }
@@ -31,7 +32,7 @@ class GainAdjustmentDialog(private val audioFile: AudioFile) : BaseDialogFragmen
 
             val dialog = createDialog(binding.root)
 
-            setupViewEvents()
+            setupView()
 
             dialog
         } ?: throw IllegalStateException("Activity cannot be null")
@@ -43,13 +44,41 @@ class GainAdjustmentDialog(private val audioFile: AudioFile) : BaseDialogFragmen
         transaction.replace(R.id.fragmentContainer, playFragment).commit()
     }
 
-    private fun setupViewEvents() {
-        binding.closeDialog.setOnClickListener {
-            closeDialog()
+    private fun setupView() {
+
+        binding.gainValuePicker.apply {
+            min = -30.0f
+            max = 30.0f
+            onSeekChangeListener = object : OnSeekChangeListener {
+                override fun onSeeking(seekParams: SeekParams?) {}
+
+                override fun onStartTrackingTouch(seekBar: IndicatorSeekBar?) { }
+
+                override fun onStopTrackingTouch(seekBar: IndicatorSeekBar?) {
+                    seekBar?.progress?.let {
+                        viewModel.setGainValue(it)
+                    }
+                }
+            }
+        }
+
+        binding.applyGain.setOnClickListener {
+            viewModel.applyGain()
+        }
+
+        binding.saveGainApplication.setOnClickListener {
+            viewModel.saveGainApplication()
+        }
+
+        binding.cancelGainApplication.setOnClickListener {
+            viewModel.cancelGainApplication()
         }
     }
 
-    private fun setupViewViewModel() {
+    private fun setupViewModel() {
+        viewModel.setGainValue(0)
+        viewModel.setAudioFile(audioFile)
+
         viewModel.isLoading.observe(viewLifecycleOwner, {
             if (it) {
                 pbLoading.visibility = View.VISIBLE
@@ -57,6 +86,15 @@ class GainAdjustmentDialog(private val audioFile: AudioFile) : BaseDialogFragmen
                 pbLoading.visibility = View.GONE
             }
         })
-    }
 
+        viewModel.gainValue.observe(viewLifecycleOwner, {
+            binding.gainValuePicker.setProgress(it.toFloat())
+        })
+
+        viewModel.closeDialog.observe(viewLifecycleOwner, {
+            if (it) {
+                closeDialog()
+            }
+        })
+    }
 }

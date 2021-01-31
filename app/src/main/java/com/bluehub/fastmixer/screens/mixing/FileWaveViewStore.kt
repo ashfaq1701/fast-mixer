@@ -4,15 +4,14 @@ import androidx.lifecycle.*
 import androidx.lifecycle.Observer
 import com.bluehub.fastmixer.common.models.AudioFileUiState
 import com.bluehub.fastmixer.common.models.AudioViewAction
-import io.reactivex.rxjava3.functions.*
+import io.reactivex.rxjava3.functions.BiFunction
 import io.reactivex.rxjava3.functions.Function
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import io.reactivex.rxjava3.subjects.SingleSubject
 import kotlinx.coroutines.*
 import java.util.*
-import javax.inject.Inject
 
-class FileWaveViewStore @Inject constructor() {
+class FileWaveViewStore {
     companion object {
         const val ZOOM_STEP = 1
     }
@@ -325,6 +324,11 @@ class FileWaveViewStore @Inject constructor() {
                 mPlayerHeadSetter.value.apply(playHead.toInt())
             }
         }
+    }
+
+    fun reRenderFile(filePath: String) {
+        val audioFileUiState = findAudioFileUiState(filePath) ?: return
+        audioFileUiState.reRender.onNext(true)
     }
 
     private fun setPlaySliderPosition(audioFileUiState: AudioFileUiState, playSliderPosition: Int) {

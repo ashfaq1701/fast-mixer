@@ -11,22 +11,30 @@
         android:minHeight="@dimen/dialog_min_height"
         tools:context=".screens.mixing.GainAdjustmentDialog">
 
-        <SeekBar
-            android:id="@+id/gainValuePicker"
+        <com.warkiz.widget.IndicatorStayLayout
+            android:id="@+id/gainValuePickerLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:minHeight="@dimen/gain_seekbar_fixed_height"
-            android:maxHeight="@dimen/gain_seekbar_fixed_height"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            android:progressDrawable="@drawable/gain_selector"
-            android:layout_marginVertical="@dimen/gain_picker_seekbar_margin" />
+            android:layout_marginTop="@dimen/gain_picker_seekbar_margin_top"
+            android:paddingBottom="@dimen/gain_picker_seekbar_padding_bottom">
+
+            <com.warkiz.widget.IndicatorSeekBar
+                android:id="@+id/gainValuePicker"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="@dimen/gain_seekbar_fixed_height"
+                android:maxHeight="@dimen/gain_seekbar_fixed_height"
+                app:isb_track_background_color="@color/colorGainControlSeekbar"
+                app:isb_track_progress_color="@color/colorGainControlSeekbar" />
+        </com.warkiz.widget.IndicatorStayLayout>
 
         <Button
             android:id="@+id/applyGain"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/gainValuePicker"
+            app:layout_constraintTop_toBottomOf="@id/gainValuePickerLayout"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginBottom="@dimen/apply_gain_buttom_margin_bottom"
@@ -40,7 +48,17 @@
             app:layout_constraintTop_toBottomOf="@id/applyGain"/>
 
         <Button
-            android:id="@+id/closeDialog"
+            android:id="@+id/saveGainApplication"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/common_save"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/cancelGainApplication"
+            android:layout_marginBottom="@dimen/dialog_button_margin"
+            android:layout_marginEnd="@dimen/dialog_button_margin" />
+
+        <Button
+            android:id="@+id/cancelGainApplication"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/common_close"

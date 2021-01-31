@@ -44,6 +44,12 @@ class MixingRepository @Inject constructor(val mixingEngineProxy: MixingEnginePr
 
     fun setSourcePlayHead(filePath: String, playHead: Int) = mixingEngineProxy.setSourcePlayHead(filePath, playHead)
 
+    fun gainSourceByDb(filePath: String, db: Float) = mixingEngineProxy.gainSourceByDb(filePath, db)
+
+    fun applySourceTransformation(filePath: String) = mixingEngineProxy.applySourceTransformation(filePath)
+
+    fun clearSourceTransformation(filePath: String) = mixingEngineProxy.clearSourceTransformation(filePath)
+
     fun clearSources() {
         mixingEngineProxy.clearPlayerSources()
     }

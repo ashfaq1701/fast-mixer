@@ -18,7 +18,6 @@ import io.reactivex.rxjava3.functions.Function
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import java.util.*
 import kotlin.math.abs
 import kotlin.math.ceil
@@ -51,6 +50,8 @@ class FileWaveView @JvmOverloads constructor(
     private lateinit var mPlotPoints: Array<Float>
 
     private var attrsLoaded: BehaviorSubject<Boolean> = BehaviorSubject.create()
+
+    private var forceFetch = false
 
     init {
         attrsLoaded.subscribe {
@@ -123,6 +124,14 @@ class FileWaveView @JvmOverloads constructor(
             .subscribe {
                 requestLayout()
             }
+        mAudioFileUiState.value.reRender
+            .observeOn(
+                AndroidSchedulers.mainThread()
+            )
+            .subscribe {
+                forceFetch = true
+                requestLayout()
+            }
     }
 
     private fun getNumPtsToPlot() = if (mAudioFileUiState.hasValue()) {
@@ -134,10 +143,11 @@ class FileWaveView @JvmOverloads constructor(
 
         val numPts = getNumPtsToPlot()
 
-        if (!mRawPoints.hasValue() || mRawPoints.value.size != numPts) {
+        if (!mRawPoints.hasValue() || mRawPoints.value.size != numPts || forceFetch) {
             mFileWaveViewStore.value.coroutineScope.launch {
                 mRawPoints.onNext(mSamplesReader.value.apply(numPts).await())
             }
+            forceFetch = false
         }
     }
 
@@ -153,13 +163,6 @@ class FileWaveView @JvmOverloads constructor(
         }
 
         val maxToScale = height * 0.48
-
-        val negativeCount = rawPts.fold(0) { acc, current ->
-            if (current < 0) {
-                acc + 1
-            } else acc
-        }
-        Timber.d("Negative count is: $negativeCount")
 
         mPlotPoints = rawPts.map { current ->
             if (maximumAbs != 0.0f) {
