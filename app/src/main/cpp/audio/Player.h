@@ -66,7 +66,6 @@ public:
 
     void setPlayHead(int32_t playHead);
     void setPlaying(bool isPlaying) { mIsPlaying = isPlaying; };
-    void setLooping(bool isLooping) { mIsLooping = isLooping; };
     int64_t getTotalSampleFrames();
 
     void clearSources();
@@ -76,7 +75,6 @@ private:
     int32_t mReadFrameIndex = 0;
     float addedMaxSampleValue = FLT_MIN;
     atomic<bool> mIsPlaying { false };
-    atomic<bool> mIsLooping { false };
     function<void(void)> mStopPlaybackCallback = nullptr;
     map<string, shared_ptr<DataSource>> mSourceMap;
 

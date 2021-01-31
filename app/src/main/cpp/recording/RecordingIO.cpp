@@ -61,7 +61,9 @@ bool RecordingIO::validate_audio_file() {
 }
 
 void RecordingIO::read_playback(float *targetData, int32_t numFrames) {
-    mPlayer->renderAudio(targetData, numFrames);
+    if (targetData && mPlayer) {
+        mPlayer->renderAudio(targetData, numFrames);
+    }
 }
 
 void RecordingIO::flush_to_file(int16_t* buffer, int32_t length, const string& recordingFilePath, shared_ptr<SndfileHandle>& recordingFile) {

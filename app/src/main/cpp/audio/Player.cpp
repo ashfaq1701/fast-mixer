@@ -67,7 +67,7 @@ void Player::renderAudio(float *targetData, int32_t numFrames) {
         int64_t maxTotalSourceFrames = getMaxTotalSourceFrames();
 
         int64_t framesToRenderFromData = numFrames;
-        if (!mIsLooping && mReadFrameIndex + numFrames >= maxTotalSourceFrames) {
+        if (mReadFrameIndex + numFrames >= maxTotalSourceFrames) {
             framesToRenderFromData = maxTotalSourceFrames - mReadFrameIndex;
             mIsPlaying = false;
             if (mStopPlaybackCallback) {
@@ -85,9 +85,13 @@ void Player::renderAudio(float *targetData, int32_t numFrames) {
 
                 for (auto it = mSourceMap.begin(); it != mSourceMap.end(); it++) {
 
+                    if (!it->second) {
+                        continue;
+                    }
+
                     const float *data = it->second->getData();
 
-                    if ((mReadFrameIndex * properties.channelCount + j) < it->second->getSize()) {
+                    if (data && (mReadFrameIndex * properties.channelCount + j) < it->second->getSize()) {
                         audioFrame += data[mReadFrameIndex * properties.channelCount + j];
                     }
                 }
@@ -103,27 +107,13 @@ void Player::renderAudio(float *targetData, int32_t numFrames) {
 
             if (++mReadFrameIndex >= maxTotalSourceFrames) {
                 mReadFrameIndex = 0;
+                break;
             }
         }
 
-        if (framesToRenderFromData < numFrames) {
-            // fill the rest of the buffer with silence
-            renderSilence(&targetData[framesToRenderFromData],
-                    (numFrames - framesToRenderFromData) * properties.channelCount);
-        }
-
-        if (mSourceMap.size() == 1) {
+        if (mSourceMap.size() == 1 && mSourceMap.begin()->second) {
             mSourceMap.begin()->second->setPlayHead(mReadFrameIndex);
         }
-
-    } else {
-        renderSilence(targetData, numFrames * properties.channelCount);
-    }
-}
-
-void Player::renderSilence(float *start, int32_t numSamples){
-    for (int i = 0; i < numSamples; ++i) {
-        start[i] = 0;
     }
 }
 
@@ -131,6 +121,9 @@ int64_t Player::getMaxTotalSourceFrames() {
     int64_t maxTotalSourceFrames = INT64_MIN;
 
     for (auto it = mSourceMap.begin(); it != mSourceMap.end(); it++) {
+        if (!it->second) {
+            continue;
+        }
         int64_t totalSourceFrames = it->second->getSize() / it->second->getProperties().channelCount;
 
         if (totalSourceFrames > maxTotalSourceFrames) {
@@ -144,6 +137,9 @@ int64_t Player::getMaxTotalSourceFrames() {
 float Player::getMaxValueAcrossSources() {
     float allMaxValue = 0.0;
     for (auto it = mSourceMap.begin(); it != mSourceMap.end(); it++) {
+        if (!it->second) {
+            continue;
+        }
         if (it->second->getAbsMaxSampleValue() > allMaxValue) {
             allMaxValue = it->second->getAbsMaxSampleValue();
         }
@@ -215,7 +211,7 @@ void Player::updateAddedMax() {
                 float totalSampleValue = 0.0;
 
                 for (auto it = mSourceMap.begin(); it != mSourceMap.end(); it++) {
-                    if (i < it->second->getSize()) {
+                    if (it->second && i < it->second->getSize()) {
                         totalSampleValue += it->second->getData()[i];
                     }
                 }
