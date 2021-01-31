@@ -70,8 +70,6 @@ private:
     unique_ptr<float[]> mBuffer;
     unique_ptr<float[]> mBackupBuffer {nullptr};
 
-    float* transformedBuffer = nullptr;
-
     const int64_t mBufferSize;
     int64_t mBackupBufferSize = 0;
 

@@ -18,7 +18,9 @@ import io.reactivex.rxjava3.functions.Function
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import java.util.*
+import kotlin.math.abs
 import kotlin.math.ceil
 
 
@@ -144,16 +146,24 @@ class FileWaveView @JvmOverloads constructor(
             return
         }
 
-        val mean = rawPts.average()
+        val maximumAbs = rawPts.fold(Float.MIN_VALUE) { acc, current ->
+            if (abs(current) > acc) {
+                abs(current)
+            } else acc
+        }
 
-        val maximum = rawPts.maxOrNull()
+        val maxToScale = height * 0.48
 
-        val maxLevelInSamples = maximum ?: 3 * mean
-        val maxToScale = height * 0.95
+        val negativeCount = rawPts.fold(0) { acc, current ->
+            if (current < 0) {
+                acc + 1
+            } else acc
+        }
+        Timber.d("Negative count is: $negativeCount")
 
         mPlotPoints = rawPts.map { current ->
-            if (maxLevelInSamples != 0) {
-                ((current / maxLevelInSamples.toFloat()) * maxToScale.toFloat())
+            if (maximumAbs != 0.0f) {
+                ((current / maximumAbs) * maxToScale.toFloat())
             } else 0.0f
         }.toTypedArray()
 
@@ -286,8 +296,10 @@ class FileWaveView @JvmOverloads constructor(
 
         var currentPoint = 0
 
+        val baseLevel = height / 2
+
         mPlotPoints.forEach { item ->
-            canvas.drawLine(currentPoint.toFloat(), height.toFloat(), currentPoint.toFloat(), (height - item), paint)
+            canvas.drawLine(currentPoint.toFloat(), baseLevel.toFloat(), currentPoint.toFloat(), (baseLevel - item), paint)
             currentPoint += ptsDistance
         }
     }

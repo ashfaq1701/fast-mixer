@@ -52,16 +52,6 @@ void FileDataSource::calculateProperties() {
             mMaxSampleValue = data[i];
         }
     }
-
-    transformedBuffer = new float [bufferSize];
-
-    for (int i = 0; i < mBufferSize; i++) {
-        if (mMinSampleValue < 0) {
-            transformedBuffer[i] = mBuffer[i] - mMinSampleValue;
-        } else {
-            transformedBuffer[i] = mBuffer[i];
-        }
-    }
 }
 
 FileDataSource* FileDataSource::newFromCompressedFile(
@@ -109,6 +99,8 @@ FileDataSource* FileDataSource::newFromCompressedFile(
 }
 
 unique_ptr<buffer_data> FileDataSource::readData(size_t countPoints) {
+
+    float * dataPtr = mBuffer.get();
     int channelCount = mProperties.channelCount;
 
     size_t samplesToHandle;
@@ -123,18 +115,25 @@ unique_ptr<buffer_data> FileDataSource::readData(size_t countPoints) {
 
     auto selectedSamples = new float [samplesToHandle];
     for (int i = 0; i < samplesToHandle; i++) {
-        float maxValue = 0;
+        float maxValue = FLT_MIN;
         for (int j = i * ptsDistance; j < (i + 1) * ptsDistance; j += channelCount) {
             float sample = 0.0;
 
+            float maxAmpValue = 0.0;
+
             for (int k = j; k < j + channelCount; k++) {
-                sample += transformedBuffer[k];
+                if (abs(dataPtr[k]) > maxValue) {
+                    maxAmpValue = dataPtr[k];
+                }
+
+                sample += abs(dataPtr[k]);
             }
 
             float avgSample = sample / channelCount;
 
-            if (avgSample > maxValue) {
-                maxValue = avgSample;
+            if (avgSample > abs(maxValue)) {
+
+                maxValue = maxAmpValue < 0 ? 0 - avgSample : avgSample;
             }
         }
 
