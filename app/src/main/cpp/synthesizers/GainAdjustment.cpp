@@ -32,5 +32,5 @@ void GainAdjustment::synthesize(shared_ptr<FileDataSource> source) {
         transformedBuffer[i] = clampedValue;
     }
 
-    source->setBackupBufferData(transformedBuffer, bufferSize);
+    source->setBackupBufferData(move(transformedBuffer), bufferSize);
 }

@@ -182,7 +182,7 @@ int64_t FileDataSource::getPlayHead() {
     return mPlayHead;
 }
 
-void FileDataSource::setBackupBufferData(float* data, int64_t numSamples) {
+void FileDataSource::setBackupBufferData(float* &&data, int64_t numSamples) {
     mBackupBuffer = unique_ptr<float[]>(move(data));
     mBackupBufferSize = numSamples;
 }

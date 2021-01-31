@@ -38,7 +38,7 @@ public:
     const float* getMainBufferData();
     const float* getData() const override;
 
-    void setBackupBufferData(float* data, int64_t numSamples);
+    void setBackupBufferData(float* &&data, int64_t numSamples);
 
     int64_t getSampleSize();
 
