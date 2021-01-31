@@ -6,13 +6,12 @@ import androidx.navigation.fragment.findNavController
 import com.bluehub.fastmixer.R
 import com.bluehub.fastmixer.common.di.DaggerFragment
 import com.bluehub.fastmixer.common.di.FragmentViewModelFactory
-import com.bluehub.fastmixer.common.utils.ViewModelType
+import com.bluehub.fastmixer.common.models.ViewModelType
 import javax.inject.Inject
 import kotlin.reflect.KClass
 
 
 abstract class BaseFragment<T: ViewModel>(viewModelType: ViewModelType = ViewModelType.FRAGMENT_SCOPED): DaggerFragment() {
-    abstract var TAG: String
 
     @Inject
     lateinit var viewModelFactory: FragmentViewModelFactory

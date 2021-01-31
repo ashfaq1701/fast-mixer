@@ -11,7 +11,7 @@ import androidx.lifecycle.viewModelScope
 import com.bluehub.fastmixer.BR
 import com.bluehub.fastmixer.R
 import com.bluehub.fastmixer.broadcastReceivers.AudioDeviceChangeListener
-import com.bluehub.fastmixer.common.permissions.PermissionViewModel
+import com.bluehub.fastmixer.common.permissions.PermissionControlViewModel
 import com.bluehub.fastmixer.common.repositories.AudioRepository
 import com.bluehub.fastmixer.common.utils.PermissionManager
 import com.bluehub.fastmixer.common.utils.ScreenConstants
@@ -19,7 +19,6 @@ import com.bluehub.fastmixer.screens.mixing.AudioFileStore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
 
@@ -29,7 +28,7 @@ class RecordingScreenViewModel @Inject constructor (override val context: Contex
                                                     private val audioRepository: AudioRepository,
                                                     private val audioFileStore: AudioFileStore,
                                                     private val audioDeviceChangeListener: AudioDeviceChangeListener)
-    : PermissionViewModel(context) {
+    : PermissionControlViewModel(context) {
 
     companion object {
         private lateinit var instance: RecordingScreenViewModel
@@ -417,7 +416,7 @@ class RecordingScreenViewModel @Inject constructor (override val context: Contex
 
     fun startTrackingSeekbar() {
         _seekbarProgress.value = 0
-        _seekbarMaxValue.value = repository.getTotalRecordedFrames()
+        _seekbarMaxValue.value = repository.getTotalSampleFrames()
         stopTrackingSeekbarTimer()
         seekbarTimer = Timer()
         seekbarTimer?.schedule(object: TimerTask() {

@@ -10,7 +10,12 @@
     <color name="colorWhiteTransparent">#99FFFFFF</color>
     <color name="colorAudioWaveViewSlider">#5D2BAE</color>
     <color name="colorAudioWaveViewSliderPressed">#8950E6</color>
+    <color name="colorGainControlSeekbar">#E0E0E0</color>
 
     <color name="colorBtnNormal">?attr/colorControlNormal</color>
     <color name="colorBtnPressed">#434543</color>
+    <color name="light_blue_400">#FF29B6F6</color>
+    <color name="light_blue_600">#FF039BE5</color>
+    <color name="gray_400">#FFBDBDBD</color>
+    <color name="gray_600">#FF757575</color>
 </resources>

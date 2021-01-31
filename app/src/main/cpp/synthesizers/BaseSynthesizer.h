@@ -6,11 +6,16 @@
 #define FAST_MIXER_BASESYNTHESIZER_H
 
 #include "oboe/Definitions.h"
+#include "../audio/FileDataSource.h"
+#include <memory>
 
+using namespace std;
 
 class BaseSynthesizer {
+
 public:
-    virtual void synthesize(int16_t data, int numSamples) = 0;
+
+    virtual void synthesize(shared_ptr<FileDataSource> source) = 0;
 };
 
 

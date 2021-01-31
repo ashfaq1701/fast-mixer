@@ -21,4 +21,9 @@
         <item name="android:mirrorForRtl">false</item>
     </style>
 
+    <style name="DialogWindow" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="android:windowMinWidthMajor">100%</item>
+        <item name="android:windowMinWidthMinor">100%</item>
+    </style>
+
 </resources>

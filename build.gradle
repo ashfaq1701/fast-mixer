@@ -19,6 +19,7 @@ buildscript {
         dagger_version = "2.23.2"
         rxjava_version = "3.0.0"
         audio_record_view_version = "1.0.4"
+        indicator_seekbar_version = "2.1.2"
     }
     repositories {
         google()

@@ -22,4 +22,9 @@
     <string name="play">Play</string>
     <string name="pause">Pause</string>
     <string name="mixing_play_enabled">Mixing Play Enabled</string>
+    <string name="menu_item_gain_adjustment">Gain Adjustment</string>
+    <string name="common_close">Close</string>
+    <string name="common_apply">Apply</string>
+    <string name="zero_label">0</string>
+    <string name="common_save">Save</string>
 </resources>

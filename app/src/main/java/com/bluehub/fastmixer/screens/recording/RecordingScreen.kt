@@ -5,28 +5,24 @@ import android.view.*
 import android.widget.SeekBar
 import androidx.activity.*
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.bluehub.fastmixer.R
-import com.bluehub.fastmixer.common.permissions.PermissionFragment
+import com.bluehub.fastmixer.common.permissions.PermissionControlFragment
 import com.bluehub.fastmixer.common.utils.DialogManager
 import com.bluehub.fastmixer.common.utils.ScreenConstants
-import com.bluehub.fastmixer.common.utils.ViewModelType
+import com.bluehub.fastmixer.common.models.ViewModelType
 import com.bluehub.fastmixer.databinding.RecordingScreenBinding
 import com.bluehub.fastmixer.screens.recording.RecordingScreenDirections.actionRecordingScreenToMixingScreen
 import com.visualizer.amplitude.AudioRecordView
 import kotlinx.android.synthetic.main.view_loading.*
-import timber.log.Timber
 import javax.inject.Inject
 
 
-class RecordingScreen : PermissionFragment<RecordingScreenViewModel>(ViewModelType.FRAGMENT_SCOPED) {
+class RecordingScreen : PermissionControlFragment<RecordingScreenViewModel>(ViewModelType.FRAGMENT_SCOPED) {
 
     companion object {
         fun newInstance() = RecordingScreen()
     }
-
-    override var TAG: String = javaClass.simpleName
 
     override val viewModelClass = RecordingScreenViewModel::class
 

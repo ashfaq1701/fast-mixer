@@ -43,7 +43,7 @@ class RecordingEngineProxy @Inject constructor(){
 
     fun resetCurrentMax() = RecordingEngine.resetCurrentMax()
 
-    fun getTotalRecordedFrames() = RecordingEngine.getTotalRecordedFrames()
+    fun getTotalSampleFrames() = RecordingEngine.getTotalSampleFrames()
 
     fun getCurrentPlaybackProgress() = RecordingEngine.getCurrentPlaybackProgress()
 

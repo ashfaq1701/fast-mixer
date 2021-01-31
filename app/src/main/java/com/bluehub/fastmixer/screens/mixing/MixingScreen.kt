@@ -11,19 +11,18 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.transition.*
 import com.bluehub.fastmixer.R
-import com.bluehub.fastmixer.common.permissions.PermissionFragment
+import com.bluehub.fastmixer.common.models.AudioViewActionType
+import com.bluehub.fastmixer.common.permissions.PermissionControlFragment
 import com.bluehub.fastmixer.common.utils.DialogManager
-import com.bluehub.fastmixer.common.utils.ViewModelType
+import com.bluehub.fastmixer.common.models.ViewModelType
 import com.bluehub.fastmixer.databinding.MixingScreenBinding
 import com.bluehub.fastmixer.screens.mixing.MixingScreenDirections.actionMixingScreenToRecordingScreen
 import javax.inject.Inject
 
-class MixingScreen : PermissionFragment<MixingScreenViewModel>(ViewModelType.NAV_SCOPED) {
+class MixingScreen : PermissionControlFragment<MixingScreenViewModel>(ViewModelType.NAV_SCOPED) {
     companion object {
         fun newInstance() = MixingScreen()
     }
-
-    override var TAG: String = javaClass.simpleName
 
     override val viewModelClass = MixingScreenViewModel::class
 
@@ -47,6 +46,7 @@ class MixingScreen : PermissionFragment<MixingScreenViewModel>(ViewModelType.NAV
         dataBinding = DataBindingUtil
             .inflate(inflater, R.layout.mixing_screen, container, false)
 
+        viewModel.resetStates()
         MixingScreenViewModel.setInstance(viewModel)
         dataBinding.mixingScreenViewModel = viewModel
 
@@ -58,7 +58,7 @@ class MixingScreen : PermissionFragment<MixingScreenViewModel>(ViewModelType.NAV
                 { filePath: String -> viewModel.deleteFile(filePath) },
                 { filePath: String -> viewModel.togglePlay(filePath) }
             ),
-            viewModel.fileWaveViewStore
+            viewModel.fileWaveViewStore,
         )
         dataBinding.audioFileListView.adapter = audioFileListAdapter
 
@@ -143,6 +143,18 @@ class MixingScreen : PermissionFragment<MixingScreenViewModel>(ViewModelType.NAV
         viewModel.isPlaying.observe(viewLifecycleOwner, {
             dataBinding.groupPlayPause.setBtnEnabled(!it)
         })
+
+        viewModel.audioViewAction.observe(viewLifecycleOwner, {
+            it?.let {
+                when(it.actionType) {
+                    AudioViewActionType.GAIN_ADJUSTMENT -> {
+                        viewModel.findAudioFileByPath(it.filePath)?.let { audioFile ->
+                            showGainControlFragment(audioFile)
+                        }
+                    }
+                }
+            }
+        })
     }
 
     private fun setupAnimations() {
@@ -169,6 +181,11 @@ class MixingScreen : PermissionFragment<MixingScreenViewModel>(ViewModelType.NAV
                 viewModel.addReadFile(documentUri)
             }
         }
+    }
+
+    fun showGainControlFragment(audioFile: AudioFile) {
+        val gainAdjustmentDialog = GainAdjustmentDialog(audioFile)
+        gainAdjustmentDialog.show(requireActivity().supportFragmentManager, "gain_control")
     }
 }
 

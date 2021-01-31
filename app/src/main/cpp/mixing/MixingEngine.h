@@ -27,9 +27,17 @@ public:
     bool startPlayback();
     void pausePlayback();
 
+    void gainSourceByDb(string filePath, float db);
+
+    void applySourceTransformation(string filePath);
+
+    void clearSourceTransformation(string filePath);
+
     void addSourcesToPlayer(string* strArr, int count);
 
     void clearPlayerSources();
+
+    int getTotalSampleFrames();
 
     int getCurrentPlaybackProgress();
 

@@ -10,6 +10,7 @@
     <dimen name="divider_margin">5dp</dimen>
     <dimen name="audio_file_view_height">120dp</dimen>
     <dimen name="horizontal_line_height">2dp</dimen>
+    <dimen name="play_seekbar_margin">15dp</dimen>
     <dimen name="recording_visualizer_height">200dp</dimen>
     <dimen name="recording_visualizer_chunk_space">1dp</dimen>
     <dimen name="recording_visualizer_chunk_width">2dp</dimen>
@@ -31,5 +32,22 @@
 
     <dimen name="progress_bar_min_width">70dp</dimen>
     <dimen name="progress_bar_min_height">70dp</dimen>
+
+    <dimen name="dialog_min_width">500dp</dimen>
+    <dimen name="dialog_min_height">370dp</dimen>
+    <dimen name="dialog_button_margin">15dp</dimen>
+
+    <dimen name="play_fragment_height">170dp</dimen>
+
+    <dimen name="play_screen_seekbar_margin">20dp</dimen>
+
+    <dimen name="gain_picker_seekbar_margin_top">20dp</dimen>
+    <dimen name="gain_picker_seekbar_padding_bottom">10dp</dimen>
+
+    <dimen name="apply_gain_buttom_margin_bottom">40dp</dimen>
+
+    <dimen name="gain_seekbar_fixed_height">2dp</dimen>
+
+    <dimen name="gain_seekbar_progress_thumb_margin">7dp</dimen>
 
 </resources>

@@ -46,7 +46,7 @@ class RecordingEngine {
 
         @JvmStatic external fun resetCurrentMax()
 
-        @JvmStatic external fun getTotalRecordedFrames(): Int
+        @JvmStatic external fun getTotalSampleFrames(): Int
 
         @JvmStatic external fun getCurrentPlaybackProgress(): Int
 

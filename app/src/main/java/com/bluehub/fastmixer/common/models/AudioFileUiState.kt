@@ -1,4 +1,4 @@
-package com.bluehub.fastmixer.screens.mixing
+package com.bluehub.fastmixer.common.models
 
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import java.io.Serializable
@@ -12,6 +12,8 @@ data class AudioFileUiState(
     var isPlaying: BehaviorSubject<Boolean>,
     var playSliderPosition: BehaviorSubject<Int>,
     var playTimer: Timer?) : Serializable {
+
+        val reRender: BehaviorSubject<Boolean> = BehaviorSubject.create()
 
         val playSliderPositionValue: Int
             get() = if (playSliderPosition.hasValue()) {

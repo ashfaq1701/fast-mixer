@@ -36,11 +36,19 @@ class MixingRepository @Inject constructor(val mixingEngineProxy: MixingEnginePr
         mixingEngineProxy.addSources(fileArr.toTypedArray())
     }
 
+    fun getTotalSampleFrames() = mixingEngineProxy.getTotalSampleFrames()
+
     fun getCurrentPlaybackProgress() = mixingEngineProxy.getCurrentPlaybackProgress()
 
     fun setPlayerHead(playHead: Int) = mixingEngineProxy.setPlayerHead(playHead)
 
     fun setSourcePlayHead(filePath: String, playHead: Int) = mixingEngineProxy.setSourcePlayHead(filePath, playHead)
+
+    fun gainSourceByDb(filePath: String, db: Float) = mixingEngineProxy.gainSourceByDb(filePath, db)
+
+    fun applySourceTransformation(filePath: String) = mixingEngineProxy.applySourceTransformation(filePath)
+
+    fun clearSourceTransformation(filePath: String) = mixingEngineProxy.clearSourceTransformation(filePath)
 
     fun clearSources() {
         mixingEngineProxy.clearPlayerSources()

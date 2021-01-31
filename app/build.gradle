@@ -94,7 +94,8 @@ dependencies {
         "com.google.dagger:dagger-android-support:$dagger_version",
         "io.reactivex.rxjava3:rxandroid:$rxjava_version",
         "io.reactivex.rxjava3:rxkotlin:$rxjava_version",
-        "com.github.Armen101:AudioRecordView:$audio_record_view_version"
+        "com.github.Armen101:AudioRecordView:$audio_record_view_version",
+        "com.github.warkiz.widget:indicatorseekbar:$indicator_seekbar_version"
     )
 
     testImplementation (

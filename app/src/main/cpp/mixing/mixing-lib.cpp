@@ -143,6 +143,15 @@ extern "C" {
     }
 
     JNIEXPORT jint JNICALL
+    Java_com_bluehub_fastmixer_audio_MixingEngine_getTotalSampleFrames(JNIEnv * env, jclass) {
+        if (!mixingEngine) {
+            LOGE("getTotalRecordedFrames: mixingEngine is null, you must call create() method before calling this method");
+            return 0;
+        }
+        return mixingEngine->getTotalSampleFrames();
+    }
+
+    JNIEXPORT jint JNICALL
     Java_com_bluehub_fastmixer_audio_MixingEngine_getCurrentPlaybackProgress(JNIEnv *env, jclass) {
         if (!mixingEngine) {
             LOGE("getCurrentPlaybackProgress: mixingEngine is null, you must call create() method before calling this method");
@@ -196,5 +205,38 @@ extern "C" {
             return;
         }
         mixingEngine->pausePlayback();
+    }
+
+    JNIEXPORT void JNICALL
+    Java_com_bluehub_fastmixer_audio_MixingEngine_gainSourceByDb(JNIEnv *env, jclass, jstring filePath, jfloat db) {
+        if (!mixingEngine) {
+            LOGE("setSourcePlayHead: mixingEngine is null, you must call create() method before calling this method");
+            return;
+        }
+
+        auto filePathStr = java_str_to_c_str(env, filePath);
+        mixingEngine->gainSourceByDb(move(filePathStr), db);
+    }
+
+    JNIEXPORT void JNICALL
+    Java_com_bluehub_fastmixer_audio_MixingEngine_applySourceTransformation(JNIEnv *env, jclass, jstring filePath) {
+        if (!mixingEngine) {
+            LOGE("applySourceTransformation: mixingEngine is null, you must call create() method before calling this method");
+            return;
+        }
+
+        auto filePathStr = java_str_to_c_str(env, filePath);
+        mixingEngine->applySourceTransformation(move(filePathStr));
+    }
+
+    JNIEXPORT void JNICALL
+    Java_com_bluehub_fastmixer_audio_MixingEngine_clearSourceTransformation(JNIEnv *env, jclass, jstring filePath) {
+        if (!mixingEngine) {
+            LOGE("clearSourceTransformation: mixingEngine is null, you must call create() method before calling this method");
+            return;
+        }
+
+        auto filePathStr = java_str_to_c_str(env, filePath);
+        mixingEngine->clearSourceTransformation(move(filePathStr));
     }
 }

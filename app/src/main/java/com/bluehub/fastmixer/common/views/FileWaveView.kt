@@ -11,7 +11,7 @@ import androidx.core.content.ContextCompat
 import androidx.databinding.BindingMethod
 import androidx.databinding.BindingMethods
 import com.bluehub.fastmixer.R
-import com.bluehub.fastmixer.screens.mixing.AudioFileUiState
+import com.bluehub.fastmixer.common.models.AudioFileUiState
 import com.bluehub.fastmixer.screens.mixing.FileWaveViewStore
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.functions.Function
@@ -19,6 +19,7 @@ import io.reactivex.rxjava3.subjects.BehaviorSubject
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.launch
 import java.util.*
+import kotlin.math.abs
 import kotlin.math.ceil
 
 
@@ -49,6 +50,8 @@ class FileWaveView @JvmOverloads constructor(
     private lateinit var mPlotPoints: Array<Float>
 
     private var attrsLoaded: BehaviorSubject<Boolean> = BehaviorSubject.create()
+
+    private var forceFetch = false
 
     init {
         attrsLoaded.subscribe {
@@ -121,6 +124,14 @@ class FileWaveView @JvmOverloads constructor(
             .subscribe {
                 requestLayout()
             }
+        mAudioFileUiState.value.reRender
+            .observeOn(
+                AndroidSchedulers.mainThread()
+            )
+            .subscribe {
+                forceFetch = true
+                requestLayout()
+            }
     }
 
     private fun getNumPtsToPlot() = if (mAudioFileUiState.hasValue()) {
@@ -132,10 +143,11 @@ class FileWaveView @JvmOverloads constructor(
 
         val numPts = getNumPtsToPlot()
 
-        if (!mRawPoints.hasValue() || mRawPoints.value.size != numPts) {
+        if (!mRawPoints.hasValue() || mRawPoints.value.size != numPts || forceFetch) {
             mFileWaveViewStore.value.coroutineScope.launch {
                 mRawPoints.onNext(mSamplesReader.value.apply(numPts).await())
             }
+            forceFetch = false
         }
     }
 
@@ -144,16 +156,17 @@ class FileWaveView @JvmOverloads constructor(
             return
         }
 
-        val mean = rawPts.average()
+        val maximumAbs = rawPts.fold(Float.MIN_VALUE) { acc, current ->
+            if (abs(current) > acc) {
+                abs(current)
+            } else acc
+        }
 
-        val maximum = rawPts.maxOrNull()
-
-        val maxLevelInSamples = maximum ?: 3 * mean
-        val maxToScale = height * 0.95
+        val maxToScale = height * 0.48
 
         mPlotPoints = rawPts.map { current ->
-            if (maxLevelInSamples != 0) {
-                ((current / maxLevelInSamples.toFloat()) * maxToScale.toFloat())
+            if (maximumAbs != 0.0f) {
+                ((current / maximumAbs) * maxToScale.toFloat())
             } else 0.0f
         }.toTypedArray()
 
@@ -286,8 +299,10 @@ class FileWaveView @JvmOverloads constructor(
 
         var currentPoint = 0
 
+        val baseLevel = height / 2
+
         mPlotPoints.forEach { item ->
-            canvas.drawLine(currentPoint.toFloat(), height.toFloat(), currentPoint.toFloat(), (height - item), paint)
+            canvas.drawLine(currentPoint.toFloat(), baseLevel.toFloat(), currentPoint.toFloat(), (baseLevel - item), paint)
             currentPoint += ptsDistance
         }
     }

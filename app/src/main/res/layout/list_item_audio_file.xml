@@ -5,7 +5,7 @@
     <data>
         <variable
             name="audioFileUiState"
-            type="com.bluehub.fastmixer.screens.mixing.AudioFileUiState" />
+            type="com.bluehub.fastmixer.common.models.AudioFileUiState" />
         <variable
             name="eventListener"
             type="com.bluehub.fastmixer.screens.mixing.AudioFileEventListeners" />

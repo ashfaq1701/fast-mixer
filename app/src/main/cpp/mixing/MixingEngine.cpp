@@ -4,6 +4,7 @@
 
 #include "MixingEngine.h"
 #include "../jvm_env.h"
+#include "../synthesizers/GainAdjustment.h"
 #include <utility>
 
 MixingEngine::MixingEngine(SourceMapStore* sourceMapStore) : mSourceMapStore(sourceMapStore) {
@@ -128,6 +129,10 @@ void MixingEngine::clearPlayerSources() {
     mMixingIO.clearPlayerSources();
 }
 
+int MixingEngine::getTotalSampleFrames() {
+    return mMixingIO.getTotalSampleFrames();
+}
+
 int MixingEngine::getCurrentPlaybackProgress() {
     return mMixingIO.getCurrentPlaybackProgress();
 }
@@ -142,4 +147,32 @@ void MixingEngine::setSourcePlayHead(string filePath, int playHead) {
     if (it != mSourceMapStore->sourceMap.end()) {
         it->second->setPlayHead(playHead);
     }
+}
+
+void MixingEngine::gainSourceByDb(string filePath, float db) {
+    auto it = mSourceMapStore->sourceMap.find(filePath);
+    if (it == mSourceMapStore->sourceMap.end()) {
+        return;
+    }
+
+    auto gainAdjustment = GainAdjustment(db);
+    gainAdjustment.synthesize(it->second);
+}
+
+void MixingEngine::applySourceTransformation(string filePath) {
+    auto it = mSourceMapStore->sourceMap.find(filePath);
+    if (it == mSourceMapStore->sourceMap.end()) {
+        return;
+    }
+
+    it->second->applyBackupBufferData();
+}
+
+void MixingEngine::clearSourceTransformation(string filePath) {
+    auto it = mSourceMapStore->sourceMap.find(filePath);
+    if (it == mSourceMapStore->sourceMap.end()) {
+        return;
+    }
+
+    it->second->resetBackupBufferData();
 }

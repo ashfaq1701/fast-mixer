@@ -9,6 +9,8 @@ class MixingEngineProxy @Inject constructor() {
 
     fun readSamples(filePath: String, countPoints: Int) = MixingEngine.readSamples(filePath, countPoints)
 
+    fun getTotalSampleFrames() = MixingEngine.getTotalSampleFrames()
+
     fun getTotalSamples(filePath: String): Int = MixingEngine.getTotalSamples(filePath)
 
     fun getCurrentPlaybackProgress(): Int = MixingEngine.getCurrentPlaybackProgress()
@@ -26,6 +28,12 @@ class MixingEngineProxy @Inject constructor() {
     fun pausePlayback() = MixingEngine.pausePlayback()
 
     fun deleteFile(filePath: String) = MixingEngine.deleteFile(filePath)
+
+    fun gainSourceByDb(filePath: String, db: Float) = MixingEngine.gainSourceByDb(filePath, db)
+
+    fun applySourceTransformation(filePath: String) = MixingEngine.applySourceTransformation(filePath)
+
+    fun clearSourceTransformation(filePath: String) = MixingEngine.clearSourceTransformation(filePath)
 
     fun delete() = MixingEngine.delete()
 }

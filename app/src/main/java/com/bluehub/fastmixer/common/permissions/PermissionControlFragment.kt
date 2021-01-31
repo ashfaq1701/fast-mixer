@@ -3,13 +3,11 @@ package com.bluehub.fastmixer.common.permissions
 import androidx.lifecycle.Observer
 import com.bluehub.fastmixer.common.fragments.BaseFragment
 import com.bluehub.fastmixer.common.utils.DialogManager
-import com.bluehub.fastmixer.common.utils.PermissionManager
 import android.Manifest
 import android.os.Build
-import android.util.Log
-import com.bluehub.fastmixer.common.utils.ViewModelType
+import com.bluehub.fastmixer.common.models.ViewModelType
 
-abstract class PermissionFragment<T: PermissionViewModel>(viewModelType: ViewModelType): BaseFragment<T>(viewModelType) {
+abstract class PermissionControlFragment<T: PermissionControlViewModel>(viewModelType: ViewModelType): BaseFragment<T>(viewModelType) {
     abstract var dialogManager: DialogManager
 
     fun setPermissionEvents() {
