@@ -319,6 +319,8 @@ int RecordingEngine::getDurationInSeconds() {
 }
 
 void RecordingEngine::resetAudioEngine() {
+    mRecordingIO.clearPlayerSources();
+    mDataSource = shared_ptr<FileDataSource> { nullptr};
     return mRecordingIO.resetProperties();
 }
 

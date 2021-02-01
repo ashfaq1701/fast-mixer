@@ -256,8 +256,7 @@ bool RecordingIO::checkPlayerSources(map<string, shared_ptr<DataSource>> playMap
 
 void RecordingIO::resetProperties() {
     taskQueue->clear_queue();
-    mPlayer.reset();
-    mPlayer.reset();
+    mPlayer->setPlayHead(0);
     mRecordingFile.reset();
     mTotalSamples = 0;
     mIteration = 1;
