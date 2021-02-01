@@ -27,8 +27,8 @@ public:
         is_running = false;
     }
 
-    void enqueue(function<void()> f) {
-        q->push_back(f);
+    void enqueue(function<void()>&& f) {
+        q->push_back(move(f));
     }
 
     void clear_queue() {

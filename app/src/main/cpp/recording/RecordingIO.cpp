@@ -15,19 +15,29 @@
 #include "../Constants.h"
 #include "RecordingEngine.h"
 
-mutex RecordingIO::mtx;
-condition_variable RecordingIO::reallocated;
-bool RecordingIO::is_reallocated = false;
+mutex RecordingIO::flushMtx;
+condition_variable RecordingIO::flushed;
+bool RecordingIO::ongoing_flush_completed = true;
+
+bool RecordingIO::check_if_flush_completed() {
+    return ongoing_flush_completed;
+}
+
+mutex RecordingIO::livePlaybackMtx;
+condition_variable RecordingIO::livePlaybackRead;
+bool RecordingIO::live_playback_read_completed = true;
+
+bool RecordingIO::check_if_live_playback_read_completed() {
+    return live_playback_read_completed;
+}
+
 
 RecordingIO::RecordingIO() {
     Player* player = new Player();
     mPlayer.reset(move(player));
 
+    mData.reserve(kMaxSamples);
     taskQueue = new TaskQueue();
-}
-
-bool RecordingIO::check_if_reallocated() {
-    return is_reallocated;
 }
 
 FileDataSource* RecordingIO::setup_audio_source() {
@@ -66,80 +76,30 @@ void RecordingIO::read_playback(float *targetData, int32_t numFrames) {
     }
 }
 
-void RecordingIO::flush_to_file(int16_t* buffer, int32_t length, const string& recordingFilePath, shared_ptr<SndfileHandle>& recordingFile) {
+void RecordingIO::flush_to_file(int16_t* data, int32_t length, const string& recordingFilePath, shared_ptr<SndfileHandle>& recordingFile) {
     if (!recordingFile) {
         int format = SF_FORMAT_WAV | SF_FORMAT_PCM_16;
         SndfileHandle file = SndfileHandle(recordingFilePath, SFM_WRITE, format, RecordingStreamConstants::mInputChannelCount, RecordingStreamConstants::mSampleRate);
         recordingFile = make_shared<SndfileHandle>(file);
     }
-    if (!buffer) {
-        return;
-    }
-    recordingFile->write(buffer, length);
 
-    unique_lock<mutex> lck(mtx);
-    reallocated.wait(lck, check_if_reallocated);
-    delete[] buffer;
-    is_reallocated = false;
-    lck.unlock();
-}
-
-void RecordingIO::perform_flush(int flushIndex) {
-    int16_t* oldBuffer = mData;
-    is_reallocated = false;
-    taskQueue->enqueue([&]() {
-        flush_to_file(oldBuffer, flushIndex, mRecordingFilePath, mRecordingFile);
-    });
-    auto * newData = new int16_t[kMaxSamples]{0};
-    copy(mData + flushIndex, mData + mWriteIndex, newData);
-    mData = newData;
-    is_reallocated = true;
-    reallocated.notify_all();
-    mWriteIndex -= flushIndex;
-    mLivePlaybackReadIndex -= flushIndex;
-    readyToFlush = false;
-    toFlush = false;
-    mIteration = 1;
+    recordingFile->write(data, length);
 }
 
 int32_t RecordingIO::write(const int16_t *sourceData, int32_t numSamples) {
-    if (mWriteIndex + numSamples > kMaxSamples) {
-        readyToFlush = true;
-    }
+    // Wait if a flush action is already in progress
+    // Known Issue: If live playback is on, this will blink in the live playback for a while
 
-    int flushIndex = 0;
-    if (readyToFlush) {
-        int upperBound  = 0;
-        if (mWriteIndex < kMaxSamples) {
-            upperBound = mWriteIndex;
-        } else {
-            upperBound = kMaxSamples;
-        }
-        if (mLivePlaybackEnabled && mLivePlaybackReadIndex >= upperBound) {
-            flushIndex = upperBound;
-            toFlush = true;
-        } else if (!mLivePlaybackEnabled) {
-            flushIndex = mWriteIndex;
-            toFlush = true;
-        }
-    }
+    unique_lock<mutex> lck(flushMtx);
+    flushed.wait(lck, check_if_flush_completed);
+    lck.unlock();
 
-    if (toFlush) {
-        perform_flush(flushIndex);
-    }
-
-    if (mWriteIndex + numSamples > mIteration * kMaxSamples) {
-        readyToFlush = true;
-        mIteration++;
-        int32_t newSize = mIteration * kMaxSamples;
-        auto * newData = new int16_t[newSize]{0};
-        copy(mData, mData + mWriteIndex, newData);
-        delete[] mData;
-        mData = newData;
+    if (mData.size() + numSamples >= kMaxSamples) {
+        flush_buffer();
     }
 
     for(int i = 0; i < numSamples; i++) {
-        mData[mWriteIndex++] = sourceData[i] * gain_factor;
+        mData.push_back(sourceData[i] * gain_factor);
         if (currentMax < abs(sourceData[i])) {
             currentMax = abs(sourceData[i]);
         }
@@ -150,45 +110,55 @@ int32_t RecordingIO::write(const int16_t *sourceData, int32_t numSamples) {
 }
 
 void RecordingIO::flush_buffer() {
-    if (mWriteIndex > 0) {
-        int16_t* oldBuffer = mData;
-        if (!oldBuffer) {
-            return;
-        }
-        is_reallocated = false;
-        int32_t flushIndex = mWriteIndex;
-        taskQueue->enqueue([&]() {
-            flush_to_file(oldBuffer, flushIndex, mRecordingFilePath, mRecordingFile);
-        });
-        mIteration = 1;
-        mWriteIndex = 0;
+
+    if (mData.size() > 0) {
+
+        ongoing_flush_completed = false;
+
+        int numItems = mData.size();
+
+        copy(mData.begin(), mData.begin() + numItems, mBuff);
+
+        taskQueue->enqueue(move([&]() {
+            flush_to_file(mBuff, numItems, mRecordingFilePath, mRecordingFile);
+        }));
+
+        // Wait if a live playback read action is already in progress
+        unique_lock<mutex> lck(livePlaybackMtx);
+        livePlaybackRead.wait(lck, check_if_live_playback_read_completed);
+        lck.unlock();
+
+        mData.clear();
         mLivePlaybackReadIndex = 0;
-        mData = new int16_t[kMaxSamples]{0};
-        is_reallocated = true;
-        reallocated.notify_all();
-        readyToFlush = false;
-        toFlush = false;
+
+        ongoing_flush_completed = true;
+        flushed.notify_all();
     }
 }
 
 int32_t RecordingIO::read_live_playback(int16_t *targetData, int32_t numSamples) {
-    if (mLivePlaybackReadIndex > mWriteIndex) {
+    if (mLivePlaybackReadIndex > mData.size()) {
         return 0;
     }
     int32_t framesRead = 0;
     auto framesToCopy = numSamples;
-    if (mLivePlaybackReadIndex + numSamples >= mTotalSamples) {
-        framesToCopy = mTotalSamples - mLivePlaybackReadIndex;
+    if (mLivePlaybackReadIndex + numSamples >= mData.size()) {
+        framesToCopy = mData.size() - mLivePlaybackReadIndex;
     }
     if (framesToCopy > 0) {
-        memcpy(targetData, mData + mLivePlaybackReadIndex, framesToCopy * sizeof(int16_t));
+
+        // Set the flag so that any flush action waits
+        live_playback_read_completed = false;
+        copy(mData.begin() + mLivePlaybackReadIndex, mData.begin() + mLivePlaybackReadIndex + framesToCopy, targetData);
         mLivePlaybackReadIndex += framesToCopy;
+        live_playback_read_completed = true;
+        livePlaybackRead.notify_all();
     }
     return framesRead;
 }
 
 void RecordingIO::sync_live_playback() {
-    mLivePlaybackReadIndex = mWriteIndex;
+    mLivePlaybackReadIndex = mData.size();
 }
 
 void RecordingIO::setLivePlaybackEnabled(bool livePlaybackEnabled) {
@@ -259,11 +229,7 @@ void RecordingIO::resetProperties() {
     mPlayer->setPlayHead(0);
     mRecordingFile.reset();
     mTotalSamples = 0;
-    mIteration = 1;
-    mWriteIndex = 0;
     mLivePlaybackReadIndex = 0;
-    readyToFlush = false;
-    toFlush = false;
 
     unlink(mRecordingFilePath.c_str());
 }
