@@ -149,7 +149,7 @@ float Player::getMaxValueAcrossSources() {
 
 void Player::setPlayHead(int32_t playHead) {
     int64_t maxTotalSourceFrames = getMaxTotalSourceFrames();
-    if (playHead < maxTotalSourceFrames) {
+    if (playHead < maxTotalSourceFrames || playHead == 0) {
         mReadFrameIndex = playHead;
     }
 }
