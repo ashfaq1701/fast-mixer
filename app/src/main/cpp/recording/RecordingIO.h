@@ -18,7 +18,7 @@
 
 using namespace std;
 
-const int kMaxSamples = 60 * oboe::DefaultStreamValues::SampleRate * oboe::ChannelCount::Stereo;
+const int kMaxSamples = 30 * oboe::DefaultStreamValues::SampleRate * oboe::ChannelCount::Stereo;
 
 class RecordingIO {
 public:
@@ -86,32 +86,31 @@ private:
     shared_ptr<Player> mPlayer {nullptr};
 
     int32_t mTotalSamples = 0;
-    int32_t mIteration = 1;
-    int32_t mWriteIndex = 0;
     int32_t mLivePlaybackReadIndex = 0;
     const int16_t gain_factor = 1;
 
     int currentMax = 0;
 
     bool mLivePlaybackEnabled = true;
-    bool readyToFlush = false;
-    bool toFlush = false;
 
     function<void()> mStopPlaybackCallback = nullptr;
 
-    int16_t* mData = new int16_t[kMaxSamples]{0};
+    vector<int16_t> mData;
+    int16_t* mBuff = new int16_t[kMaxSamples]{0};
 
-    static void flush_to_file(int16_t* buffer, int length, const string& recordingFilePath, shared_ptr<SndfileHandle>& recordingFile);
+    static void flush_to_file(int16_t* data, int32_t length, const string& recordingFilePath, shared_ptr<SndfileHandle>& recordingFile);
 
     bool validate_audio_file();
 
-    void perform_flush(int flushIndex);
+    static mutex flushMtx;
+    static condition_variable flushed;
+    static bool ongoing_flush_completed;
+    static bool check_if_flush_completed();
 
-    static mutex mtx;
-    static condition_variable reallocated;
-    static bool is_reallocated;
-
-    static bool check_if_reallocated();
+    static mutex livePlaybackMtx;
+    static condition_variable livePlaybackRead;
+    static bool live_playback_read_completed;
+    static bool check_if_live_playback_read_completed();
 };
 
 
