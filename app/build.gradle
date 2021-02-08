@@ -40,7 +40,7 @@ android {
             externalNativeBuild {
                 cmake {
                     if (rootProject.ext.useHWASAN == true) {
-                        abiFilters.addAll( SupportedABIs )
+                        abiFilters.addAll(SupportedABIs)
                         arguments "-DANDROID_STL=c++_shared", "-DUSEHWASAN=ON"
                     } else if (rootProject.ext.useASAN == false) {
                         arguments "-DUSEASAN=ON"
@@ -76,40 +76,40 @@ android {
 }
 
 dependencies {
-    implementation (
-        fileTree(dir: "libs", include: ["*.jar"]),
-        "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version",
-        "androidx.core:core-ktx:$core_ktx_version",
-        "androidx.appcompat:appcompat:$appcompat_version",
-        "androidx.constraintlayout:constraintlayout:$constraint_layout_version",
-        "androidx.lifecycle:lifecycle-extensions:$lifecycle_extensions_version",
-        "androidx.legacy:legacy-support-v4:$legacy_support_version",
-        "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_viewmodel_ktx_version",
-        "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutine_version",
-        "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutine_android_version",
-        "androidx.navigation:navigation-fragment-ktx:$navigation_fragment_ktx_version",
-        "androidx.navigation:navigation-ui-ktx:$navigation_ui_ktx_version",
-        "com.jakewharton.timber:timber:$timber_version",
-        "com.google.dagger:dagger:$dagger_version",
-        "com.google.dagger:dagger-android-support:$dagger_version",
-        "io.reactivex.rxjava3:rxandroid:$rxjava_version",
-        "io.reactivex.rxjava3:rxkotlin:$rxjava_version",
-        "com.github.Armen101:AudioRecordView:$audio_record_view_version",
-        "com.github.warkiz.widget:indicatorseekbar:$indicator_seekbar_version"
+    implementation(
+            fileTree(dir: "libs", include: ["*.jar"]),
+            "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version",
+            "androidx.core:core-ktx:$core_ktx_version",
+            "androidx.appcompat:appcompat:$appcompat_version",
+            "androidx.constraintlayout:constraintlayout:$constraint_layout_version",
+            "androidx.lifecycle:lifecycle-extensions:$lifecycle_extensions_version",
+            "androidx.legacy:legacy-support-v4:$legacy_support_version",
+            "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_viewmodel_ktx_version",
+            "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutine_version",
+            "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutine_android_version",
+            "androidx.navigation:navigation-fragment-ktx:$navigation_fragment_ktx_version",
+            "androidx.navigation:navigation-ui-ktx:$navigation_ui_ktx_version",
+            "com.jakewharton.timber:timber:$timber_version",
+            "com.google.dagger:dagger:$dagger_version",
+            "com.google.dagger:dagger-android-support:$dagger_version",
+            "io.reactivex.rxjava3:rxandroid:$rxjava_version",
+            "io.reactivex.rxjava3:rxkotlin:$rxjava_version",
+            "com.github.Armen101:AudioRecordView:$audio_record_view_version",
+            "com.github.warkiz.widget:indicatorseekbar:$indicator_seekbar_version"
     )
 
-    testImplementation (
-        "junit:junit:$junit_version"
+    testImplementation(
+            "junit:junit:$junit_version"
     )
 
-    androidTestImplementation (
-        "androidx.test.ext:junit:$ext_version",
-        "androidx.test.espresso:espresso-core:$espresso_version"
+    androidTestImplementation(
+            "androidx.test.ext:junit:$ext_version",
+            "androidx.test.espresso:espresso-core:$espresso_version"
     )
 
-    kapt (
-        "com.google.dagger:dagger-compiler:$dagger_version",
-        "com.google.dagger:dagger-android-processor:$dagger_version"
+    kapt(
+            "com.google.dagger:dagger-compiler:$dagger_version",
+            "com.google.dagger:dagger-android-processor:$dagger_version"
     )
 }
 
