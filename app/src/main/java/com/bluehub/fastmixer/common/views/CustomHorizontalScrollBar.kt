@@ -99,7 +99,16 @@ class CustomHorizontalScrollBar(context: Context, attributeSet: AttributeSet?)
     }
 
     private fun repositionScrollThumb(newLeft: Int, newRight: Int) {
-        mScrollThumb.layout(newLeft, top, newRight, bottom)
+        mScrollThumb.layout(newLeft, mScrollThumb.top, newRight, mScrollThumb.bottom)
+        performScrollOnScrollView()
+    }
+
+    private fun performScrollOnScrollView() {
+        val ratio = mView.width.toFloat() / mScrollBar.width.toFloat()
+        val posToScroll = (ratio * mScrollThumb.left).toInt()
+        mHorizontalScrollView.post {
+            mHorizontalScrollView.scrollTo(posToScroll, mHorizontalScrollView.top)
+        }
     }
 
     private fun setViewWidthListener() {
