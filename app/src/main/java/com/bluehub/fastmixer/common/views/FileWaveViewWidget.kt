@@ -16,6 +16,7 @@ import com.bluehub.fastmixer.databinding.FileWaveViewWidgetBinding
 import com.bluehub.fastmixer.screens.mixing.*
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.subjects.BehaviorSubject
+import timber.log.Timber
 
 @BindingMethods(
     value = [
@@ -45,6 +46,8 @@ class FileWaveViewWidget(context: Context, attributeSet: AttributeSet?)
 
     private lateinit var menu: PopupMenu
     private lateinit var binding: FileWaveViewWidgetBinding
+
+    private lateinit var fileWaveViewScroll: HorizontalScrollView
 
     private val onMenuItemClick = { menuItem: MenuItem ->
         when(menuItem.itemId) {
@@ -124,6 +127,11 @@ class FileWaveViewWidget(context: Context, attributeSet: AttributeSet?)
                     )
                 }
             }
+
+        mAudioFileUiState.value.zoomLevel
+            .subscribe {
+                fileWaveViewScroll.scrollTo(0, fileWaveViewScroll.top)
+            }
     }
 
     private fun checkAndRenderView() {
@@ -148,6 +156,8 @@ class FileWaveViewWidget(context: Context, attributeSet: AttributeSet?)
                 fileWaveViewScrollBar.setHorizontalScrollView(fileWaveViewScroll)
                 fileWaveViewScrollBar.setControlledView(fileWaveView)
             }
+
+            fileWaveViewScroll = binding.fileWaveViewScroll
 
             setupStoreObservers()
             setupUiStateObservers()
