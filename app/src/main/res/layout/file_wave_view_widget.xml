@@ -28,7 +28,7 @@
         android:layout_margin="@dimen/audio_file_margin"
         android:background="@drawable/audio_widget_border">
 
-        <HorizontalScrollView
+        <com.bluehub.fastmixer.common.views.LockableHorizontalScrollView
             android:id="@+id/fileWaveViewScroll"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -52,13 +52,13 @@
 
             </com.bluehub.fastmixer.common.views.FileWaveView>
 
-        </HorizontalScrollView>
+        </com.bluehub.fastmixer.common.views.LockableHorizontalScrollView>
 
         <View
             android:id="@+id/waveViewControlDivider"
             android:layout_width="match_parent"
             android:layout_height="@dimen/horizontal_line_height"
-            android:layout_marginBottom="@dimen/divider_margin"
+            android:layout_marginVertical="@dimen/divider_margin"
             android:background="@color/borderColor"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/fileWaveViewScroll" />
