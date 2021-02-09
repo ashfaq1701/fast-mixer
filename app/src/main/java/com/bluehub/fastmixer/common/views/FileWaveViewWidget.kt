@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.MenuItem
+import android.widget.HorizontalScrollView
 import android.widget.PopupMenu
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
@@ -127,7 +128,7 @@ class FileWaveViewWidget(context: Context, attributeSet: AttributeSet?)
 
     private fun checkAndRenderView() {
         if (mAudioFileUiState.hasValue() && mAudioFileEventListeners.hasValue() && mFileWaveViewStore.hasValue()) {
-            val waveViewEventListeners = FileWaveViewEventListeners(
+            val waveViewEvListeners = FileWaveViewEventListeners(
                 ::toggleDropUpMenu,
                 ::waveViewZoomIn,
                 ::waveViewZoomOut,
@@ -137,10 +138,16 @@ class FileWaveViewWidget(context: Context, attributeSet: AttributeSet?)
 
             val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
             binding = FileWaveViewWidgetBinding.inflate(inflater, this, true)
-            binding.audioFileUiState = mAudioFileUiState.value
-            binding.eventListener = mAudioFileEventListeners.value
-            binding.waveViewEventListeners = waveViewEventListeners
-            binding.fileWaveViewStore = mFileWaveViewStore.value
+
+            binding.apply {
+                audioFileUiState = mAudioFileUiState.value
+                eventListener = mAudioFileEventListeners.value
+                waveViewEventListeners = waveViewEvListeners
+                fileWaveViewStore = mFileWaveViewStore.value
+
+                fileWaveViewScrollBar.setHorizontalScrollView(fileWaveViewScroll)
+                fileWaveViewScrollBar.setControlledView(fileWaveView)
+            }
 
             setupStoreObservers()
             setupUiStateObservers()

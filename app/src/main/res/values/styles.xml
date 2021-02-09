@@ -26,12 +26,4 @@
         <item name="android:windowMinWidthMinor">100%</item>
     </style>
 
-    <style name="CustomScrollbar">
-        <item name="android:scrollbarStyle">outsideInset</item>
-        <item name="android:fadeScrollbars">false</item>
-        <item name="android:scrollbarThumbHorizontal">@drawable/scrollbar_horizontal_thumb</item>
-        <item name="android:scrollbarTrackHorizontal">@drawable/scrollbar_horizontal_track</item>
-        <item name="android:scrollbarSize">12dp</item>
-    </style>
-
 </resources>

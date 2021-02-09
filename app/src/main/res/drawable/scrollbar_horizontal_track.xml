@@ -6,6 +6,6 @@
         android:endColor="#9BA3C5"
         android:startColor="#8388A4" />
 
-    <corners android:radius="6dp" />
+    <corners android:radius="8dp" />
 
 </shape>
