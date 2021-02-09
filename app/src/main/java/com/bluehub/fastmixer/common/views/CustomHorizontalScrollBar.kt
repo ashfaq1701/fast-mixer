@@ -7,14 +7,14 @@ import android.widget.HorizontalScrollView
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.bluehub.fastmixer.databinding.CustomScrollBarBinding
 
-class ScrollBar(context: Context, attributeSet: AttributeSet?)
+class CustomHorizontalScrollBar(context: Context, attributeSet: AttributeSet?)
     : ConstraintLayout(context, attributeSet) {
 
     private val binding: CustomScrollBarBinding
     private lateinit var mHorizontalScrollView: HorizontalScrollView
     private lateinit var mView: View
 
-    private val mScrollBar: ScrollBar
+    private val mScrollBar: CustomHorizontalScrollBar
     private val mScrollTrack: View
     private val mScrollThumb: View
 
@@ -26,8 +26,11 @@ class ScrollBar(context: Context, attributeSet: AttributeSet?)
             distanceY: Float
         ): Boolean {
 
+            handleScrollOfThumb(e2, distanceX)
+            return true
+        }
 
-            //handleScrollOfThumb()
+        override fun onDown(e: MotionEvent?): Boolean {
             return true
         }
     }
@@ -51,8 +54,7 @@ class ScrollBar(context: Context, attributeSet: AttributeSet?)
     }
 
     override fun onTouchEvent(event: MotionEvent?): Boolean {
-        gestureDetector.onTouchEvent(event);
-        return true;
+        return gestureDetector.onTouchEvent(event)
     }
 
     fun setHorizontalScrollView(horizontalScrollView: HorizontalScrollView) {
@@ -62,6 +64,38 @@ class ScrollBar(context: Context, attributeSet: AttributeSet?)
     fun setControlledView(view: View) {
         this.mView = view
         setViewWidthListener()
+    }
+
+    private fun handleScrollOfThumb(event: MotionEvent?, distanceX: Float) {
+        event?: return
+
+        if (event.x >= mScrollThumb.left && event.x <= mScrollThumb.left + mScrollThumb.width) {
+
+            var newLeft = mScrollThumb.left - distanceX.toInt()
+            var newRight = mScrollThumb.right - distanceX.toInt()
+
+            if (newRight <= mScrollBar.width && newLeft >= 0) {
+                mScrollThumb.layout(newLeft, mScrollThumb.top, newRight, mScrollThumb.bottom)
+            }
+            // Thumb is not at left nor right, but distanced asked to traverse by move is more
+            else if (mScrollThumb.left != 0 && mScrollThumb.right < mScrollBar.width - 1) {
+
+                // Distance from right end of bar
+                val distanceToRight = mScrollBar.width - mScrollThumb.right - 1
+
+                // Get the closest distance to move the thumb to
+                val newDist = if (mScrollThumb.left < distanceToRight) {
+                    mScrollThumb.left
+                } else {
+                    -distanceToRight
+                }
+
+                newLeft = mScrollThumb.left - newDist
+                newRight = mScrollThumb.right - newDist
+
+                mScrollThumb.layout(newLeft, mScrollThumb.top, newRight, mScrollThumb.bottom)
+            }
+        }
     }
 
     private fun setViewWidthListener() {

@@ -53,7 +53,7 @@
 
         </com.bluehub.fastmixer.common.views.LockableHorizontalScrollView>
 
-        <com.bluehub.fastmixer.common.views.ScrollBar
+        <com.bluehub.fastmixer.common.views.CustomHorizontalScrollBar
             android:id="@+id/fileWaveViewScrollBar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
