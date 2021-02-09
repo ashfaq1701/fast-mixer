@@ -75,7 +75,7 @@ class CustomHorizontalScrollBar(context: Context, attributeSet: AttributeSet?)
             var newRight = mScrollThumb.right - distanceX.toInt()
 
             if (newRight <= mScrollBar.width && newLeft >= 0) {
-                mScrollThumb.layout(newLeft, mScrollThumb.top, newRight, mScrollThumb.bottom)
+                repositionScrollThumb(newLeft, newRight)
             }
             // Thumb is not at left nor right, but distanced asked to traverse by move is more
             else if (mScrollThumb.left != 0 && mScrollThumb.right < mScrollBar.width - 1) {
@@ -93,9 +93,13 @@ class CustomHorizontalScrollBar(context: Context, attributeSet: AttributeSet?)
                 newLeft = mScrollThumb.left - newDist
                 newRight = mScrollThumb.right - newDist
 
-                mScrollThumb.layout(newLeft, mScrollThumb.top, newRight, mScrollThumb.bottom)
+                repositionScrollThumb(newLeft, newRight)
             }
         }
+    }
+
+    private fun repositionScrollThumb(newLeft: Int, newRight: Int) {
+        mScrollThumb.layout(newLeft, top, newRight, bottom)
     }
 
     private fun setViewWidthListener() {
