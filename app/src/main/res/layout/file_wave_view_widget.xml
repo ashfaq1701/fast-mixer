@@ -59,7 +59,7 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <com.bluehub.fastmixer.common.views.LockableHorizontalScrollView
+        <com.bluehub.fastmixer.common.views.LockedHorizontalScrollView
             android:id="@+id/fileWaveViewScroll"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -82,7 +82,7 @@
 
             </com.bluehub.fastmixer.common.views.FileWaveView>
 
-        </com.bluehub.fastmixer.common.views.LockableHorizontalScrollView>
+        </com.bluehub.fastmixer.common.views.LockedHorizontalScrollView>
 
         <com.bluehub.fastmixer.common.views.CustomHorizontalScrollBar
             android:id="@+id/fileWaveViewScrollBar"

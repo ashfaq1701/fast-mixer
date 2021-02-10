@@ -5,14 +5,11 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import android.widget.HorizontalScrollView
 
-class LockableHorizontalScrollView(
+class LockedHorizontalScrollView(
     context: Context,
     attrs: AttributeSet? = null) : HorizontalScrollView(context, attrs) {
 
     init {
-
-        verticalScrollbarPosition
-
         isVerticalScrollBarEnabled = false
         isHorizontalScrollBarEnabled = false
     }
