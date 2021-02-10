@@ -17,7 +17,6 @@ import io.reactivex.rxjava3.functions.Function
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import kotlin.math.abs
 import kotlin.math.ceil
 
@@ -233,12 +232,16 @@ class FileWaveView @JvmOverloads constructor(
             val sliderLeft = getSliderLeftPosition()
             val sliderTop = 0
             if (mAudioWidgetSlider.visibility != GONE) {
-                mAudioWidgetSlider.layout(
-                    sliderLeft,
-                    sliderTop,
-                    sliderLeft + mAudioWidgetSlider.measuredWidth,
-                    sliderTop + mAudioWidgetSlider.measuredHeight
-                )
+                if (mAudioWidgetSlider.measuredWidth > 0 && mAudioWidgetSlider.measuredHeight > 0) {
+                    mAudioWidgetSlider.post {
+                        mAudioWidgetSlider.layout(
+                            sliderLeft,
+                            sliderTop,
+                            sliderLeft + mAudioWidgetSlider.measuredWidth,
+                            sliderTop + mAudioWidgetSlider.measuredHeight
+                        )
+                    }
+                }
             }
         }
     }
@@ -261,10 +264,15 @@ class FileWaveView @JvmOverloads constructor(
 
         if (::mAudioWidgetSlider.isInitialized) {
             val sliderWidth = context.resources.getDimension(R.dimen.audio_view_slider_line_width)
-            mAudioWidgetSlider.measure(
-                MeasureSpec.makeMeasureSpec(ceil(sliderWidth).toInt(), MeasureSpec.EXACTLY),
-                measuredHeight
-            )
+            mAudioWidgetSlider.post {
+                mAudioWidgetSlider.measure(
+                    MeasureSpec.makeMeasureSpec(
+                        ceil(sliderWidth).toInt(),
+                        MeasureSpec.EXACTLY
+                    ),
+                    measuredHeight
+                )
+            }
         }
 
         val calculatedWidth = mAudioFileUiState.value.numPtsToPlot

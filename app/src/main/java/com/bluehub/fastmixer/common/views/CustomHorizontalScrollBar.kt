@@ -6,6 +6,7 @@ import android.view.*
 import android.widget.HorizontalScrollView
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.bluehub.fastmixer.databinding.CustomScrollBarBinding
+import timber.log.Timber
 
 class CustomHorizontalScrollBar(context: Context, attributeSet: AttributeSet?)
     : ConstraintLayout(context, attributeSet) {
@@ -99,9 +100,10 @@ class CustomHorizontalScrollBar(context: Context, attributeSet: AttributeSet?)
     }
 
     private fun repositionScrollThumb(newLeft: Int, newRight: Int) {
-        mScrollThumb.post {
+        //mScrollThumb.post {
+            Timber.d("REPOSITION SCROLL THUMB, $newLeft, $newRight")
             mScrollThumb.layout(newLeft, mScrollThumb.top, newRight, mScrollThumb.bottom)
-        }
+        //}
         performScrollOnScrollView()
     }
 
@@ -130,10 +132,11 @@ class CustomHorizontalScrollBar(context: Context, attributeSet: AttributeSet?)
                 val layoutParams = mScrollThumb.layoutParams
 
                 val newWidth = (mScrollTrack.width.toFloat() / ratio).toInt()
-                val newLayoutParams = LayoutParams(newWidth, layoutParams.height)
 
-                mScrollThumb.post {
-                    mScrollThumb.layoutParams = newLayoutParams
+                layoutParams.width = newWidth
+
+                if (mScrollThumb.width != newWidth) {
+                    mScrollThumb.layoutParams = layoutParams
                 }
             }
         }
