@@ -7,9 +7,14 @@ import android.widget.HorizontalScrollView
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.bluehub.fastmixer.databinding.CustomScrollBarBinding
 import timber.log.Timber
+import kotlin.math.ceil
 
 class CustomHorizontalScrollBar(context: Context, attributeSet: AttributeSet?)
     : ConstraintLayout(context, attributeSet) {
+
+    companion object {
+        const val WIDTH_FRACTION = 0.25
+    }
 
     private val binding: CustomScrollBarBinding
     private lateinit var mHorizontalScrollView: HorizontalScrollView
@@ -71,39 +76,59 @@ class CustomHorizontalScrollBar(context: Context, attributeSet: AttributeSet?)
         event?: return
 
         if (event.x >= mScrollThumb.left && event.x <= mScrollThumb.left + mScrollThumb.width) {
+            performScroll(distanceX.toInt())
+        }
+    }
 
-            var newLeft = mScrollThumb.left - distanceX.toInt()
-            var newRight = mScrollThumb.right - distanceX.toInt()
+    fun performScrollByWidthFraction(direction: ScrollDirection): Boolean {
+        val thumbWidthFraction = mScrollBar.width.toFloat() * WIDTH_FRACTION
 
-            if (newRight <= mScrollBar.width && newLeft >= 0) {
-                repositionScrollThumb(newLeft, newRight)
+        val scrollDistance = (mScrollBar.width.toFloat() / mView.width.toFloat()) * thumbWidthFraction
+
+        val scrollDistanceSigned = if (direction == ScrollDirection.LEFT)
+            scrollDistance
+        else
+            -scrollDistance
+
+        return performScroll(ceil(scrollDistanceSigned).toInt())
+    }
+
+
+    private fun performScroll(distanceX: Int): Boolean {
+        var newLeft = mScrollThumb.left - distanceX
+        var newRight = mScrollThumb.right - distanceX
+
+        if (newRight <= mScrollBar.width && newLeft >= 0) {
+
+            repositionScrollThumb(newLeft, newRight)
+            return true
+        }
+        // Thumb is not at left nor right, but distanced asked to traverse by move is more
+        else if (mScrollThumb.left != 0 && mScrollThumb.right < mScrollBar.width - 1) {
+
+            // Distance from right end of bar
+            val distanceToRight = mScrollBar.width - mScrollThumb.right - 1
+
+            // Get the closest distance to move the thumb to
+            val newDist = if (mScrollThumb.left < distanceToRight) {
+                mScrollThumb.left
+            } else {
+                -distanceToRight
             }
-            // Thumb is not at left nor right, but distanced asked to traverse by move is more
-            else if (mScrollThumb.left != 0 && mScrollThumb.right < mScrollBar.width - 1) {
 
-                // Distance from right end of bar
-                val distanceToRight = mScrollBar.width - mScrollThumb.right - 1
+            newLeft = mScrollThumb.left - newDist
+            newRight = mScrollThumb.right - newDist
 
-                // Get the closest distance to move the thumb to
-                val newDist = if (mScrollThumb.left < distanceToRight) {
-                    mScrollThumb.left
-                } else {
-                    -distanceToRight
-                }
+            repositionScrollThumb(newLeft, newRight)
+            return true
+        } else {
 
-                newLeft = mScrollThumb.left - newDist
-                newRight = mScrollThumb.right - newDist
-
-                repositionScrollThumb(newLeft, newRight)
-            }
+            return false
         }
     }
 
     private fun repositionScrollThumb(newLeft: Int, newRight: Int) {
-        //mScrollThumb.post {
-            Timber.d("REPOSITION SCROLL THUMB, $newLeft, $newRight")
-            mScrollThumb.layout(newLeft, mScrollThumb.top, newRight, mScrollThumb.bottom)
-        //}
+        mScrollThumb.layout(newLeft, mScrollThumb.top, newRight, mScrollThumb.bottom)
         performScrollOnScrollView()
     }
 
@@ -136,9 +161,18 @@ class CustomHorizontalScrollBar(context: Context, attributeSet: AttributeSet?)
                 layoutParams.width = newWidth
 
                 if (mScrollThumb.width != newWidth) {
-                    mScrollThumb.layoutParams = layoutParams
+                    mScrollThumb.post {
+                        mScrollThumb.layoutParams = layoutParams
+                    }
                 }
             }
         }
     }
 }
+
+enum class ScrollDirection {
+    LEFT, RIGHT
+}
+
+
+

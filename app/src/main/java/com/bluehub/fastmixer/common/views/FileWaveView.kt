@@ -115,7 +115,7 @@ class FileWaveView @JvmOverloads constructor(
         }
 
         mAudioFileUiState.value.displayPtsCount.subscribe {
-            requestLayoutCallable()
+            requestLayout()
         }
         mAudioFileUiState.value.zoomLevel.subscribe {
             handleZoom()
@@ -125,7 +125,7 @@ class FileWaveView @JvmOverloads constructor(
                 AndroidSchedulers.mainThread()
             )
             .subscribe {
-                requestLayoutCallable()
+                requestLayout()
             }
         mAudioFileUiState.value.reRender
             .observeOn(
@@ -133,14 +133,8 @@ class FileWaveView @JvmOverloads constructor(
             )
             .subscribe {
                 forceFetch = true
-                requestLayoutCallable()
+                requestLayout()
             }
-    }
-
-    private fun requestLayoutCallable() {
-        post{
-            requestLayout()
-        }
     }
 
     private fun getNumPtsToPlot() = if (mAudioFileUiState.hasValue()) {
@@ -190,7 +184,7 @@ class FileWaveView @JvmOverloads constructor(
     }
 
     private fun handleZoom() {
-        requestLayoutCallable()
+        requestLayout()
     }
 
     private fun getSliderLeftPosition() = if (mAudioFileUiState.hasValue()) {
@@ -233,14 +227,12 @@ class FileWaveView @JvmOverloads constructor(
             val sliderTop = 0
             if (mAudioWidgetSlider.visibility != GONE) {
                 if (mAudioWidgetSlider.measuredWidth > 0 && mAudioWidgetSlider.measuredHeight > 0) {
-                    mAudioWidgetSlider.post {
-                        mAudioWidgetSlider.layout(
-                            sliderLeft,
-                            sliderTop,
-                            sliderLeft + mAudioWidgetSlider.measuredWidth,
-                            sliderTop + mAudioWidgetSlider.measuredHeight
-                        )
-                    }
+                    mAudioWidgetSlider.layout(
+                        sliderLeft,
+                        sliderTop,
+                        sliderLeft + mAudioWidgetSlider.measuredWidth,
+                        sliderTop + mAudioWidgetSlider.measuredHeight
+                    )
                 }
             }
         }
@@ -264,15 +256,13 @@ class FileWaveView @JvmOverloads constructor(
 
         if (::mAudioWidgetSlider.isInitialized) {
             val sliderWidth = context.resources.getDimension(R.dimen.audio_view_slider_line_width)
-            mAudioWidgetSlider.post {
-                mAudioWidgetSlider.measure(
-                    MeasureSpec.makeMeasureSpec(
-                        ceil(sliderWidth).toInt(),
-                        MeasureSpec.EXACTLY
-                    ),
-                    measuredHeight
-                )
-            }
+            mAudioWidgetSlider.measure(
+                MeasureSpec.makeMeasureSpec(
+                    ceil(sliderWidth).toInt(),
+                    MeasureSpec.EXACTLY
+                ),
+                measuredHeight
+            )
         }
 
         val calculatedWidth = mAudioFileUiState.value.numPtsToPlot
