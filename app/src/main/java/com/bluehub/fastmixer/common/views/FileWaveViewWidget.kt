@@ -130,7 +130,9 @@ class FileWaveViewWidget(context: Context, attributeSet: AttributeSet?)
 
         mAudioFileUiState.value.zoomLevel
             .subscribe {
-                fileWaveViewScroll.scrollTo(0, fileWaveViewScroll.top)
+                fileWaveViewScroll.post {
+                    fileWaveViewScroll.scrollTo(0, fileWaveViewScroll.top)
+                }
             }
     }
 

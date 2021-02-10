@@ -5,6 +5,7 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.bluehub.fastmixer.databinding.AudioWidgetSliderBinding
+import timber.log.Timber
 
 class AudioWidgetSlider(context: Context, attributeSet: AttributeSet?)
     : ConstraintLayout(context, attributeSet) {

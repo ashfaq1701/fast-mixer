@@ -17,6 +17,7 @@ import io.reactivex.rxjava3.functions.Function
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import kotlin.math.abs
 import kotlin.math.ceil
 
@@ -115,7 +116,7 @@ class FileWaveView @JvmOverloads constructor(
         }
 
         mAudioFileUiState.value.displayPtsCount.subscribe {
-            requestLayout()
+            requestLayoutCallable()
         }
         mAudioFileUiState.value.zoomLevel.subscribe {
             handleZoom()
@@ -125,7 +126,7 @@ class FileWaveView @JvmOverloads constructor(
                 AndroidSchedulers.mainThread()
             )
             .subscribe {
-                requestLayout()
+                requestLayoutCallable()
             }
         mAudioFileUiState.value.reRender
             .observeOn(
@@ -133,8 +134,14 @@ class FileWaveView @JvmOverloads constructor(
             )
             .subscribe {
                 forceFetch = true
-                requestLayout()
+                requestLayoutCallable()
             }
+    }
+
+    private fun requestLayoutCallable() {
+        post{
+            requestLayout()
+        }
     }
 
     private fun getNumPtsToPlot() = if (mAudioFileUiState.hasValue()) {
@@ -184,7 +191,7 @@ class FileWaveView @JvmOverloads constructor(
     }
 
     private fun handleZoom() {
-        requestLayout()
+        requestLayoutCallable()
     }
 
     private fun getSliderLeftPosition() = if (mAudioFileUiState.hasValue()) {
