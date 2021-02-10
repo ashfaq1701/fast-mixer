@@ -28,13 +28,44 @@
         android:layout_margin="@dimen/audio_file_margin"
         android:background="@drawable/audio_widget_border">
 
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/waveViewSlideLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageButton
+                android:id="@+id/waveViewSlideLeft"
+                style="@style/IconButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/arrow_left_button"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <ImageButton
+                android:id="@+id/waveViewSlideRight"
+                style="@style/IconButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/arrow_right_button"
+                android:layout_marginStart="@dimen/wave_slide_button_horizontal_margin"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toEndOf="@id/waveViewSlideLeft" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
         <com.bluehub.fastmixer.common.views.LockableHorizontalScrollView
             android:id="@+id/fileWaveViewScroll"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:fillViewport="true"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toBottomOf="@id/waveViewSlideLayout">
 
             <com.bluehub.fastmixer.common.views.FileWaveView
                 android:id="@+id/fileWaveView"

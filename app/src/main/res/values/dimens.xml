@@ -53,4 +53,6 @@
     <dimen name="scrollbar_track_height">15dp</dimen>
     <dimen name="scrollbar_thumb_height">15dp</dimen>
 
+    <dimen name="wave_slide_button_horizontal_margin">20dp</dimen>
+
 </resources>
