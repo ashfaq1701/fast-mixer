@@ -9,6 +9,7 @@ import com.bluehub.fastmixer.common.models.AudioViewAction
 import com.bluehub.fastmixer.common.permissions.PermissionControlViewModel
 import com.bluehub.fastmixer.common.utils.*
 import kotlinx.coroutines.*
+import timber.log.Timber
 import java.io.File
 import java.util.*
 import javax.inject.Inject
@@ -204,6 +205,15 @@ class MixingScreenViewModel @Inject constructor(override val context: Context,
                 firstIdx?.let {
                     val removedFile = audioFiles.removeAt(it)
                     fileManager.removeFile(removedFile.path)
+
+                    playFlagStore.apply {
+                        if (isPlaying.value == true) {
+                            pauseAudio()
+                        } else if (isGroupPlaying.value == true) {
+                            groupPause()
+                        }
+                    }
+
                     audioFilesLiveData.value = audioFiles
                     _itemRemovedIdx.value = it
                 }

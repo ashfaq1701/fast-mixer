@@ -50,4 +50,9 @@
 
     <dimen name="gain_seekbar_progress_thumb_margin">7dp</dimen>
 
+    <dimen name="scrollbar_track_height">15dp</dimen>
+    <dimen name="scrollbar_thumb_height">15dp</dimen>
+
+    <dimen name="wave_slide_button_horizontal_margin">20dp</dimen>
+
 </resources>
