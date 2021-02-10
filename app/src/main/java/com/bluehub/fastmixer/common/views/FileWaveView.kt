@@ -226,14 +226,12 @@ class FileWaveView @JvmOverloads constructor(
             val sliderLeft = getSliderLeftPosition()
             val sliderTop = 0
             if (mAudioWidgetSlider.visibility != GONE) {
-                if (mAudioWidgetSlider.measuredWidth > 0 && mAudioWidgetSlider.measuredHeight > 0) {
-                    mAudioWidgetSlider.layout(
-                        sliderLeft,
-                        sliderTop,
-                        sliderLeft + mAudioWidgetSlider.measuredWidth,
-                        sliderTop + mAudioWidgetSlider.measuredHeight
-                    )
-                }
+                mAudioWidgetSlider.layout(
+                    sliderLeft,
+                    sliderTop,
+                    sliderLeft + mAudioWidgetSlider.measuredWidth,
+                    sliderTop + mAudioWidgetSlider.measuredHeight
+                )
             }
         }
     }
