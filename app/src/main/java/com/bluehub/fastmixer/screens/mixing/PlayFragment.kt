@@ -11,7 +11,7 @@ import com.bluehub.fastmixer.databinding.PlayFragmentBinding
 import kotlinx.android.synthetic.main.play_fragment.*
 import kotlinx.android.synthetic.main.view_loading.*
 
-class PlayFragment(private val audioFile: AudioFile, val isLoading: MutableLiveData<Boolean>) : BaseFragment<PlayViewModel>() {
+class PlayFragment(private val audioFilePath: String, val isLoading: MutableLiveData<Boolean>) : BaseFragment<PlayViewModel>() {
 
     private lateinit var binding: PlayFragmentBinding
     override val viewModelClass = PlayViewModel::class
@@ -25,7 +25,7 @@ class PlayFragment(private val audioFile: AudioFile, val isLoading: MutableLiveD
         binding = DataBindingUtil
             .inflate(inflater, R.layout.play_fragment, container, false)
 
-        viewModel.setAudioFile(audioFile)
+        viewModel.setAudioFilePath(audioFilePath)
 
         binding.viewModel = viewModel
 

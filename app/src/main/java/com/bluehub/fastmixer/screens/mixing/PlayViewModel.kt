@@ -16,7 +16,7 @@ class PlayViewModel @Inject constructor(
     private val audioFileStore: AudioFileStore,
     private val playFlagStore: PlayFlagStore) : BaseViewModel() {
 
-    lateinit var selectedAudioFile: AudioFile
+    lateinit var mAudioFilePath: String
 
     val isPlaying: LiveData<Boolean>
         get() = playFlagStore.isPlaying
@@ -42,8 +42,8 @@ class PlayViewModel @Inject constructor(
         _isLoading = isLoading
     }
 
-    fun setAudioFile(audioFile: AudioFile) {
-        selectedAudioFile = audioFile
+    fun setAudioFilePath(audioFilePath: String) {
+        mAudioFilePath = audioFilePath
         loadSource()
     }
 
@@ -68,7 +68,7 @@ class PlayViewModel @Inject constructor(
 
             setIsLoading()
 
-            val pathList = listOf(selectedAudioFile.path)
+            val pathList = listOf(mAudioFilePath)
             mixingRepository.loadFiles(pathList)
 
             _seekbarMaxValue.postValue(mixingRepository.getTotalSampleFrames())
@@ -82,7 +82,7 @@ class PlayViewModel @Inject constructor(
 
             setIsLoading()
 
-            val pathList = listOf(selectedAudioFile.path)
+            val pathList = listOf(mAudioFilePath)
 
             if (!playList.areEqual(pathList)) {
                 mixingRepository.loadFiles(pathList)
@@ -169,7 +169,7 @@ class PlayViewModel @Inject constructor(
 
     fun setPlayerHead(playHead: Int) = mixingRepository.setPlayerHead(playHead)
 
-    fun setTrackPlayHead(playHead: Int) = mixingRepository.setSourcePlayHead(selectedAudioFile.path, playHead)
+    fun setTrackPlayHead(playHead: Int) = mixingRepository.setSourcePlayHead(mAudioFilePath, playHead)
 
     fun setIsLoading() {
         if (::_isLoading.isInitialized) {

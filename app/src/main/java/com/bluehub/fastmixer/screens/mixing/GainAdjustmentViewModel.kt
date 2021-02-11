@@ -15,7 +15,7 @@ class GainAdjustmentViewModel @Inject constructor(
 
     val isLoading: MutableLiveData<Boolean> = MutableLiveData()
 
-    private lateinit var _audioFile: AudioFile
+    private lateinit var _audioFilePath: String
 
     private val _closeDialog: MutableLiveData<Boolean> = MutableLiveData()
     val closeDialog: LiveData<Boolean>
@@ -25,8 +25,8 @@ class GainAdjustmentViewModel @Inject constructor(
     val gainValue: LiveData<Int>
         get() = _gainValue
 
-    fun setAudioFile(audioFile: AudioFile) {
-        _audioFile = audioFile
+    fun setAudioFilePath(audioFilePath: String) {
+        _audioFilePath = audioFilePath
     }
 
     fun setGainValue(gainVal: Int) {
@@ -37,7 +37,7 @@ class GainAdjustmentViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             _gainValue.value?.let { gainValue ->
                 isLoading.postValue(true)
-                mixingRepository.gainSourceByDb(_audioFile.path, gainValue.toFloat())
+                mixingRepository.gainSourceByDb(_audioFilePath, gainValue.toFloat())
                 isLoading.postValue(false)
             }
         }
@@ -46,8 +46,8 @@ class GainAdjustmentViewModel @Inject constructor(
     fun saveGainApplication() {
         viewModelScope.launch(Dispatchers.IO) {
             isLoading.postValue(true)
-            mixingRepository.applySourceTransformation(_audioFile.path)
-            fileWaveViewStore.reRenderFile(_audioFile.path)
+            mixingRepository.applySourceTransformation(_audioFilePath)
+            fileWaveViewStore.reRenderFile(_audioFilePath)
             isLoading.postValue(false)
             _closeDialog.postValue(true)
         }
@@ -55,7 +55,7 @@ class GainAdjustmentViewModel @Inject constructor(
 
     fun cancelGainApplication() {
         isLoading.postValue(true)
-        mixingRepository.clearSourceTransformation(_audioFile.path)
+        mixingRepository.clearSourceTransformation(_audioFilePath)
         isLoading.postValue(false)
         _closeDialog.postValue(true)
     }

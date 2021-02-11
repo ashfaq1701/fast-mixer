@@ -11,10 +11,9 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.transition.*
 import com.bluehub.fastmixer.R
-import com.bluehub.fastmixer.common.models.AudioViewActionType
+import com.bluehub.fastmixer.common.models.*
 import com.bluehub.fastmixer.common.permissions.PermissionControlFragment
 import com.bluehub.fastmixer.common.utils.DialogManager
-import com.bluehub.fastmixer.common.models.ViewModelType
 import com.bluehub.fastmixer.databinding.MixingScreenBinding
 import com.bluehub.fastmixer.screens.mixing.MixingScreenDirections.actionMixingScreenToRecordingScreen
 import javax.inject.Inject
@@ -97,7 +96,7 @@ class MixingScreen : PermissionControlFragment<MixingScreenViewModel>(ViewModelT
             }
         })
 
-        viewModel.fileWaveViewStore.audioFileUiStateListLiveData.observe(viewLifecycleOwner, {
+        viewModel.audioFilesLiveData.observe(viewLifecycleOwner, {
             audioFileListAdapter.submitList(it)
         })
 
@@ -183,8 +182,8 @@ class MixingScreen : PermissionControlFragment<MixingScreenViewModel>(ViewModelT
         }
     }
 
-    fun showGainControlFragment(audioFile: AudioFile) {
-        val gainAdjustmentDialog = GainAdjustmentDialog(audioFile)
+    fun showGainControlFragment(audioFile: AudioFileUiState) {
+        val gainAdjustmentDialog = GainAdjustmentDialog(audioFile.path)
         gainAdjustmentDialog.show(requireActivity().supportFragmentManager, "gain_control")
     }
 }

@@ -13,6 +13,20 @@ data class AudioFileUiState(
     var playSliderPosition: BehaviorSubject<Int>,
     var playTimer: Timer?) : Serializable {
 
+    companion object {
+        fun create(filePath: String, numSamples: Int): AudioFileUiState {
+            return AudioFileUiState(
+                path = filePath,
+                numSamples = numSamples,
+                displayPtsCount = BehaviorSubject.create(),
+                zoomLevel = BehaviorSubject.create(),
+                isPlaying = BehaviorSubject.createDefault(false),
+                playSliderPosition = BehaviorSubject.create(),
+                playTimer = null
+            )
+        }
+    }
+
         val reRender: BehaviorSubject<Boolean> = BehaviorSubject.create()
 
         val playSliderPositionValue: Int
