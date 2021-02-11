@@ -9,7 +9,7 @@ import com.bluehub.fastmixer.databinding.GainAdjustmentDialogBinding
 import com.warkiz.widget.*
 import kotlinx.android.synthetic.main.view_loading.*
 
-class GainAdjustmentDialog(private val audioFile: AudioFile) : BaseDialogFragment<GainAdjustmentViewModel>() {
+class GainAdjustmentDialog(private val audioFilePath: String) : BaseDialogFragment<GainAdjustmentViewModel>() {
 
     private lateinit var binding: GainAdjustmentDialogBinding
     override val viewModelClass = GainAdjustmentViewModel::class
@@ -39,7 +39,7 @@ class GainAdjustmentDialog(private val audioFile: AudioFile) : BaseDialogFragmen
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        val playFragment = PlayFragment(audioFile, viewModel.isLoading)
+        val playFragment = PlayFragment(audioFilePath, viewModel.isLoading)
         val transaction = childFragmentManager.beginTransaction()
         transaction.replace(R.id.fragmentContainer, playFragment).commit()
     }
@@ -77,7 +77,7 @@ class GainAdjustmentDialog(private val audioFile: AudioFile) : BaseDialogFragmen
 
     private fun setupViewModel() {
         viewModel.setGainValue(0)
-        viewModel.setAudioFile(audioFile)
+        viewModel.setAudioFilePath(audioFilePath)
 
         viewModel.isLoading.observe(viewLifecycleOwner, {
             if (it) {

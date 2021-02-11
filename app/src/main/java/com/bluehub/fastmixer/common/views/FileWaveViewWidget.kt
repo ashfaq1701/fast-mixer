@@ -1,9 +1,10 @@
 package com.bluehub.fastmixer.common.views
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.util.AttributeSet
-import android.view.LayoutInflater
-import android.view.MenuItem
+import android.view.*
+import android.widget.HorizontalScrollView
 import android.widget.PopupMenu
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
@@ -15,6 +16,8 @@ import com.bluehub.fastmixer.databinding.FileWaveViewWidgetBinding
 import com.bluehub.fastmixer.screens.mixing.*
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.subjects.BehaviorSubject
+import timber.log.Timber
+import java.util.*
 
 @BindingMethods(
     value = [
@@ -45,6 +48,9 @@ class FileWaveViewWidget(context: Context, attributeSet: AttributeSet?)
     private lateinit var menu: PopupMenu
     private lateinit var binding: FileWaveViewWidgetBinding
 
+    private lateinit var fileWaveViewScroll: HorizontalScrollView
+    private lateinit var horizontalScrollBar: CustomHorizontalScrollBar
+
     private val onMenuItemClick = { menuItem: MenuItem ->
         when(menuItem.itemId) {
             R.id.gainAdjustment -> {
@@ -57,6 +63,9 @@ class FileWaveViewWidget(context: Context, attributeSet: AttributeSet?)
             else -> false
         }
     }
+
+    private var slideLeftTimer: Timer? = null
+    private var slideRightTimer: Timer? = null
 
     init {
         setupObservers()
@@ -123,11 +132,19 @@ class FileWaveViewWidget(context: Context, attributeSet: AttributeSet?)
                     )
                 }
             }
+
+        mAudioFileUiState.value.zoomLevel
+            .subscribe {
+                fileWaveViewScroll.post {
+                    fileWaveViewScroll.scrollTo(0, fileWaveViewScroll.top)
+                }
+            }
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     private fun checkAndRenderView() {
         if (mAudioFileUiState.hasValue() && mAudioFileEventListeners.hasValue() && mFileWaveViewStore.hasValue()) {
-            val waveViewEventListeners = FileWaveViewEventListeners(
+            val waveViewEvListeners = FileWaveViewEventListeners(
                 ::toggleDropUpMenu,
                 ::waveViewZoomIn,
                 ::waveViewZoomOut,
@@ -137,10 +154,29 @@ class FileWaveViewWidget(context: Context, attributeSet: AttributeSet?)
 
             val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
             binding = FileWaveViewWidgetBinding.inflate(inflater, this, true)
-            binding.audioFileUiState = mAudioFileUiState.value
-            binding.eventListener = mAudioFileEventListeners.value
-            binding.waveViewEventListeners = waveViewEventListeners
-            binding.fileWaveViewStore = mFileWaveViewStore.value
+
+            binding.apply {
+                audioFileUiState = mAudioFileUiState.value
+                eventListener = mAudioFileEventListeners.value
+                waveViewEventListeners = waveViewEvListeners
+                fileWaveViewStore = mFileWaveViewStore.value
+
+                fileWaveViewScrollBar.setHorizontalScrollView(fileWaveViewScroll)
+                fileWaveViewScrollBar.setControlledView(fileWaveView)
+
+                waveViewSlideLeft.setOnTouchListener { _, event ->
+                    setupLeftSliderTouchEvent(event)
+                    true
+                }
+
+                waveViewSlideRight.setOnTouchListener { _, event ->
+                    setupRightSliderTouchEvent(event)
+                    true
+                }
+            }
+
+            fileWaveViewScroll = binding.fileWaveViewScroll
+            horizontalScrollBar = binding.fileWaveViewScrollBar
 
             setupStoreObservers()
             setupUiStateObservers()
@@ -173,6 +209,57 @@ class FileWaveViewWidget(context: Context, attributeSet: AttributeSet?)
 
     private fun toggleDropUpMenu() {
         menu.show()
+    }
+
+    private fun setupLeftSliderTouchEvent(event: MotionEvent) {
+
+        when (event.actionMasked) {
+            MotionEvent.ACTION_DOWN -> setupLeftSliderTimer()
+            MotionEvent.ACTION_UP -> stopLeftSliderTimer()
+        }
+    }
+
+    private fun setupRightSliderTouchEvent(event: MotionEvent) {
+        when (event.actionMasked) {
+            MotionEvent.ACTION_DOWN -> setupRightSliderTimer()
+            MotionEvent.ACTION_UP -> stopRightSliderTimer()
+        }
+    }
+
+    private fun setupLeftSliderTimer() {
+        slideLeftTimer = Timer()
+        slideLeftTimer?.schedule(object: TimerTask() {
+            override fun run() {
+                if (!horizontalScrollBar.performScrollByWidthFraction(ScrollDirection.LEFT)) {
+                    stopLeftSliderTimer()
+                }
+            }
+        }, 0, 300)
+    }
+
+    private fun stopLeftSliderTimer() {
+        slideLeftTimer?.let {
+            it.cancel()
+            slideLeftTimer = null
+        }
+    }
+
+    private fun setupRightSliderTimer() {
+        slideRightTimer = Timer()
+        slideRightTimer?.schedule(object: TimerTask() {
+            override fun run() {
+                if (!horizontalScrollBar.performScrollByWidthFraction(ScrollDirection.RIGHT)) {
+                    stopRightSliderTimer()
+                }
+            }
+        }, 0, 300)
+    }
+
+    private fun stopRightSliderTimer() {
+        slideRightTimer?.let {
+            it.cancel()
+            slideRightTimer = null
+        }
     }
 }
 

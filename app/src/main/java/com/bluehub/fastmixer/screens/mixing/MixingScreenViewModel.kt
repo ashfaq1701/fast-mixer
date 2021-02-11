@@ -2,26 +2,24 @@ package com.bluehub.fastmixer.screens.mixing
 
 import android.content.Context
 import android.net.Uri
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
+import com.bluehub.fastmixer.common.models.AudioFileUiState
 import com.bluehub.fastmixer.common.models.AudioViewAction
-import com.bluehub.fastmixer.common.permissions.PermissionControlViewModel
 import com.bluehub.fastmixer.common.utils.*
+import com.bluehub.fastmixer.common.viewmodel.BaseViewModel
 import kotlinx.coroutines.*
 import java.io.File
 import java.util.*
 import javax.inject.Inject
 
 
-class MixingScreenViewModel @Inject constructor(override val context: Context,
-                                                override val permissionManager: PermissionManager,
+class MixingScreenViewModel @Inject constructor(val context: Context,
                                                 private val fileManager: FileManager,
                                                 private val mixingRepository: MixingRepository,
                                                 private val audioFileStore: AudioFileStore,
                                                 private val playFlagStore: PlayFlagStore,
                                                 val fileWaveViewStore: FileWaveViewStore)
-    : PermissionControlViewModel(context) {
+    : BaseViewModel() {
 
     companion object {
         private lateinit var instance: MixingScreenViewModel
@@ -39,7 +37,9 @@ class MixingScreenViewModel @Inject constructor(override val context: Context,
         }
     }
 
-    private val audioFilesLiveData = MutableLiveData<MutableList<AudioFile>>(mutableListOf())
+    private val _audioFilesLiveData = MutableLiveData<MutableList<AudioFileUiState>>(mutableListOf())
+    val audioFilesLiveData: LiveData<MutableList<AudioFileUiState>>
+        get() = _audioFilesLiveData
 
     private val _eventDrawerOpen = MutableLiveData<Boolean>()
     val eventDrawerOpen: LiveData<Boolean>
@@ -131,9 +131,9 @@ class MixingScreenViewModel @Inject constructor(override val context: Context,
                     withContext(Dispatchers.IO) {
                         mixingRepository.addFile(filePath)
                         val totalSamples = getTotalSamples(filePath)
-                        audioFiles.add(AudioFile(filePath, totalSamples, AudioFileType.RECORDED))
+                        audioFiles.add(AudioFileUiState.create(filePath, totalSamples))
                     }
-                    audioFilesLiveData.value = audioFiles
+                    _audioFilesLiveData.value = audioFiles
                     _itemAddedIdx.value = audioFiles.size - 1
                 }
             }
@@ -158,10 +158,10 @@ class MixingScreenViewModel @Inject constructor(override val context: Context,
                 val totalSamples = getTotalSamples(newPath)
 
                 audioFileStore.run {
-                    audioFiles.add(AudioFile(newPath, totalSamples, AudioFileType.IMPORTED))
+                    audioFiles.add(AudioFileUiState.create(newPath, totalSamples))
 
                     withContext(Dispatchers.Main) {
-                        audioFilesLiveData.value = audioFiles
+                        _audioFilesLiveData.value = audioFiles
                         _itemAddedIdx.value = audioFiles.size - 1
                     }
                 }
@@ -204,7 +204,16 @@ class MixingScreenViewModel @Inject constructor(override val context: Context,
                 firstIdx?.let {
                     val removedFile = audioFiles.removeAt(it)
                     fileManager.removeFile(removedFile.path)
-                    audioFilesLiveData.value = audioFiles
+
+                    playFlagStore.apply {
+                        if (isPlaying.value == true) {
+                            pauseAudio()
+                        } else if (isGroupPlaying.value == true) {
+                            groupPause()
+                        }
+                    }
+
+                    _audioFilesLiveData.value = audioFiles
                     _itemRemovedIdx.value = it
                 }
             }
@@ -311,7 +320,7 @@ class MixingScreenViewModel @Inject constructor(override val context: Context,
         audioViewAction.value = null
     }
 
-    fun findAudioFileByPath(filePath: String) : AudioFile? {
+    fun findAudioFileByPath(filePath: String) : AudioFileUiState? {
         return audioFileStore.findAudioFileByPath(filePath)
     }
 

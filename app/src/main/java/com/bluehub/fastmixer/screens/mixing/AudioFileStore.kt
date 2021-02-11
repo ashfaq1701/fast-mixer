@@ -1,9 +1,11 @@
 package com.bluehub.fastmixer.screens.mixing
 
-class AudioFileStore {
-    val audioFiles: MutableList<AudioFile> = mutableListOf()
+import com.bluehub.fastmixer.common.models.AudioFileUiState
 
-    fun findAudioFileByPath(filePath: String) : AudioFile? {
+class AudioFileStore {
+    val audioFiles: MutableList<AudioFileUiState> = mutableListOf()
+
+    fun findAudioFileByPath(filePath: String) : AudioFileUiState? {
         return audioFiles.find { it.path == filePath }
     }
 }

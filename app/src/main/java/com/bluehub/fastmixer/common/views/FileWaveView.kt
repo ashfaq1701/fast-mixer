@@ -5,8 +5,7 @@ import android.content.res.Configuration
 import android.graphics.*
 import android.os.*
 import android.util.AttributeSet
-import android.view.MotionEvent
-import android.view.ViewGroup
+import android.view.*
 import androidx.core.content.ContextCompat
 import androidx.databinding.BindingMethod
 import androidx.databinding.BindingMethods
@@ -18,7 +17,6 @@ import io.reactivex.rxjava3.functions.Function
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.launch
-import java.util.*
 import kotlin.math.abs
 import kotlin.math.ceil
 
@@ -32,12 +30,6 @@ class FileWaveView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null
 ) : ViewGroup(context, attrs) {
-
-    companion object {
-        const val MAX_CLICK_DURATION = 200
-    }
-
-    private var mStartClickTime: Long = 0
 
     private val mAudioFileUiState: BehaviorSubject<AudioFileUiState> = BehaviorSubject.create()
     var mSamplesReader: BehaviorSubject<Function<Int, Deferred<Array<Float>>>> = BehaviorSubject.create()
@@ -53,6 +45,15 @@ class FileWaveView @JvmOverloads constructor(
 
     private var forceFetch = false
 
+    private val gestureListener = object:GestureDetector.SimpleOnGestureListener() {
+        override fun onLongPress(e: MotionEvent?) {
+            e?:return
+            val x = e.x
+            handleLongClick(x)
+        }
+    }
+    private val gestureDetector: GestureDetector
+
     init {
         attrsLoaded.subscribe {
             if (it) {
@@ -63,6 +64,8 @@ class FileWaveView @JvmOverloads constructor(
         mAudioFileUiState.subscribe{ checkAttrs() }
         mSamplesReader.subscribe { checkAttrs() }
         mFileWaveViewStore.subscribe { checkAttrs() }
+
+        gestureDetector = GestureDetector(context, gestureListener)
 
         setWillNotDraw(false)
     }
@@ -209,26 +212,13 @@ class FileWaveView @JvmOverloads constructor(
         vibrateDevice()
     }
 
+    override fun onInterceptTouchEvent(ev: MotionEvent?): Boolean {
+        return gestureDetector.onTouchEvent(ev)
+    }
+
     override fun onTouchEvent(event: MotionEvent?): Boolean {
-        event ?: return false
-
-        val x = event.x
-        when (event.action) {
-            MotionEvent.ACTION_DOWN -> {
-                mStartClickTime = Calendar.getInstance().timeInMillis
-            }
-            MotionEvent.ACTION_UP -> {
-                val clickDuration = Calendar.getInstance().timeInMillis - mStartClickTime
-
-                return if (clickDuration > MAX_CLICK_DURATION) {
-                    handleLongClick(x)
-                    true
-                } else {
-                    super.onTouchEvent(event)
-                }
-            }
-        }
-        return true
+        gestureDetector.onTouchEvent(event);
+        return true;
     }
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
@@ -265,7 +255,10 @@ class FileWaveView @JvmOverloads constructor(
         if (::mAudioWidgetSlider.isInitialized) {
             val sliderWidth = context.resources.getDimension(R.dimen.audio_view_slider_line_width)
             mAudioWidgetSlider.measure(
-                MeasureSpec.makeMeasureSpec(ceil(sliderWidth).toInt(), MeasureSpec.EXACTLY),
+                MeasureSpec.makeMeasureSpec(
+                    ceil(sliderWidth).toInt(),
+                    MeasureSpec.EXACTLY
+                ),
                 measuredHeight
             )
         }

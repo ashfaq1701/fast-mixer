@@ -16,8 +16,6 @@ class FileWaveViewStore {
         const val ZOOM_STEP = 1
     }
 
-    private lateinit var mAudioFilesLiveData: LiveData<MutableList<AudioFile>>
-
     private lateinit var mIsPlayingLiveData: LiveData<Boolean>
     private lateinit var mIsGroupPlayingLiveData: LiveData<Boolean>
     lateinit var audioViewActionLiveData: MutableLiveData<AudioViewAction?>
@@ -27,9 +25,14 @@ class FileWaveViewStore {
 
     private val measuredWidthObservable: BehaviorSubject<Int> = BehaviorSubject.create()
 
-    private var audioFileUiStateList: MutableList<AudioFileUiState> = mutableListOf()
-    val audioFileUiStateListLiveData =
-        MutableLiveData<MutableList<AudioFileUiState>>(mutableListOf())
+    private lateinit var mAudioFileUiStateListLiveData: LiveData<MutableList<AudioFileUiState>>
+
+    private val audioFileUiStateList: List<AudioFileUiState>
+        get() {
+            return if (::mAudioFileUiStateListLiveData.isInitialized) {
+                mAudioFileUiStateListLiveData.value ?: listOf()
+            } else listOf()
+        }
 
     private val mCurrentPlaybackProgressGetter: SingleSubject<Function<Unit, Int>> =  SingleSubject.create()
 
@@ -39,7 +42,7 @@ class FileWaveViewStore {
 
     val coroutineScope = CoroutineScope(Job() + Dispatchers.Main)
 
-    private val fileListObserver: Observer<MutableList<AudioFile>> = Observer {
+    private val fileListObserver: Observer<MutableList<AudioFileUiState>> = Observer {
         calculateSampleCountEachView()
     }
 
@@ -57,9 +60,9 @@ class FileWaveViewStore {
         }
     }
 
-    fun setAudioFilesLiveData(audioFilesLiveData: LiveData<MutableList<AudioFile>>) {
-        mAudioFilesLiveData = audioFilesLiveData
-        mAudioFilesLiveData.observeForever(fileListObserver)
+    fun setAudioFilesLiveData(audioFilesLiveData: LiveData<MutableList<AudioFileUiState>>) {
+        mAudioFileUiStateListLiveData = audioFilesLiveData
+        mAudioFileUiStateListLiveData.observeForever(fileListObserver)
     }
 
     fun setIsPlayingLiveData(isPlayingLiveData: LiveData<Boolean>) {
@@ -91,30 +94,6 @@ class FileWaveViewStore {
     }
     
     private fun calculateSampleCountEachView() {
-        val audioFiles = mAudioFilesLiveData.value ?: return
-
-        audioFileUiStateList.filter {
-            findAudioFile(it.path) == null
-        }.onEach {
-            audioFileUiStateList.remove(it)
-        }
-
-        audioFiles.forEach { audioFile ->
-            findAudioFileUiState(audioFile.path) ?: let {
-                val audioFileUiState = AudioFileUiState(
-                    path = audioFile.path,
-                    numSamples = audioFile.numSamples,
-                    displayPtsCount = BehaviorSubject.create(),
-                    zoomLevel = BehaviorSubject.create(),
-                    isPlaying = BehaviorSubject.createDefault(false),
-                    playSliderPosition = BehaviorSubject.create(),
-                    playTimer = null
-                )
-                audioFileUiStateList.add(audioFileUiState)
-            }
-        }
-
-        audioFileUiStateListLiveData.value = audioFileUiStateList
         updateDisplayPoints()
     }
 
@@ -140,14 +119,10 @@ class FileWaveViewStore {
         }
     }
 
-    private fun findAudioFile(audioFilePath: String): AudioFile? {
-        return mAudioFilesLiveData.value?.find {
+    private fun findAudioFileUiState(audioFilePath: String): AudioFileUiState? {
+        return audioFileUiStateList.find {
             it.path == audioFilePath
         }
-    }
-
-    private fun findAudioFileUiState(audioFilePath: String) = audioFileUiStateList.find {
-        it.path == audioFilePath
     }
     
     private fun getSampleCount(filePath: String): Int? {
@@ -336,7 +311,9 @@ class FileWaveViewStore {
     }
 
     fun cleanup() {
-        mAudioFilesLiveData.removeObserver(fileListObserver)
+        if (::mAudioFileUiStateListLiveData.isInitialized) {
+            mAudioFileUiStateListLiveData.removeObserver(fileListObserver)
+        }
         mIsPlayingLiveData.removeObserver(isPlayingObserver)
         coroutineScope.cancel()
     }
