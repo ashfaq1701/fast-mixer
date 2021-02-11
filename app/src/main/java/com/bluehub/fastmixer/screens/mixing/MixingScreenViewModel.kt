@@ -5,22 +5,21 @@ import android.net.Uri
 import androidx.lifecycle.*
 import com.bluehub.fastmixer.common.models.AudioFileUiState
 import com.bluehub.fastmixer.common.models.AudioViewAction
-import com.bluehub.fastmixer.common.permissions.PermissionControlViewModel
 import com.bluehub.fastmixer.common.utils.*
+import com.bluehub.fastmixer.common.viewmodel.BaseViewModel
 import kotlinx.coroutines.*
 import java.io.File
 import java.util.*
 import javax.inject.Inject
 
 
-class MixingScreenViewModel @Inject constructor(override val context: Context,
-                                                override val permissionManager: PermissionManager,
+class MixingScreenViewModel @Inject constructor(val context: Context,
                                                 private val fileManager: FileManager,
                                                 private val mixingRepository: MixingRepository,
                                                 private val audioFileStore: AudioFileStore,
                                                 private val playFlagStore: PlayFlagStore,
                                                 val fileWaveViewStore: FileWaveViewStore)
-    : PermissionControlViewModel(context) {
+    : BaseViewModel() {
 
     companion object {
         private lateinit var instance: MixingScreenViewModel

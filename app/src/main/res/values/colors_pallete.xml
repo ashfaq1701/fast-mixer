@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Declaring colors with their real name from the style guide we get -->
+    <color name="white">#FFFFFF</color>
+    <color name="black">#030303</color>
+
+</resources>

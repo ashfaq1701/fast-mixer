@@ -11,10 +11,9 @@ import androidx.lifecycle.viewModelScope
 import com.bluehub.fastmixer.BR
 import com.bluehub.fastmixer.R
 import com.bluehub.fastmixer.broadcastReceivers.AudioDeviceChangeListener
-import com.bluehub.fastmixer.common.permissions.PermissionControlViewModel
 import com.bluehub.fastmixer.common.repositories.AudioRepository
-import com.bluehub.fastmixer.common.utils.PermissionManager
 import com.bluehub.fastmixer.common.utils.ScreenConstants
+import com.bluehub.fastmixer.common.viewmodel.BaseViewModel
 import com.bluehub.fastmixer.screens.mixing.AudioFileStore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -22,13 +21,12 @@ import kotlinx.coroutines.withContext
 import java.util.*
 import javax.inject.Inject
 
-class RecordingScreenViewModel @Inject constructor (override val context: Context,
-                                                    override val permissionManager: PermissionManager,
+class RecordingScreenViewModel @Inject constructor (val context: Context,
                                                     val repository: RecordingRepository,
                                                     private val audioRepository: AudioRepository,
                                                     private val audioFileStore: AudioFileStore,
                                                     private val audioDeviceChangeListener: AudioDeviceChangeListener)
-    : PermissionControlViewModel(context) {
+    : BaseViewModel() {
 
     companion object {
         private lateinit var instance: RecordingScreenViewModel
@@ -73,6 +71,14 @@ class RecordingScreenViewModel @Inject constructor (override val context: Contex
     private val _eventGoBack = MutableLiveData<Boolean>(false)
     val eventGoBack: LiveData<Boolean>
         get() = _eventGoBack
+
+    private val _recordingPermissionGranted = MutableLiveData<Boolean>(false)
+    val recordingPermissionGranted: LiveData<Boolean>
+        get() = _recordingPermissionGranted
+
+    private val _requestRecordingPermission = MutableLiveData<Boolean>(false)
+    val requestRecordingPermission: LiveData<Boolean>
+        get() = _requestRecordingPermission
 
     val recordingLabel = Transformations.map(_eventIsRecording) {
         if (it)
@@ -181,8 +187,8 @@ class RecordingScreenViewModel @Inject constructor (override val context: Contex
     }
 
     fun toggleRecording() {
-        if (!checkRecordingPermission()) {
-            setRequestRecordPermission(ScreenConstants.TOGGLE_RECORDING)
+        if (_recordingPermissionGranted.value == null || _recordingPermissionGranted.value == false) {
+            _requestRecordingPermission.value = true
             return
         }
 
@@ -396,6 +402,14 @@ class RecordingScreenViewModel @Inject constructor (override val context: Contex
 
     fun resetGoBack() {
         _eventGoBack.value = false
+    }
+
+    fun setRecordingPermissionGranted() {
+        _recordingPermissionGranted.value = true
+    }
+
+    fun resetRequestRecordingPermission() {
+        _requestRecordingPermission.value = false
     }
 
     fun startDrawingVisualizer() {

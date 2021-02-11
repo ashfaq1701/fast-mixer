@@ -1,33 +1,36 @@
 package com.bluehub.fastmixer.screens.recording
 
+import android.Manifest
+import android.content.DialogInterface
 import android.os.Bundle
 import android.view.*
 import android.widget.SeekBar
 import androidx.activity.*
+import androidx.appcompat.app.AlertDialog
 import androidx.databinding.DataBindingUtil
 import androidx.navigation.fragment.findNavController
 import com.bluehub.fastmixer.R
-import com.bluehub.fastmixer.common.permissions.PermissionControlFragment
-import com.bluehub.fastmixer.common.utils.DialogManager
-import com.bluehub.fastmixer.common.utils.ScreenConstants
+import com.bluehub.fastmixer.common.fragments.BaseFragment
 import com.bluehub.fastmixer.common.models.ViewModelType
 import com.bluehub.fastmixer.databinding.RecordingScreenBinding
 import com.bluehub.fastmixer.screens.recording.RecordingScreenDirections.actionRecordingScreenToMixingScreen
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.tbruyelle.rxpermissions3.Permission
+import com.tbruyelle.rxpermissions3.RxPermissions
 import com.visualizer.amplitude.AudioRecordView
 import kotlinx.android.synthetic.main.view_loading.*
 import javax.inject.Inject
 
 
-class RecordingScreen : PermissionControlFragment<RecordingScreenViewModel>(ViewModelType.FRAGMENT_SCOPED) {
+class RecordingScreen : BaseFragment<RecordingScreenViewModel>(ViewModelType.FRAGMENT_SCOPED) {
 
     companion object {
         fun newInstance() = RecordingScreen()
     }
 
-    override val viewModelClass = RecordingScreenViewModel::class
+    @Inject lateinit var rxPermission: RxPermissions
 
-    @Inject
-    override lateinit var dialogManager: DialogManager
+    override val viewModelClass = RecordingScreenViewModel::class
 
     private lateinit var dataBinding: RecordingScreenBinding
 
@@ -62,7 +65,6 @@ class RecordingScreen : PermissionControlFragment<RecordingScreenViewModel>(View
 
         dataBinding.lifecycleOwner = viewLifecycleOwner
 
-        setPermissionEvents()
         initUI()
 
         return dataBinding.root
@@ -109,15 +111,6 @@ class RecordingScreen : PermissionControlFragment<RecordingScreenViewModel>(View
             }
         })
 
-        viewModel.eventRecordPermission.observe(viewLifecycleOwner, { record ->
-            if (record.fromCallback && record.hasPermission) {
-                when(record.permissionCode) {
-                    ScreenConstants.TOGGLE_RECORDING -> viewModel.toggleRecording()
-                    ScreenConstants.STOP_RECORDING -> viewModel.reset()
-                }
-            }
-        })
-
         viewModel.audioVisualizerMaxAmplitude.observe(viewLifecycleOwner, {
             if (viewModel.audioVisualizerRunning.value == true) {
                 audioRecordView.update(it)
@@ -144,6 +137,17 @@ class RecordingScreen : PermissionControlFragment<RecordingScreenViewModel>(View
             }
         })
 
+        viewModel.requestRecordingPermission.observe(viewLifecycleOwner, {
+            if (it) {
+                rxPermission
+                    .requestEach(Manifest.permission.RECORD_AUDIO)
+                    .subscribe(::handleRecordingPermission)
+                    .addToDisposables()
+
+                viewModel.resetRequestRecordingPermission()
+            }
+        })
+
         recordingSeekbar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
                 if (fromUser) {
@@ -167,4 +171,40 @@ class RecordingScreen : PermissionControlFragment<RecordingScreenViewModel>(View
             }
         })
     }
+
+    private fun handleRecordingPermission(permission: Permission) {
+        when {
+            permission.granted -> {
+                viewModel.setRecordingPermissionGranted()
+                viewModel.toggleRecording()
+            }
+            permission.shouldShowRequestPermissionRationale -> {
+                // Deny
+                showPermissionRequiredDialog(false)
+            }
+            else -> {
+                // Deny and never ask again
+                showPermissionRequiredDialog(true)
+            }
+        }
+    }
+
+    private fun showPermissionRequiredDialog(showSettingsLink: Boolean) {
+        val alertBuilder = AlertDialog.Builder(requireContext())
+            .setTitle(R.string.permission_require_title)
+            .setMessage(R.string.permission_recording_require_message)
+            .setNegativeButton(R.string.common_close) { dialogInterface: DialogInterface, _: Int ->
+                dialogInterface.cancel()
+            }
+
+        if (showSettingsLink) {
+            alertBuilder.setPositiveButton(R.string.open_settings) { _, _ ->
+                openAppSettingsPage()
+            }
+        }
+
+        alertBuilder.setCancelable(false)
+            .show()
+    }
+
 }

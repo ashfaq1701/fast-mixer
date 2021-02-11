@@ -11,22 +11,17 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.transition.*
 import com.bluehub.fastmixer.R
+import com.bluehub.fastmixer.common.fragments.BaseFragment
 import com.bluehub.fastmixer.common.models.*
-import com.bluehub.fastmixer.common.permissions.PermissionControlFragment
-import com.bluehub.fastmixer.common.utils.DialogManager
 import com.bluehub.fastmixer.databinding.MixingScreenBinding
 import com.bluehub.fastmixer.screens.mixing.MixingScreenDirections.actionMixingScreenToRecordingScreen
-import javax.inject.Inject
 
-class MixingScreen : PermissionControlFragment<MixingScreenViewModel>(ViewModelType.NAV_SCOPED) {
+class MixingScreen : BaseFragment<MixingScreenViewModel>(ViewModelType.NAV_SCOPED) {
     companion object {
         fun newInstance() = MixingScreen()
     }
 
     override val viewModelClass = MixingScreenViewModel::class
-
-    @Inject
-    override lateinit var dialogManager: DialogManager
 
     private lateinit var dataBinding: MixingScreenBinding
 
@@ -67,7 +62,6 @@ class MixingScreen : PermissionControlFragment<MixingScreenViewModel>(ViewModelT
 
         resolver = requireContext().contentResolver
 
-        setPermissionEvents()
         setupViewModel()
         setupAnimations()
 
@@ -182,7 +176,7 @@ class MixingScreen : PermissionControlFragment<MixingScreenViewModel>(ViewModelT
         }
     }
 
-    fun showGainControlFragment(audioFile: AudioFileUiState) {
+    private fun showGainControlFragment(audioFile: AudioFileUiState) {
         val gainAdjustmentDialog = GainAdjustmentDialog(audioFile.path)
         gainAdjustmentDialog.show(requireActivity().supportFragmentManager, "gain_control")
     }
