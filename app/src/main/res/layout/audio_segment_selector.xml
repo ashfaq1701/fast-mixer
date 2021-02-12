@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="@dimen/audio_segment_selector_width"
+        android:layout_height="@dimen/audio_segment_selector_height"
+        android:background="@color/colorGlassTransparent">
+
+        <View
+            android:id="@+id/leftEdge"
+            android:layout_width="@dimen/audio_segment_selector_edge_width"
+            android:layout_height="match_parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:background="@color/grey"/>
+
+        <View
+            android:id="@+id/rightEdge"
+            android:layout_width="@dimen/audio_segment_selector_edge_width"
+            android:layout_height="match_parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:background="@color/grey"/>
+
+        <View
+            android:id="@+id/leftTrigger"
+            android:layout_width="@dimen/audio_segment_selector_trigger_width"
+            android:layout_height="@dimen/audio_segment_selector_trigger_height"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:background="@drawable/audio_segment_selector_right_circle"/>
+
+        <View
+            android:id="@+id/rightTrigger"
+            android:layout_width="@dimen/audio_segment_selector_trigger_width"
+            android:layout_height="@dimen/audio_segment_selector_trigger_height"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:background="@drawable/audio_segment_selector_left_circle"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
+

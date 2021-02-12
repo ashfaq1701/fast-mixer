@@ -150,6 +150,7 @@ class FileWaveViewWidget(context: Context, attributeSet: AttributeSet?)
                 ::waveViewZoomOut,
                 ::waveViewDelete,
                 ::waveViewTogglePlay,
+                ::toggleSegmentSelector
             )
 
             val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
@@ -205,6 +206,10 @@ class FileWaveViewWidget(context: Context, attributeSet: AttributeSet?)
 
     private fun waveViewZoomOut() {
         binding.fileWaveView.zoomOut()
+    }
+
+    private fun toggleSegmentSelector() {
+
     }
 
     private fun toggleDropUpMenu() {
@@ -268,5 +273,6 @@ class FileWaveViewEventListeners(
     val waveViewZoomIn: () -> Unit,
     val waveViewZoomOut: () -> Unit,
     val waveViewDelete: () -> Unit,
-    val waveViewTogglePlay: () -> Unit
+    val waveViewTogglePlay: () -> Unit,
+    val toggleSegmentSelector: () -> Unit
 )

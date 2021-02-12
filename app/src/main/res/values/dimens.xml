@@ -17,6 +17,9 @@
     <dimen name="recording_visualizer_chunk_max_width">160dp</dimen>
     <dimen name="recording_visualizer_chunk_min_width">0dp</dimen>
 
+    <dimen name="audio_segment_selector_height">120dp</dimen>
+    <dimen name="audio_segment_selector_width">60dp</dimen>
+
     <dimen name="recording_screen_checkbox_margin_start">20dp</dimen>
 
     <dimen name="card_view_elevation">10dp</dimen>
@@ -54,5 +57,9 @@
     <dimen name="scrollbar_thumb_height">15dp</dimen>
 
     <dimen name="wave_slide_button_horizontal_margin">20dp</dimen>
+
+    <dimen name="audio_segment_selector_trigger_width">5dp</dimen>
+    <dimen name="audio_segment_selector_trigger_height">10dp</dimen>
+    <dimen name="audio_segment_selector_edge_width">1dp</dimen>
 
 </resources>
