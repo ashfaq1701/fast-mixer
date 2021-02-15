@@ -23,6 +23,7 @@
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/containerLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/audio_file_margin"
@@ -83,12 +84,6 @@
             </com.bluehub.fastmixer.common.views.FileWaveView>
 
         </com.bluehub.fastmixer.common.views.LockedHorizontalScrollView>
-
-        <com.bluehub.fastmixer.common.views.AudioSegmentSelector
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/waveViewSlideLayout" />
 
         <com.bluehub.fastmixer.common.views.CustomHorizontalScrollBar
             android:id="@+id/fileWaveViewScrollBar"

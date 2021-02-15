@@ -11,6 +11,7 @@ data class AudioFileUiState(
     var zoomLevel: BehaviorSubject<Int>,
     var isPlaying: BehaviorSubject<Boolean>,
     var playSliderPosition: BehaviorSubject<Int>,
+    var showSegmentSelector: BehaviorSubject<Boolean>,
     var playTimer: Timer?) : Serializable {
 
     companion object {
@@ -22,6 +23,7 @@ data class AudioFileUiState(
                 zoomLevel = BehaviorSubject.create(),
                 isPlaying = BehaviorSubject.createDefault(false),
                 playSliderPosition = BehaviorSubject.create(),
+                showSegmentSelector = BehaviorSubject.createDefault(false),
                 playTimer = null
             )
         }

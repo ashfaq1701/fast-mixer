@@ -17,6 +17,7 @@ import io.reactivex.rxjava3.functions.Function
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import kotlin.math.abs
 import kotlin.math.ceil
 
@@ -53,6 +54,8 @@ class FileWaveView @JvmOverloads constructor(
         }
     }
     private val gestureDetector: GestureDetector
+
+    private var mAudioSegmentSelector: AudioSegmentSelector? = null
 
     init {
         attrsLoaded.subscribe {
@@ -135,6 +138,17 @@ class FileWaveView @JvmOverloads constructor(
                 forceFetch = true
                 requestLayout()
             }
+
+        mAudioFileUiState.value.showSegmentSelector
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe {
+                if (it) {
+                    removeSegmentSelector()
+                    createAndShowSegmentSelector()
+                } else {
+                    removeSegmentSelector()
+                }
+            }
     }
 
     private fun getNumPtsToPlot() = if (mAudioFileUiState.hasValue()) {
@@ -212,6 +226,24 @@ class FileWaveView @JvmOverloads constructor(
         vibrateDevice()
     }
 
+    private fun createAndShowSegmentSelector() {
+        val audioSegmentSelector = AudioSegmentSelector(context, null)
+        audioSegmentSelector.id = View.generateViewId()
+
+        audioSegmentSelector.layoutParams = LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
+
+        addView(audioSegmentSelector)
+
+        mAudioSegmentSelector = audioSegmentSelector
+    }
+
+    private fun removeSegmentSelector() {
+        mAudioSegmentSelector?.let {
+            removeView(it)
+        }
+        mAudioSegmentSelector = null
+    }
+
     override fun onInterceptTouchEvent(ev: MotionEvent?): Boolean {
         return gestureDetector.onTouchEvent(ev)
     }
@@ -222,6 +254,7 @@ class FileWaveView @JvmOverloads constructor(
     }
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
+        Timber.d("ON LAYOUT CALLED HERE")
         if (::mAudioWidgetSlider.isInitialized) {
             val sliderLeft = getSliderLeftPosition()
             val sliderTop = 0
@@ -232,6 +265,20 @@ class FileWaveView @JvmOverloads constructor(
                     sliderLeft + mAudioWidgetSlider.measuredWidth,
                     sliderTop + mAudioWidgetSlider.measuredHeight
                 )
+            }
+
+            mAudioSegmentSelector?.let {
+                val selectorLeft = getSliderLeftPosition()
+                val selectorTop = 0
+
+                if (it.visibility != GONE) {
+                    it.layout(
+                        selectorLeft,
+                        selectorTop,
+                        selectorLeft + it.measuredWidth,
+                        selectorTop + it.measuredHeight
+                    )
+                }
             }
         }
     }
@@ -257,6 +304,17 @@ class FileWaveView @JvmOverloads constructor(
             mAudioWidgetSlider.measure(
                 MeasureSpec.makeMeasureSpec(
                     ceil(sliderWidth).toInt(),
+                    MeasureSpec.EXACTLY
+                ),
+                measuredHeight
+            )
+        }
+
+        mAudioSegmentSelector?.let {
+            val segmentSelectorWidth = context.resources.getDimension(R.dimen.audio_segment_selector_width)
+            it.measure(
+                MeasureSpec.makeMeasureSpec(
+                    ceil(segmentSelectorWidth).toInt(),
                     MeasureSpec.EXACTLY
                 ),
                 measuredHeight

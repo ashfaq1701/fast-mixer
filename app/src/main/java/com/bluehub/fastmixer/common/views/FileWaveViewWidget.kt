@@ -2,11 +2,14 @@ package com.bluehub.fastmixer.common.views
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.res.ColorStateList
 import android.util.AttributeSet
 import android.view.*
 import android.widget.HorizontalScrollView
 import android.widget.PopupMenu
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
 import androidx.databinding.BindingMethod
 import androidx.databinding.BindingMethods
@@ -16,7 +19,7 @@ import com.bluehub.fastmixer.databinding.FileWaveViewWidgetBinding
 import com.bluehub.fastmixer.screens.mixing.*
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.subjects.BehaviorSubject
-import timber.log.Timber
+import kotlinx.android.synthetic.main.file_wave_view_widget.view.*
 import java.util.*
 
 @BindingMethods(
@@ -48,8 +51,9 @@ class FileWaveViewWidget(context: Context, attributeSet: AttributeSet?)
     private lateinit var menu: PopupMenu
     private lateinit var binding: FileWaveViewWidgetBinding
 
-    private lateinit var fileWaveViewScroll: HorizontalScrollView
-    private lateinit var horizontalScrollBar: CustomHorizontalScrollBar
+    private lateinit var mFileWaveViewScroll: HorizontalScrollView
+    private lateinit var mHorizontalScrollBar: CustomHorizontalScrollBar
+    private lateinit var mFileWaveView: FileWaveView
 
     private val onMenuItemClick = { menuItem: MenuItem ->
         when(menuItem.itemId) {
@@ -135,8 +139,18 @@ class FileWaveViewWidget(context: Context, attributeSet: AttributeSet?)
 
         mAudioFileUiState.value.zoomLevel
             .subscribe {
-                fileWaveViewScroll.post {
-                    fileWaveViewScroll.scrollTo(0, fileWaveViewScroll.top)
+                mFileWaveViewScroll.post {
+                    mFileWaveViewScroll.scrollTo(0, mFileWaveViewScroll.top)
+                }
+            }
+
+        mAudioFileUiState.value.showSegmentSelector
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe {
+                if (it) {
+                    binding.toggleSegmentSelector.backgroundTintList = AppCompatResources.getColorStateList(context, R.color.gray_400)
+                } else {
+                    binding.toggleSegmentSelector.backgroundTintList = ColorStateList(arrayOf<IntArray>(), IntArray(0))
                 }
             }
     }
@@ -176,8 +190,9 @@ class FileWaveViewWidget(context: Context, attributeSet: AttributeSet?)
                 }
             }
 
-            fileWaveViewScroll = binding.fileWaveViewScroll
-            horizontalScrollBar = binding.fileWaveViewScrollBar
+            mFileWaveViewScroll = binding.fileWaveViewScroll
+            mHorizontalScrollBar = binding.fileWaveViewScrollBar
+            mFileWaveView = mFileWaveViewScroll.fileWaveView
 
             setupStoreObservers()
             setupUiStateObservers()
@@ -209,7 +224,9 @@ class FileWaveViewWidget(context: Context, attributeSet: AttributeSet?)
     }
 
     private fun toggleSegmentSelector() {
-
+        mAudioFileUiState.value.showSegmentSelector.onNext(
+            !mAudioFileUiState.value.showSegmentSelector.value
+        )
     }
 
     private fun toggleDropUpMenu() {
@@ -235,7 +252,7 @@ class FileWaveViewWidget(context: Context, attributeSet: AttributeSet?)
         slideLeftTimer = Timer()
         slideLeftTimer?.schedule(object: TimerTask() {
             override fun run() {
-                if (!horizontalScrollBar.performScrollByWidthFraction(ScrollDirection.LEFT)) {
+                if (!mHorizontalScrollBar.performScrollByWidthFraction(ScrollDirection.LEFT)) {
                     stopLeftSliderTimer()
                 }
             }
@@ -253,7 +270,7 @@ class FileWaveViewWidget(context: Context, attributeSet: AttributeSet?)
         slideRightTimer = Timer()
         slideRightTimer?.schedule(object: TimerTask() {
             override fun run() {
-                if (!horizontalScrollBar.performScrollByWidthFraction(ScrollDirection.RIGHT)) {
+                if (!mHorizontalScrollBar.performScrollByWidthFraction(ScrollDirection.RIGHT)) {
                     stopRightSliderTimer()
                 }
             }
