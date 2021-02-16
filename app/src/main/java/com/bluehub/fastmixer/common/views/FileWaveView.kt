@@ -17,9 +17,7 @@ import io.reactivex.rxjava3.functions.Function
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.launch
-import timber.log.Timber
-import kotlin.math.abs
-import kotlin.math.ceil
+import kotlin.math.*
 
 
 @BindingMethods(value = [
@@ -201,12 +199,6 @@ class FileWaveView @JvmOverloads constructor(
         requestLayout()
     }
 
-    private fun getSliderLeftPosition() = if (mAudioFileUiState.hasValue()) {
-        if (mAudioFileUiState.value.playSliderPosition.hasValue()) {
-            mAudioFileUiState.value.playSliderPosition.value
-        } else 0
-    } else 0
-
     private fun vibrateDevice() {
         val v = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -242,7 +234,53 @@ class FileWaveView @JvmOverloads constructor(
             removeView(it)
         }
         mAudioSegmentSelector = null
+
+        mAudioFileUiState.value.run {
+            segmentStartSample = null
+            segmentEndSample = null
+        }
     }
+
+    private fun calculateSegmentSelectorProperties(): Int {
+        if (!mAudioFileUiState.hasValue()) return 0
+
+        return mAudioFileUiState.value.run {
+            if (numPtsToPlot == 0 || numSamples == 0) return 0
+
+            segmentStartSample ?: run {
+                val sliderStartPosition = getSliderLeftPosition()
+                segmentStartSample = ((sliderStartPosition.toDouble() / numPtsToPlot) * numSamples).toInt()
+            }
+
+            segmentEndSample ?: run {
+                val initWidth = context.resources.displayMetrics.widthPixels / 10.0
+                val widthInSamples = floor((initWidth / numPtsToPlot) * numSamples).toInt()
+
+                val startSample = segmentStartSample ?: 0
+
+                segmentEndSample = if (startSample + widthInSamples >= numSamples) {
+                    numSamples - 1
+                } else {
+                    startSample + widthInSamples
+                }
+            }
+
+            val startSample = segmentStartSample ?: 0
+            val endSample = segmentEndSample ?: 0
+
+            val estWidth = ceil(((endSample.toDouble() - startSample.toDouble()) / numSamples) * numPtsToPlot).toInt()
+
+            if (segmentSelectorLeft + estWidth >= numPtsToPlot) {
+                numPtsToPlot - segmentSelectorLeft - 1
+            } else estWidth
+        }
+    }
+
+    private fun getSliderLeftPosition() = if (mAudioFileUiState.hasValue()) {
+        if (mAudioFileUiState.value.playSliderPosition.hasValue()) {
+            mAudioFileUiState.value.playSliderPosition.value
+        } else 0
+    } else 0
 
     override fun onInterceptTouchEvent(ev: MotionEvent?): Boolean {
         return gestureDetector.onTouchEvent(ev)
@@ -254,7 +292,6 @@ class FileWaveView @JvmOverloads constructor(
     }
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
-        Timber.d("ON LAYOUT CALLED HERE")
         if (::mAudioWidgetSlider.isInitialized) {
             val sliderLeft = getSliderLeftPosition()
             val sliderTop = 0
@@ -268,16 +305,20 @@ class FileWaveView @JvmOverloads constructor(
             }
 
             mAudioSegmentSelector?.let {
-                val selectorLeft = getSliderLeftPosition()
-                val selectorTop = 0
+                if (!mAudioFileUiState.hasValue()) return@let
 
-                if (it.visibility != GONE) {
-                    it.layout(
-                        selectorLeft,
-                        selectorTop,
-                        selectorLeft + it.measuredWidth,
-                        selectorTop + it.measuredHeight
-                    )
+                mAudioFileUiState.value.run {
+
+                    val selectorTop = 0
+
+                    if (it.visibility != GONE && it.measuredWidth > 0) {
+                        it.layout(
+                            segmentSelectorLeft,
+                            selectorTop,
+                            segmentSelectorRight,
+                            selectorTop + it.measuredHeight
+                        )
+                    }
                 }
             }
         }
@@ -311,10 +352,10 @@ class FileWaveView @JvmOverloads constructor(
         }
 
         mAudioSegmentSelector?.let {
-            val segmentSelectorWidth = context.resources.getDimension(R.dimen.audio_segment_selector_width)
+            val segmentSelectorWidth = calculateSegmentSelectorProperties()
             it.measure(
                 MeasureSpec.makeMeasureSpec(
-                    ceil(segmentSelectorWidth).toInt(),
+                    segmentSelectorWidth,
                     MeasureSpec.EXACTLY
                 ),
                 measuredHeight

@@ -12,6 +12,8 @@ data class AudioFileUiState(
     var isPlaying: BehaviorSubject<Boolean>,
     var playSliderPosition: BehaviorSubject<Int>,
     var showSegmentSelector: BehaviorSubject<Boolean>,
+    var segmentStartSample: Int?,
+    var segmentEndSample: Int?,
     var playTimer: Timer?) : Serializable {
 
     companion object {
@@ -22,8 +24,10 @@ data class AudioFileUiState(
                 displayPtsCount = BehaviorSubject.create(),
                 zoomLevel = BehaviorSubject.create(),
                 isPlaying = BehaviorSubject.createDefault(false),
-                playSliderPosition = BehaviorSubject.create(),
+                playSliderPosition = BehaviorSubject.createDefault(0),
                 showSegmentSelector = BehaviorSubject.createDefault(false),
+                segmentStartSample = null,
+                segmentEndSample = null,
                 playTimer = null
             )
         }
@@ -53,5 +57,21 @@ data class AudioFileUiState(
         val numPtsToPlot: Int
             get() {
                 return (zoomLevelValue * displayPtsCountValue).coerceAtMost(numSamples)
+            }
+
+        val segmentSelectorLeft : Int
+            get() {
+                if (numSamples == 0) return 0
+                return segmentStartSample ?. let {
+                    ((it.toDouble() / numSamples.toDouble()) * numPtsToPlot).toInt()
+                } ?: 0
+            }
+
+        val segmentSelectorRight : Int
+            get() {
+                if (numSamples == 0) return 0
+                return segmentEndSample ?. let {
+                    ((it.toDouble() / numSamples.toDouble()) * numPtsToPlot).toInt().coerceAtMost(numPtsToPlot - 1)
+                } ?: 0
             }
     }

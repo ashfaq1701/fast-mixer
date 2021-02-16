@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="@dimen/audio_segment_selector_width"
+        android:layout_width="match_parent"
         android:layout_height="@dimen/audio_segment_selector_height"
         android:background="@color/colorGlassTransparent">
 
