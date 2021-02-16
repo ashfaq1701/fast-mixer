@@ -30,6 +30,10 @@ class FileWaveView @JvmOverloads constructor(
     attrs: AttributeSet? = null
 ) : ViewGroup(context, attrs) {
 
+    companion object {
+        const val TAIL_WIDTH = 3
+    }
+
     private val mAudioFileUiState: BehaviorSubject<AudioFileUiState> = BehaviorSubject.create()
     var mSamplesReader: BehaviorSubject<Function<Int, Deferred<Array<Float>>>> = BehaviorSubject.create()
     private val mFileWaveViewStore: BehaviorSubject<FileWaveViewStore> = BehaviorSubject.create()
@@ -214,8 +218,10 @@ class FileWaveView @JvmOverloads constructor(
     }
 
     private fun handleLongClick(xPosition: Float) {
-        mFileWaveViewStore.value.setPlayHead(mAudioFileUiState.value.path, xPosition.toInt())
-        vibrateDevice()
+        if (xPosition < getNumPtsToPlot()) {
+            mFileWaveViewStore.value.setPlayHead(mAudioFileUiState.value.path, xPosition.toInt())
+            vibrateDevice()
+        }
     }
 
     private fun createAndShowSegmentSelector() {
@@ -268,11 +274,7 @@ class FileWaveView @JvmOverloads constructor(
             val startSample = segmentStartSample ?: 0
             val endSample = segmentEndSample ?: 0
 
-            val estWidth = ceil(((endSample.toDouble() - startSample.toDouble()) / numSamples) * numPtsToPlot).toInt()
-
-            if (segmentSelectorLeft + estWidth >= numPtsToPlot) {
-                numPtsToPlot - segmentSelectorLeft - 1
-            } else estWidth
+            ceil(((endSample.toDouble() - startSample.toDouble()) / numSamples) * numPtsToPlot).toInt()
         }
     }
 
@@ -364,7 +366,7 @@ class FileWaveView @JvmOverloads constructor(
 
         val calculatedWidth = mAudioFileUiState.value.numPtsToPlot
 
-        val roundedWidth = if (measuredWidth == 0 || calculatedWidth < measuredWidth) measuredWidth else calculatedWidth
+        val roundedWidth = if (measuredWidth == 0 || calculatedWidth <= measuredWidth) measuredWidth else (calculatedWidth + TAIL_WIDTH)
 
         if (roundedWidth > 0) {
             fetchPointsToPlot()
