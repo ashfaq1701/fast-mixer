@@ -1,12 +1,16 @@
 package com.bluehub.fastmixer.screens.mixing
 
+import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.bluehub.fastmixer.R
 import com.bluehub.fastmixer.common.models.AudioFileUiState
 import com.bluehub.fastmixer.common.viewmodel.BaseViewModel
 import javax.inject.Inject
 
-class SegmentAdjustmentViewModel @Inject constructor() : BaseViewModel() {
+class SegmentAdjustmentViewModel @Inject constructor(
+    val context: Context
+) : BaseViewModel() {
 
     private lateinit var _audioFileUiState: AudioFileUiState
 
@@ -44,33 +48,42 @@ class SegmentAdjustmentViewModel @Inject constructor() : BaseViewModel() {
 
     fun saveSegmentAdjustment() {
 
+        if (!validateSegmentBoundaries()) return
+
+        val segmentStartValue = _segmentStart.value ?: 0
+        val segmentEndValue = _segmentEnd.value ?: 0
+
+        _audioFileUiState.setSegmentStartInMs(segmentStartValue)
+        _audioFileUiState.setSegmentEndInMs(segmentEndValue)
+
+        _closeDialog.value = true
+    }
+
+    private fun validateSegmentBoundaries(): Boolean {
         if (_segmentStart.value == null || _segmentEnd.value == null) {
-            _error.value = "Segment start and end bounds has to be set"
-            return
+            _error.value = context.getString(R.string.error_segment_bounds_required)
+            return false
         }
 
         val segmentStartValue = _segmentStart.value ?: 0
         val segmentEndValue = _segmentEnd.value ?: 0
 
         if (segmentEndValue > _audioFileUiState.numSamplesMs) {
-            _error.value = "Segment end should be less than file duration"
-            return
+            _error.value = context.getString(R.string.error_segment_end_should_be_less_than_duration)
+            return false
         }
 
         if (segmentStartValue == segmentEndValue) {
-            _error.value = "Segment start and end value has to be different"
-            return
+            _error.value = context.getString(R.string.error_segment_start_end_should_be_different)
+            return false
         }
 
         if (segmentStartValue > segmentEndValue) {
-            _error.value = "Segment start value should be less than end value"
-            return
+            _error.value = context.getString(R.string.error_segment_start_should_be_less_than_end)
+            return false
         }
 
-        _audioFileUiState.setSegmentStartInMs(segmentStartValue)
-        _audioFileUiState.setSegmentEndInMs(segmentEndValue)
-
-        _closeDialog.value = true
+        return true
     }
 
     fun setSegmentStart(value: Int) {
