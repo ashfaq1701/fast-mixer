@@ -153,6 +153,12 @@ class FileWaveViewWidget(context: Context, attributeSet: AttributeSet?)
                     binding.toggleSegmentSelector.backgroundTintList = ColorStateList(arrayOf<IntArray>(), IntArray(0))
                 }
             }
+
+        mAudioFileUiState.value.playSliderPositionMs
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe {
+                binding.playHeadValue.text = it.toString()
+            }
     }
 
     @SuppressLint("ClickableViewAccessibility")

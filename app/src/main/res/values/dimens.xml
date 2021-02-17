@@ -58,8 +58,8 @@
 
     <dimen name="wave_slide_button_horizontal_margin">20dp</dimen>
 
-    <dimen name="audio_segment_selector_trigger_width">5dp</dimen>
-    <dimen name="audio_segment_selector_trigger_height">10dp</dimen>
+    <dimen name="audio_segment_selector_trigger_width">20dp</dimen>
+    <dimen name="audio_segment_selector_trigger_height">40dp</dimen>
     <dimen name="audio_segment_selector_edge_width">1dp</dimen>
 
 </resources>

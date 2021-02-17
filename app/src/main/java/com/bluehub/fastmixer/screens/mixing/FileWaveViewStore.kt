@@ -275,6 +275,8 @@ class FileWaveViewStore {
             audioFileUiState.isPlaying.onNext(false)
             audioFileUiState.playTimer?.cancel()
             audioFileUiState.playTimer = null
+
+            audioFileUiState.calculatePlaySliderPositionMs()
         }
     }
 
@@ -292,13 +294,13 @@ class FileWaveViewStore {
                 mSourcePlayHeadSetter.value.apply(filePath, playHead.toInt())
                 setPlaySliderPosition(audioFileUiState, playHeadPointer)
             }
-
-
         } else {
             if (mPlayerHeadSetter.hasValue()) {
                 mPlayerHeadSetter.value.apply(playHead.toInt())
             }
         }
+
+        audioFileUiState.calculatePlaySliderPositionMs()
     }
 
     fun reRenderFile(filePath: String) {

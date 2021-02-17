@@ -1,5 +1,6 @@
 package com.bluehub.fastmixer.common.models
 
+import com.bluehub.fastmixer.common.config.Config
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import java.io.Serializable
 import java.util.*
@@ -33,6 +34,8 @@ data class AudioFileUiState(
         }
     }
 
+        val playSliderPositionMs = BehaviorSubject.createDefault(0)
+
         val reRender: BehaviorSubject<Boolean> = BehaviorSubject.create()
 
         val playSliderPositionValue: Int
@@ -52,6 +55,11 @@ data class AudioFileUiState(
                 displayPtsCount.value
             } else {
                 0
+            }
+
+        private val playHeadSample: Int
+            get() {
+                return ((playSliderPosition.value.toFloat() / numPtsToPlot.toFloat()) * numSamples).toInt()
             }
 
         val numPtsToPlot: Int
@@ -74,4 +82,9 @@ data class AudioFileUiState(
                     ((it.toDouble() / numSamples.toDouble()) * numPtsToPlot).toInt().coerceAtMost(numPtsToPlot - 1)
                 } ?: 0
             }
+
+        fun calculatePlaySliderPositionMs() {
+            val playHeadMs = playHeadSample.toFloat() / (Config.SAMPLE_RATE.toFloat() / 1000.0)
+            playSliderPositionMs.onNext(playHeadMs.toInt())
+        }
     }

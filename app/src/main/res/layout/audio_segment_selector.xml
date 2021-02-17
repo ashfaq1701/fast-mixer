@@ -28,7 +28,9 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            android:background="@drawable/audio_segment_selector_right_circle"/>
+            android:background="@drawable/audio_segment_selector_right_circle"
+            android:clickable="true"
+            android:focusable="true" />
 
         <View
             android:id="@+id/rightTrigger"
@@ -37,7 +39,9 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            android:background="@drawable/audio_segment_selector_left_circle"/>
+            android:background="@drawable/audio_segment_selector_left_circle"
+            android:clickable="true"
+            android:focusable="true" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

@@ -17,6 +17,7 @@ import io.reactivex.rxjava3.functions.Function
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import kotlin.math.*
 
 
@@ -53,6 +54,20 @@ class FileWaveView @JvmOverloads constructor(
             e?:return
             val x = e.x
             handleLongClick(x)
+        }
+
+        override fun onScroll(
+            e1: MotionEvent?,
+            e2: MotionEvent?,
+            distanceX: Float,
+            distanceY: Float
+        ): Boolean {
+            handleScroll(e2, distanceX)
+            return true
+        }
+
+        override fun onDown(e: MotionEvent?): Boolean {
+            return true
         }
     }
     private val gestureDetector: GestureDetector
@@ -218,9 +233,37 @@ class FileWaveView @JvmOverloads constructor(
     }
 
     private fun handleLongClick(xPosition: Float) {
+
+        mAudioSegmentSelector?.let {
+            if (xPosition >= it.left && xPosition <= it.right) {
+                return
+            }
+        }
+
         if (xPosition < getNumPtsToPlot()) {
             mFileWaveViewStore.value.setPlayHead(mAudioFileUiState.value.path, xPosition.toInt())
             vibrateDevice()
+        }
+    }
+
+    private fun handleScroll(event: MotionEvent?, distanceX: Float) {
+
+        event ?: return
+
+        mAudioSegmentSelector?.let {
+
+            val xPos = event.x
+            val yPos = event.y
+
+            val viewLeft = it.left
+            val viewRight = it.right
+
+            if (xPos >= viewLeft && xPos <= viewRight) {
+
+                val transformedX = xPos - viewLeft
+
+
+            }
         }
     }
 

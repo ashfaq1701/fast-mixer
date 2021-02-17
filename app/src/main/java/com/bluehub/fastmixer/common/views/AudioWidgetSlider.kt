@@ -17,4 +17,5 @@ class AudioWidgetSlider(context: Context, attributeSet: AttributeSet?)
         val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         binding = AudioWidgetSliderBinding.inflate(inflater, this, true)
     }
+
 }

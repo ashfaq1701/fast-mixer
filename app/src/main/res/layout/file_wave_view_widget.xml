@@ -31,11 +31,29 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/waveViewSlideLayout"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/playHeadLabel"
+                android:layout_width="70dp"
+                android:layout_height="wrap_content"
+                android:text="@string/play_head_label"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+
+            <TextView
+                android:id="@+id/playHeadValue"
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toEndOf="@id/playHeadLabel"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                tools:text="2000000000" />
 
             <ImageButton
                 android:id="@+id/waveViewSlideLeft"
@@ -45,7 +63,7 @@
                 android:src="@drawable/arrow_left_button"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toStartOf="parent" />
+                app:layout_constraintStart_toEndOf="@id/playHeadValue" />
 
             <ImageButton
                 android:id="@+id/waveViewSlideRight"
