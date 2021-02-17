@@ -22,6 +22,10 @@ interface MainActivityFragmentModule {
     fun gainAdjustmentDialog(): GainAdjustmentDialog
 
     @FragmentScope
+    @ContributesAndroidInjector(modules = [SegmentAdjustmentDialogModule::class])
+    fun segmentAdjustmentDialog(): SegmentAdjustmentDialog
+
+    @FragmentScope
     @ContributesAndroidInjector(modules = [PlayFragmentModule::class])
     fun playFragment(): PlayFragment
 }

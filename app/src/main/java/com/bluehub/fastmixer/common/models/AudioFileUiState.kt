@@ -1,9 +1,12 @@
 package com.bluehub.fastmixer.common.models
 
 import com.bluehub.fastmixer.common.config.Config
+import com.bluehub.fastmixer.common.utils.Optional
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import java.io.Serializable
 import java.util.*
+
+
 
 data class AudioFileUiState(
     val path: String,
@@ -13,12 +16,13 @@ data class AudioFileUiState(
     var isPlaying: BehaviorSubject<Boolean>,
     var playSliderPosition: BehaviorSubject<Int>,
     var showSegmentSelector: BehaviorSubject<Boolean>,
-    var segmentStartSample: Int?,
-    var segmentEndSample: Int?,
+    var segmentStartSample: BehaviorSubject<Optional<Int>>,
+    var segmentEndSample: BehaviorSubject<Optional<Int>>,
     var playTimer: Timer?) : Serializable {
 
     companion object {
         fun create(filePath: String, numSamples: Int): AudioFileUiState {
+
             return AudioFileUiState(
                 path = filePath,
                 numSamples = numSamples,
@@ -27,14 +31,14 @@ data class AudioFileUiState(
                 isPlaying = BehaviorSubject.createDefault(false),
                 playSliderPosition = BehaviorSubject.createDefault(0),
                 showSegmentSelector = BehaviorSubject.createDefault(false),
-                segmentStartSample = null,
-                segmentEndSample = null,
+                segmentStartSample = BehaviorSubject.createDefault(Optional.empty()),
+                segmentEndSample = BehaviorSubject.createDefault(Optional.empty()),
                 playTimer = null
             )
         }
     }
 
-        val playSliderPositionMs = BehaviorSubject.createDefault(0)
+        val playSliderPositionMs: BehaviorSubject<Int> = BehaviorSubject.createDefault(0)
 
         val reRender: BehaviorSubject<Boolean> = BehaviorSubject.create()
 
@@ -48,6 +52,11 @@ data class AudioFileUiState(
                 zoomLevel.value
             } else {
                 1
+            }
+
+        val numSamplesMs: Int
+            get() {
+                return (numSamples.toFloat() / (Config.SAMPLE_RATE.toFloat() / 1000.0)).toInt()
             }
 
         val displayPtsCountValue: Int
@@ -70,7 +79,7 @@ data class AudioFileUiState(
         val segmentSelectorLeft : Int
             get() {
                 if (numSamples == 0) return 0
-                return segmentStartSample ?. let {
+                return segmentStartSample.value.value ?. let {
                     ((it.toDouble() / numSamples.toDouble()) * numPtsToPlot).toInt()
                 } ?: 0
             }
@@ -78,13 +87,37 @@ data class AudioFileUiState(
         val segmentSelectorRight : Int
             get() {
                 if (numSamples == 0) return 0
-                return segmentEndSample ?. let {
+                return segmentEndSample.value.value ?. let {
                     ((it.toDouble() / numSamples.toDouble()) * numPtsToPlot).toInt().coerceAtMost(numPtsToPlot - 1)
                 } ?: 0
+            }
+
+        val segmentStartSampleMs: Int?
+            get() {
+                return segmentStartSample.value.value ?. let {
+                    (it.toFloat() / (Config.SAMPLE_RATE.toFloat() / 1000.0)).toInt()
+                }
+            }
+
+        val segmentEndSampleMs: Int?
+            get() {
+                return segmentEndSample.value.value ?. let {
+                    (it.toFloat() / (Config.SAMPLE_RATE.toFloat() / 1000.0)).toInt()
+                }
             }
 
         fun calculatePlaySliderPositionMs() {
             val playHeadMs = playHeadSample.toFloat() / (Config.SAMPLE_RATE.toFloat() / 1000.0)
             playSliderPositionMs.onNext(playHeadMs.toInt())
+        }
+
+        fun setSegmentStartInMs(segmentStartInMs: Int) {
+            val segmentStart = segmentStartInMs * (Config.SAMPLE_RATE / 1000)
+            segmentStartSample.onNext(Optional.of(segmentStart))
+        }
+
+        fun setSegmentEndInMs(segmentEndInMs: Int) {
+            val segmentEnd = segmentEndInMs * (Config.SAMPLE_RATE / 1000)
+            segmentEndSample.onNext(Optional.of(segmentEnd))
         }
     }

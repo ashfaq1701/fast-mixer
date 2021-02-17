@@ -39,6 +39,7 @@
     <dimen name="dialog_min_width">500dp</dimen>
     <dimen name="dialog_min_height">370dp</dimen>
     <dimen name="dialog_button_margin">15dp</dimen>
+    <dimen name="dialog_vertical_padding">15dp</dimen>
 
     <dimen name="play_fragment_height">170dp</dimen>
 
@@ -62,4 +63,8 @@
     <dimen name="audio_segment_selector_trigger_height">40dp</dimen>
     <dimen name="audio_segment_selector_edge_width">1dp</dimen>
 
+    <dimen name="segment_adjustment_dialog_height">200dp</dimen>
+    <dimen name="segment_adjustment_layout_padding">10dp</dimen>
+    <dimen name="segment_adjustment_error_margin_bottom">20dp</dimen>
+    <dimen name="segment_adjustment_error_height">20dp</dimen>
 </resources>

@@ -320,10 +320,6 @@ class MixingScreenViewModel @Inject constructor(val context: Context,
         audioViewAction.value = null
     }
 
-    fun findAudioFileByPath(filePath: String) : AudioFileUiState? {
-        return audioFileStore.findAudioFileByPath(filePath)
-    }
-
     override fun onCleared() {
         super.onCleared()
         mixingRepository.pausePlayback()

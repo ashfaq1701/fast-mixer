@@ -23,6 +23,7 @@
     <string name="pause">Pause</string>
     <string name="mixing_play_enabled">Mixing Play Enabled</string>
     <string name="menu_item_gain_adjustment">Gain Adjustment</string>
+    <string name="menu_item_segment_adjustment">Segment Adjustment</string>
     <string name="common_close">Close</string>
     <string name="common_apply">Apply</string>
     <string name="zero_label">0</string>
@@ -32,4 +33,6 @@
     <string name="common_cancel">Cancel</string>
     <string name="open_settings">Open settings</string>
     <string name="play_head_label">Play Head:</string>
+    <string name="start_ms">Start (ms)</string>
+    <string name="end_ms">End (ms)</string>
 </resources>

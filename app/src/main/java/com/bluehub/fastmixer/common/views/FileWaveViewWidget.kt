@@ -60,7 +60,14 @@ class FileWaveViewWidget(context: Context, attributeSet: AttributeSet?)
             R.id.gainAdjustment -> {
                 mFileWaveViewStore.value.audioViewActionLiveData.value = AudioViewAction(
                     actionType = AudioViewActionType.GAIN_ADJUSTMENT,
-                    filePath = mAudioFileUiState.value.path
+                    uiState = mAudioFileUiState.value
+                )
+                true
+            }
+            R.id.segmentAdjustment -> {
+                mFileWaveViewStore.value.audioViewActionLiveData.value = AudioViewAction(
+                    actionType = AudioViewActionType.SEGMENT_ADJUSTMENT,
+                    uiState = mAudioFileUiState.value
                 )
                 true
             }
@@ -158,6 +165,12 @@ class FileWaveViewWidget(context: Context, attributeSet: AttributeSet?)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe {
                 binding.playHeadValue.text = it.toString()
+            }
+
+        mAudioFileUiState.value.showSegmentSelector
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe {
+                menu.menu.getItem(1).isEnabled = it
             }
     }
 

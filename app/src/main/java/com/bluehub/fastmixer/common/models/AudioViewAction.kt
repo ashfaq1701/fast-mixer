@@ -1,7 +1,7 @@
 package com.bluehub.fastmixer.common.models
 
-data class AudioViewAction(val actionType: AudioViewActionType, val filePath: String)
+data class AudioViewAction(val actionType: AudioViewActionType, val uiState: AudioFileUiState)
 
 enum class AudioViewActionType {
-    NONE, GAIN_ADJUSTMENT
+    NONE, GAIN_ADJUSTMENT, SEGMENT_ADJUSTMENT
 }

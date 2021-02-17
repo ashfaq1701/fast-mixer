@@ -11,13 +11,13 @@ import androidx.databinding.BindingMethod
 import androidx.databinding.BindingMethods
 import com.bluehub.fastmixer.R
 import com.bluehub.fastmixer.common.models.AudioFileUiState
+import com.bluehub.fastmixer.common.utils.Optional
 import com.bluehub.fastmixer.screens.mixing.FileWaveViewStore
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.functions.Function
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import kotlin.math.*
 
 
@@ -160,10 +160,25 @@ class FileWaveView @JvmOverloads constructor(
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe {
                 if (it) {
-                    removeSegmentSelector()
                     createAndShowSegmentSelector()
                 } else {
                     removeSegmentSelector()
+                }
+            }
+
+        mAudioFileUiState.value.segmentStartSample
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe {
+                it?.let {
+                    requestLayout()
+                }
+            }
+
+        mAudioFileUiState.value.segmentEndSample
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe {
+                it?.let {
+                    requestLayout()
                 }
             }
     }
@@ -273,6 +288,8 @@ class FileWaveView @JvmOverloads constructor(
 
         audioSegmentSelector.layoutParams = LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
 
+        calculateSegmentSelectorProperties()
+
         addView(audioSegmentSelector)
 
         mAudioSegmentSelector = audioSegmentSelector
@@ -285,39 +302,49 @@ class FileWaveView @JvmOverloads constructor(
         mAudioSegmentSelector = null
 
         mAudioFileUiState.value.run {
-            segmentStartSample = null
-            segmentEndSample = null
+            segmentStartSample.onNext(Optional.empty())
+            segmentEndSample.onNext(Optional.empty())
         }
     }
 
-    private fun calculateSegmentSelectorProperties(): Int {
-        if (!mAudioFileUiState.hasValue()) return 0
+    private fun calculateSegmentSelectorProperties() {
+        if (!mAudioFileUiState.hasValue()) return
 
         return mAudioFileUiState.value.run {
-            if (numPtsToPlot == 0 || numSamples == 0) return 0
+            if (numPtsToPlot == 0 || numSamples == 0) return
 
-            segmentStartSample ?: run {
+            segmentStartSample.value.value ?: run {
                 val sliderStartPosition = getSliderLeftPosition()
-                segmentStartSample = ((sliderStartPosition.toDouble() / numPtsToPlot) * numSamples).toInt()
+                segmentStartSample.onNext(
+                    Optional.of(((sliderStartPosition.toDouble() / numPtsToPlot) * numSamples).toInt())
+                )
             }
 
-            segmentEndSample ?: run {
+            segmentEndSample.value.value ?: run {
+
                 val initWidth = context.resources.displayMetrics.widthPixels / 10.0
                 val widthInSamples = floor((initWidth / numPtsToPlot) * numSamples).toInt()
 
-                val startSample = segmentStartSample ?: 0
+                val startSample = segmentStartSample.value.value ?: 0
 
-                segmentEndSample = if (startSample + widthInSamples >= numSamples) {
+                val segmentEndSampleValue = if (startSample + widthInSamples >= numSamples) {
                     numSamples - 1
                 } else {
                     startSample + widthInSamples
                 }
+
+                segmentEndSample.onNext(Optional.of(segmentEndSampleValue))
             }
+        }
+    }
 
-            val startSample = segmentStartSample ?: 0
-            val endSample = segmentEndSample ?: 0
+    private fun getSegmentSelectorWidth(): Int {
 
-            ceil(((endSample.toDouble() - startSample.toDouble()) / numSamples) * numPtsToPlot).toInt()
+        mAudioFileUiState.value.run {
+            val startSample = segmentStartSample.value.value ?: 0
+            val endSample = segmentEndSample.value.value ?: 0
+
+            return ceil(((endSample.toDouble() - startSample.toDouble()) / numSamples) * numPtsToPlot).toInt()
         }
     }
 
@@ -397,7 +424,7 @@ class FileWaveView @JvmOverloads constructor(
         }
 
         mAudioSegmentSelector?.let {
-            val segmentSelectorWidth = calculateSegmentSelectorProperties()
+            val segmentSelectorWidth = getSegmentSelectorWidth()
             it.measure(
                 MeasureSpec.makeMeasureSpec(
                     segmentSelectorWidth,
