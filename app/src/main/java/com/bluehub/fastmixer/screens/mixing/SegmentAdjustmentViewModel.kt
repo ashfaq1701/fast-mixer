@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.bluehub.fastmixer.R
 import com.bluehub.fastmixer.common.models.AudioFileUiState
+import com.bluehub.fastmixer.common.utils.Optional
 import com.bluehub.fastmixer.common.viewmodel.BaseViewModel
 import javax.inject.Inject
 
@@ -22,12 +23,12 @@ class SegmentAdjustmentViewModel @Inject constructor(
     val error: LiveData<String>
         get() = _error
 
-    private val _segmentStart: MutableLiveData<Int> = MutableLiveData()
-    val segmentStart: LiveData<Int>
+    private val _segmentStart: MutableLiveData<Int?> = MutableLiveData()
+    val segmentStart: LiveData<Int?>
         get() = _segmentStart
 
-    private val _segmentEnd: MutableLiveData<Int> = MutableLiveData()
-    val segmentEnd: LiveData<Int>
+    private val _segmentEnd: MutableLiveData<Int?> = MutableLiveData()
+    val segmentEnd: LiveData<Int?>
         get() = _segmentEnd
 
     fun setAudioFileUiState(audioFileUiState: AudioFileUiState) {
@@ -86,13 +87,21 @@ class SegmentAdjustmentViewModel @Inject constructor(
         return true
     }
 
-    fun setSegmentStart(value: Int) {
+    fun clearSegment() {
+        _audioFileUiState.showSegmentSelector.onNext(false)
+        _audioFileUiState.segmentStartSample.onNext(Optional.empty())
+        _audioFileUiState.segmentEndSample.onNext(Optional.empty())
+
+        _closeDialog.value = true
+    }
+
+    fun setSegmentStart(value: Int?) {
         if (_segmentStart.value != value) {
             _segmentStart.value = value
         }
     }
 
-    fun setSegmentEnd(value: Int) {
+    fun setSegmentEnd(value: Int?) {
         if (_segmentEnd.value != value) {
             _segmentEnd.value = value
         }

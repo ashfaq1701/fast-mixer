@@ -43,7 +43,7 @@ class SegmentAdjustmentDialog(private val audioFileUiState: AudioFileUiState) : 
             text?.let {
                 val str = it.toString()
 
-                val numVal = if (str == "") 0 else str.toInt()
+                val numVal = if (str == "") null else str.toInt()
 
                 binding.segmentStart.apply {
                     setSelection(this.length())
@@ -58,7 +58,7 @@ class SegmentAdjustmentDialog(private val audioFileUiState: AudioFileUiState) : 
             text?.let {
                 val str = it.toString()
 
-                val numVal = if (str == "") 0 else str.toInt()
+                val numVal = if (str == "") null else str.toInt()
 
                 binding.segmentEnd.apply {
                     setSelection(this.length())
@@ -74,6 +74,10 @@ class SegmentAdjustmentDialog(private val audioFileUiState: AudioFileUiState) : 
 
         binding.cancelSegmentAdjustment.setOnClickListener {
             viewModel.cancelSegmentAdjustment()
+        }
+
+        binding.clearSegmentBounds.setOnClickListener {
+            viewModel.clearSegment()
         }
     }
 
@@ -91,11 +95,13 @@ class SegmentAdjustmentDialog(private val audioFileUiState: AudioFileUiState) : 
         })
 
         viewModel.segmentStart.observe(viewLifecycleOwner, {
-            binding.segmentStart.setText(it.toString())
+            val str = it?.toString() ?: ""
+            binding.segmentStart.setText(str)
         })
 
         viewModel.segmentEnd.observe(viewLifecycleOwner, {
-            binding.segmentEnd.setText(it.toString())
+            val str = it?.toString() ?: ""
+            binding.segmentEnd.setText(str)
         })
     }
 }

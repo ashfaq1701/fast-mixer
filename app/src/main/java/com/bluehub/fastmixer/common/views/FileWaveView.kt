@@ -300,11 +300,6 @@ class FileWaveView @JvmOverloads constructor(
             removeView(it)
         }
         mAudioSegmentSelector = null
-
-        mAudioFileUiState.value.run {
-            segmentStartSample.onNext(Optional.empty())
-            segmentEndSample.onNext(Optional.empty())
-        }
     }
 
     private fun calculateSegmentSelectorProperties() {
