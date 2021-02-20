@@ -33,6 +33,7 @@ class FileWaveView @JvmOverloads constructor(
 
     companion object {
         const val TAIL_WIDTH = 3
+        const val SEGMENT_SELECTOR_MIN_WIDTH = 10
     }
 
     private val mAudioFileUiState: BehaviorSubject<AudioFileUiState> = BehaviorSubject.create()
@@ -49,21 +50,13 @@ class FileWaveView @JvmOverloads constructor(
 
     private var forceFetch = false
 
+    private var segmentSliderActivationX: Float? = null
+
     private val gestureListener = object:GestureDetector.SimpleOnGestureListener() {
         override fun onLongPress(e: MotionEvent?) {
             e?:return
             val x = e.x
             handleLongClick(x)
-        }
-
-        override fun onScroll(
-            e1: MotionEvent?,
-            e2: MotionEvent?,
-            distanceX: Float,
-            distanceY: Float
-        ): Boolean {
-            handleScroll(e2, distanceX)
-            return true
         }
 
         override fun onDown(e: MotionEvent?): Boolean {
@@ -251,6 +244,8 @@ class FileWaveView @JvmOverloads constructor(
 
         mAudioSegmentSelector?.let {
             if (xPosition >= it.left && xPosition <= it.right) {
+                activateSegmentSelectorEdge(xPosition)
+
                 return
             }
         }
@@ -261,24 +256,59 @@ class FileWaveView @JvmOverloads constructor(
         }
     }
 
-    private fun handleScroll(event: MotionEvent?, distanceX: Float) {
+    private fun activateSegmentSelectorEdge(xPosition: Float) {
+        mAudioSegmentSelector?.let { audioSegmentSelector ->
+            audioSegmentSelector.disableAllEdges()
+
+            val left = audioSegmentSelector.left
+
+            val mid = left + (audioSegmentSelector.width / 2)
+
+            if (xPosition < mid) {
+                audioSegmentSelector.activateLeftEdge()
+            } else {
+                audioSegmentSelector.activateRightEdge()
+            }
+
+            segmentSliderActivationX = xPosition
+        }
+    }
+
+    private fun resizeSegmentSelector(event: MotionEvent?) {
 
         event ?: return
 
-        mAudioSegmentSelector?.let {
+        mAudioSegmentSelector?.let { audioSegmentSelector ->
+
+            if (!(audioSegmentSelector.leftEdgeActivated || audioSegmentSelector.rightEdgeActivated)) return@let
 
             val xPos = event.x
-            val yPos = event.y
 
-            val viewLeft = it.left
-            val viewRight = it.right
+            var viewLeft = audioSegmentSelector.left
+            var viewRight = audioSegmentSelector.right
 
-            if (xPos >= viewLeft && xPos <= viewRight) {
+            val boundedNewPosition = xPos.toInt().coerceAtLeast(0).coerceAtMost(getNumPtsToPlot())
 
-                val transformedX = xPos - viewLeft
-
-
+            if (audioSegmentSelector.leftEdgeActivated) {
+                viewLeft = boundedNewPosition
+            } else {
+                viewRight = boundedNewPosition
             }
+
+            if (viewRight > viewLeft) {
+                mAudioFileUiState.value.run {
+                    val newPositionInSamples =
+                        (boundedNewPosition.toFloat() / numPtsToPlot) * numSamples
+
+                    if (audioSegmentSelector.leftEdgeActivated) {
+                        segmentStartSample.onNext(Optional.of(newPositionInSamples.toInt()))
+                    } else {
+                        segmentEndSample.onNext(Optional.of(newPositionInSamples.toInt()))
+                    }
+                }
+            }
+
+            audioSegmentSelector.disableAllEdges()
         }
     }
 
@@ -354,8 +384,21 @@ class FileWaveView @JvmOverloads constructor(
     }
 
     override fun onTouchEvent(event: MotionEvent?): Boolean {
-        gestureDetector.onTouchEvent(event);
-        return true;
+        when (event?.action) {
+            MotionEvent.ACTION_UP -> {
+                mAudioSegmentSelector?.let {
+                    if (it.leftEdgeActivated || it.rightEdgeActivated) {
+                        if (segmentSliderActivationX != event.x) {
+                            resizeSegmentSelector(event)
+                            return true
+                        }
+                    }
+                }
+            }
+        }
+
+        gestureDetector.onTouchEvent(event)
+        return true
     }
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {

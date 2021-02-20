@@ -21,28 +21,6 @@
             app:layout_constraintEnd_toEndOf="parent"
             android:background="@color/grey"/>
 
-        <View
-            android:id="@+id/leftTrigger"
-            android:layout_width="@dimen/audio_segment_selector_trigger_width"
-            android:layout_height="@dimen/audio_segment_selector_trigger_height"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            android:background="@drawable/audio_segment_selector_right_circle"
-            android:clickable="true"
-            android:focusable="true" />
-
-        <View
-            android:id="@+id/rightTrigger"
-            android:layout_width="@dimen/audio_segment_selector_trigger_width"
-            android:layout_height="@dimen/audio_segment_selector_trigger_height"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            android:background="@drawable/audio_segment_selector_left_circle"
-            android:clickable="true"
-            android:focusable="true" />
-
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
 

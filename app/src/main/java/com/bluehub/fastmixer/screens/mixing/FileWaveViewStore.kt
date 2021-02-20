@@ -254,7 +254,7 @@ class FileWaveViewStore {
     private fun getSliderPosition(audioFileUiState: AudioFileUiState) = audioFileUiState.run {
         if (mCurrentPlaybackProgressGetter.hasValue()) {
             val perSample = mCurrentPlaybackProgressGetter.value.apply(Unit).toFloat() / numSamples.toFloat()
-            (perSample * numPtsToPlot).toInt()
+            (perSample * numPtsToPlot.toInt()).toInt()
         } else 0
     }
 
@@ -286,7 +286,7 @@ class FileWaveViewStore {
         if (audioFileUiState.displayPtsCountValue == 0) return
 
         val playHead = audioFileUiState.run {
-            (playHeadPointer.toFloat() / numPtsToPlot.toFloat()) * numSamples
+            (playHeadPointer.toFloat() / numPtsToPlot.toFloat()) * numSamples.toFloat()
         }
 
         if (!audioFileUiState.isPlaying.hasValue() || !audioFileUiState.isPlaying.value) {
