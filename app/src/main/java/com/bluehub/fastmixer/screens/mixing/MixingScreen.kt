@@ -141,9 +141,10 @@ class MixingScreen : BaseFragment<MixingScreenViewModel>(ViewModelType.NAV_SCOPE
             it?.let {
                 when(it.actionType) {
                     AudioViewActionType.GAIN_ADJUSTMENT -> {
-                        viewModel.findAudioFileByPath(it.filePath)?.let { audioFile ->
-                            showGainControlFragment(audioFile)
-                        }
+                        showGainControlFragment(it.uiState)
+                    }
+                    AudioViewActionType.SEGMENT_ADJUSTMENT -> {
+                        showSegmentControlFragment(it.uiState)
                     }
                 }
             }
@@ -179,6 +180,11 @@ class MixingScreen : BaseFragment<MixingScreenViewModel>(ViewModelType.NAV_SCOPE
     private fun showGainControlFragment(audioFile: AudioFileUiState) {
         val gainAdjustmentDialog = GainAdjustmentDialog(audioFile.path)
         gainAdjustmentDialog.show(requireActivity().supportFragmentManager, "gain_control")
+    }
+
+    private fun showSegmentControlFragment(audioFile: AudioFileUiState) {
+        val segmentAdjustmentDialog = SegmentAdjustmentDialog(audioFile)
+        segmentAdjustmentDialog.show(requireActivity().supportFragmentManager, "segment_control")
     }
 }
 

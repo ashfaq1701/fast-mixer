@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/segment_adjustment_dialog_height"
+        android:minWidth="@dimen/dialog_min_width"
+        android:minHeight="@dimen/segment_adjustment_dialog_height"
+        android:paddingHorizontal="@dimen/segment_adjustment_layout_padding"
+        android:paddingVertical="@dimen/dialog_vertical_padding"
+        tools:context=".screens.mixing.SegmentAdjustmentDialog">
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/segmentStartLayout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintWidth_percent="0.48"
+            android:hint="@string/start_ms">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/segmentStart"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="number" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/segmentEndLayout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintWidth_percent="0.48"
+            android:hint="@string/end_ms">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/segmentEnd"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="number" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <TextView
+            android:id="@+id/errorText"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/segment_adjustment_error_height"
+            app:layout_constraintBottom_toTopOf="@id/saveSegmentAdjustment"
+            app:layout_constraintStart_toStartOf="parent"
+            android:gravity="center"
+            android:layout_marginBottom="@dimen/segment_adjustment_error_margin_bottom"
+            android:textColor="@color/red"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:text="Could not save data" />
+
+        <Button
+            android:id="@+id/clearSegmentBounds"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/clear_bounds"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/saveSegmentAdjustment"
+            android:layout_marginEnd="@dimen/dialog_button_margin" />
+
+        <Button
+            android:id="@+id/saveSegmentAdjustment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/common_save"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/cancelSegmentAdjustment"
+            android:layout_marginEnd="@dimen/dialog_button_margin" />
+
+        <Button
+            android:id="@+id/cancelSegmentAdjustment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/common_close"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginEnd="@dimen/dialog_button_margin"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

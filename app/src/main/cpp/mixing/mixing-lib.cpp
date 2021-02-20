@@ -239,4 +239,26 @@ extern "C" {
         auto filePathStr = java_str_to_c_str(env, filePath);
         mixingEngine->clearSourceTransformation(move(filePathStr));
     }
+
+    JNIEXPORT void JNICALL
+    Java_com_bluehub_fastmixer_audio_MixingEngine_setSourceBounds(JNIEnv *env, jclass, jstring filePath, jint start, jint end) {
+        if (!mixingEngine) {
+            LOGE("setSourceBounds: mixingEngine is null, you must call create() method before calling this method");
+            return;
+        }
+
+        auto filePathStr = java_str_to_c_str(env, filePath);
+        mixingEngine->setSourceBounds(filePathStr, start, end);
+    }
+
+    JNIEXPORT void JNICALL
+    Java_com_bluehub_fastmixer_audio_MixingEngine_resetSourceBounds(JNIEnv *env, jclass, jstring filePath) {
+        if (!mixingEngine) {
+            LOGE("resetSourceBounds: mixingEngine is null, you must call create() method before calling this method");
+            return;
+        }
+
+        auto filePathStr = java_str_to_c_str(env, filePath);
+        mixingEngine->resetSourceBounds(filePathStr);
+    }
 }

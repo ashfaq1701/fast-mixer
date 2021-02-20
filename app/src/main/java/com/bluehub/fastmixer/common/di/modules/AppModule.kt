@@ -27,6 +27,6 @@ interface AppModule {
         @JvmStatic
         @Provides
         @ApplicationScope
-        fun fileWaveViewStore(): FileWaveViewStore = FileWaveViewStore()
+        fun fileWaveViewStore(mixingRepository: MixingRepository): FileWaveViewStore = FileWaveViewStore(mixingRepository)
     }
 }

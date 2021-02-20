@@ -4,4 +4,8 @@
     <item
         android:id="@+id/gainAdjustment"
         android:title="@string/menu_item_gain_adjustment"/>
+
+    <item
+        android:id="@+id/segmentAdjustment"
+        android:title="@string/menu_item_segment_adjustment" />
 </menu>

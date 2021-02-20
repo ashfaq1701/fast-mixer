@@ -31,6 +31,8 @@ public:
     virtual float getMinSampleValue() const = 0;
     virtual AudioProperties getProperties() const  = 0;
     virtual const float* getData() const = 0;
+    virtual int64_t getSelectionStart() = 0;
+    virtual int64_t getSelectionEnd() = 0;
 };
 
 

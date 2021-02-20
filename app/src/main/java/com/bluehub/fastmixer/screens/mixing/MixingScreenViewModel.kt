@@ -74,15 +74,11 @@ class MixingScreenViewModel @Inject constructor(val context: Context,
     init {
         mixingRepository.createMixingEngine()
 
-        fileWaveViewStore.setAudioFilesLiveData(audioFilesLiveData)
-        fileWaveViewStore.setIsPlayingLiveData(isPlaying)
-        fileWaveViewStore.setIsGroupPlayingLiveData(isGroupPlaying)
-        fileWaveViewStore.audioViewActionLiveData = audioViewAction
-
-        fileWaveViewStore.setCurrentPlaybackProgressGetter { getCurrentPlaybackProgress() }
-        fileWaveViewStore.setPlayerHeadSetter { playHead: Int -> setPlayerHead(playHead) }
-        fileWaveViewStore.setSourcePlayHeadSetter { filePath: String, playHead: Int ->
-            setSourcePlayHead(filePath, playHead)
+        fileWaveViewStore.run {
+            setAudioFilesLiveData(audioFilesLiveData)
+            setIsPlayingLiveData(isPlaying)
+            setIsGroupPlayingLiveData(isGroupPlaying)
+            audioViewActionLiveData = audioViewAction
         }
     }
 
@@ -270,13 +266,6 @@ class MixingScreenViewModel @Inject constructor(val context: Context,
 
     private fun getTotalSamples(filePath: String): Int = mixingRepository.getTotalSamples(filePath)
 
-    private fun getCurrentPlaybackProgress(): Int = mixingRepository.getCurrentPlaybackProgress()
-
-    private fun setPlayerHead(playHead: Int) = mixingRepository.setPlayerHead(playHead)
-
-    private fun setSourcePlayHead(filePath: String, playHead: Int) =
-        mixingRepository.setSourcePlayHead(filePath, playHead)
-
     fun groupZoomIn() {
         fileWaveViewStore.groupZoomIn()
     }
@@ -318,10 +307,6 @@ class MixingScreenViewModel @Inject constructor(val context: Context,
 
     fun resetStates() {
         audioViewAction.value = null
-    }
-
-    fun findAudioFileByPath(filePath: String) : AudioFileUiState? {
-        return audioFileStore.findAudioFileByPath(filePath)
     }
 
     override fun onCleared() {

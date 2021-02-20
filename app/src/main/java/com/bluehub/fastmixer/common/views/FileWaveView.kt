@@ -11,14 +11,14 @@ import androidx.databinding.BindingMethod
 import androidx.databinding.BindingMethods
 import com.bluehub.fastmixer.R
 import com.bluehub.fastmixer.common.models.AudioFileUiState
+import com.bluehub.fastmixer.common.utils.Optional
 import com.bluehub.fastmixer.screens.mixing.FileWaveViewStore
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.functions.Function
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.launch
-import kotlin.math.abs
-import kotlin.math.ceil
+import kotlin.math.*
 
 
 @BindingMethods(value = [
@@ -30,6 +30,11 @@ class FileWaveView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null
 ) : ViewGroup(context, attrs) {
+
+    companion object {
+        const val TAIL_WIDTH = 3
+        const val SEGMENT_SELECTOR_MIN_WIDTH = 10
+    }
 
     private val mAudioFileUiState: BehaviorSubject<AudioFileUiState> = BehaviorSubject.create()
     var mSamplesReader: BehaviorSubject<Function<Int, Deferred<Array<Float>>>> = BehaviorSubject.create()
@@ -45,14 +50,22 @@ class FileWaveView @JvmOverloads constructor(
 
     private var forceFetch = false
 
+    private var segmentSliderActivationX: Float? = null
+
     private val gestureListener = object:GestureDetector.SimpleOnGestureListener() {
         override fun onLongPress(e: MotionEvent?) {
             e?:return
             val x = e.x
             handleLongClick(x)
         }
+
+        override fun onDown(e: MotionEvent?): Boolean {
+            return true
+        }
     }
     private val gestureDetector: GestureDetector
+
+    private var mAudioSegmentSelector: AudioSegmentSelector? = null
 
     init {
         attrsLoaded.subscribe {
@@ -135,6 +148,32 @@ class FileWaveView @JvmOverloads constructor(
                 forceFetch = true
                 requestLayout()
             }
+
+        mAudioFileUiState.value.showSegmentSelector
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe {
+                if (it) {
+                    createAndShowSegmentSelector()
+                } else {
+                    removeSegmentSelector()
+                }
+            }
+
+        mAudioFileUiState.value.segmentStartSample
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe {
+                it?.let {
+                    requestLayout()
+                }
+            }
+
+        mAudioFileUiState.value.segmentEndSample
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe {
+                it?.let {
+                    requestLayout()
+                }
+            }
     }
 
     private fun getNumPtsToPlot() = if (mAudioFileUiState.hasValue()) {
@@ -187,12 +226,6 @@ class FileWaveView @JvmOverloads constructor(
         requestLayout()
     }
 
-    private fun getSliderLeftPosition() = if (mAudioFileUiState.hasValue()) {
-        if (mAudioFileUiState.value.playSliderPosition.hasValue()) {
-            mAudioFileUiState.value.playSliderPosition.value
-        } else 0
-    } else 0
-
     private fun vibrateDevice() {
         val v = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -208,17 +241,164 @@ class FileWaveView @JvmOverloads constructor(
     }
 
     private fun handleLongClick(xPosition: Float) {
-        mFileWaveViewStore.value.setPlayHead(mAudioFileUiState.value.path, xPosition.toInt())
-        vibrateDevice()
+
+        mAudioSegmentSelector?.let {
+            if (xPosition >= it.left && xPosition <= it.right) {
+                activateSegmentSelectorEdge(xPosition)
+
+                return
+            }
+        }
+
+        if (xPosition < getNumPtsToPlot()) {
+            mFileWaveViewStore.value.setPlayHead(mAudioFileUiState.value.path, xPosition.toInt())
+            vibrateDevice()
+        }
     }
+
+    private fun activateSegmentSelectorEdge(xPosition: Float) {
+        mAudioSegmentSelector?.let { audioSegmentSelector ->
+            audioSegmentSelector.disableAllEdges()
+
+            val left = audioSegmentSelector.left
+
+            val mid = left + (audioSegmentSelector.width / 2)
+
+            if (xPosition < mid) {
+                audioSegmentSelector.activateLeftEdge()
+            } else {
+                audioSegmentSelector.activateRightEdge()
+            }
+
+            segmentSliderActivationX = xPosition
+        }
+    }
+
+    private fun resizeSegmentSelector(event: MotionEvent?) {
+
+        event ?: return
+
+        mAudioSegmentSelector?.let { audioSegmentSelector ->
+
+            if (!(audioSegmentSelector.leftEdgeActivated || audioSegmentSelector.rightEdgeActivated)) return@let
+
+            val xPos = event.x
+
+            var viewLeft = audioSegmentSelector.left
+            var viewRight = audioSegmentSelector.right
+
+            val boundedNewPosition = xPos.toInt().coerceAtLeast(0).coerceAtMost(getNumPtsToPlot())
+
+            if (audioSegmentSelector.leftEdgeActivated) {
+                viewLeft = boundedNewPosition
+            } else {
+                viewRight = boundedNewPosition
+            }
+
+            if (viewRight > viewLeft) {
+                mAudioFileUiState.value.run {
+                    val newPositionInSamples =
+                        (boundedNewPosition.toFloat() / numPtsToPlot) * numSamples
+
+                    if (audioSegmentSelector.leftEdgeActivated) {
+                        segmentStartSample.onNext(Optional.of(newPositionInSamples.toInt()))
+                    } else {
+                        segmentEndSample.onNext(Optional.of(newPositionInSamples.toInt()))
+                    }
+                }
+            }
+
+            audioSegmentSelector.disableAllEdges()
+        }
+    }
+
+    private fun createAndShowSegmentSelector() {
+        val audioSegmentSelector = AudioSegmentSelector(context, null)
+        audioSegmentSelector.id = View.generateViewId()
+
+        audioSegmentSelector.layoutParams = LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
+
+        calculateSegmentSelectorProperties()
+
+        addView(audioSegmentSelector)
+
+        mAudioSegmentSelector = audioSegmentSelector
+    }
+
+    private fun removeSegmentSelector() {
+        mAudioSegmentSelector?.let {
+            removeView(it)
+        }
+        mAudioSegmentSelector = null
+    }
+
+    private fun calculateSegmentSelectorProperties() {
+        if (!mAudioFileUiState.hasValue()) return
+
+        return mAudioFileUiState.value.run {
+            if (numPtsToPlot == 0 || numSamples == 0) return
+
+            segmentStartSample.value.value ?: run {
+                val sliderStartPosition = getSliderLeftPosition()
+                segmentStartSample.onNext(
+                    Optional.of(((sliderStartPosition.toDouble() / numPtsToPlot) * numSamples).toInt())
+                )
+            }
+
+            segmentEndSample.value.value ?: run {
+
+                val initWidth = context.resources.displayMetrics.widthPixels / 10.0
+                val widthInSamples = floor((initWidth / numPtsToPlot) * numSamples).toInt()
+
+                val startSample = segmentStartSample.value.value ?: 0
+
+                val segmentEndSampleValue = if (startSample + widthInSamples >= numSamples) {
+                    numSamples - 1
+                } else {
+                    startSample + widthInSamples
+                }
+
+                segmentEndSample.onNext(Optional.of(segmentEndSampleValue))
+            }
+        }
+    }
+
+    private fun getSegmentSelectorWidth(): Int {
+
+        mAudioFileUiState.value.run {
+            val startSample = segmentStartSample.value.value ?: 0
+            val endSample = segmentEndSample.value.value ?: 0
+
+            return ceil(((endSample.toDouble() - startSample.toDouble()) / numSamples) * numPtsToPlot).toInt()
+        }
+    }
+
+    private fun getSliderLeftPosition() = if (mAudioFileUiState.hasValue()) {
+        if (mAudioFileUiState.value.playSliderPosition.hasValue()) {
+            mAudioFileUiState.value.playSliderPosition.value
+        } else 0
+    } else 0
 
     override fun onInterceptTouchEvent(ev: MotionEvent?): Boolean {
         return gestureDetector.onTouchEvent(ev)
     }
 
     override fun onTouchEvent(event: MotionEvent?): Boolean {
-        gestureDetector.onTouchEvent(event);
-        return true;
+        when (event?.action) {
+            MotionEvent.ACTION_UP -> {
+                mAudioSegmentSelector?.let {
+                    if (it.leftEdgeActivated || it.rightEdgeActivated) {
+                        if (segmentSliderActivationX != event.x) {
+                            resizeSegmentSelector(event)
+                            return true
+                        }
+                    }
+                }
+            }
+        }
+
+        gestureDetector.onTouchEvent(event)
+        return true
     }
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
@@ -232,6 +412,24 @@ class FileWaveView @JvmOverloads constructor(
                     sliderLeft + mAudioWidgetSlider.measuredWidth,
                     sliderTop + mAudioWidgetSlider.measuredHeight
                 )
+            }
+
+            mAudioSegmentSelector?.let {
+                if (!mAudioFileUiState.hasValue()) return@let
+
+                mAudioFileUiState.value.run {
+
+                    val selectorTop = 0
+
+                    if (it.visibility != GONE && it.measuredWidth > 0) {
+                        it.layout(
+                            segmentSelectorLeft,
+                            selectorTop,
+                            segmentSelectorRight,
+                            selectorTop + it.measuredHeight
+                        )
+                    }
+                }
             }
         }
     }
@@ -263,9 +461,20 @@ class FileWaveView @JvmOverloads constructor(
             )
         }
 
+        mAudioSegmentSelector?.let {
+            val segmentSelectorWidth = getSegmentSelectorWidth()
+            it.measure(
+                MeasureSpec.makeMeasureSpec(
+                    segmentSelectorWidth,
+                    MeasureSpec.EXACTLY
+                ),
+                measuredHeight
+            )
+        }
+
         val calculatedWidth = mAudioFileUiState.value.numPtsToPlot
 
-        val roundedWidth = if (measuredWidth == 0 || calculatedWidth < measuredWidth) measuredWidth else calculatedWidth
+        val roundedWidth = if (measuredWidth == 0 || calculatedWidth <= measuredWidth) measuredWidth else (calculatedWidth + TAIL_WIDTH)
 
         if (roundedWidth > 0) {
             fetchPointsToPlot()

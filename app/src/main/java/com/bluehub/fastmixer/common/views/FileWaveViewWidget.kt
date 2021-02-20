@@ -2,11 +2,14 @@ package com.bluehub.fastmixer.common.views
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.res.ColorStateList
 import android.util.AttributeSet
 import android.view.*
 import android.widget.HorizontalScrollView
 import android.widget.PopupMenu
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
 import androidx.databinding.BindingMethod
 import androidx.databinding.BindingMethods
@@ -16,7 +19,7 @@ import com.bluehub.fastmixer.databinding.FileWaveViewWidgetBinding
 import com.bluehub.fastmixer.screens.mixing.*
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.subjects.BehaviorSubject
-import timber.log.Timber
+import kotlinx.android.synthetic.main.file_wave_view_widget.view.*
 import java.util.*
 
 @BindingMethods(
@@ -48,15 +51,23 @@ class FileWaveViewWidget(context: Context, attributeSet: AttributeSet?)
     private lateinit var menu: PopupMenu
     private lateinit var binding: FileWaveViewWidgetBinding
 
-    private lateinit var fileWaveViewScroll: HorizontalScrollView
-    private lateinit var horizontalScrollBar: CustomHorizontalScrollBar
+    private lateinit var mFileWaveViewScroll: HorizontalScrollView
+    private lateinit var mHorizontalScrollBar: CustomHorizontalScrollBar
+    private lateinit var mFileWaveView: FileWaveView
 
     private val onMenuItemClick = { menuItem: MenuItem ->
         when(menuItem.itemId) {
             R.id.gainAdjustment -> {
                 mFileWaveViewStore.value.audioViewActionLiveData.value = AudioViewAction(
                     actionType = AudioViewActionType.GAIN_ADJUSTMENT,
-                    filePath = mAudioFileUiState.value.path
+                    uiState = mAudioFileUiState.value
+                )
+                true
+            }
+            R.id.segmentAdjustment -> {
+                mFileWaveViewStore.value.audioViewActionLiveData.value = AudioViewAction(
+                    actionType = AudioViewActionType.SEGMENT_ADJUSTMENT,
+                    uiState = mAudioFileUiState.value
                 )
                 true
             }
@@ -120,25 +131,69 @@ class FileWaveViewWidget(context: Context, attributeSet: AttributeSet?)
     }
 
     private fun setupUiStateObservers() {
-        mAudioFileUiState.value.isPlaying
-            .subscribe {
-                if (it) {
-                    binding.wavePlayPause.setImageDrawable(
-                        ContextCompat.getDrawable(context, R.drawable.pause_button)
-                    )
-                } else {
-                    binding.wavePlayPause.setImageDrawable(
-                        ContextCompat.getDrawable(context, R.drawable.play_button)
-                    )
-                }
-            }
 
-        mAudioFileUiState.value.zoomLevel
-            .subscribe {
-                fileWaveViewScroll.post {
-                    fileWaveViewScroll.scrollTo(0, fileWaveViewScroll.top)
+        mAudioFileUiState.value.run {
+            isPlaying
+                .subscribe {
+                    if (it) {
+                        binding.wavePlayPause.setImageDrawable(
+                            ContextCompat.getDrawable(context, R.drawable.pause_button)
+                        )
+                    } else {
+                        binding.wavePlayPause.setImageDrawable(
+                            ContextCompat.getDrawable(context, R.drawable.play_button)
+                        )
+                    }
                 }
-            }
+
+            zoomLevel
+                .subscribe {
+                    mFileWaveViewScroll.post {
+                        mFileWaveViewScroll.scrollTo(0, mFileWaveViewScroll.top)
+                    }
+                }
+
+            showSegmentSelector
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe {
+                    if (it) {
+                        binding.toggleSegmentSelector.backgroundTintList = AppCompatResources.getColorStateList(context, R.color.gray_400)
+                    } else {
+                        binding.toggleSegmentSelector.backgroundTintList = ColorStateList(arrayOf<IntArray>(), IntArray(0))
+                    }
+                }
+
+            playSliderPositionMs
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe {
+                    binding.playHeadValue.text = it.toString()
+                }
+
+            showSegmentSelector
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe {
+                    menu.menu.getItem(1).isEnabled = it
+                }
+
+            showSegmentSelector
+                .flatMap { segmentSelectorShown ->
+                    segmentStartSample.map { startSample ->
+                        Pair(segmentSelectorShown, startSample.value)
+                    }
+                }
+                .flatMap { dataPair ->
+                    segmentEndSample.map { endSample ->
+                        Triple(dataPair.first, dataPair.second, endSample.value)
+                    }
+                }
+                .subscribe { (segmentSelectorShown, startSample, endSample) ->
+                    if (segmentSelectorShown && startSample != null && endSample != null) {
+                        mFileWaveViewStore.value.setSourceBounds(path)
+                    } else {
+                        mFileWaveViewStore.value.resetSourceBounds(path)
+                    }
+                }
+        }
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -150,6 +205,7 @@ class FileWaveViewWidget(context: Context, attributeSet: AttributeSet?)
                 ::waveViewZoomOut,
                 ::waveViewDelete,
                 ::waveViewTogglePlay,
+                ::toggleSegmentSelector
             )
 
             val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
@@ -175,8 +231,9 @@ class FileWaveViewWidget(context: Context, attributeSet: AttributeSet?)
                 }
             }
 
-            fileWaveViewScroll = binding.fileWaveViewScroll
-            horizontalScrollBar = binding.fileWaveViewScrollBar
+            mFileWaveViewScroll = binding.fileWaveViewScroll
+            mHorizontalScrollBar = binding.fileWaveViewScrollBar
+            mFileWaveView = mFileWaveViewScroll.fileWaveView
 
             setupStoreObservers()
             setupUiStateObservers()
@@ -207,6 +264,12 @@ class FileWaveViewWidget(context: Context, attributeSet: AttributeSet?)
         binding.fileWaveView.zoomOut()
     }
 
+    private fun toggleSegmentSelector() {
+        mAudioFileUiState.value.showSegmentSelector.onNext(
+            !mAudioFileUiState.value.showSegmentSelector.value
+        )
+    }
+
     private fun toggleDropUpMenu() {
         menu.show()
     }
@@ -230,7 +293,7 @@ class FileWaveViewWidget(context: Context, attributeSet: AttributeSet?)
         slideLeftTimer = Timer()
         slideLeftTimer?.schedule(object: TimerTask() {
             override fun run() {
-                if (!horizontalScrollBar.performScrollByWidthFraction(ScrollDirection.LEFT)) {
+                if (!mHorizontalScrollBar.performScrollByWidthFraction(ScrollDirection.LEFT)) {
                     stopLeftSliderTimer()
                 }
             }
@@ -248,7 +311,7 @@ class FileWaveViewWidget(context: Context, attributeSet: AttributeSet?)
         slideRightTimer = Timer()
         slideRightTimer?.schedule(object: TimerTask() {
             override fun run() {
-                if (!horizontalScrollBar.performScrollByWidthFraction(ScrollDirection.RIGHT)) {
+                if (!mHorizontalScrollBar.performScrollByWidthFraction(ScrollDirection.RIGHT)) {
                     stopRightSliderTimer()
                 }
             }
@@ -268,5 +331,6 @@ class FileWaveViewEventListeners(
     val waveViewZoomIn: () -> Unit,
     val waveViewZoomOut: () -> Unit,
     val waveViewDelete: () -> Unit,
-    val waveViewTogglePlay: () -> Unit
+    val waveViewTogglePlay: () -> Unit,
+    val toggleSegmentSelector: () -> Unit
 )

@@ -38,6 +38,10 @@ class MixingEngine {
 
         @JvmStatic external fun clearSourceTransformation(filePath: String)
 
+        @JvmStatic external fun setSourceBounds(filePath: String, start: Int, end: Int)
+
+        @JvmStatic external fun resetSourceBounds(filePath: String)
+
         @JvmStatic external fun delete()
     }
 }

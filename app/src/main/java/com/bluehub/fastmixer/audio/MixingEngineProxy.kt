@@ -35,5 +35,9 @@ class MixingEngineProxy @Inject constructor() {
 
     fun clearSourceTransformation(filePath: String) = MixingEngine.clearSourceTransformation(filePath)
 
+    fun setSourceBounds(filePath: String, start: Int, end: Int) = MixingEngine.setSourceBounds(filePath, start, end)
+
+    fun resetSourceBounds(filePath: String) = MixingEngine.resetSourceBounds(filePath)
+
     fun delete() = MixingEngine.delete()
 }
