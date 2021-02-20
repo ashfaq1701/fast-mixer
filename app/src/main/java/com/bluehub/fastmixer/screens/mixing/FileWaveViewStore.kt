@@ -6,12 +6,13 @@ import com.bluehub.fastmixer.common.models.AudioFileUiState
 import com.bluehub.fastmixer.common.models.AudioViewAction
 import io.reactivex.rxjava3.functions.BiFunction
 import io.reactivex.rxjava3.functions.Function
+import io.reactivex.rxjava3.functions.Function3
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import io.reactivex.rxjava3.subjects.SingleSubject
 import kotlinx.coroutines.*
 import java.util.*
 
-class FileWaveViewStore {
+class FileWaveViewStore(val mixingRepository: MixingRepository) {
     companion object {
         const val ZOOM_STEP = 1
     }
@@ -33,12 +34,6 @@ class FileWaveViewStore {
                 mAudioFileUiStateListLiveData.value ?: listOf()
             } else listOf()
         }
-
-    private val mCurrentPlaybackProgressGetter: SingleSubject<Function<Unit, Int>> =  SingleSubject.create()
-
-    private val mPlayerHeadSetter: SingleSubject<Function<Int, Unit>> = SingleSubject.create()
-
-    private val mSourcePlayHeadSetter: SingleSubject<BiFunction<String, Int, Unit>> = SingleSubject.create()
 
     val coroutineScope = CoroutineScope(Job() + Dispatchers.Main)
 
@@ -73,18 +68,6 @@ class FileWaveViewStore {
     fun setIsGroupPlayingLiveData(isGroupPlayingLiveData: LiveData<Boolean>) {
         mIsGroupPlayingLiveData = isGroupPlayingLiveData
         mIsGroupPlayingLiveData.observeForever(isGroupPlayingObserver)
-    }
-
-    fun setCurrentPlaybackProgressGetter(currentPlaybackProgressGetter: Function<Unit, Int>) {
-        mCurrentPlaybackProgressGetter.onSuccess(currentPlaybackProgressGetter)
-    }
-
-    fun setPlayerHeadSetter(playerHeadSetter: Function<Int, Unit>) {
-        mPlayerHeadSetter.onSuccess(playerHeadSetter)
-    }
-
-    fun setSourcePlayHeadSetter(sourcePlayHeadSetter: BiFunction<String, Int, Unit>) {
-        mSourcePlayHeadSetter.onSuccess(sourcePlayHeadSetter)
     }
 
     fun updateMeasuredWidth(width: Int) {
@@ -239,6 +222,7 @@ class FileWaveViewStore {
     fun setFilePaused(filePath: String) {
         val audioFileUiState = findAudioFileUiState(filePath)
         audioFileUiState?.let { setPaused(it) }
+
     }
 
     fun togglePlayFlag(filePath: String) {
@@ -252,10 +236,8 @@ class FileWaveViewStore {
     }
 
     private fun getSliderPosition(audioFileUiState: AudioFileUiState) = audioFileUiState.run {
-        if (mCurrentPlaybackProgressGetter.hasValue()) {
-            val perSample = mCurrentPlaybackProgressGetter.value.apply(Unit).toFloat() / numSamples.toFloat()
-            (perSample * numPtsToPlot.toInt()).toInt()
-        } else 0
+        val perSample = mixingRepository.getCurrentPlaybackProgress().toFloat() / numSamples.toFloat()
+        (perSample * numPtsToPlot).toInt()
     }
 
     private fun setPlaying(audioFileUiState: AudioFileUiState) {
@@ -276,6 +258,9 @@ class FileWaveViewStore {
             audioFileUiState.playTimer?.cancel()
             audioFileUiState.playTimer = null
 
+            val sliderPos = getSliderPosition(audioFileUiState)
+            setPlaySliderPosition(audioFileUiState, sliderPos)
+
             audioFileUiState.calculatePlaySliderPositionMs()
         }
     }
@@ -290,14 +275,10 @@ class FileWaveViewStore {
         }
 
         if (!audioFileUiState.isPlaying.hasValue() || !audioFileUiState.isPlaying.value) {
-            if (mSourcePlayHeadSetter.hasValue()) {
-                mSourcePlayHeadSetter.value.apply(filePath, playHead.toInt())
-                setPlaySliderPosition(audioFileUiState, playHeadPointer)
-            }
+            mixingRepository.setSourcePlayHead(filePath, playHead.toInt())
+            setPlaySliderPosition(audioFileUiState, playHeadPointer)
         } else {
-            if (mPlayerHeadSetter.hasValue()) {
-                mPlayerHeadSetter.value.apply(playHead.toInt())
-            }
+            mixingRepository.setPlayerHead(playHead.toInt())
         }
 
         audioFileUiState.calculatePlaySliderPositionMs()
@@ -310,6 +291,20 @@ class FileWaveViewStore {
 
     private fun setPlaySliderPosition(audioFileUiState: AudioFileUiState, playSliderPosition: Int) {
         audioFileUiState.playSliderPosition.onNext(playSliderPosition)
+    }
+
+    fun setSourceBounds(filePath: String) {
+        val audioFileUiState = findAudioFileUiState(filePath) ?: return
+
+        audioFileUiState.run {
+            mixingRepository.setSourceBounds(filePath, segmentStartSampleValue, segmentEndSampleValue)
+        }
+    }
+
+    fun resetSourceBounds(filePath: String) {
+        findAudioFileUiState(filePath) ?: return
+
+        mixingRepository.resetSourceBounds(filePath)
     }
 
     fun cleanup() {

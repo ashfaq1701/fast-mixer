@@ -45,6 +45,10 @@ public:
 
     void setSourcePlayHead(string filePath, int playHead);
 
+    void setSourceBounds(string filePath, int64_t start, int64_t end);
+
+    void resetSourceBounds(string filePath);
+
 private:
 
     const char* TAG = "Mixing Engine:: %s";

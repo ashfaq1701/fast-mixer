@@ -131,47 +131,69 @@ class FileWaveViewWidget(context: Context, attributeSet: AttributeSet?)
     }
 
     private fun setupUiStateObservers() {
-        mAudioFileUiState.value.isPlaying
-            .subscribe {
-                if (it) {
-                    binding.wavePlayPause.setImageDrawable(
-                        ContextCompat.getDrawable(context, R.drawable.pause_button)
-                    )
-                } else {
-                    binding.wavePlayPause.setImageDrawable(
-                        ContextCompat.getDrawable(context, R.drawable.play_button)
-                    )
+
+        mAudioFileUiState.value.run {
+            isPlaying
+                .subscribe {
+                    if (it) {
+                        binding.wavePlayPause.setImageDrawable(
+                            ContextCompat.getDrawable(context, R.drawable.pause_button)
+                        )
+                    } else {
+                        binding.wavePlayPause.setImageDrawable(
+                            ContextCompat.getDrawable(context, R.drawable.play_button)
+                        )
+                    }
                 }
-            }
 
-        mAudioFileUiState.value.zoomLevel
-            .subscribe {
-                mFileWaveViewScroll.post {
-                    mFileWaveViewScroll.scrollTo(0, mFileWaveViewScroll.top)
+            zoomLevel
+                .subscribe {
+                    mFileWaveViewScroll.post {
+                        mFileWaveViewScroll.scrollTo(0, mFileWaveViewScroll.top)
+                    }
                 }
-            }
 
-        mAudioFileUiState.value.showSegmentSelector
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe {
-                if (it) {
-                    binding.toggleSegmentSelector.backgroundTintList = AppCompatResources.getColorStateList(context, R.color.gray_400)
-                } else {
-                    binding.toggleSegmentSelector.backgroundTintList = ColorStateList(arrayOf<IntArray>(), IntArray(0))
+            showSegmentSelector
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe {
+                    if (it) {
+                        binding.toggleSegmentSelector.backgroundTintList = AppCompatResources.getColorStateList(context, R.color.gray_400)
+                    } else {
+                        binding.toggleSegmentSelector.backgroundTintList = ColorStateList(arrayOf<IntArray>(), IntArray(0))
+                    }
                 }
-            }
 
-        mAudioFileUiState.value.playSliderPositionMs
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe {
-                binding.playHeadValue.text = it.toString()
-            }
+            playSliderPositionMs
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe {
+                    binding.playHeadValue.text = it.toString()
+                }
 
-        mAudioFileUiState.value.showSegmentSelector
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe {
-                menu.menu.getItem(1).isEnabled = it
-            }
+            showSegmentSelector
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe {
+                    menu.menu.getItem(1).isEnabled = it
+                }
+
+            showSegmentSelector
+                .flatMap { segmentSelectorShown ->
+                    segmentStartSample.map { startSample ->
+                        Pair(segmentSelectorShown, startSample.value)
+                    }
+                }
+                .flatMap { dataPair ->
+                    segmentEndSample.map { endSample ->
+                        Triple(dataPair.first, dataPair.second, endSample.value)
+                    }
+                }
+                .subscribe { (segmentSelectorShown, startSample, endSample) ->
+                    if (segmentSelectorShown && startSample != null && endSample != null) {
+                        mFileWaveViewStore.value.setSourceBounds(path)
+                    } else {
+                        mFileWaveViewStore.value.resetSourceBounds(path)
+                    }
+                }
+        }
     }
 
     @SuppressLint("ClickableViewAccessibility")

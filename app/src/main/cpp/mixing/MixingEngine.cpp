@@ -176,3 +176,23 @@ void MixingEngine::clearSourceTransformation(string filePath) {
 
     it->second->resetBackupBufferData();
 }
+
+void MixingEngine::setSourceBounds(string filePath, int64_t start, int64_t end) {
+    auto it = mSourceMapStore->sourceMap.find(filePath);
+    if (it == mSourceMapStore->sourceMap.end()) {
+        return;
+    }
+
+    it->second->setSelectionStart(start);
+    it->second->setSelectionEnd(end);
+}
+
+void MixingEngine::resetSourceBounds(string filePath) {
+    auto it = mSourceMapStore->sourceMap.find(filePath);
+    if (it == mSourceMapStore->sourceMap.end()) {
+        return;
+    }
+
+    it->second->resetSelectionStart();
+    it->second->resetSelectionEnd();
+}

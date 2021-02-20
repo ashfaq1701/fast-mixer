@@ -58,21 +58,36 @@ void Player::setPlaybackCallback(function<void ()> stopPlaybackCallback) {
 void Player::renderAudio(float *targetData, int32_t numFrames) {
     if (mSourceMap.size() == 0) return;
 
+    auto firstSource = mSourceMap.begin()->second;
+
+    auto selectionStart = firstSource->getSelectionStart();
+    auto selectionEnd = firstSource->getSelectionEnd();
+
     // All the sources should have the same properties
-    const AudioProperties properties = mSourceMap.begin()->second->getProperties();
+    const AudioProperties properties = firstSource->getProperties();
 
     if (mIsPlaying) {
 
+        if (mSourceMap.size() == 1) {
+            if (selectionStart >= 0 && selectionEnd >= 0 && !(mReadFrameIndex >= selectionStart && mReadFrameIndex <= selectionEnd)) {
+                mReadFrameIndex = selectionStart;
+            }
+        }
+
         float allMaxValue = getMaxValueAcrossSources();
-        int64_t maxTotalSourceFrames = getMaxTotalSourceFrames();
+
+        int64_t sourceFramesUpperBound = getMaxTotalSourceFrames();
+        if (mSourceMap.size() == 1) {
+            if (selectionEnd >= 0) {
+                sourceFramesUpperBound = selectionEnd + 1;
+            }
+        }
 
         int64_t framesToRenderFromData = numFrames;
-        if (mReadFrameIndex + numFrames >= maxTotalSourceFrames) {
-            framesToRenderFromData = maxTotalSourceFrames - mReadFrameIndex;
-            mIsPlaying = false;
-            if (mStopPlaybackCallback) {
-                mStopPlaybackCallback();
-            }
+
+        bool toStop = mReadFrameIndex + numFrames >= sourceFramesUpperBound;
+        if (toStop) {
+            framesToRenderFromData = sourceFramesUpperBound - mReadFrameIndex;
         }
 
         if (framesToRenderFromData <= 0) return;
@@ -105,14 +120,25 @@ void Player::renderAudio(float *targetData, int32_t numFrames) {
                 targetData[i * properties.channelCount + j] = scaledAudioFrame;
             }
 
-            if (++mReadFrameIndex >= maxTotalSourceFrames) {
-                mReadFrameIndex = 0;
+            if (++mReadFrameIndex >= sourceFramesUpperBound) {
+                if (mSourceMap.size() == 1 && selectionStart >= 0) {
+                    mReadFrameIndex = selectionStart;
+                } else {
+                    mReadFrameIndex = 0;
+                }
                 break;
             }
         }
 
         if (mSourceMap.size() == 1 && mSourceMap.begin()->second) {
             mSourceMap.begin()->second->setPlayHead(mReadFrameIndex);
+        }
+
+        if (toStop) {
+            mIsPlaying = false;
+            if (mStopPlaybackCallback) {
+                mStopPlaybackCallback();
+            }
         }
     }
 }

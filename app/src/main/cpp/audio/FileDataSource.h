@@ -43,13 +43,22 @@ public:
     int64_t getSampleSize();
 
     void setPlayHead(int64_t playHead);
-    int64_t getPlayHead();
+    int64_t getPlayHead() override;
 
     float getAbsMaxSampleValue() const override;
 
     float getMaxSampleValue() const override;
 
     float getMinSampleValue() const override;
+
+    void setSelectionStart(int64_t selectionStart);
+    void setSelectionEnd(int64_t selectionEnd);
+
+    void resetSelectionStart();
+    void resetSelectionEnd();
+
+    int64_t getSelectionStart() override;
+    int64_t getSelectionEnd() override;
 
     static FileDataSource* newFromCompressedFile(
             const char *filename,
@@ -80,5 +89,8 @@ private:
     float mMaxAbsSampleValue = FLT_MIN;
     float mMaxSampleValue = FLT_MIN;
     float mMinSampleValue = FLT_MAX;
+
+    int64_t mSelectionStart = INT64_MIN;
+    int64_t mSelectionEnd = INT64_MIN;
 };
 #endif //RHYTHMGAME_AASSETDATASOURCE_H

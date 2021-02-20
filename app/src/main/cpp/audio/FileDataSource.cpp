@@ -182,6 +182,30 @@ int64_t FileDataSource::getPlayHead() {
     return mPlayHead;
 }
 
+void FileDataSource::setSelectionStart(int64_t selectionStart) {
+    mSelectionStart = selectionStart;
+}
+
+void FileDataSource::setSelectionEnd(int64_t selectionEnd) {
+    mSelectionEnd = selectionEnd;
+}
+
+void FileDataSource::resetSelectionStart() {
+    mSelectionStart = INT64_MIN;
+}
+
+void FileDataSource::resetSelectionEnd() {
+    mSelectionEnd = INT64_MIN;
+}
+
+int64_t FileDataSource::getSelectionStart() {
+    return mSelectionStart;
+}
+
+int64_t FileDataSource::getSelectionEnd() {
+    return mSelectionEnd;
+}
+
 void FileDataSource::setBackupBufferData(float* &&data, int64_t numSamples) {
     mBackupBuffer = unique_ptr<float[]>(move(data));
     mBackupBufferSize = numSamples;

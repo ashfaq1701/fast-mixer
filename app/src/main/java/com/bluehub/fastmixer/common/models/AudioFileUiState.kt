@@ -92,6 +92,20 @@ data class AudioFileUiState(
                 } ?: 0
             }
 
+        val segmentStartSampleValue: Int
+            get() {
+                return if (segmentStartSample.hasValue()) {
+                    segmentStartSample.value.value ?: Int.MIN_VALUE
+                } else Int.MIN_VALUE
+            }
+
+        val segmentEndSampleValue: Int
+            get() {
+                return if (segmentEndSample.hasValue()) {
+                    segmentEndSample.value.value ?: Int.MIN_VALUE
+                } else Int.MIN_VALUE
+            }
+
         val segmentStartSampleMs: Int?
             get() {
                 return segmentStartSample.value.value ?. let {
