@@ -9,7 +9,7 @@
         android:layout_height="match_parent"
         android:minWidth="@dimen/dialog_min_width"
         android:minHeight="@dimen/dialog_min_height"
-        tools:context=".screens.mixing.GainAdjustmentDialog">
+        tools:context=".screens.mixing.modals.GainAdjustmentDialog">
 
         <com.warkiz.widget.IndicatorStayLayout
             android:id="@+id/gainValuePickerLayout"

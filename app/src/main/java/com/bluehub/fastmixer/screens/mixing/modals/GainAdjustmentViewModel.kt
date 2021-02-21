@@ -1,8 +1,10 @@
-package com.bluehub.fastmixer.screens.mixing
+package com.bluehub.fastmixer.screens.mixing.modals
 
 import android.content.Context
 import androidx.lifecycle.*
 import com.bluehub.fastmixer.common.viewmodel.BaseViewModel
+import com.bluehub.fastmixer.screens.mixing.FileWaveViewStore
+import com.bluehub.fastmixer.screens.mixing.MixingRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -11,15 +13,11 @@ class GainAdjustmentViewModel @Inject constructor(
     val context: Context,
     private val mixingRepository: MixingRepository,
     val fileWaveViewStore: FileWaveViewStore
-) : BaseViewModel() {
+) : BaseDialogViewModel() {
 
     val isLoading: MutableLiveData<Boolean> = MutableLiveData()
 
     private lateinit var _audioFilePath: String
-
-    private val _closeDialog: MutableLiveData<Boolean> = MutableLiveData()
-    val closeDialog: LiveData<Boolean>
-        get() = _closeDialog
 
     private val _gainValue: MutableLiveData<Int> = MutableLiveData(0)
     val gainValue: LiveData<Int>
@@ -49,7 +47,7 @@ class GainAdjustmentViewModel @Inject constructor(
             mixingRepository.applySourceTransformation(_audioFilePath)
             fileWaveViewStore.reRenderFile(_audioFilePath)
             isLoading.postValue(false)
-            _closeDialog.postValue(true)
+            closeDialogLiveData.postValue(true)
         }
     }
 
@@ -57,6 +55,6 @@ class GainAdjustmentViewModel @Inject constructor(
         isLoading.postValue(true)
         mixingRepository.clearSourceTransformation(_audioFilePath)
         isLoading.postValue(false)
-        _closeDialog.postValue(true)
+        closeDialogLiveData.postValue(true)
     }
 }

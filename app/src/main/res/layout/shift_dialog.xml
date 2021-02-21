@@ -8,39 +8,21 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/segment_adjustment_dialog_height"
         android:minWidth="@dimen/dialog_min_width"
-        android:minHeight="@dimen/segment_adjustment_dialog_height"
+        android:minHeight="@dimen/shift_dialog_height"
         android:paddingHorizontal="@dimen/dialog_layout_padding"
         android:paddingVertical="@dimen/dialog_vertical_padding"
-        tools:context=".screens.mixing.modals.SegmentAdjustmentDialog">
+        tools:context=".screens.mixing.modals.ShiftDialog">
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/segmentStartLayout"
-            android:layout_width="0dp"
+            android:id="@+id/shiftDurationLayout"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintWidth_percent="0.48"
-            android:hint="@string/start_ms">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/segmentStart"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="number" />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/segmentDurationLayout"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintWidth_percent="0.48"
             android:hint="@string/duration_ms">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/segmentDuration"
+                android:id="@+id/shiftDuration"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="number" />
@@ -51,7 +33,7 @@
             android:id="@+id/errorText"
             android:layout_width="match_parent"
             android:layout_height="@dimen/segment_adjustment_error_height"
-            app:layout_constraintBottom_toTopOf="@id/saveSegmentAdjustment"
+            app:layout_constraintBottom_toTopOf="@id/saveShift"
             app:layout_constraintStart_toStartOf="parent"
             android:gravity="center"
             android:layout_marginBottom="@dimen/segment_adjustment_error_margin_bottom"
@@ -60,25 +42,16 @@
             tools:text="Could not save data" />
 
         <Button
-            android:id="@+id/clearSegmentBounds"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/clear_bounds"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/saveSegmentAdjustment"
-            android:layout_marginEnd="@dimen/dialog_button_margin" />
-
-        <Button
-            android:id="@+id/saveSegmentAdjustment"
+            android:id="@+id/saveShift"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/common_save"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/cancelSegmentAdjustment"
+            app:layout_constraintEnd_toStartOf="@id/cancelShift"
             android:layout_marginEnd="@dimen/dialog_button_margin" />
 
         <Button
-            android:id="@+id/cancelSegmentAdjustment"
+            android:id="@+id/cancelShift"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/common_close"

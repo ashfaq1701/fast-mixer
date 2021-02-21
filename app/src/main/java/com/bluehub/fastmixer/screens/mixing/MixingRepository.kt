@@ -54,6 +54,8 @@ class MixingRepository @Inject constructor(val mixingEngineProxy: MixingEnginePr
 
     fun resetSourceBounds(filePath: String) = mixingEngineProxy.resetSourceBounds(filePath)
 
+    fun shiftBySamples(filePath: String, position: Int, numSamples: Int) = mixingEngineProxy.shiftBySamples(filePath, position, numSamples)
+
     fun clearSources() {
         mixingEngineProxy.clearPlayerSources()
     }

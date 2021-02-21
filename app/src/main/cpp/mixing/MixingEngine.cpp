@@ -196,3 +196,12 @@ void MixingEngine::resetSourceBounds(string filePath) {
     it->second->resetSelectionStart();
     it->second->resetSelectionEnd();
 }
+
+void MixingEngine::shiftBySamples(string filePath, int64_t position, int64_t numSamples) {
+    auto it = mSourceMapStore->sourceMap.find(filePath);
+    if (it == mSourceMapStore->sourceMap.end()) {
+        return;
+    }
+
+    it->second->shiftBySamples(position, numSamples);
+}

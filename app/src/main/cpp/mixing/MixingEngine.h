@@ -49,6 +49,8 @@ public:
 
     void resetSourceBounds(string filePath);
 
+    void shiftBySamples(string filePath, int64_t position, int64_t numSamples);
+
 private:
 
     const char* TAG = "Mixing Engine:: %s";

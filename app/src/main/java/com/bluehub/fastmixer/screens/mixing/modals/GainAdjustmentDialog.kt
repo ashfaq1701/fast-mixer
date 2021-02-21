@@ -1,4 +1,4 @@
-package com.bluehub.fastmixer.screens.mixing
+package com.bluehub.fastmixer.screens.mixing.modals
 
 import android.app.Dialog
 import android.os.Bundle
@@ -6,6 +6,7 @@ import android.view.*
 import com.bluehub.fastmixer.R
 import com.bluehub.fastmixer.common.fragments.BaseDialogFragment
 import com.bluehub.fastmixer.databinding.GainAdjustmentDialogBinding
+import com.bluehub.fastmixer.screens.mixing.PlayFragment
 import com.warkiz.widget.*
 import kotlinx.android.synthetic.main.view_loading.*
 

@@ -1,4 +1,4 @@
-package com.bluehub.fastmixer.screens.mixing
+package com.bluehub.fastmixer.screens.mixing.modals
 
 import android.app.Dialog
 import android.os.Bundle

@@ -69,6 +69,8 @@ public:
     void applyBackupBufferData();
     void resetBackupBufferData();
 
+    void shiftBySamples(int64_t position, int64_t numSamples);
+
 private:
 
     FileDataSource(unique_ptr<float[]> data, size_t size,
@@ -79,7 +81,7 @@ private:
     unique_ptr<float[]> mBuffer;
     unique_ptr<float[]> mBackupBuffer {nullptr};
 
-    const int64_t mBufferSize;
+    int64_t mBufferSize;
     int64_t mBackupBufferSize = 0;
 
     const AudioProperties mProperties;

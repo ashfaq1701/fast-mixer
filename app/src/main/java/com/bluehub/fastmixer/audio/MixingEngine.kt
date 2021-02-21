@@ -42,6 +42,8 @@ class MixingEngine {
 
         @JvmStatic external fun resetSourceBounds(filePath: String)
 
+        @JvmStatic external fun shiftBySamples(filePath: String, position: Int, numSamples: Int)
+
         @JvmStatic external fun delete()
     }
 }

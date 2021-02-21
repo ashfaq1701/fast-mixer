@@ -15,6 +15,7 @@ import com.bluehub.fastmixer.common.fragments.BaseFragment
 import com.bluehub.fastmixer.common.models.*
 import com.bluehub.fastmixer.databinding.MixingScreenBinding
 import com.bluehub.fastmixer.screens.mixing.MixingScreenDirections.actionMixingScreenToRecordingScreen
+import com.bluehub.fastmixer.screens.mixing.modals.*
 
 class MixingScreen : BaseFragment<MixingScreenViewModel>(ViewModelType.NAV_SCOPED) {
     companion object {
@@ -146,6 +147,9 @@ class MixingScreen : BaseFragment<MixingScreenViewModel>(ViewModelType.NAV_SCOPE
                     AudioViewActionType.SEGMENT_ADJUSTMENT -> {
                         showSegmentControlFragment(it.uiState)
                     }
+                    AudioViewActionType.SHIFT -> {
+                        showShiftFragment(it.uiState)
+                    }
                 }
             }
         })
@@ -185,6 +189,11 @@ class MixingScreen : BaseFragment<MixingScreenViewModel>(ViewModelType.NAV_SCOPE
     private fun showSegmentControlFragment(audioFile: AudioFileUiState) {
         val segmentAdjustmentDialog = SegmentAdjustmentDialog(audioFile)
         segmentAdjustmentDialog.show(requireActivity().supportFragmentManager, "segment_control")
+    }
+
+    private fun showShiftFragment(audioFile: AudioFileUiState) {
+        val shiftDialog = ShiftDialog(audioFile)
+        shiftDialog.show(requireActivity().supportFragmentManager, "shift")
     }
 }
 

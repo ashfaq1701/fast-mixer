@@ -239,3 +239,21 @@ void FileDataSource::applyBackupBufferData() {
     resetBackupBufferData();
     calculateProperties();
 }
+
+void FileDataSource::shiftBySamples(int64_t position, int64_t numSamples) {
+
+    int64_t numSamplesWithChannelCount = numSamples * mProperties.channelCount;
+    int64_t beforePositionWithChannelCount = (position - 1) * mProperties.channelCount;
+
+    int64_t newBufferSize = mBufferSize + numSamplesWithChannelCount;
+
+    float* oldBufferData = mBuffer.get();
+    float* newBuffer = new float[newBufferSize];
+
+    copy(oldBufferData, oldBufferData + beforePositionWithChannelCount + 1, newBuffer);
+    fill(newBuffer + beforePositionWithChannelCount + 1, newBuffer + beforePositionWithChannelCount + numSamplesWithChannelCount  + 1, 0);
+    copy(oldBufferData + beforePositionWithChannelCount + 1, oldBufferData + mBufferSize, newBuffer + beforePositionWithChannelCount + numSamplesWithChannelCount  + 1);
+
+    mBuffer.reset(move(newBuffer));
+    mBufferSize = newBufferSize;
+}

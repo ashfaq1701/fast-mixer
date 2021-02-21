@@ -3,6 +3,7 @@ package com.bluehub.fastmixer.common.di.modules
 import com.bluehub.fastmixer.common.di.FragmentScope
 import com.bluehub.fastmixer.common.di.modules.screens.*
 import com.bluehub.fastmixer.screens.mixing.*
+import com.bluehub.fastmixer.screens.mixing.modals.*
 import com.bluehub.fastmixer.screens.recording.RecordingScreen
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
@@ -24,6 +25,10 @@ interface MainActivityFragmentModule {
     @FragmentScope
     @ContributesAndroidInjector(modules = [SegmentAdjustmentDialogModule::class])
     fun segmentAdjustmentDialog(): SegmentAdjustmentDialog
+
+    @FragmentScope
+    @ContributesAndroidInjector(modules = [ShiftDialogModule::class])
+    fun shiftDialog(): ShiftDialog
 
     @FragmentScope
     @ContributesAndroidInjector(modules = [PlayFragmentModule::class])
