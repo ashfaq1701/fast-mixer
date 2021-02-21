@@ -111,7 +111,7 @@ unique_ptr<buffer_data> FileDataSource::readData(size_t countPoints) {
         samplesToHandle = countPoints;
     }
 
-    int ptsDistance = (int) ((float) mBufferSize / (float) (samplesToHandle * channelCount));
+    int ptsDistance = (int) ((float) mBufferSize / (float) samplesToHandle);
 
     auto selectedSamples = new float [samplesToHandle];
     for (int i = 0; i < samplesToHandle; i++) {
