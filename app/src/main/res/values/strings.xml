@@ -34,12 +34,10 @@
     <string name="open_settings">Open settings</string>
     <string name="play_head_label">Play Head:</string>
     <string name="start_ms">Start (ms)</string>
-    <string name="end_ms">End (ms)</string>
+    <string name="duration_ms">Duration (ms)</string>
 
-    <string name="error_segment_bounds_required">Segment start and end bounds has to be set</string>
-    <string name="error_segment_end_should_be_less_than_duration">Segment end should be less than file duration</string>
-    <string name="error_segment_start_end_should_be_different">Segment start and end value has to be different</string>
-    <string name="error_segment_start_should_be_less_than_end">Segment start value should be less than end value</string>
+    <string name="error_segment_bounds_required">Segment start and duration has to be set</string>
+    <string name="error_segment_duration_should_be_less_than_duration">Segment duration should be less than file duration</string>
     <string name="clear_bounds">Clear Bounds</string>
 
 </resources>

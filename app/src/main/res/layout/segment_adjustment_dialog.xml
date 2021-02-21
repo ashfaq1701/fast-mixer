@@ -31,16 +31,16 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/segmentEndLayout"
+            android:id="@+id/segmentDurationLayout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintWidth_percent="0.48"
-            android:hint="@string/end_ms">
+            android:hint="@string/duration_ms">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/segmentEnd"
+                android:id="@+id/segmentDuration"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="number" />

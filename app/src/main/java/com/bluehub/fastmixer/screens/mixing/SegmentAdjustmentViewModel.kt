@@ -27,9 +27,9 @@ class SegmentAdjustmentViewModel @Inject constructor(
     val segmentStart: LiveData<Int?>
         get() = _segmentStart
 
-    private val _segmentEnd: MutableLiveData<Int?> = MutableLiveData()
-    val segmentEnd: LiveData<Int?>
-        get() = _segmentEnd
+    private val _segmentDuration: MutableLiveData<Int?> = MutableLiveData()
+    val segmentDuration: LiveData<Int?>
+        get() = _segmentDuration
 
     fun setAudioFileUiState(audioFileUiState: AudioFileUiState) {
         _audioFileUiState = audioFileUiState
@@ -38,8 +38,8 @@ class SegmentAdjustmentViewModel @Inject constructor(
             _segmentStart.value = it
         }
 
-        _audioFileUiState.segmentEndSampleMs?.let {
-            _segmentEnd.value = it
+        _audioFileUiState.segmentDurationMs?.let {
+            _segmentDuration.value = it
         }
     }
 
@@ -52,35 +52,27 @@ class SegmentAdjustmentViewModel @Inject constructor(
         if (!validateSegmentBoundaries()) return
 
         val segmentStartValue = _segmentStart.value ?: 0
-        val segmentEndValue = _segmentEnd.value ?: 0
+        val segmentDuration = _segmentDuration.value ?: 0
 
         _audioFileUiState.setSegmentStartInMs(segmentStartValue)
+
+        val segmentEndValue = segmentStartValue + segmentDuration - 1
         _audioFileUiState.setSegmentEndInMs(segmentEndValue)
 
         _closeDialog.value = true
     }
 
     private fun validateSegmentBoundaries(): Boolean {
-        if (_segmentStart.value == null || _segmentEnd.value == null) {
+        if (_segmentStart.value == null || _segmentDuration.value == null) {
             _error.value = context.getString(R.string.error_segment_bounds_required)
             return false
         }
 
         val segmentStartValue = _segmentStart.value ?: 0
-        val segmentEndValue = _segmentEnd.value ?: 0
+        val segmentDurationValue = _segmentDuration.value ?: 0
 
-        if (segmentEndValue > _audioFileUiState.numSamplesMs) {
-            _error.value = context.getString(R.string.error_segment_end_should_be_less_than_duration)
-            return false
-        }
-
-        if (segmentStartValue == segmentEndValue) {
-            _error.value = context.getString(R.string.error_segment_start_end_should_be_different)
-            return false
-        }
-
-        if (segmentStartValue > segmentEndValue) {
-            _error.value = context.getString(R.string.error_segment_start_should_be_less_than_end)
+        if (segmentStartValue + segmentDurationValue > _audioFileUiState.numSamplesMs) {
+            _error.value = context.getString(R.string.error_segment_duration_should_be_less_than_duration)
             return false
         }
 
@@ -101,9 +93,9 @@ class SegmentAdjustmentViewModel @Inject constructor(
         }
     }
 
-    fun setSegmentEnd(value: Int?) {
-        if (_segmentEnd.value != value) {
-            _segmentEnd.value = value
+    fun setSegmentDuration(value: Int?) {
+        if (_segmentDuration.value != value) {
+            _segmentDuration.value = value
         }
     }
 
