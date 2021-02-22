@@ -126,9 +126,13 @@ class FileWaveView @JvmOverloads constructor(
             processPlotPoints(ptsArr)
         }
 
-        mAudioFileUiState.value.displayPtsCount.subscribe {
-            requestLayout()
-        }
+        mAudioFileUiState.value.displayPtsCount
+            .observeOn(
+                AndroidSchedulers.mainThread()
+            )
+            .subscribe {
+                requestLayout()
+            }
         mAudioFileUiState.value.zoomLevel.subscribe {
             handleZoom()
         }

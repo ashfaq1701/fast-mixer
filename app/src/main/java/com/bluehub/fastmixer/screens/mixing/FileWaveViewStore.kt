@@ -4,11 +4,7 @@ import androidx.lifecycle.*
 import androidx.lifecycle.Observer
 import com.bluehub.fastmixer.common.models.AudioFileUiState
 import com.bluehub.fastmixer.common.models.AudioViewAction
-import io.reactivex.rxjava3.functions.BiFunction
-import io.reactivex.rxjava3.functions.Function
-import io.reactivex.rxjava3.functions.Function3
 import io.reactivex.rxjava3.subjects.BehaviorSubject
-import io.reactivex.rxjava3.subjects.SingleSubject
 import kotlinx.coroutines.*
 import java.util.*
 
@@ -305,6 +301,21 @@ class FileWaveViewStore(val mixingRepository: MixingRepository) {
         findAudioFileUiState(filePath) ?: return
 
         mixingRepository.resetSourceBounds(filePath)
+    }
+
+    fun recalculateAudioSegment(filePath: String, playSliderPositionSamples: Int) {
+        val audioFileUiState = findAudioFileUiState(filePath) ?: return
+
+        audioFileUiState.run {
+            numSamples = mixingRepository.getTotalSamples(filePath)
+            reRender.onNext(true)
+
+            calculateSampleCountEachView()
+
+            val playSliderPos = (playSliderPositionSamples.toFloat() / numSamples.toFloat()) * numPtsToPlot.toFloat()
+            setPlayHead(path, playSliderPos.toInt())
+
+        }
     }
 
     fun cleanup() {

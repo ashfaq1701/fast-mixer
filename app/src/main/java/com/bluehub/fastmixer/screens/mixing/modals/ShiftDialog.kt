@@ -7,6 +7,7 @@ import androidx.core.widget.doOnTextChanged
 import com.bluehub.fastmixer.common.fragments.BaseDialogFragment
 import com.bluehub.fastmixer.common.models.AudioFileUiState
 import com.bluehub.fastmixer.databinding.ShiftDialogBinding
+import kotlinx.android.synthetic.main.view_loading.*
 
 class ShiftDialog(private val audioFileUiState: AudioFileUiState) : BaseDialogFragment<ShiftViewModel>() {
 
@@ -64,6 +65,14 @@ class ShiftDialog(private val audioFileUiState: AudioFileUiState) : BaseDialogFr
 
     private fun setupViewModel() {
         viewModel.setAudioFileUiState(audioFileUiState)
+
+        viewModel.isLoading.observe(viewLifecycleOwner, {
+            if (it) {
+                pbLoading.visibility = View.VISIBLE
+            } else {
+                pbLoading.visibility = View.GONE
+            }
+        })
 
         viewModel.closeDialog.observe(viewLifecycleOwner, {
             if (it) {

@@ -59,5 +59,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginEnd="@dimen/dialog_button_margin"/>
 
+        <include layout="@layout/view_loading" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

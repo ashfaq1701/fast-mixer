@@ -15,8 +15,6 @@ class GainAdjustmentViewModel @Inject constructor(
     val fileWaveViewStore: FileWaveViewStore
 ) : BaseDialogViewModel() {
 
-    val isLoading: MutableLiveData<Boolean> = MutableLiveData()
-
     private lateinit var _audioFilePath: String
 
     private val _gainValue: MutableLiveData<Int> = MutableLiveData(0)

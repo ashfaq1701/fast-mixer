@@ -40,7 +40,7 @@ class ShiftViewModel@Inject constructor(
                 return
             }
 
-            if (playSliderPosition.value > numSamples) {
+            if (playSliderPositionSample >= numSamples) {
                 errorLiveData.value = context.getString(R.string.error_play_head_should_be_less_than_numsamples)
                 return
             }
@@ -48,20 +48,25 @@ class ShiftViewModel@Inject constructor(
             _shiftDuration.value?.let {
 
                 val shiftDurationSamples = (it * (Config.SAMPLE_RATE.toFloat() / 1000.0)).toInt()
-                applyShift(path, playSliderPosition.value, shiftDurationSamples)
+                applyShift(path, playSliderPositionSample, shiftDurationSamples)
             } ?: run {
                 errorLiveData.value = context.getString(R.string.error_shift_duration_required)
                 return
             }
         }
-
-        closeDialogLiveData.value = true
     }
 
     private fun applyShift(filePath: String, position: Int, numSamples: Int) {
         viewModelScope.launch(Dispatchers.IO) {
+            isLoading.postValue(true)
+
             mixingRepository.shiftBySamples(filePath, position, numSamples)
-            // TODO Fetch sample count and update other related params
+
+            val newPlayHeadPosition = position + numSamples
+
+            fileWaveViewStore.recalculateAudioSegment(filePath, newPlayHeadPosition)
+
+            isLoading.postValue(false)
             closeDialogLiveData.postValue(true)
         }
     }

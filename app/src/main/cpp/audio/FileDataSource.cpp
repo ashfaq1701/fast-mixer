@@ -242,17 +242,31 @@ void FileDataSource::applyBackupBufferData() {
 
 void FileDataSource::shiftBySamples(int64_t position, int64_t numSamples) {
 
+    auto channelCount = mProperties.channelCount;
+
     int64_t numSamplesWithChannelCount = numSamples * mProperties.channelCount;
-    int64_t beforePositionWithChannelCount = (position - 1) * mProperties.channelCount;
+    int64_t positionWithChannelCount = position * mProperties.channelCount;
 
     int64_t newBufferSize = mBufferSize + numSamplesWithChannelCount;
 
     float* oldBufferData = mBuffer.get();
     float* newBuffer = new float[newBufferSize];
 
-    copy(oldBufferData, oldBufferData + beforePositionWithChannelCount + 1, newBuffer);
-    fill(newBuffer + beforePositionWithChannelCount + 1, newBuffer + beforePositionWithChannelCount + numSamplesWithChannelCount  + 1, 0);
-    copy(oldBufferData + beforePositionWithChannelCount + 1, oldBufferData + mBufferSize, newBuffer + beforePositionWithChannelCount + numSamplesWithChannelCount  + 1);
+    if (positionWithChannelCount - channelCount + 1 >= 0) {
+        copy(oldBufferData, oldBufferData + (positionWithChannelCount - channelCount + 1), newBuffer);
+    }
+
+    int64_t fillStartPosition = positionWithChannelCount;
+
+    if (positionWithChannelCount - channelCount + 1 >= 0) {
+        fillStartPosition = positionWithChannelCount - channelCount + 1;
+    }
+
+    int64_t fillEndPosition = fillStartPosition + numSamplesWithChannelCount;
+
+    fill(newBuffer + fillStartPosition, newBuffer + fillEndPosition, 0);
+
+    copy(oldBufferData + fillStartPosition, oldBufferData + mBufferSize, newBuffer + fillEndPosition);
 
     mBuffer.reset(move(newBuffer));
     mBufferSize = newBufferSize;

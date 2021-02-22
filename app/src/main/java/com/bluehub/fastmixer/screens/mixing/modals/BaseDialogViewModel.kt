@@ -6,6 +6,8 @@ import com.bluehub.fastmixer.common.viewmodel.BaseViewModel
 
 open class BaseDialogViewModel : BaseViewModel() {
 
+    val isLoading: MutableLiveData<Boolean> = MutableLiveData()
+
     protected val closeDialogLiveData: MutableLiveData<Boolean> = MutableLiveData()
     val closeDialog: LiveData<Boolean>
         get() = closeDialogLiveData

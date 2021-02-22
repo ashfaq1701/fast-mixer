@@ -9,7 +9,7 @@ import java.util.*
 
 data class AudioFileUiState(
     val path: String,
-    val numSamples: Int,
+    var numSamples: Int,
     var displayPtsCount: BehaviorSubject<Int>,
     var zoomLevel: BehaviorSubject<Int>,
     var isPlaying: BehaviorSubject<Boolean>,
@@ -46,6 +46,12 @@ data class AudioFileUiState(
         get() = if (playSliderPosition.hasValue()) {
             playSliderPosition.value
         } else 0
+
+    val playSliderPositionSample: Int
+        get() {
+            if (numPtsToPlot == 0) return 0
+            return ((playSliderPositionValue.toFloat() / numPtsToPlot.toFloat()) * numSamples.toFloat()).toInt()
+        }
 
     val zoomLevelValue: Int
         get() = if (zoomLevel.hasValue()) {
