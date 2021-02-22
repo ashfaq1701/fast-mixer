@@ -33,7 +33,6 @@ class FileWaveView @JvmOverloads constructor(
 
     companion object {
         const val TAIL_WIDTH = 3
-        const val SEGMENT_SELECTOR_MIN_WIDTH = 10
     }
 
     private val mAudioFileUiState: BehaviorSubject<AudioFileUiState> = BehaviorSubject.create()
@@ -127,9 +126,13 @@ class FileWaveView @JvmOverloads constructor(
             processPlotPoints(ptsArr)
         }
 
-        mAudioFileUiState.value.displayPtsCount.subscribe {
-            requestLayout()
-        }
+        mAudioFileUiState.value.displayPtsCount
+            .observeOn(
+                AndroidSchedulers.mainThread()
+            )
+            .subscribe {
+                requestLayout()
+            }
         mAudioFileUiState.value.zoomLevel.subscribe {
             handleZoom()
         }

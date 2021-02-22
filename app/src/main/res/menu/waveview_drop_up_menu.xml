@@ -8,4 +8,8 @@
     <item
         android:id="@+id/segmentAdjustment"
         android:title="@string/menu_item_segment_adjustment" />
+
+    <item
+        android:id="@+id/shift"
+        android:title="@string/menu_item_shift" />
 </menu>

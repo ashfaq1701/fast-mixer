@@ -1,4 +1,4 @@
-package com.bluehub.fastmixer.screens.mixing
+package com.bluehub.fastmixer.screens.mixing.modals
 
 import android.content.Context
 import androidx.lifecycle.LiveData
@@ -11,25 +11,17 @@ import javax.inject.Inject
 
 class SegmentAdjustmentViewModel @Inject constructor(
     val context: Context
-) : BaseViewModel() {
+) : BaseDialogViewModel() {
 
     private lateinit var _audioFileUiState: AudioFileUiState
-
-    private val _closeDialog: MutableLiveData<Boolean> = MutableLiveData()
-    val closeDialog: LiveData<Boolean>
-        get() = _closeDialog
-
-    private val _error: MutableLiveData<String> = MutableLiveData()
-    val error: LiveData<String>
-        get() = _error
 
     private val _segmentStart: MutableLiveData<Int?> = MutableLiveData()
     val segmentStart: LiveData<Int?>
         get() = _segmentStart
 
-    private val _segmentEnd: MutableLiveData<Int?> = MutableLiveData()
-    val segmentEnd: LiveData<Int?>
-        get() = _segmentEnd
+    private val _segmentDuration: MutableLiveData<Int?> = MutableLiveData()
+    val segmentDuration: LiveData<Int?>
+        get() = _segmentDuration
 
     fun setAudioFileUiState(audioFileUiState: AudioFileUiState) {
         _audioFileUiState = audioFileUiState
@@ -38,13 +30,13 @@ class SegmentAdjustmentViewModel @Inject constructor(
             _segmentStart.value = it
         }
 
-        _audioFileUiState.segmentEndSampleMs?.let {
-            _segmentEnd.value = it
+        _audioFileUiState.segmentDurationMs?.let {
+            _segmentDuration.value = it
         }
     }
 
     fun cancelSegmentAdjustment() {
-        _closeDialog.value = true
+        closeDialogLiveData.value = true
     }
 
     fun saveSegmentAdjustment() {
@@ -52,35 +44,27 @@ class SegmentAdjustmentViewModel @Inject constructor(
         if (!validateSegmentBoundaries()) return
 
         val segmentStartValue = _segmentStart.value ?: 0
-        val segmentEndValue = _segmentEnd.value ?: 0
+        val segmentDuration = _segmentDuration.value ?: 0
 
         _audioFileUiState.setSegmentStartInMs(segmentStartValue)
+
+        val segmentEndValue = segmentStartValue + segmentDuration - 1
         _audioFileUiState.setSegmentEndInMs(segmentEndValue)
 
-        _closeDialog.value = true
+        closeDialogLiveData.value = true
     }
 
     private fun validateSegmentBoundaries(): Boolean {
-        if (_segmentStart.value == null || _segmentEnd.value == null) {
-            _error.value = context.getString(R.string.error_segment_bounds_required)
+        if (_segmentStart.value == null || _segmentDuration.value == null) {
+            errorLiveData.value = context.getString(R.string.error_segment_bounds_required)
             return false
         }
 
         val segmentStartValue = _segmentStart.value ?: 0
-        val segmentEndValue = _segmentEnd.value ?: 0
+        val segmentDurationValue = _segmentDuration.value ?: 0
 
-        if (segmentEndValue > _audioFileUiState.numSamplesMs) {
-            _error.value = context.getString(R.string.error_segment_end_should_be_less_than_duration)
-            return false
-        }
-
-        if (segmentStartValue == segmentEndValue) {
-            _error.value = context.getString(R.string.error_segment_start_end_should_be_different)
-            return false
-        }
-
-        if (segmentStartValue > segmentEndValue) {
-            _error.value = context.getString(R.string.error_segment_start_should_be_less_than_end)
+        if (segmentStartValue + segmentDurationValue > _audioFileUiState.numSamplesMs) {
+            errorLiveData.value = context.getString(R.string.error_segment_duration_should_be_less_than_duration)
             return false
         }
 
@@ -92,7 +76,7 @@ class SegmentAdjustmentViewModel @Inject constructor(
         _audioFileUiState.segmentStartSample.onNext(Optional.empty())
         _audioFileUiState.segmentEndSample.onNext(Optional.empty())
 
-        _closeDialog.value = true
+        closeDialogLiveData.value = true
     }
 
     fun setSegmentStart(value: Int?) {
@@ -101,13 +85,9 @@ class SegmentAdjustmentViewModel @Inject constructor(
         }
     }
 
-    fun setSegmentEnd(value: Int?) {
-        if (_segmentEnd.value != value) {
-            _segmentEnd.value = value
+    fun setSegmentDuration(value: Int?) {
+        if (_segmentDuration.value != value) {
+            _segmentDuration.value = value
         }
-    }
-
-    fun setError(str: String) {
-        _error.value = str
     }
 }

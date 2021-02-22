@@ -71,6 +71,13 @@ class FileWaveViewWidget(context: Context, attributeSet: AttributeSet?)
                 )
                 true
             }
+            R.id.shift -> {
+                mFileWaveViewStore.value.audioViewActionLiveData.value = AudioViewAction(
+                    actionType = AudioViewActionType.SHIFT,
+                    uiState = mAudioFileUiState.value
+                )
+                true
+            }
             else -> false
         }
     }
@@ -139,10 +146,15 @@ class FileWaveViewWidget(context: Context, attributeSet: AttributeSet?)
                         binding.wavePlayPause.setImageDrawable(
                             ContextCompat.getDrawable(context, R.drawable.pause_button)
                         )
+
                     } else {
                         binding.wavePlayPause.setImageDrawable(
                             ContextCompat.getDrawable(context, R.drawable.play_button)
                         )
+                    }
+
+                    if (::menu.isInitialized) {
+                        menu.menu.getItem(2).isEnabled = !it
                     }
                 }
 

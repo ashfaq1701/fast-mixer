@@ -1,4 +1,4 @@
-package com.bluehub.fastmixer.screens.mixing
+package com.bluehub.fastmixer.screens.mixing.modals
 
 import android.app.Dialog
 import android.os.Bundle
@@ -53,18 +53,18 @@ class SegmentAdjustmentDialog(private val audioFileUiState: AudioFileUiState) : 
             }
         }
 
-        binding.segmentEnd.doOnTextChanged { text, _, _, _ ->
+        binding.segmentDuration.doOnTextChanged { text, _, _, _ ->
             viewModel.setError("")
             text?.let {
                 val str = it.toString()
 
                 val numVal = if (str == "") null else str.toInt()
 
-                binding.segmentEnd.apply {
+                binding.segmentDuration.apply {
                     setSelection(this.length())
                 }
 
-                viewModel.setSegmentEnd(numVal)
+                viewModel.setSegmentDuration(numVal)
             }
         }
 
@@ -99,9 +99,9 @@ class SegmentAdjustmentDialog(private val audioFileUiState: AudioFileUiState) : 
             binding.segmentStart.setText(str)
         })
 
-        viewModel.segmentEnd.observe(viewLifecycleOwner, {
+        viewModel.segmentDuration.observe(viewLifecycleOwner, {
             val str = it?.toString() ?: ""
-            binding.segmentEnd.setText(str)
+            binding.segmentDuration.setText(str)
         })
     }
 }

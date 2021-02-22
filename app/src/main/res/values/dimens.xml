@@ -63,8 +63,11 @@
     <dimen name="audio_segment_selector_trigger_height">40dp</dimen>
     <dimen name="audio_segment_selector_edge_width">1dp</dimen>
 
+    <dimen name="dialog_layout_padding">10dp</dimen>
+
     <dimen name="segment_adjustment_dialog_height">200dp</dimen>
-    <dimen name="segment_adjustment_layout_padding">10dp</dimen>
     <dimen name="segment_adjustment_error_margin_bottom">20dp</dimen>
     <dimen name="segment_adjustment_error_height">20dp</dimen>
+
+    <dimen name="shift_dialog_height">200dp</dimen>
 </resources>

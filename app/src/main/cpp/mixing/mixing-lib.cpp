@@ -261,4 +261,15 @@ extern "C" {
         auto filePathStr = java_str_to_c_str(env, filePath);
         mixingEngine->resetSourceBounds(filePathStr);
     }
+
+    JNIEXPORT void JNICALL
+    Java_com_bluehub_fastmixer_audio_MixingEngine_shiftBySamples(JNIEnv *env, jclass, jstring filePath, jint position, jint numSamples) {
+        if (!mixingEngine) {
+            LOGE("shiftBySamples: mixingEngine is null, you must call create() method before calling this method");
+            return;
+        }
+
+        auto filePathStr = java_str_to_c_str(env, filePath);
+        mixingEngine->shiftBySamples(filePathStr, position, numSamples);
+    }
 }
