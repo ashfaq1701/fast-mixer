@@ -44,5 +44,9 @@
     <string name="error_shift_duration_required">Shift duration has to be set</string>
     <string name="error_play_head_required">Play head has to be set</string>
     <string name="error_play_head_should_be_less_than_numsamples">Play head should be less than total samples</string>
+    <string name="cut">Cut</string>
+    <string name="copy">Copy</string>
+    <string name="paste">Paste</string>
+    <string name="paste_new">Paste New</string>
 
 </resources>

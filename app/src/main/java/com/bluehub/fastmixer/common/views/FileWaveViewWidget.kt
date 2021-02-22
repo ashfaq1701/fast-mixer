@@ -78,6 +78,18 @@ class FileWaveViewWidget(context: Context, attributeSet: AttributeSet?)
                 )
                 true
             }
+            R.id.cut -> {
+
+                true
+            }
+            R.id.copy -> {
+
+                true
+            }
+            R.id.paste -> {
+
+                true
+            }
             else -> false
         }
     }
@@ -155,6 +167,8 @@ class FileWaveViewWidget(context: Context, attributeSet: AttributeSet?)
 
                     if (::menu.isInitialized) {
                         menu.menu.getItem(2).isEnabled = !it
+                        menu.menu.getItem(3).isEnabled = !it
+                        menu.menu.getItem(5).isEnabled = !it
                     }
                 }
 

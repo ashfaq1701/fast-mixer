@@ -305,6 +305,10 @@ class MixingScreenViewModel @Inject constructor(val context: Context,
         }
     }
 
+    fun pasteAsNew() {
+
+    }
+
     fun resetStates() {
         audioViewAction.value = null
     }
