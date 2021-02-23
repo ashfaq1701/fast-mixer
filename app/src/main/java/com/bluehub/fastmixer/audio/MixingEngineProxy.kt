@@ -41,5 +41,9 @@ class MixingEngineProxy @Inject constructor() {
 
     fun shiftBySamples(filePath: String, position: Int, numSamples: Int) = MixingEngine.shiftBySamples(filePath, position, numSamples)
 
+    fun cutToClipboard(filePath: String, startPosition: Int, endPosition: Int) = MixingEngine.cutToClipboard(filePath, startPosition, endPosition)
+
+    fun copyToClipboard(filePath: String, startPosition: Int, endPosition: Int) = MixingEngine.copyToClipboard(filePath, startPosition, endPosition)
+
     fun delete() = MixingEngine.delete()
 }

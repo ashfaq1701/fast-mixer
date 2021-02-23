@@ -4,6 +4,7 @@ import androidx.lifecycle.*
 import androidx.lifecycle.Observer
 import com.bluehub.fastmixer.common.models.AudioFileUiState
 import com.bluehub.fastmixer.common.models.AudioViewAction
+import io.reactivex.rxjava3.functions.Function
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import kotlinx.coroutines.*
 import java.util.*
@@ -15,10 +16,12 @@ class FileWaveViewStore(val mixingRepository: MixingRepository) {
 
     private lateinit var mIsPlayingLiveData: LiveData<Boolean>
     private lateinit var mIsGroupPlayingLiveData: LiveData<Boolean>
+    private lateinit var mClipboardHasDataLiveData: LiveData<Boolean>
     lateinit var audioViewActionLiveData: MutableLiveData<AudioViewAction?>
 
     val isPlayingObservable: BehaviorSubject<Boolean> = BehaviorSubject.createDefault(false)
     val isGroupPlayingObservable: BehaviorSubject<Boolean> = BehaviorSubject.createDefault(false)
+    val clipboardHasDataObservable: BehaviorSubject<Boolean> = BehaviorSubject.createDefault(false)
 
     private val measuredWidthObservable: BehaviorSubject<Int> = BehaviorSubject.create()
 
@@ -30,6 +33,9 @@ class FileWaveViewStore(val mixingRepository: MixingRepository) {
                 mAudioFileUiStateListLiveData.value ?: listOf()
             } else listOf()
         }
+
+    private lateinit var mCutToClipboard: Function<String, Unit>
+    private lateinit var mCopyToClipboard: Function<String, Unit>
 
     val coroutineScope = CoroutineScope(Job() + Dispatchers.Main)
 
@@ -43,6 +49,10 @@ class FileWaveViewStore(val mixingRepository: MixingRepository) {
 
     private val isGroupPlayingObserver: Observer<Boolean> = Observer {
         isGroupPlayingObservable.onNext(it)
+    }
+
+    private val clipboardHasDataObserver: Observer<Boolean> = Observer {
+        clipboardHasDataObservable.onNext(it)
     }
     
     init {
@@ -64,6 +74,19 @@ class FileWaveViewStore(val mixingRepository: MixingRepository) {
     fun setIsGroupPlayingLiveData(isGroupPlayingLiveData: LiveData<Boolean>) {
         mIsGroupPlayingLiveData = isGroupPlayingLiveData
         mIsGroupPlayingLiveData.observeForever(isGroupPlayingObserver)
+    }
+
+    fun setClipboardHasDataLiveData(clipboardHasDataLiveData: LiveData<Boolean>) {
+        mClipboardHasDataLiveData = clipboardHasDataLiveData
+        mClipboardHasDataLiveData.observeForever(clipboardHasDataObserver)
+    }
+
+    fun setCutToClipboard(cutToClipboardFunction: Function<String, Unit>) {
+        mCutToClipboard = cutToClipboardFunction
+    }
+
+    fun setCopyToClipboard(copyToClipboardFunction: Function<String, Unit>) {
+        mCopyToClipboard = copyToClipboardFunction
     }
 
     fun updateMeasuredWidth(width: Int) {
@@ -321,10 +344,12 @@ class FileWaveViewStore(val mixingRepository: MixingRepository) {
 
     fun cut(filePath: String) {
         val audioFileUiState = findAudioFileUiState(filePath) ?: return
+        mCutToClipboard.apply(audioFileUiState.path)
     }
 
     fun copy(filePath: String) {
         val audioFileUiState = findAudioFileUiState(filePath) ?: return
+        mCopyToClipboard.apply(audioFileUiState.path)
     }
 
     fun cleanup() {

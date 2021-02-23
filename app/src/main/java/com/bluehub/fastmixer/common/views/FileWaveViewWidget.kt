@@ -20,6 +20,8 @@ import com.bluehub.fastmixer.screens.mixing.*
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import kotlinx.android.synthetic.main.file_wave_view_widget.view.*
+import kotlinx.android.synthetic.main.view_loading.*
+import kotlinx.android.synthetic.main.view_loading.view.*
 import java.util.*
 
 @BindingMethods(
@@ -146,6 +148,7 @@ class FileWaveViewWidget(context: Context, attributeSet: AttributeSet?)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe {
                 menu.menu.getItem(0).isEnabled = !it
+                menu.menu.getItem(2).isEnabled = !it
             }
     }
 
@@ -227,9 +230,18 @@ class FileWaveViewWidget(context: Context, attributeSet: AttributeSet?)
                 }
                 .subscribe {
                     if (::menu.isInitialized) {
-                        menu.menu.getItem(2).isEnabled = it
                         menu.menu.getItem(3).isEnabled = it
                         menu.menu.getItem(5).isEnabled = it
+                    }
+                }
+
+            isLoading
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe {
+                    if (it) {
+                        pbLoading.visibility = View.VISIBLE
+                    } else {
+                        pbLoading.visibility = View.GONE
                     }
                 }
         }

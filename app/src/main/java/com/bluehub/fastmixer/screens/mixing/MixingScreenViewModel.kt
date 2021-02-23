@@ -67,6 +67,10 @@ class MixingScreenViewModel @Inject constructor(val context: Context,
     val isGroupPlaying: LiveData<Boolean>
         get() = playFlagStore.isGroupPlaying
 
+    private val _clipboardHasData = MutableLiveData(false)
+    val clipboardHasData: LiveData<Boolean>
+        get() = _clipboardHasData
+
     private val playList: MutableList<String> = mutableListOf()
 
     val audioViewAction: MutableLiveData<AudioViewAction?> = MutableLiveData<AudioViewAction?>()
@@ -78,7 +82,11 @@ class MixingScreenViewModel @Inject constructor(val context: Context,
             setAudioFilesLiveData(audioFilesLiveData)
             setIsPlayingLiveData(isPlaying)
             setIsGroupPlayingLiveData(isGroupPlaying)
+            setClipboardHasDataLiveData(clipboardHasData)
             audioViewActionLiveData = audioViewAction
+
+            setCutToClipboard(::cutToClipboard)
+            setCopyToClipboard(::copyToClipboard)
         }
     }
 
@@ -302,6 +310,30 @@ class MixingScreenViewModel @Inject constructor(val context: Context,
             groupPlay()
         } else {
             groupPause()
+        }
+    }
+
+    fun cutToClipboard(filePath: String) {
+        val audioFileUiState = audioFileStore.findAudioFileByPath(filePath) ?: return
+
+        viewModelScope.launch(Dispatchers.IO) {
+            audioFileUiState.run {
+                audioFileUiState.isLoading.onNext(true)
+                mixingRepository.cutToClipboard(path, segmentStartSampleValue, segmentEndSampleValue)
+                audioFileUiState.isLoading.onNext(false)
+            }
+        }
+    }
+
+    fun copyToClipboard(filePath: String) {
+        val audioFileUiState = audioFileStore.findAudioFileByPath(filePath) ?: return
+
+        viewModelScope.launch(Dispatchers.IO) {
+            audioFileUiState.run {
+                audioFileUiState.isLoading.onNext(true)
+                mixingRepository.copyToClipboard(path, segmentStartSampleValue, segmentEndSampleValue)
+                audioFileUiState.isLoading.onNext(false)
+            }
         }
     }
 

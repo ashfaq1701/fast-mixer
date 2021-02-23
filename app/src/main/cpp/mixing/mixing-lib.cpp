@@ -272,4 +272,26 @@ extern "C" {
         auto filePathStr = java_str_to_c_str(env, filePath);
         mixingEngine->shiftBySamples(filePathStr, position, numSamples);
     }
+
+    JNIEXPORT void JNICALL
+    Java_com_bluehub_fastmixer_audio_MixingEngine_copyToClipboard(JNIEnv *env, jclass, jstring filePath, jint startPosition, jint endPosition) {
+        if (!mixingEngine) {
+            LOGE("copyToClipboard: mixingEngine is null, you must call create() method before calling this method");
+            return;
+        }
+
+        auto filePathStr = java_str_to_c_str(env, filePath);
+        mixingEngine->copyToClipboard(filePathStr, startPosition, endPosition);
+    }
+
+    JNIEXPORT void JNICALL
+    Java_com_bluehub_fastmixer_audio_MixingEngine_cutToClipboard(JNIEnv *env, jclass, jstring filePath, jint startPosition, jint endPosition) {
+        if (!mixingEngine) {
+            LOGE("cutToClipboard: mixingEngine is null, you must call create() method before calling this method");
+            return;
+        }
+
+        auto filePathStr = java_str_to_c_str(env, filePath);
+        mixingEngine->cutToClipboard(filePathStr, startPosition, endPosition);
+    }
 }
