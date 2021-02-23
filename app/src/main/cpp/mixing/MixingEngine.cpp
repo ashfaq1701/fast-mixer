@@ -205,3 +205,39 @@ void MixingEngine::shiftBySamples(string filePath, int64_t position, int64_t num
 
     it->second->shiftBySamples(position, numSamples);
 }
+
+void MixingEngine::cutToClipboard(string filePath, int64_t startPosition, int64_t endPosition) {
+    auto it = mSourceMapStore->sourceMap.find(filePath);
+    if (it == mSourceMapStore->sourceMap.end()) {
+        return;
+    }
+
+    auto source = it->second;
+
+    int channelCount = source->getProperties().channelCount;
+    int64_t numElementsToCopy = (endPosition - startPosition + 1) * channelCount;
+
+    vector <float> v;
+    clipboard.swap(v);
+    clipboard.reserve(numElementsToCopy);
+
+    source->cutToClipboard(startPosition, endPosition, clipboard);
+}
+
+void MixingEngine::copyToClipboard(string filePath, int64_t startPosition, int64_t endPosition) {
+    auto it = mSourceMapStore->sourceMap.find(filePath);
+    if (it == mSourceMapStore->sourceMap.end()) {
+        return;
+    }
+
+    auto source = it->second;
+
+    int channelCount = source->getProperties().channelCount;
+    int64_t numElementsToCopy = (endPosition - startPosition + 1) * channelCount;
+
+    vector <float> v;
+    clipboard.swap(v);
+    clipboard.reserve(numElementsToCopy);
+
+    source->copyToClipboard(startPosition, endPosition, clipboard);
+}

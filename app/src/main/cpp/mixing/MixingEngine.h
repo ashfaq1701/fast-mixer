@@ -12,6 +12,7 @@
 #include "streams/MixingPlaybackStream.h"
 #include "MixingIO.h"
 #include "map"
+#include <vector>
 
 using namespace std;
 
@@ -51,6 +52,10 @@ public:
 
     void shiftBySamples(string filePath, int64_t position, int64_t numSamples);
 
+    void cutToClipboard(string filePath, int64_t startPosition, int64_t endPosition);
+
+    void copyToClipboard(string filePath, int64_t startPosition, int64_t endPosition);
+
 private:
 
     const char* TAG = "Mixing Engine:: %s";
@@ -58,6 +63,8 @@ private:
     MixingIO mMixingIO;
 
     SourceMapStore* mSourceMapStore;
+
+    vector<float> clipboard;
 
     mutex playbackStreamMtx;
 

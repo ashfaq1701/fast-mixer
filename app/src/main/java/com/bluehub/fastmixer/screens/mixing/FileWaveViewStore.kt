@@ -303,7 +303,7 @@ class FileWaveViewStore(val mixingRepository: MixingRepository) {
         mixingRepository.resetSourceBounds(filePath)
     }
 
-    fun recalculateAudioSegment(filePath: String, playSliderPositionSamples: Int) {
+    fun recalculateAudioSegment(filePath: String, playSliderPositionSamples: Int? = null) {
         val audioFileUiState = findAudioFileUiState(filePath) ?: return
 
         audioFileUiState.run {
@@ -312,10 +312,19 @@ class FileWaveViewStore(val mixingRepository: MixingRepository) {
 
             calculateSampleCountEachView()
 
-            val playSliderPos = (playSliderPositionSamples.toFloat() / numSamples.toFloat()) * numPtsToPlot.toFloat()
-            setPlayHead(path, playSliderPos.toInt())
-
+            playSliderPositionSamples?.let {
+                val playSliderPos = (it.toFloat() / numSamples.toFloat()) * numPtsToPlot.toFloat()
+                setPlayHead(path, playSliderPos.toInt())
+            }
         }
+    }
+
+    fun cut(filePath: String) {
+        val audioFileUiState = findAudioFileUiState(filePath) ?: return
+    }
+
+    fun copy(filePath: String) {
+        val audioFileUiState = findAudioFileUiState(filePath) ?: return
     }
 
     fun cleanup() {

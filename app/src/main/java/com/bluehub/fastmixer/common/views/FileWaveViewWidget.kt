@@ -79,11 +79,11 @@ class FileWaveViewWidget(context: Context, attributeSet: AttributeSet?)
                 true
             }
             R.id.cut -> {
-
+                mFileWaveViewStore.value.cut(mAudioFileUiState.value.path)
                 true
             }
             R.id.copy -> {
-
+                mFileWaveViewStore.value.copy(mAudioFileUiState.value.path)
                 true
             }
             R.id.paste -> {
@@ -164,12 +164,6 @@ class FileWaveViewWidget(context: Context, attributeSet: AttributeSet?)
                             ContextCompat.getDrawable(context, R.drawable.play_button)
                         )
                     }
-
-                    if (::menu.isInitialized) {
-                        menu.menu.getItem(2).isEnabled = !it
-                        menu.menu.getItem(3).isEnabled = !it
-                        menu.menu.getItem(5).isEnabled = !it
-                    }
                 }
 
             zoomLevel
@@ -217,6 +211,25 @@ class FileWaveViewWidget(context: Context, attributeSet: AttributeSet?)
                         mFileWaveViewStore.value.setSourceBounds(path)
                     } else {
                         mFileWaveViewStore.value.resetSourceBounds(path)
+                    }
+                }
+
+            showSegmentSelector
+                .flatMap { segmentSelectorShown ->
+                    mAudioFileUiState.value.isPlaying.map { isPlayingFlag ->
+                        segmentSelectorShown && !isPlayingFlag
+                    }
+                }
+                .flatMap { result ->
+                    mFileWaveViewStore.value.isGroupPlayingObservable.map { isGroupPlayingFlag ->
+                        result && !isGroupPlayingFlag
+                    }
+                }
+                .subscribe {
+                    if (::menu.isInitialized) {
+                        menu.menu.getItem(2).isEnabled = it
+                        menu.menu.getItem(3).isEnabled = it
+                        menu.menu.getItem(5).isEnabled = it
                     }
                 }
         }

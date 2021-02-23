@@ -271,3 +271,11 @@ void FileDataSource::shiftBySamples(int64_t position, int64_t numSamples) {
     mBuffer.reset(move(newBuffer));
     mBufferSize = newBufferSize;
 }
+
+void FileDataSource::cutToClipboard(int64_t startPosition, int64_t endPosition, vector<float>& clipboard) {
+
+}
+
+void FileDataSource::copyToClipboard(int64_t startPosition, int64_t endPosition, vector<float>& clipboard) {
+
+}

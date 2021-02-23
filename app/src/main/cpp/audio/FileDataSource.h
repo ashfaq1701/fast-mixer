@@ -71,6 +71,10 @@ public:
 
     void shiftBySamples(int64_t position, int64_t numSamples);
 
+    void cutToClipboard(int64_t startPosition, int64_t endPosition, vector<float>& clipboard);
+
+    void copyToClipboard(int64_t startPosition, int64_t endPosition, vector<float>& clipboard);
+
 private:
 
     FileDataSource(unique_ptr<float[]> data, size_t size,
