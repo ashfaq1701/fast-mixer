@@ -18,6 +18,7 @@ import io.reactivex.rxjava3.functions.Function
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import kotlin.math.*
 
 
@@ -316,6 +317,7 @@ class FileWaveView @JvmOverloads constructor(
     }
 
     private fun createAndShowSegmentSelector() {
+
         val audioSegmentSelector = AudioSegmentSelector(context, null)
         audioSegmentSelector.id = View.generateViewId()
 
@@ -416,22 +418,23 @@ class FileWaveView @JvmOverloads constructor(
                     sliderTop + mAudioWidgetSlider.measuredHeight
                 )
             }
+        }
 
-            mAudioSegmentSelector?.let {
-                if (!mAudioFileUiState.hasValue()) return@let
+        mAudioSegmentSelector?.let {
 
-                mAudioFileUiState.value.run {
+            if (!mAudioFileUiState.hasValue()) return@let
 
-                    val selectorTop = 0
+            mAudioFileUiState.value.run {
 
-                    if (it.visibility != GONE && it.measuredWidth > 0) {
-                        it.layout(
-                            segmentSelectorLeft,
-                            selectorTop,
-                            segmentSelectorRight,
-                            selectorTop + it.measuredHeight
-                        )
-                    }
+                val selectorTop = 0
+
+                if (it.visibility != GONE && it.measuredWidth > 0) {
+                    it.layout(
+                        segmentSelectorLeft,
+                        selectorTop,
+                        segmentSelectorRight,
+                        selectorTop + it.measuredHeight
+                    )
                 }
             }
         }
@@ -446,7 +449,7 @@ class FileWaveView @JvmOverloads constructor(
 
         if (!mAudioFileUiState.hasValue()) return
 
-        if (childCount == 1) {
+        if (childCount >= 1) {
             val child = getChildAt(0)
             if (child is AudioWidgetSlider && !::mAudioWidgetSlider.isInitialized) {
                 mAudioWidgetSlider = child
@@ -465,6 +468,7 @@ class FileWaveView @JvmOverloads constructor(
         }
 
         mAudioSegmentSelector?.let {
+
             val segmentSelectorWidth = getSegmentSelectorWidth()
             it.measure(
                 MeasureSpec.makeMeasureSpec(

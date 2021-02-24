@@ -8,7 +8,6 @@ import com.bluehub.fastmixer.common.utils.Optional
 import io.reactivex.rxjava3.functions.Function
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import kotlinx.coroutines.*
-import timber.log.Timber
 import java.util.*
 
 class FileWaveViewStore(val mixingRepository: MixingRepository) {
@@ -316,6 +315,7 @@ class FileWaveViewStore(val mixingRepository: MixingRepository) {
     }
 
     private fun setPlaySliderPosition(audioFileUiState: AudioFileUiState, playSliderPosition: Int) {
+
         audioFileUiState.playSliderPosition.onNext(playSliderPosition)
     }
 
