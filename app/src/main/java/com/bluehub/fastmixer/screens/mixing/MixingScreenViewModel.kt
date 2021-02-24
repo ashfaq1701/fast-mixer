@@ -8,7 +8,6 @@ import com.bluehub.fastmixer.common.models.AudioViewAction
 import com.bluehub.fastmixer.common.utils.*
 import com.bluehub.fastmixer.common.viewmodel.BaseViewModel
 import kotlinx.coroutines.*
-import timber.log.Timber
 import java.io.File
 import java.util.*
 import javax.inject.Inject
@@ -85,10 +84,6 @@ class MixingScreenViewModel @Inject constructor(val context: Context,
             setIsGroupPlayingLiveData(isGroupPlaying)
             setClipboardHasDataLiveData(clipboardHasData)
             audioViewActionLiveData = audioViewAction
-
-            setCutToClipboard(::cutToClipboard)
-            setCopyToClipboard(::copyToClipboard)
-            setMuteAndCopyToClipboard(::muteAndCopyToClipboard)
         }
     }
 
@@ -315,8 +310,7 @@ class MixingScreenViewModel @Inject constructor(val context: Context,
         }
     }
 
-    private fun cutToClipboard(filePath: String) {
-        val audioFileUiState = audioFileStore.findAudioFileByPath(filePath) ?: return
+    fun cutToClipboard(audioFileUiState: AudioFileUiState) {
 
         viewModelScope.launch(Dispatchers.IO) {
             audioFileUiState.run {
@@ -336,8 +330,7 @@ class MixingScreenViewModel @Inject constructor(val context: Context,
         }
     }
 
-    private fun copyToClipboard(filePath: String) {
-        val audioFileUiState = audioFileStore.findAudioFileByPath(filePath) ?: return
+    fun copyToClipboard(audioFileUiState: AudioFileUiState) {
 
         viewModelScope.launch(Dispatchers.IO) {
             audioFileUiState.run {
@@ -354,8 +347,7 @@ class MixingScreenViewModel @Inject constructor(val context: Context,
         }
     }
 
-    private fun muteAndCopyToClipboard(filePath: String) {
-        val audioFileUiState = audioFileStore.findAudioFileByPath(filePath) ?: return
+    fun muteAndCopyToClipboard(audioFileUiState: AudioFileUiState) {
 
         viewModelScope.launch(Dispatchers.IO) {
             audioFileUiState.run {

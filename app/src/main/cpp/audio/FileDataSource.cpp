@@ -275,8 +275,16 @@ void FileDataSource::shiftBySamples(int64_t position, int64_t numSamples) {
 int64_t FileDataSource::cutToClipboard(int64_t startPosition, int64_t endPosition, vector<float>& clipboard) {
     auto channelCount = mProperties.channelCount;
 
+    if (endPosition > getSampleSize() - 1) {
+        endPosition = getSampleSize() - 1;
+    }
+
     auto startIndexWithChannels = startPosition * channelCount;
     auto endIndexWithChannels = (endPosition + 1) * channelCount;
+
+    if (endIndexWithChannels > mBufferSize) {
+        endIndexWithChannels = mBufferSize;
+    }
 
     auto numElements = (endPosition - startPosition + 1) * channelCount;
 
@@ -312,8 +320,16 @@ int64_t FileDataSource::cutToClipboard(int64_t startPosition, int64_t endPositio
 void FileDataSource::copyToClipboard(int64_t startPosition, int64_t endPosition, vector<float>& clipboard) {
     auto channelCount = mProperties.channelCount;
 
+    if (endPosition > getSampleSize() - 1) {
+        endPosition = getSampleSize() - 1;
+    }
+
     auto startIndexWithChannels = startPosition * channelCount;
     auto endIndexWithChannels = (endPosition + 1) * channelCount;
+
+    if (endIndexWithChannels > mBufferSize) {
+        endIndexWithChannels = mBufferSize;
+    }
 
     float* oldBufferData = mBuffer.get();
 
@@ -322,6 +338,10 @@ void FileDataSource::copyToClipboard(int64_t startPosition, int64_t endPosition,
 
 void FileDataSource::muteAndCopyToClipboard(int64_t startPosition, int64_t endPosition, vector<float>& clipboard) {
     auto channelCount = mProperties.channelCount;
+
+    if (endPosition > getSampleSize() - 1) {
+        endPosition = getSampleSize() - 1;
+    }
 
     auto startIndexWithChannels = startPosition * channelCount;
     auto endIndexWithChannels = (endPosition + 1) * channelCount;

@@ -35,10 +35,6 @@ class FileWaveViewStore(val mixingRepository: MixingRepository) {
             } else listOf()
         }
 
-    private lateinit var mCutToClipboard: Function<String, Unit>
-    private lateinit var mCopyToClipboard: Function<String, Unit>
-    private lateinit var mMuteAndCopyToClipboard: Function<String, Unit>
-
     val coroutineScope = CoroutineScope(Job() + Dispatchers.Main)
 
     private val fileListObserver: Observer<MutableList<AudioFileUiState>> = Observer {
@@ -81,18 +77,6 @@ class FileWaveViewStore(val mixingRepository: MixingRepository) {
     fun setClipboardHasDataLiveData(clipboardHasDataLiveData: LiveData<Boolean>) {
         mClipboardHasDataLiveData = clipboardHasDataLiveData
         mClipboardHasDataLiveData.observeForever(clipboardHasDataObserver)
-    }
-
-    fun setCutToClipboard(cutToClipboardFunction: Function<String, Unit>) {
-        mCutToClipboard = cutToClipboardFunction
-    }
-
-    fun setCopyToClipboard(copyToClipboardFunction: Function<String, Unit>) {
-        mCopyToClipboard = copyToClipboardFunction
-    }
-
-    fun setMuteAndCopyToClipboard(muteAndCopyToClipboardFunction: Function<String, Unit>) {
-        mMuteAndCopyToClipboard = muteAndCopyToClipboardFunction;
     }
 
     fun updateMeasuredWidth(width: Int) {
@@ -365,21 +349,6 @@ class FileWaveViewStore(val mixingRepository: MixingRepository) {
                 setPlayHead(path, playSliderPos.toInt())
             }
         }
-    }
-
-    fun cut(filePath: String) {
-        val audioFileUiState = findAudioFileUiState(filePath) ?: return
-        mCutToClipboard.apply(audioFileUiState.path)
-    }
-
-    fun copy(filePath: String) {
-        val audioFileUiState = findAudioFileUiState(filePath) ?: return
-        mCopyToClipboard.apply(audioFileUiState.path)
-    }
-
-    fun mute(filePath: String) {
-        val audioFileUiState = findAudioFileUiState(filePath) ?: return
-        mMuteAndCopyToClipboard.apply(audioFileUiState.path)
     }
 
     fun cleanup() {

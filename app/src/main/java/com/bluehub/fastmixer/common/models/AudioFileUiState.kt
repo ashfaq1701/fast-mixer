@@ -150,4 +150,16 @@ data class AudioFileUiState(
         val segmentEnd = segmentEndInMs * (Config.SAMPLE_RATE / 1000)
         segmentEndSample.onNext(Optional.of(segmentEnd))
     }
+
+    fun setSegmentStartSample(startSample: Int) {
+        segmentStartSample.onNext(
+            Optional.of(startSample.coerceAtMost(numSamples - 1))
+        )
+    }
+
+    fun setSegmentEndSample(endSample: Int) {
+        segmentEndSample.onNext(
+            Optional.of(endSample.coerceAtMost(numSamples - 1))
+        )
+    }
 }

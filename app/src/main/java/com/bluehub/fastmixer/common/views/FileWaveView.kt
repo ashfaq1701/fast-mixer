@@ -11,14 +11,12 @@ import androidx.databinding.BindingMethod
 import androidx.databinding.BindingMethods
 import com.bluehub.fastmixer.R
 import com.bluehub.fastmixer.common.models.AudioFileUiState
-import com.bluehub.fastmixer.common.utils.Optional
 import com.bluehub.fastmixer.screens.mixing.FileWaveViewStore
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.functions.Function
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import kotlin.math.*
 
 
@@ -302,12 +300,12 @@ class FileWaveView @JvmOverloads constructor(
             if (viewRight > viewLeft) {
                 mAudioFileUiState.value.run {
                     val newPositionInSamples =
-                        (boundedNewPosition.toFloat() / numPtsToPlot) * numSamples
+                        ((boundedNewPosition.toFloat() / numPtsToPlot) * numSamples).toInt()
 
                     if (audioSegmentSelector.leftEdgeActivated) {
-                        segmentStartSample.onNext(Optional.of(newPositionInSamples.toInt()))
+                        setSegmentStartSample(newPositionInSamples)
                     } else {
-                        segmentEndSample.onNext(Optional.of(newPositionInSamples.toInt()))
+                        setSegmentEndSample(newPositionInSamples)
                     }
                 }
             }
@@ -345,8 +343,8 @@ class FileWaveView @JvmOverloads constructor(
 
             segmentStartSample.value.value ?: run {
                 val sliderStartPosition = getSliderLeftPosition()
-                segmentStartSample.onNext(
-                    Optional.of(((sliderStartPosition.toDouble() / numPtsToPlot) * numSamples).toInt())
+                setSegmentStartSample(
+                    ((sliderStartPosition.toDouble() / numPtsToPlot) * numSamples).toInt()
                 )
             }
 
@@ -363,7 +361,7 @@ class FileWaveView @JvmOverloads constructor(
                     startSample + widthInSamples
                 }
 
-                segmentEndSample.onNext(Optional.of(segmentEndSampleValue))
+                setSegmentEndSample(segmentEndSampleValue)
             }
         }
     }

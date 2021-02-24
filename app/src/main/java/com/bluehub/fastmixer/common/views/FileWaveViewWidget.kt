@@ -81,15 +81,24 @@ class FileWaveViewWidget(context: Context, attributeSet: AttributeSet?)
                 true
             }
             R.id.cut -> {
-                mFileWaveViewStore.value.cut(mAudioFileUiState.value.path)
+                mFileWaveViewStore.value.audioViewActionLiveData.value = AudioViewAction(
+                    actionType = AudioViewActionType.CUT,
+                    uiState = mAudioFileUiState.value
+                )
                 true
             }
             R.id.copy -> {
-                mFileWaveViewStore.value.copy(mAudioFileUiState.value.path)
+                mFileWaveViewStore.value.audioViewActionLiveData.value = AudioViewAction(
+                    actionType = AudioViewActionType.COPY,
+                    uiState = mAudioFileUiState.value
+                )
                 true
             }
             R.id.mute -> {
-                mFileWaveViewStore.value.mute(mAudioFileUiState.value.path)
+                mFileWaveViewStore.value.audioViewActionLiveData.value = AudioViewAction(
+                    actionType = AudioViewActionType.MUTE,
+                    uiState = mAudioFileUiState.value
+                )
                 true
             }
             R.id.paste -> {
