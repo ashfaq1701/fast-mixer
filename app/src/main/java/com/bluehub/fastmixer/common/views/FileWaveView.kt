@@ -387,20 +387,20 @@ class FileWaveView @JvmOverloads constructor(
     }
 
     override fun onTouchEvent(event: MotionEvent?): Boolean {
+        gestureDetector.onTouchEvent(event)
+
         when (event?.action) {
             MotionEvent.ACTION_UP -> {
                 mAudioSegmentSelector?.let {
                     if (it.leftEdgeActivated || it.rightEdgeActivated) {
                         if (segmentSliderActivationX != event.x) {
                             resizeSegmentSelector(event)
-                            return true
                         }
                     }
                 }
             }
         }
 
-        gestureDetector.onTouchEvent(event)
         return true
     }
 
