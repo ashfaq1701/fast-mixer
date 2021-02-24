@@ -135,34 +135,38 @@ class FileWaveViewWidget(context: Context, attributeSet: AttributeSet?)
     }
 
     private fun setupStoreObservers() {
-        mFileWaveViewStore.value.isPlayingObservable
-            .flatMap { isPlaying ->
-                mAudioFileUiState.value.isPlaying.map { uiStateIsPlaying ->
-                    isPlaying == uiStateIsPlaying
+        mFileWaveViewStore.value.run {
+            isPlayingObservable
+                .flatMap { isPlaying ->
+                    mAudioFileUiState.value.isPlaying.map { uiStateIsPlaying ->
+                        isPlaying == uiStateIsPlaying
+                    }
                 }
-            }
-            .flatMap { isPlayingEnabled ->
-                mFileWaveViewStore.value.isGroupPlayingObservable.map { isGroupPlaying ->
-                    isPlayingEnabled && !isGroupPlaying
+                .flatMap { isPlayingEnabled ->
+                    isGroupPlayingObservable.map { isGroupPlaying ->
+                        isPlayingEnabled && !isGroupPlaying
+                    }
                 }
-            }
-            .observeOn(
-                AndroidSchedulers.mainThread()
-            ).subscribe {
-                binding.wavePlayPause.isEnabled = it
-            }
+                .observeOn(
+                    AndroidSchedulers.mainThread()
+                ).subscribe {
+                    binding.wavePlayPause.isEnabled = it
+                }
 
-        mFileWaveViewStore.value.isPlayingObservable
-            .flatMap {  isPlaying ->
-                mFileWaveViewStore.value.isGroupPlayingObservable.map { isGroupPlaying ->
-                    isPlaying || isGroupPlaying
+            isAnyPlayingObservable
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe {
+                    menu.menu.getItem(0).isEnabled = !it
+                    menu.menu.getItem(2).isEnabled = !it
                 }
-            }
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe {
-                menu.menu.getItem(0).isEnabled = !it
-                menu.menu.getItem(2).isEnabled = !it
-            }
+
+
+            isPasteEnabled
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe {
+                    menu.menu.getItem(6).isEnabled = it
+                }
+        }
     }
 
     private fun setupUiStateObservers() {
@@ -232,7 +236,7 @@ class FileWaveViewWidget(context: Context, attributeSet: AttributeSet?)
 
             showSegmentSelector
                 .flatMap { segmentSelectorShown ->
-                    mAudioFileUiState.value.isPlaying.map { isPlayingFlag ->
+                    isPlaying.map { isPlayingFlag ->
                         segmentSelectorShown && !isPlayingFlag
                     }
                 }
@@ -246,7 +250,6 @@ class FileWaveViewWidget(context: Context, attributeSet: AttributeSet?)
                     if (::menu.isInitialized) {
                         menu.menu.getItem(3).isEnabled = it
                         menu.menu.getItem(5).isEnabled = it
-                        menu.menu.getItem(6).isEnabled = it
                     }
                 }
 

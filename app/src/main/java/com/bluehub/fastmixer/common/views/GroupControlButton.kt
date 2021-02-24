@@ -56,4 +56,8 @@ class GroupControlButton(context: Context, attributeSet: AttributeSet?)
             clickListener()
         }
     }
+
+    fun setIsEnabled(isEnabled: Boolean) {
+        binding.imgButton.isEnabled = isEnabled
+    }
 }
