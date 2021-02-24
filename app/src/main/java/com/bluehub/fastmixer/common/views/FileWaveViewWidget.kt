@@ -88,6 +88,10 @@ class FileWaveViewWidget(context: Context, attributeSet: AttributeSet?)
                 mFileWaveViewStore.value.copy(mAudioFileUiState.value.path)
                 true
             }
+            R.id.mute -> {
+                mFileWaveViewStore.value.mute(mAudioFileUiState.value.path)
+                true
+            }
             R.id.paste -> {
 
                 true
@@ -228,10 +232,12 @@ class FileWaveViewWidget(context: Context, attributeSet: AttributeSet?)
                         result && !isGroupPlayingFlag
                     }
                 }
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
                     if (::menu.isInitialized) {
                         menu.menu.getItem(3).isEnabled = it
                         menu.menu.getItem(5).isEnabled = it
+                        menu.menu.getItem(6).isEnabled = it
                     }
                 }
 

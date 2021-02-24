@@ -48,5 +48,6 @@
     <string name="copy">Copy</string>
     <string name="paste">Paste</string>
     <string name="paste_new">Paste New</string>
+    <string name="mute">Mute</string>
 
 </resources>

@@ -8,6 +8,7 @@ import com.bluehub.fastmixer.common.models.AudioViewAction
 import com.bluehub.fastmixer.common.utils.*
 import com.bluehub.fastmixer.common.viewmodel.BaseViewModel
 import kotlinx.coroutines.*
+import timber.log.Timber
 import java.io.File
 import java.util.*
 import javax.inject.Inject
@@ -87,6 +88,7 @@ class MixingScreenViewModel @Inject constructor(val context: Context,
 
             setCutToClipboard(::cutToClipboard)
             setCopyToClipboard(::copyToClipboard)
+            setMuteAndCopyToClipboard(::muteAndCopyToClipboard)
         }
     }
 
@@ -313,25 +315,60 @@ class MixingScreenViewModel @Inject constructor(val context: Context,
         }
     }
 
-    fun cutToClipboard(filePath: String) {
+    private fun cutToClipboard(filePath: String) {
         val audioFileUiState = audioFileStore.findAudioFileByPath(filePath) ?: return
 
         viewModelScope.launch(Dispatchers.IO) {
             audioFileUiState.run {
                 audioFileUiState.isLoading.onNext(true)
-                mixingRepository.cutToClipboard(path, segmentStartSampleValue, segmentEndSampleValue)
+
+                val playHeadPosition = mixingRepository.cutToClipboard(path, segmentStartSampleValue, segmentEndSampleValue)
+
+                if (playHeadPosition >= 0) {
+                    _clipboardHasData.postValue(true)
+
+                    fileWaveViewStore.hideAndRemoveSegmentSelector(path)
+                    fileWaveViewStore.recalculateAudioSegment(path, playHeadPosition)
+                }
+
                 audioFileUiState.isLoading.onNext(false)
             }
         }
     }
 
-    fun copyToClipboard(filePath: String) {
+    private fun copyToClipboard(filePath: String) {
         val audioFileUiState = audioFileStore.findAudioFileByPath(filePath) ?: return
 
         viewModelScope.launch(Dispatchers.IO) {
             audioFileUiState.run {
                 audioFileUiState.isLoading.onNext(true)
-                mixingRepository.copyToClipboard(path, segmentStartSampleValue, segmentEndSampleValue)
+
+                val result = mixingRepository.copyToClipboard(path, segmentStartSampleValue, segmentEndSampleValue)
+
+                if (result) {
+                    _clipboardHasData.postValue(true)
+                }
+
+                audioFileUiState.isLoading.onNext(false)
+            }
+        }
+    }
+
+    private fun muteAndCopyToClipboard(filePath: String) {
+        val audioFileUiState = audioFileStore.findAudioFileByPath(filePath) ?: return
+
+        viewModelScope.launch(Dispatchers.IO) {
+            audioFileUiState.run {
+                audioFileUiState.isLoading.onNext(true)
+                val result = mixingRepository.muteAndCopyToClipboard(path, segmentStartSampleValue, segmentEndSampleValue)
+
+                if (result) {
+                    reRender.onNext(true)
+
+                    fileWaveViewStore.hideSegmentSelector(path)
+                    _clipboardHasData.postValue(true)
+                }
+
                 audioFileUiState.isLoading.onNext(false)
             }
         }

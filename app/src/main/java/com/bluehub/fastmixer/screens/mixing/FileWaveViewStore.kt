@@ -4,9 +4,11 @@ import androidx.lifecycle.*
 import androidx.lifecycle.Observer
 import com.bluehub.fastmixer.common.models.AudioFileUiState
 import com.bluehub.fastmixer.common.models.AudioViewAction
+import com.bluehub.fastmixer.common.utils.Optional
 import io.reactivex.rxjava3.functions.Function
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import kotlinx.coroutines.*
+import timber.log.Timber
 import java.util.*
 
 class FileWaveViewStore(val mixingRepository: MixingRepository) {
@@ -36,6 +38,7 @@ class FileWaveViewStore(val mixingRepository: MixingRepository) {
 
     private lateinit var mCutToClipboard: Function<String, Unit>
     private lateinit var mCopyToClipboard: Function<String, Unit>
+    private lateinit var mMuteAndCopyToClipboard: Function<String, Unit>
 
     val coroutineScope = CoroutineScope(Job() + Dispatchers.Main)
 
@@ -87,6 +90,10 @@ class FileWaveViewStore(val mixingRepository: MixingRepository) {
 
     fun setCopyToClipboard(copyToClipboardFunction: Function<String, Unit>) {
         mCopyToClipboard = copyToClipboardFunction
+    }
+
+    fun setMuteAndCopyToClipboard(muteAndCopyToClipboardFunction: Function<String, Unit>) {
+        mMuteAndCopyToClipboard = muteAndCopyToClipboardFunction;
     }
 
     fun updateMeasuredWidth(width: Int) {
@@ -326,11 +333,29 @@ class FileWaveViewStore(val mixingRepository: MixingRepository) {
         mixingRepository.resetSourceBounds(filePath)
     }
 
+    fun hideSegmentSelector(filePath: String) {
+        val audioFileUiState = findAudioFileUiState(filePath) ?: return
+        audioFileUiState.showSegmentSelector.onNext(false)
+
+    }
+
+    fun hideAndRemoveSegmentSelector(filePath: String) {
+        val audioFileUiState = findAudioFileUiState(filePath) ?: return
+
+        hideSegmentSelector(filePath)
+
+        audioFileUiState.run {
+            segmentStartSample.onNext(Optional.empty())
+            segmentEndSample.onNext(Optional.empty())
+        }
+    }
+
     fun recalculateAudioSegment(filePath: String, playSliderPositionSamples: Int? = null) {
         val audioFileUiState = findAudioFileUiState(filePath) ?: return
 
         audioFileUiState.run {
             numSamples = mixingRepository.getTotalSamples(filePath)
+
             reRender.onNext(true)
 
             calculateSampleCountEachView()
@@ -350,6 +375,11 @@ class FileWaveViewStore(val mixingRepository: MixingRepository) {
     fun copy(filePath: String) {
         val audioFileUiState = findAudioFileUiState(filePath) ?: return
         mCopyToClipboard.apply(audioFileUiState.path)
+    }
+
+    fun mute(filePath: String) {
+        val audioFileUiState = findAudioFileUiState(filePath) ?: return
+        mMuteAndCopyToClipboard.apply(audioFileUiState.path)
     }
 
     fun cleanup() {
