@@ -271,3 +271,84 @@ void FileDataSource::shiftBySamples(int64_t position, int64_t numSamples) {
     mBuffer.reset(move(newBuffer));
     mBufferSize = newBufferSize;
 }
+
+int64_t FileDataSource::cutToClipboard(int64_t startPosition, int64_t endPosition, vector<float>& clipboard) {
+    auto channelCount = mProperties.channelCount;
+
+    if (endPosition > getSampleSize() - 1) {
+        endPosition = getSampleSize() - 1;
+    }
+
+    auto startIndexWithChannels = startPosition * channelCount;
+    auto endIndexWithChannels = (endPosition + 1) * channelCount;
+
+    if (endIndexWithChannels > mBufferSize) {
+        endIndexWithChannels = mBufferSize;
+    }
+
+    auto numElements = (endPosition - startPosition + 1) * channelCount;
+
+    float* oldBufferData = mBuffer.get();
+    float* newBuffer = new float[mBufferSize - numElements];
+
+    copy(oldBufferData + startIndexWithChannels, oldBufferData + endIndexWithChannels, clipboard.begin());
+
+    copy(oldBufferData, oldBufferData + startIndexWithChannels, newBuffer);
+    copy(oldBufferData + endIndexWithChannels, oldBufferData + mBufferSize, newBuffer + startIndexWithChannels);
+
+    mBuffer.reset(move(newBuffer));
+    mBufferSize = mBufferSize - numElements;
+
+    if (mPlayHead >= startPosition && mPlayHead <= endPosition) {
+        if (startPosition > 0) {
+            mPlayHead = startPosition - 1;
+        } else {
+            mPlayHead = startPosition;
+        }
+    } else if (mPlayHead > endPosition) {
+       auto newPlayHead = mPlayHead - (endPosition - startPosition + 1);
+       if (newPlayHead < 0) {
+           newPlayHead = 0;
+       }
+
+       mPlayHead = newPlayHead;
+    }
+
+    return mPlayHead;
+}
+
+void FileDataSource::copyToClipboard(int64_t startPosition, int64_t endPosition, vector<float>& clipboard) {
+    auto channelCount = mProperties.channelCount;
+
+    if (endPosition > getSampleSize() - 1) {
+        endPosition = getSampleSize() - 1;
+    }
+
+    auto startIndexWithChannels = startPosition * channelCount;
+    auto endIndexWithChannels = (endPosition + 1) * channelCount;
+
+    if (endIndexWithChannels > mBufferSize) {
+        endIndexWithChannels = mBufferSize;
+    }
+
+    float* oldBufferData = mBuffer.get();
+
+    copy(oldBufferData + startIndexWithChannels, oldBufferData + endIndexWithChannels, clipboard.begin());
+}
+
+void FileDataSource::muteAndCopyToClipboard(int64_t startPosition, int64_t endPosition, vector<float>& clipboard) {
+    auto channelCount = mProperties.channelCount;
+
+    if (endPosition > getSampleSize() - 1) {
+        endPosition = getSampleSize() - 1;
+    }
+
+    auto startIndexWithChannels = startPosition * channelCount;
+    auto endIndexWithChannels = (endPosition + 1) * channelCount;
+
+    float* oldBufferData = mBuffer.get();
+
+    copy(oldBufferData + startIndexWithChannels, oldBufferData + endIndexWithChannels, clipboard.begin());
+
+    fill(oldBufferData + startIndexWithChannels, oldBufferData + endIndexWithChannels, 0.0f);
+}

@@ -13,6 +13,7 @@ data class AudioFileUiState(
     var displayPtsCount: BehaviorSubject<Int>,
     var zoomLevel: BehaviorSubject<Int>,
     var isPlaying: BehaviorSubject<Boolean>,
+    var isLoading: BehaviorSubject<Boolean>,
     var playSliderPosition: BehaviorSubject<Int>,
     var showSegmentSelector: BehaviorSubject<Boolean>,
     var segmentStartSample: BehaviorSubject<Optional<Int>>,
@@ -29,6 +30,7 @@ data class AudioFileUiState(
                 displayPtsCount = BehaviorSubject.create(),
                 zoomLevel = BehaviorSubject.create(),
                 isPlaying = BehaviorSubject.createDefault(false),
+                isLoading = BehaviorSubject.createDefault(false),
                 playSliderPosition = BehaviorSubject.createDefault(0),
                 showSegmentSelector = BehaviorSubject.createDefault(false),
                 segmentStartSample = BehaviorSubject.createDefault(Optional.empty()),
@@ -147,5 +149,17 @@ data class AudioFileUiState(
     fun setSegmentEndInMs(segmentEndInMs: Int) {
         val segmentEnd = segmentEndInMs * (Config.SAMPLE_RATE / 1000)
         segmentEndSample.onNext(Optional.of(segmentEnd))
+    }
+
+    fun setSegmentStartSample(startSample: Int) {
+        segmentStartSample.onNext(
+            Optional.of(startSample.coerceAtMost(numSamples - 1))
+        )
+    }
+
+    fun setSegmentEndSample(endSample: Int) {
+        segmentEndSample.onNext(
+            Optional.of(endSample.coerceAtMost(numSamples - 1))
+        )
     }
 }

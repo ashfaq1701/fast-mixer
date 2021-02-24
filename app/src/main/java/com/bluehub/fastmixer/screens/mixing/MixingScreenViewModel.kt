@@ -67,6 +67,10 @@ class MixingScreenViewModel @Inject constructor(val context: Context,
     val isGroupPlaying: LiveData<Boolean>
         get() = playFlagStore.isGroupPlaying
 
+    private val _clipboardHasData = MutableLiveData(false)
+    val clipboardHasData: LiveData<Boolean>
+        get() = _clipboardHasData
+
     private val playList: MutableList<String> = mutableListOf()
 
     val audioViewAction: MutableLiveData<AudioViewAction?> = MutableLiveData<AudioViewAction?>()
@@ -78,6 +82,7 @@ class MixingScreenViewModel @Inject constructor(val context: Context,
             setAudioFilesLiveData(audioFilesLiveData)
             setIsPlayingLiveData(isPlaying)
             setIsGroupPlayingLiveData(isGroupPlaying)
+            setClipboardHasDataLiveData(clipboardHasData)
             audioViewActionLiveData = audioViewAction
         }
     }
@@ -303,6 +308,66 @@ class MixingScreenViewModel @Inject constructor(val context: Context,
         } else {
             groupPause()
         }
+    }
+
+    fun cutToClipboard(audioFileUiState: AudioFileUiState) {
+
+        viewModelScope.launch(Dispatchers.IO) {
+            audioFileUiState.run {
+                audioFileUiState.isLoading.onNext(true)
+
+                val playHeadPosition = mixingRepository.cutToClipboard(path, segmentStartSampleValue, segmentEndSampleValue)
+
+                if (playHeadPosition >= 0) {
+                    _clipboardHasData.postValue(true)
+
+                    fileWaveViewStore.hideAndRemoveSegmentSelector(path)
+                    fileWaveViewStore.recalculateAudioSegment(path, playHeadPosition)
+                }
+
+                audioFileUiState.isLoading.onNext(false)
+            }
+        }
+    }
+
+    fun copyToClipboard(audioFileUiState: AudioFileUiState) {
+
+        viewModelScope.launch(Dispatchers.IO) {
+            audioFileUiState.run {
+                audioFileUiState.isLoading.onNext(true)
+
+                val result = mixingRepository.copyToClipboard(path, segmentStartSampleValue, segmentEndSampleValue)
+
+                if (result) {
+                    _clipboardHasData.postValue(true)
+                }
+
+                audioFileUiState.isLoading.onNext(false)
+            }
+        }
+    }
+
+    fun muteAndCopyToClipboard(audioFileUiState: AudioFileUiState) {
+
+        viewModelScope.launch(Dispatchers.IO) {
+            audioFileUiState.run {
+                audioFileUiState.isLoading.onNext(true)
+                val result = mixingRepository.muteAndCopyToClipboard(path, segmentStartSampleValue, segmentEndSampleValue)
+
+                if (result) {
+                    reRender.onNext(true)
+
+                    fileWaveViewStore.hideSegmentSelector(path)
+                    _clipboardHasData.postValue(true)
+                }
+
+                audioFileUiState.isLoading.onNext(false)
+            }
+        }
+    }
+
+    fun pasteAsNew() {
+
     }
 
     fun resetStates() {

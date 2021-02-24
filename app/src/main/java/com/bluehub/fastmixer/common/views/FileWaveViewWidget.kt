@@ -20,6 +20,8 @@ import com.bluehub.fastmixer.screens.mixing.*
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import kotlinx.android.synthetic.main.file_wave_view_widget.view.*
+import kotlinx.android.synthetic.main.view_loading.*
+import kotlinx.android.synthetic.main.view_loading.view.*
 import java.util.*
 
 @BindingMethods(
@@ -78,6 +80,31 @@ class FileWaveViewWidget(context: Context, attributeSet: AttributeSet?)
                 )
                 true
             }
+            R.id.cut -> {
+                mFileWaveViewStore.value.audioViewActionLiveData.value = AudioViewAction(
+                    actionType = AudioViewActionType.CUT,
+                    uiState = mAudioFileUiState.value
+                )
+                true
+            }
+            R.id.copy -> {
+                mFileWaveViewStore.value.audioViewActionLiveData.value = AudioViewAction(
+                    actionType = AudioViewActionType.COPY,
+                    uiState = mAudioFileUiState.value
+                )
+                true
+            }
+            R.id.mute -> {
+                mFileWaveViewStore.value.audioViewActionLiveData.value = AudioViewAction(
+                    actionType = AudioViewActionType.MUTE,
+                    uiState = mAudioFileUiState.value
+                )
+                true
+            }
+            R.id.paste -> {
+
+                true
+            }
             else -> false
         }
     }
@@ -134,6 +161,7 @@ class FileWaveViewWidget(context: Context, attributeSet: AttributeSet?)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe {
                 menu.menu.getItem(0).isEnabled = !it
+                menu.menu.getItem(2).isEnabled = !it
             }
     }
 
@@ -151,10 +179,6 @@ class FileWaveViewWidget(context: Context, attributeSet: AttributeSet?)
                         binding.wavePlayPause.setImageDrawable(
                             ContextCompat.getDrawable(context, R.drawable.play_button)
                         )
-                    }
-
-                    if (::menu.isInitialized) {
-                        menu.menu.getItem(2).isEnabled = !it
                     }
                 }
 
@@ -203,6 +227,36 @@ class FileWaveViewWidget(context: Context, attributeSet: AttributeSet?)
                         mFileWaveViewStore.value.setSourceBounds(path)
                     } else {
                         mFileWaveViewStore.value.resetSourceBounds(path)
+                    }
+                }
+
+            showSegmentSelector
+                .flatMap { segmentSelectorShown ->
+                    mAudioFileUiState.value.isPlaying.map { isPlayingFlag ->
+                        segmentSelectorShown && !isPlayingFlag
+                    }
+                }
+                .flatMap { result ->
+                    mFileWaveViewStore.value.isGroupPlayingObservable.map { isGroupPlayingFlag ->
+                        result && !isGroupPlayingFlag
+                    }
+                }
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe {
+                    if (::menu.isInitialized) {
+                        menu.menu.getItem(3).isEnabled = it
+                        menu.menu.getItem(5).isEnabled = it
+                        menu.menu.getItem(6).isEnabled = it
+                    }
+                }
+
+            isLoading
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe {
+                    if (it) {
+                        pbLoading.visibility = View.VISIBLE
+                    } else {
+                        pbLoading.visibility = View.GONE
                     }
                 }
         }

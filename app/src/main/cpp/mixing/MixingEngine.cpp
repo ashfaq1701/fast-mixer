@@ -205,3 +205,75 @@ void MixingEngine::shiftBySamples(string filePath, int64_t position, int64_t num
 
     it->second->shiftBySamples(position, numSamples);
 }
+
+int64_t MixingEngine::cutToClipboard(string filePath, int64_t startPosition, int64_t endPosition) {
+    if (startPosition < 0 || endPosition < 0) {
+        return -1;
+    }
+
+    auto it = mSourceMapStore->sourceMap.find(filePath);
+    if (it == mSourceMapStore->sourceMap.end()) {
+        return -1;
+    }
+
+    auto source = it->second;
+
+    int channelCount = source->getProperties().channelCount;
+    int64_t numElementsToCopy = (endPosition - startPosition + 1) * channelCount;
+
+    vector <float> v;
+    clipboard.swap(v);
+    clipboard.reserve(numElementsToCopy);
+
+    return source->cutToClipboard(startPosition, endPosition, clipboard);
+}
+
+bool MixingEngine::copyToClipboard(string filePath, int64_t startPosition, int64_t endPosition) {
+
+    if (startPosition < 0 || endPosition < 0) {
+        return false;
+    }
+
+    auto it = mSourceMapStore->sourceMap.find(filePath);
+    if (it == mSourceMapStore->sourceMap.end()) {
+        return false;
+    }
+
+    auto source = it->second;
+
+    int channelCount = source->getProperties().channelCount;
+    int64_t numElementsToCopy = (endPosition - startPosition + 1) * channelCount;
+
+    vector <float> v;
+    clipboard.swap(v);
+    clipboard.reserve(numElementsToCopy);
+
+    source->copyToClipboard(startPosition, endPosition, clipboard);
+
+    return true;
+}
+
+bool MixingEngine::muteAndCopyToClipboard(string filePath, int64_t startPosition, int64_t endPosition) {
+
+    if (startPosition < 0 || endPosition < 0) {
+        return false;
+    }
+
+    auto it = mSourceMapStore->sourceMap.find(filePath);
+    if (it == mSourceMapStore->sourceMap.end()) {
+        return false;
+    }
+
+    auto source = it->second;
+
+    int channelCount = source->getProperties().channelCount;
+    int64_t numElementsToCopy = (endPosition - startPosition + 1) * channelCount;
+
+    vector <float> v;
+    clipboard.swap(v);
+    clipboard.reserve(numElementsToCopy);
+
+    source->muteAndCopyToClipboard(startPosition, endPosition, clipboard);
+
+    return true;
+}

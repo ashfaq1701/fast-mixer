@@ -4,6 +4,8 @@ import androidx.lifecycle.*
 import androidx.lifecycle.Observer
 import com.bluehub.fastmixer.common.models.AudioFileUiState
 import com.bluehub.fastmixer.common.models.AudioViewAction
+import com.bluehub.fastmixer.common.utils.Optional
+import io.reactivex.rxjava3.functions.Function
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import kotlinx.coroutines.*
 import java.util.*
@@ -15,10 +17,12 @@ class FileWaveViewStore(val mixingRepository: MixingRepository) {
 
     private lateinit var mIsPlayingLiveData: LiveData<Boolean>
     private lateinit var mIsGroupPlayingLiveData: LiveData<Boolean>
+    private lateinit var mClipboardHasDataLiveData: LiveData<Boolean>
     lateinit var audioViewActionLiveData: MutableLiveData<AudioViewAction?>
 
     val isPlayingObservable: BehaviorSubject<Boolean> = BehaviorSubject.createDefault(false)
     val isGroupPlayingObservable: BehaviorSubject<Boolean> = BehaviorSubject.createDefault(false)
+    val clipboardHasDataObservable: BehaviorSubject<Boolean> = BehaviorSubject.createDefault(false)
 
     private val measuredWidthObservable: BehaviorSubject<Int> = BehaviorSubject.create()
 
@@ -44,6 +48,10 @@ class FileWaveViewStore(val mixingRepository: MixingRepository) {
     private val isGroupPlayingObserver: Observer<Boolean> = Observer {
         isGroupPlayingObservable.onNext(it)
     }
+
+    private val clipboardHasDataObserver: Observer<Boolean> = Observer {
+        clipboardHasDataObservable.onNext(it)
+    }
     
     init {
         measuredWidthObservable.subscribe {
@@ -64,6 +72,11 @@ class FileWaveViewStore(val mixingRepository: MixingRepository) {
     fun setIsGroupPlayingLiveData(isGroupPlayingLiveData: LiveData<Boolean>) {
         mIsGroupPlayingLiveData = isGroupPlayingLiveData
         mIsGroupPlayingLiveData.observeForever(isGroupPlayingObserver)
+    }
+
+    fun setClipboardHasDataLiveData(clipboardHasDataLiveData: LiveData<Boolean>) {
+        mClipboardHasDataLiveData = clipboardHasDataLiveData
+        mClipboardHasDataLiveData.observeForever(clipboardHasDataObserver)
     }
 
     fun updateMeasuredWidth(width: Int) {
@@ -286,6 +299,7 @@ class FileWaveViewStore(val mixingRepository: MixingRepository) {
     }
 
     private fun setPlaySliderPosition(audioFileUiState: AudioFileUiState, playSliderPosition: Int) {
+
         audioFileUiState.playSliderPosition.onNext(playSliderPosition)
     }
 
@@ -303,18 +317,37 @@ class FileWaveViewStore(val mixingRepository: MixingRepository) {
         mixingRepository.resetSourceBounds(filePath)
     }
 
-    fun recalculateAudioSegment(filePath: String, playSliderPositionSamples: Int) {
+    fun hideSegmentSelector(filePath: String) {
+        val audioFileUiState = findAudioFileUiState(filePath) ?: return
+        audioFileUiState.showSegmentSelector.onNext(false)
+
+    }
+
+    fun hideAndRemoveSegmentSelector(filePath: String) {
+        val audioFileUiState = findAudioFileUiState(filePath) ?: return
+
+        hideSegmentSelector(filePath)
+
+        audioFileUiState.run {
+            segmentStartSample.onNext(Optional.empty())
+            segmentEndSample.onNext(Optional.empty())
+        }
+    }
+
+    fun recalculateAudioSegment(filePath: String, playSliderPositionSamples: Int? = null) {
         val audioFileUiState = findAudioFileUiState(filePath) ?: return
 
         audioFileUiState.run {
             numSamples = mixingRepository.getTotalSamples(filePath)
+
             reRender.onNext(true)
 
             calculateSampleCountEachView()
 
-            val playSliderPos = (playSliderPositionSamples.toFloat() / numSamples.toFloat()) * numPtsToPlot.toFloat()
-            setPlayHead(path, playSliderPos.toInt())
-
+            playSliderPositionSamples?.let {
+                val playSliderPos = (it.toFloat() / numSamples.toFloat()) * numPtsToPlot.toFloat()
+                setPlayHead(path, playSliderPos.toInt())
+            }
         }
     }
 

@@ -89,6 +89,14 @@
                 tools:visibility="visible">
 
                 <com.bluehub.fastmixer.common.views.GroupControlButton
+                    android:id="@+id/pasteAsNew"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:btnDrawable="@{@drawable/paste_new_button}"
+                    app:btnLabel="@{@string/paste_new}"
+                    app:clickListener="@{mixingScreenViewModel.pasteAsNew}" />
+
+                <com.bluehub.fastmixer.common.views.GroupControlButton
                     android:id="@+id/groupPlayPause"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
