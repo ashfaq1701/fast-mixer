@@ -8,6 +8,7 @@
 
 #include <memory>
 #include <FileDataSource.h>
+#include <BufferedDataSource.h>
 #include "streams/MixingStreamConstants.h"
 #include "../audio/Player.h"
 
@@ -17,6 +18,7 @@ class MixingIO {
 public:
     MixingIO();
     shared_ptr<FileDataSource> readFile(string filename);
+    shared_ptr<BufferedDataSource> createClipboardDataSource(vector<float>& clipboard);
     void read_playback(float *targetData, int32_t numSamples);
 
     void setPlaying(bool setPlaying);

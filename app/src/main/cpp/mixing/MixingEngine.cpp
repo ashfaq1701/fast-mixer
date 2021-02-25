@@ -197,13 +197,13 @@ void MixingEngine::resetSourceBounds(string filePath) {
     it->second->resetSelectionEnd();
 }
 
-void MixingEngine::shiftBySamples(string filePath, int64_t position, int64_t numSamples) {
+int64_t MixingEngine::shiftBySamples(string filePath, int64_t position, int64_t numSamples) {
     auto it = mSourceMapStore->sourceMap.find(filePath);
     if (it == mSourceMapStore->sourceMap.end()) {
-        return;
+        return -1;
     }
 
-    it->second->shiftBySamples(position, numSamples);
+    return it->second->shiftBySamples(position, numSamples);
 }
 
 int64_t MixingEngine::cutToClipboard(string filePath, int64_t startPosition, int64_t endPosition) {
@@ -223,7 +223,7 @@ int64_t MixingEngine::cutToClipboard(string filePath, int64_t startPosition, int
 
     vector <float> v;
     clipboard.swap(v);
-    clipboard.reserve(numElementsToCopy);
+    clipboard.resize(numElementsToCopy);
 
     return source->cutToClipboard(startPosition, endPosition, clipboard);
 }
@@ -246,7 +246,7 @@ bool MixingEngine::copyToClipboard(string filePath, int64_t startPosition, int64
 
     vector <float> v;
     clipboard.swap(v);
-    clipboard.reserve(numElementsToCopy);
+    clipboard.resize(numElementsToCopy);
 
     source->copyToClipboard(startPosition, endPosition, clipboard);
 
@@ -271,9 +271,34 @@ bool MixingEngine::muteAndCopyToClipboard(string filePath, int64_t startPosition
 
     vector <float> v;
     clipboard.swap(v);
-    clipboard.reserve(numElementsToCopy);
+    clipboard.resize(numElementsToCopy);
 
     source->muteAndCopyToClipboard(startPosition, endPosition, clipboard);
 
     return true;
+}
+
+void MixingEngine::pasteFromClipboard(string filePath, int64_t position) {
+    if (position < 0) return;
+
+    auto it = mSourceMapStore->sourceMap.find(filePath);
+    if (it == mSourceMapStore->sourceMap.end()) {
+        return;
+    }
+
+    auto source = it->second;
+
+    source->pasteFromClipboard(position, clipboard);
+}
+
+void MixingEngine::pasteNewFromClipboard(string fileId) {
+    auto it = mSourceMapStore->sourceMap.find(fileId);
+    if (it != mSourceMapStore->sourceMap.end()) {
+        fileId.erase();
+        return;
+    }
+
+    shared_ptr<BufferedDataSource> source = mMixingIO.createClipboardDataSource(clipboard);
+    mSourceMapStore->sourceMap.insert(pair<string, shared_ptr<FileDataSource>>(fileId, move(source)));
+    fileId.erase();
 }

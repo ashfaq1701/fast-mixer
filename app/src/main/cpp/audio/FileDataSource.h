@@ -69,7 +69,7 @@ public:
     void applyBackupBufferData();
     void resetBackupBufferData();
 
-    void shiftBySamples(int64_t position, int64_t numSamples);
+    int64_t shiftBySamples(int64_t position, int64_t numSamples);
 
     int64_t cutToClipboard(int64_t startPosition, int64_t endPosition, vector<float>& clipboard);
 
@@ -77,10 +77,14 @@ public:
 
     void muteAndCopyToClipboard(int64_t startPosition, int64_t endPosition, vector<float>& clipboard);
 
-private:
+    void pasteFromClipboard(int64_t position, vector<float>& clipboard);
+
+protected:
 
     FileDataSource(unique_ptr<float[]> data, size_t size,
                    const AudioProperties properties);
+
+private:
 
     void calculateProperties();
 

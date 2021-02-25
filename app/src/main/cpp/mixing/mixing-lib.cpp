@@ -262,15 +262,15 @@ extern "C" {
         mixingEngine->resetSourceBounds(filePathStr);
     }
 
-    JNIEXPORT void JNICALL
+    JNIEXPORT jint JNICALL
     Java_com_bluehub_fastmixer_audio_MixingEngine_shiftBySamples(JNIEnv *env, jclass, jstring filePath, jint position, jint numSamples) {
         if (!mixingEngine) {
             LOGE("shiftBySamples: mixingEngine is null, you must call create() method before calling this method");
-            return;
+            return -1;
         }
 
         auto filePathStr = java_str_to_c_str(env, filePath);
-        mixingEngine->shiftBySamples(filePathStr, position, numSamples);
+        return mixingEngine->shiftBySamples(filePathStr, position, numSamples);
     }
 
     JNIEXPORT jboolean JNICALL
@@ -304,5 +304,27 @@ extern "C" {
 
         auto filePathStr = java_str_to_c_str(env, filePath);
         return mixingEngine->muteAndCopyToClipboard(filePathStr, startPosition, endPosition);
+    }
+
+    JNIEXPORT void  JNICALL
+    Java_com_bluehub_fastmixer_audio_MixingEngine_pasteFromClipboard(JNIEnv *env, jclass, jstring filePath, jint position) {
+        if (!mixingEngine) {
+            LOGE("pasteFromClipboard: mixingEngine is null, you must call create() method before calling this method");
+            return;
+        }
+
+        auto filePathStr = java_str_to_c_str(env, filePath);
+        mixingEngine->pasteFromClipboard(filePathStr, position);
+    }
+
+    JNIEXPORT void  JNICALL
+    Java_com_bluehub_fastmixer_audio_MixingEngine_pasteNewFromClipboard(JNIEnv *env, jclass, jstring filePath) {
+        if (!mixingEngine) {
+            LOGE("pasteNewFromClipboard: mixingEngine is null, you must call create() method before calling this method");
+            return;
+        }
+
+        auto filePathStr = java_str_to_c_str(env, filePath);
+        mixingEngine->pasteNewFromClipboard(filePathStr);
     }
 }

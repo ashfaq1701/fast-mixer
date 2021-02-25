@@ -366,8 +366,31 @@ class MixingScreenViewModel @Inject constructor(val context: Context,
         }
     }
 
-    fun pasteAsNew() {
+    fun pasteFromClipboard(audioFileUiState: AudioFileUiState) {
+        viewModelScope.launch(Dispatchers.IO) {
+            audioFileUiState.run {
+                audioFileUiState.isLoading.onNext(true)
+                mixingRepository.pasteFromClipboard(path, playSliderPositionSample)
+                fileWaveViewStore.recalculateAudioSegment(path, playSliderPositionSample)
+                audioFileUiState.isLoading.onNext(false)
+            }
+        }
+    }
 
+    fun pasteAsNew() {
+        val fileId = UUID.randomUUID().toString()
+
+        viewModelScope.launch {
+            audioFileStore.run {
+                withContext(Dispatchers.IO) {
+                    mixingRepository.pasteNewFromClipboard(fileId)
+                    val totalSamples = getTotalSamples(fileId)
+                    audioFiles.add(AudioFileUiState.create(fileId, totalSamples))
+                }
+                _audioFilesLiveData.value = audioFiles
+                _itemAddedIdx.value = audioFiles.size - 1
+            }
+        }
     }
 
     fun resetStates() {

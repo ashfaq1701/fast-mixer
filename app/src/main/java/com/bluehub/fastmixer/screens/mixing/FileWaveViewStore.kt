@@ -5,7 +5,6 @@ import androidx.lifecycle.Observer
 import com.bluehub.fastmixer.common.models.AudioFileUiState
 import com.bluehub.fastmixer.common.models.AudioViewAction
 import com.bluehub.fastmixer.common.utils.Optional
-import io.reactivex.rxjava3.functions.Function
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import kotlinx.coroutines.*
 import java.util.*
@@ -22,7 +21,22 @@ class FileWaveViewStore(val mixingRepository: MixingRepository) {
 
     val isPlayingObservable: BehaviorSubject<Boolean> = BehaviorSubject.createDefault(false)
     val isGroupPlayingObservable: BehaviorSubject<Boolean> = BehaviorSubject.createDefault(false)
+
+    val isAnyPlayingObservable = isPlayingObservable
+        .flatMap {  isPlaying ->
+            isGroupPlayingObservable.map { isGroupPlaying ->
+                isPlaying || isGroupPlaying
+            }
+        }
+
     val clipboardHasDataObservable: BehaviorSubject<Boolean> = BehaviorSubject.createDefault(false)
+
+    val isPasteEnabled = clipboardHasDataObservable
+        .flatMap { hasClipboardData ->
+            isAnyPlayingObservable.map { isAnyPlaying ->
+                hasClipboardData && !isAnyPlaying
+            }
+        }
 
     private val measuredWidthObservable: BehaviorSubject<Int> = BehaviorSubject.create()
 
@@ -299,8 +313,7 @@ class FileWaveViewStore(val mixingRepository: MixingRepository) {
     }
 
     private fun setPlaySliderPosition(audioFileUiState: AudioFileUiState, playSliderPosition: Int) {
-
-        audioFileUiState.playSliderPosition.onNext(playSliderPosition)
+        audioFileUiState.setPlaySliderPosition(playSliderPosition)
     }
 
     fun setSourceBounds(filePath: String) {

@@ -16,6 +16,7 @@ import com.bluehub.fastmixer.common.models.*
 import com.bluehub.fastmixer.databinding.MixingScreenBinding
 import com.bluehub.fastmixer.screens.mixing.MixingScreenDirections.actionMixingScreenToRecordingScreen
 import com.bluehub.fastmixer.screens.mixing.modals.*
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 
 class MixingScreen : BaseFragment<MixingScreenViewModel>(ViewModelType.NAV_SCOPED) {
     companion object {
@@ -159,9 +160,18 @@ class MixingScreen : BaseFragment<MixingScreenViewModel>(ViewModelType.NAV_SCOPE
                     AudioViewActionType.MUTE -> {
                         viewModel.muteAndCopyToClipboard(it.uiState)
                     }
+                    AudioViewActionType.PASTE -> {
+                        viewModel.pasteFromClipboard(it.uiState)
+                    }
                 }
             }
         })
+
+        viewModel.fileWaveViewStore.isPasteEnabled
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe {
+                dataBinding.pasteAsNew.setIsEnabled(it)
+            }
     }
 
     private fun setupAnimations() {
