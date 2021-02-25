@@ -240,7 +240,7 @@ void FileDataSource::applyBackupBufferData() {
     calculateProperties();
 }
 
-void FileDataSource::shiftBySamples(int64_t position, int64_t numSamples) {
+int64_t FileDataSource::shiftBySamples(int64_t position, int64_t numSamples) {
 
     auto channelCount = mProperties.channelCount;
 
@@ -270,6 +270,8 @@ void FileDataSource::shiftBySamples(int64_t position, int64_t numSamples) {
 
     mBuffer.reset(move(newBuffer));
     mBufferSize = newBufferSize;
+
+    return position + numSamples;
 }
 
 int64_t FileDataSource::cutToClipboard(int64_t startPosition, int64_t endPosition, vector<float>& clipboard) {
@@ -351,4 +353,32 @@ void FileDataSource::muteAndCopyToClipboard(int64_t startPosition, int64_t endPo
     copy(oldBufferData + startIndexWithChannels, oldBufferData + endIndexWithChannels, clipboard.begin());
 
     fill(oldBufferData + startIndexWithChannels, oldBufferData + endIndexWithChannels, 0.0f);
+}
+
+void FileDataSource::pasteFromClipboard(int64_t position, vector<float>& clipboard) {
+    auto channelCount = mProperties.channelCount;
+
+    if (position > getSampleSize() - 1) {
+        position = getSampleSize() - 1;
+    }
+
+    auto pasteIndex = position * channelCount;
+
+    if (position == getSampleSize() - 1) {
+        pasteIndex = (position + 1) * channelCount;
+    }
+
+    float* oldBufferData = mBuffer.get();
+    float* newBuffer = new float[mBufferSize + clipboard.size()];
+
+    copy(oldBufferData, oldBufferData + pasteIndex, newBuffer);
+    copy(clipboard.begin(), clipboard.end(), newBuffer + pasteIndex);
+
+    if (pasteIndex < mBufferSize) {
+        copy(oldBufferData + pasteIndex, oldBufferData + mBufferSize,
+                        newBuffer + pasteIndex + clipboard.size());
+    }
+
+    mBuffer.reset(move(newBuffer));
+    mBufferSize += clipboard.size();
 }

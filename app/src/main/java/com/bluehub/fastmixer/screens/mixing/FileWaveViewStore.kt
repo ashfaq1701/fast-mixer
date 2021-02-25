@@ -313,8 +313,7 @@ class FileWaveViewStore(val mixingRepository: MixingRepository) {
     }
 
     private fun setPlaySliderPosition(audioFileUiState: AudioFileUiState, playSliderPosition: Int) {
-
-        audioFileUiState.playSliderPosition.onNext(playSliderPosition)
+        audioFileUiState.setPlaySliderPosition(playSliderPosition)
     }
 
     fun setSourceBounds(filePath: String) {

@@ -42,13 +42,15 @@ class MixingEngine {
 
         @JvmStatic external fun resetSourceBounds(filePath: String)
 
-        @JvmStatic external fun shiftBySamples(filePath: String, position: Int, numSamples: Int)
+        @JvmStatic external fun shiftBySamples(filePath: String, position: Int, numSamples: Int): Int
 
         @JvmStatic external fun cutToClipboard(filePath: String, startPosition: Int, endPosition: Int): Int
 
         @JvmStatic external fun copyToClipboard(filePath: String, startPosition: Int, endPosition: Int): Boolean
 
         @JvmStatic external fun muteAndCopyToClipboard(filePath: String, startPosition: Int, endPosition: Int): Boolean
+
+        @JvmStatic external fun pasteFromClipboard(filePath: String, position: Int)
 
         @JvmStatic external fun delete()
     }

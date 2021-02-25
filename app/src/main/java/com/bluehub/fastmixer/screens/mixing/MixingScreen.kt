@@ -160,6 +160,9 @@ class MixingScreen : BaseFragment<MixingScreenViewModel>(ViewModelType.NAV_SCOPE
                     AudioViewActionType.MUTE -> {
                         viewModel.muteAndCopyToClipboard(it.uiState)
                     }
+                    AudioViewActionType.PASTE -> {
+                        viewModel.pasteFromClipboard(it.uiState)
+                    }
                 }
             }
         })

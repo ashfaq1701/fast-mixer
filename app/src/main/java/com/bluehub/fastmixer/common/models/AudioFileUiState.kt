@@ -52,7 +52,9 @@ data class AudioFileUiState(
     val playSliderPositionSample: Int
         get() {
             if (numPtsToPlot == 0) return 0
-            return ((playSliderPositionValue.toFloat() / numPtsToPlot.toFloat()) * numSamples.toFloat()).toInt()
+            return ((playSliderPositionValue.toFloat() / numPtsToPlot.toFloat()) * numSamples.toFloat())
+                .toInt()
+                .coerceAtMost(numSamples - 1)
         }
 
     val zoomLevelValue: Int
@@ -161,5 +163,9 @@ data class AudioFileUiState(
         segmentEndSample.onNext(
             Optional.of(endSample.coerceAtMost(numSamples - 1))
         )
+    }
+
+    fun setPlaySliderPosition(position: Int) {
+        playSliderPosition.onNext(position.coerceAtMost(numPtsToPlot - 1))
     }
 }

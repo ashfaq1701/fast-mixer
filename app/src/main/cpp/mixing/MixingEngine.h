@@ -50,13 +50,15 @@ public:
 
     void resetSourceBounds(string filePath);
 
-    void shiftBySamples(string filePath, int64_t position, int64_t numSamples);
+    int64_t shiftBySamples(string filePath, int64_t position, int64_t numSamples);
 
     int64_t cutToClipboard(string filePath, int64_t startPosition, int64_t endPosition);
 
     bool copyToClipboard(string filePath, int64_t startPosition, int64_t endPosition);
 
     bool muteAndCopyToClipboard(string filePath, int64_t startPosition, int64_t endPosition);
+
+    void pasteFromClipboard(string filePath, int64_t position);
 
 private:
 

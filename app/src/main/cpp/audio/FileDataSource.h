@@ -69,13 +69,15 @@ public:
     void applyBackupBufferData();
     void resetBackupBufferData();
 
-    void shiftBySamples(int64_t position, int64_t numSamples);
+    int64_t shiftBySamples(int64_t position, int64_t numSamples);
 
     int64_t cutToClipboard(int64_t startPosition, int64_t endPosition, vector<float>& clipboard);
 
     void copyToClipboard(int64_t startPosition, int64_t endPosition, vector<float>& clipboard);
 
     void muteAndCopyToClipboard(int64_t startPosition, int64_t endPosition, vector<float>& clipboard);
+
+    void pasteFromClipboard(int64_t position, vector<float>& clipboard);
 
 private:
 

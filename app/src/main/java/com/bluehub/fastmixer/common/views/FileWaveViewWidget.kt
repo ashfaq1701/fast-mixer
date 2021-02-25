@@ -102,7 +102,10 @@ class FileWaveViewWidget(context: Context, attributeSet: AttributeSet?)
                 true
             }
             R.id.paste -> {
-
+                mFileWaveViewStore.value.audioViewActionLiveData.value = AudioViewAction(
+                    actionType = AudioViewActionType.PASTE,
+                    uiState = mAudioFileUiState.value
+                )
                 true
             }
             else -> false
@@ -213,6 +216,7 @@ class FileWaveViewWidget(context: Context, attributeSet: AttributeSet?)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
                     menu.menu.getItem(1).isEnabled = it
+                    menu.menu.getItem(4).isEnabled = it
                 }
 
             showSegmentSelector

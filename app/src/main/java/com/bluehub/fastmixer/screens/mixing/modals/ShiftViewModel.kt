@@ -60,11 +60,11 @@ class ShiftViewModel@Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             isLoading.postValue(true)
 
-            mixingRepository.shiftBySamples(filePath, position, numSamples)
+            val newPlayHeadPosition = mixingRepository.shiftBySamples(filePath, position, numSamples)
 
-            val newPlayHeadPosition = position + numSamples
-
-            fileWaveViewStore.recalculateAudioSegment(filePath, newPlayHeadPosition)
+            if (newPlayHeadPosition >= 0) {
+                fileWaveViewStore.recalculateAudioSegment(filePath, newPlayHeadPosition)
+            }
 
             isLoading.postValue(false)
             closeDialogLiveData.postValue(true)
