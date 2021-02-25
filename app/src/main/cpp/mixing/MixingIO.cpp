@@ -21,6 +21,17 @@ shared_ptr<FileDataSource> MixingIO::readFile(string filename) {
     };
 }
 
+shared_ptr<BufferedDataSource> MixingIO::createClipboardDataSource(vector<float>& clipboard) {
+    AudioProperties targetProperties{
+            .channelCount = MixingStreamConstants::mChannelCount,
+            .sampleRate = MixingStreamConstants::mSampleRate
+    };
+
+    return shared_ptr<BufferedDataSource> {
+        BufferedDataSource::newFromClipboard(clipboard, targetProperties)
+    };
+}
+
 void MixingIO::setPlaying(bool isPlaying) {
     mPlayer->setPlaying(isPlaying);
 }

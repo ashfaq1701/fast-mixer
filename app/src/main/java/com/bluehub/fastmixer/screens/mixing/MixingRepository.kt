@@ -64,6 +64,8 @@ class MixingRepository @Inject constructor(val mixingEngineProxy: MixingEnginePr
 
     fun pasteFromClipboard(filePath: String, position: Int) = mixingEngineProxy.pasteFromClipboard(filePath, position)
 
+    fun pasteNewFromClipboard(filePath: String) = mixingEngineProxy.pasteNewFromClipboard(filePath)
+
     fun clearSources() {
         mixingEngineProxy.clearPlayerSources()
     }

@@ -79,10 +79,12 @@ public:
 
     void pasteFromClipboard(int64_t position, vector<float>& clipboard);
 
-private:
+protected:
 
     FileDataSource(unique_ptr<float[]> data, size_t size,
                    const AudioProperties properties);
+
+private:
 
     void calculateProperties();
 

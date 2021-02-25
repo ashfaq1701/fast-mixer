@@ -44,6 +44,7 @@ add_library( # Sets the name of the library.
         synthesizers/GainAdjustment.cpp
 
         audio/FileDataSource.cpp
+        audio/BufferedDataSource.cpp
         audio/Player.cpp
         audio/FFMpegExtractor.cpp
         recording/recording-lib.cpp

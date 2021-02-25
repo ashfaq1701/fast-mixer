@@ -316,4 +316,15 @@ extern "C" {
         auto filePathStr = java_str_to_c_str(env, filePath);
         mixingEngine->pasteFromClipboard(filePathStr, position);
     }
+
+    JNIEXPORT void  JNICALL
+    Java_com_bluehub_fastmixer_audio_MixingEngine_pasteNewFromClipboard(JNIEnv *env, jclass, jstring filePath) {
+        if (!mixingEngine) {
+            LOGE("pasteNewFromClipboard: mixingEngine is null, you must call create() method before calling this method");
+            return;
+        }
+
+        auto filePathStr = java_str_to_c_str(env, filePath);
+        mixingEngine->pasteNewFromClipboard(filePathStr);
+    }
 }

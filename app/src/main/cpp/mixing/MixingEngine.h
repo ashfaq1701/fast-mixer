@@ -60,6 +60,8 @@ public:
 
     void pasteFromClipboard(string filePath, int64_t position);
 
+    void pasteNewFromClipboard(string fileId);
+
 private:
 
     const char* TAG = "Mixing Engine:: %s";

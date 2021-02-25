@@ -290,3 +290,15 @@ void MixingEngine::pasteFromClipboard(string filePath, int64_t position) {
 
     source->pasteFromClipboard(position, clipboard);
 }
+
+void MixingEngine::pasteNewFromClipboard(string fileId) {
+    auto it = mSourceMapStore->sourceMap.find(fileId);
+    if (it != mSourceMapStore->sourceMap.end()) {
+        fileId.erase();
+        return;
+    }
+
+    shared_ptr<BufferedDataSource> source = mMixingIO.createClipboardDataSource(clipboard);
+    mSourceMapStore->sourceMap.insert(pair<string, shared_ptr<FileDataSource>>(fileId, move(source)));
+    fileId.erase();
+}

@@ -378,7 +378,19 @@ class MixingScreenViewModel @Inject constructor(val context: Context,
     }
 
     fun pasteAsNew() {
+        val fileId = UUID.randomUUID().toString()
 
+        viewModelScope.launch {
+            audioFileStore.run {
+                withContext(Dispatchers.IO) {
+                    mixingRepository.pasteNewFromClipboard(fileId)
+                    val totalSamples = getTotalSamples(fileId)
+                    audioFiles.add(AudioFileUiState.create(fileId, totalSamples))
+                }
+                _audioFilesLiveData.value = audioFiles
+                _itemAddedIdx.value = audioFiles.size - 1
+            }
+        }
     }
 
     fun resetStates() {
