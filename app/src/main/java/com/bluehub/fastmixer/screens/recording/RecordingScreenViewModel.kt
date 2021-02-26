@@ -4,10 +4,7 @@ import android.content.Context
 import android.content.IntentFilter
 import android.media.AudioManager
 import androidx.databinding.Bindable
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.bluehub.fastmixer.BR
 import com.bluehub.fastmixer.R
 import com.bluehub.fastmixer.broadcastReceivers.AudioDeviceChangeListener
@@ -106,7 +103,10 @@ class RecordingScreenViewModel @Inject constructor (val context: Context,
     val recordingTimerText: LiveData<String>
         get() = _recordingTimerText
 
-    private val _livePlaybackPermitted = MutableLiveData<Boolean>(false)
+    private val _livePlaybackEnabled = MutableLiveData<Boolean>(false)
+    val livePlaybackEnabled: LiveData<Boolean>
+        get() = _livePlaybackEnabled
+
 
     val mixingPlayActive = MutableLiveData<Boolean>(false)
 
@@ -115,7 +115,7 @@ class RecordingScreenViewModel @Inject constructor (val context: Context,
             _eventLivePlaybackSet.value = audioRepository.isHeadphoneConnected()
             notifyPropertyChanged(BR.livePlaybackActive)
         }
-        _livePlaybackPermitted.value = audioRepository.isHeadphoneConnected()
+        _livePlaybackEnabled.value = audioRepository.isHeadphoneConnected()
     }
 
     val handleInputStreamDisconnection: () -> Unit = {
@@ -156,7 +156,7 @@ class RecordingScreenViewModel @Inject constructor (val context: Context,
             }
 
             audioRepository.audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
-            _livePlaybackPermitted.value = audioRepository.isHeadphoneConnected()
+            _livePlaybackEnabled.value = audioRepository.isHeadphoneConnected()
         }
 
         audioDeviceChangeListener.setHandleInputCallback(handleInputStreamDisconnection)
@@ -177,8 +177,8 @@ class RecordingScreenViewModel @Inject constructor (val context: Context,
 
     fun setLivePlaybackActive(value: Boolean) {
         if (_eventLivePlaybackSet.value != value) {
-            if (!value || (_eventIsRecording.value == true && _livePlaybackPermitted.value == true)) {
-                _eventLivePlaybackSet.value = value
+            _eventLivePlaybackSet.value = value
+            if (eventIsRecording.value == true) {
                 toggleLivePlayback()
             }
             notifyPropertyChanged(BR.livePlaybackActive)

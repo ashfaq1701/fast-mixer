@@ -19,6 +19,7 @@ import com.tbruyelle.rxpermissions3.Permission
 import com.tbruyelle.rxpermissions3.RxPermissions
 import com.visualizer.amplitude.AudioRecordView
 import kotlinx.android.synthetic.main.view_loading.*
+import timber.log.Timber
 import javax.inject.Inject
 
 
@@ -100,6 +101,10 @@ class RecordingScreen : BaseFragment<RecordingScreenViewModel>(ViewModelType.FRA
                 dataBinding.togglePlayWithMixingTracks.text = getString(R.string.pause_label)
                 viewModel.startTrackingSeekbar()
             }
+        })
+
+        viewModel.livePlaybackEnabled.observe(viewLifecycleOwner, {
+            dataBinding.livePlaybackEnabled.isEnabled = it
         })
 
         viewModel.eventGoBack.observe(viewLifecycleOwner, { goBack ->
