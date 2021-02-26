@@ -141,31 +141,38 @@ class CustomHorizontalScrollBar(context: Context, attributeSet: AttributeSet?)
     }
 
     private fun setViewWidthListener() {
-        mView.addOnLayoutChangeListener { view: View, _, _, _, _, _, _, _, _ ->
 
-            if (mScrollTrack.width == 0) return@addOnLayoutChangeListener
+        val layoutChangeListener = layoutChangeListener@{ controlledView: View, scrollTrack: View ->
+            if (scrollTrack.width == 0) return@layoutChangeListener
 
-            val w = view.width
+            val w = controlledView.width
 
-            val ratio = w.toFloat() / mScrollTrack.width.toFloat()
+            val ratio = w.toFloat() / scrollTrack.width.toFloat()
 
-            if (ratio == 1.0f) {
-                mScrollBar.visibility = View.INVISIBLE
-            } else {
-                mScrollBar.visibility = View.VISIBLE
+            val layoutParams = mScrollThumb.layoutParams
 
-                val layoutParams = mScrollThumb.layoutParams
+            val newWidth = (scrollTrack.width.toFloat() / ratio).toInt()
 
-                val newWidth = (mScrollTrack.width.toFloat() / ratio).toInt()
+            layoutParams.width = newWidth
 
-                layoutParams.width = newWidth
-
+            mScrollThumb.post {
                 if (mScrollThumb.width != newWidth) {
-                    mScrollThumb.post {
-                        mScrollThumb.layoutParams = layoutParams
-                    }
+                    mScrollThumb.layoutParams = layoutParams
+                }
+
+                if (ratio <= 1.0f) {
+                    mScrollBar.visibility = INVISIBLE
+                } else {
+                    mScrollBar.visibility = VISIBLE
                 }
             }
+        }
+
+        mView.addOnLayoutChangeListener { v, _, _, _, _, _, _, _, _ ->
+            layoutChangeListener(v, mScrollTrack)
+        }
+        mScrollTrack.addOnLayoutChangeListener { v, _, _, _, _, _, _, _, _ ->
+            layoutChangeListener(mView, v)
         }
     }
 }
