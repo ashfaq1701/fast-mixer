@@ -15,7 +15,8 @@ interface ActivityModule {
     @ActivityScope
     @ContributesAndroidInjector(
         modules = [
-            MainActivityFragmentModule::class
+            MainActivityFragmentModule::class,
+            FileStoresModule::class
         ]
     )
     fun mainActivity(): MainActivity
