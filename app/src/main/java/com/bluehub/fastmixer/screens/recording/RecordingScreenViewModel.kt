@@ -40,6 +40,9 @@ class RecordingScreenViewModel @Inject constructor (val context: Context,
         }
     }
 
+    private val cacheDir = context.cacheDir.absolutePath
+    private val recordingSessionId = UUID.randomUUID().toString()
+
     private var visualizerTimer: Timer? = null
     private var seekbarTimer: Timer? = null
     private var recordingTimer: Timer?  = null
@@ -61,16 +64,12 @@ class RecordingScreenViewModel @Inject constructor (val context: Context,
         get() = _eventIsPlayingWithMixingTracks
 
     private val _eventLivePlaybackSet = MutableLiveData<Boolean>(false)
-    val eventLivePlayback: LiveData<Boolean>
-        get() = _eventLivePlaybackSet
 
     private val _eventGoBack = MutableLiveData<Boolean>(false)
     val eventGoBack: LiveData<Boolean>
         get() = _eventGoBack
 
     private val _recordingPermissionGranted = MutableLiveData<Boolean>(false)
-    val recordingPermissionGranted: LiveData<Boolean>
-        get() = _recordingPermissionGranted
 
     private val _requestRecordingPermission = MutableLiveData<Boolean>(false)
     val requestRecordingPermission: LiveData<Boolean>
@@ -150,8 +149,7 @@ class RecordingScreenViewModel @Inject constructor (val context: Context,
     init {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                repository.createCacheDirectory(context.cacheDir.absolutePath)
-                repository.createAudioEngine()
+                repository.createAudioEngine(cacheDir, recordingSessionId)
                 loadMixerFiles()
             }
 

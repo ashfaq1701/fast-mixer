@@ -1,18 +1,11 @@
 package com.bluehub.fastmixer.screens.recording
 
-import android.content.Context
-import android.os.Build
-import android.os.Environment
 import com.bluehub.fastmixer.audio.RecordingEngineProxy
-import java.io.File
-import java.nio.file.*
-import java.util.*
 import javax.inject.Inject
 
 class RecordingRepository @Inject
     constructor(private val recordingEngineProxy: RecordingEngineProxy) {
 
-    private val recordingSessionId = UUID.randomUUID().toString()
     private lateinit var cacheDir: String
 
     fun stopRecording() {
@@ -75,16 +68,7 @@ class RecordingRepository @Inject
         recordingEngineProxy.delete()
     }
 
-    fun createCacheDirectory(cacheDirPath: String): String {
-        cacheDir = "$cacheDirPath/$recordingSessionId"
-        val cacheDirFile = File(cacheDir)
-        if (!cacheDirFile.exists()) {
-            cacheDirFile.mkdir()
-        }
-        return cacheDir
-    }
-
-    fun createAudioEngine() {
+    fun createAudioEngine(cacheDir: String, recordingSessionId: String) {
         recordingEngineProxy.create(cacheDir, recordingSessionId, true)
     }
 

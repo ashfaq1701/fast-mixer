@@ -16,7 +16,7 @@ RecordingEngine::RecordingEngine(
         bool recordingScreenViewModelPassed): mAppDir(move(appDir)), mRecordingSessionId(move(recordingSessionId)) {
 
     assert(RecordingStreamConstants::mInputChannelCount == RecordingStreamConstants::mOutputChannelCount);
-    auto recordingFilePath = mAppDir + "/recording.wav";
+    auto recordingFilePath = mAppDir + "/" + mRecordingSessionId + "/recording.wav";
 
     mRecordingIO.setRecordingFilePath(recordingFilePath);
     mRecordingIO.setStopPlaybackCallback([&] () {
