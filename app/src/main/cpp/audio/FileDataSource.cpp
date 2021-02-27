@@ -244,22 +244,22 @@ int64_t FileDataSource::shiftBySamples(int64_t position, int64_t numSamples) {
 
     auto channelCount = mProperties.channelCount;
 
-    int64_t numSamplesWithChannelCount = numSamples * mProperties.channelCount;
-    int64_t positionWithChannelCount = position * mProperties.channelCount;
+    int64_t numSamplesWithChannelCount = numSamples * channelCount;
+    int64_t positionWithChannelCount = position * channelCount;
 
     int64_t newBufferSize = mBufferSize + numSamplesWithChannelCount;
 
     float* oldBufferData = mBuffer.get();
     float* newBuffer = new float[newBufferSize];
 
-    if (positionWithChannelCount - channelCount + 1 >= 0) {
-        copy(oldBufferData, oldBufferData + (positionWithChannelCount - channelCount + 1), newBuffer);
-    }
-
     int64_t fillStartPosition = positionWithChannelCount;
 
-    if (positionWithChannelCount - channelCount + 1 >= 0) {
+    if (positionWithChannelCount - channelCount + 1 > 0) {
         fillStartPosition = positionWithChannelCount - channelCount + 1;
+    }
+
+    if (fillStartPosition >= 0) {
+        copy(oldBufferData, oldBufferData + fillStartPosition, newBuffer);
     }
 
     int64_t fillEndPosition = fillStartPosition + numSamplesWithChannelCount;

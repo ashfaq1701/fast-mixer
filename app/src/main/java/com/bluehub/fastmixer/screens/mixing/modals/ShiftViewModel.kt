@@ -9,6 +9,7 @@ import com.bluehub.fastmixer.screens.mixing.FileWaveViewStore
 import com.bluehub.fastmixer.screens.mixing.MixingRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 class ShiftViewModel@Inject constructor(
@@ -48,6 +49,7 @@ class ShiftViewModel@Inject constructor(
             _shiftDuration.value?.let {
 
                 val shiftDurationSamples = (it * (Config.SAMPLE_RATE.toFloat() / 1000.0)).toInt()
+
                 applyShift(path, playSliderPositionSample, shiftDurationSamples)
             } ?: run {
                 errorLiveData.value = context.getString(R.string.error_shift_duration_required)
