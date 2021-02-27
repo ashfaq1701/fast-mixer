@@ -14,6 +14,8 @@ import com.bluehub.fastmixer.screens.mixing.AudioFileStore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
+import java.io.File
 import java.util.*
 import javax.inject.Inject
 
@@ -42,6 +44,15 @@ class RecordingScreenViewModel @Inject constructor (val context: Context,
 
     private val cacheDir = context.cacheDir.absolutePath
     private val recordingSessionId = UUID.randomUUID().toString()
+    private val recordingFileDirectory: String
+        get() {
+            return "$cacheDir/$recordingSessionId"
+        }
+
+    val recordingFilePath: String
+        get() {
+            return "$recordingFileDirectory/recording.wav"
+        }
 
     private var visualizerTimer: Timer? = null
     private var seekbarTimer: Timer? = null
@@ -149,7 +160,7 @@ class RecordingScreenViewModel @Inject constructor (val context: Context,
     init {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                repository.createAudioEngine(cacheDir, recordingSessionId)
+                repository.createAudioEngine(recordingFileDirectory)
                 loadMixerFiles()
             }
 
@@ -392,6 +403,11 @@ class RecordingScreenViewModel @Inject constructor (val context: Context,
                     }
                 }
             }
+
+            val recordingFile = File(recordingFilePath)
+            val fileSize = recordingFile.length()
+            Timber.d("Recording File size is: $recordingFilePath, $fileSize")
+
             _eventGoBack.value = true
         }
         stopAllTimers()

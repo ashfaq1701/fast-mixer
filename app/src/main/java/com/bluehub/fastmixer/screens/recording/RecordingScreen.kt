@@ -110,7 +110,7 @@ class RecordingScreen : BaseFragment<RecordingScreenViewModel>(ViewModelType.FRA
         viewModel.eventGoBack.observe(viewLifecycleOwner, { goBack ->
             if (goBack) {
                 val action = actionRecordingScreenToMixingScreen()
-                action.recordedFilePath = viewModel.repository.getRecordedFilePath()
+                action.recordedFilePath = viewModel.recordingFilePath
                 viewModel.resetGoBack()
                 findNavController().navigate(action)
             }

@@ -4,10 +4,9 @@ import com.bluehub.fastmixer.audio.RecordingEngine
 import javax.inject.Inject
 
 class RecordingEngineProxy @Inject constructor(){
-    fun create(appPathStr: String,
-               recordingSessionIdStr: String,
+    fun create(recordingFileDir: String,
                recordingScreenViewModelPassed: Boolean = false): Boolean =
-        RecordingEngine.create(appPathStr, recordingSessionIdStr, recordingScreenViewModelPassed)
+        RecordingEngine.create(recordingFileDir, recordingScreenViewModelPassed)
 
     fun delete() = RecordingEngine.delete()
 

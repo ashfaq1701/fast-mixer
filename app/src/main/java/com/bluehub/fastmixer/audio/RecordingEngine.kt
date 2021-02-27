@@ -8,8 +8,7 @@ class RecordingEngine {
         }
 
         @JvmStatic external fun create(
-            appPathStr: String,
-            recordingSessionIdStr: String,
+            recordingFileDir: String,
             recordingScreenViewModelPassed: Boolean = false): Boolean
 
         @JvmStatic external fun delete()

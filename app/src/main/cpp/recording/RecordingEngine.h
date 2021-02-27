@@ -22,7 +22,7 @@ class RecordingEngine {
 
 public:
 
-    RecordingEngine(string appDir, string recordingSessionId, bool recordingScreenViewModelPassed);
+    RecordingEngine(string recordingFileDir, bool recordingScreenViewModelPassed);
     ~RecordingEngine();
 
     void startRecording();
@@ -75,8 +75,7 @@ private:
 
     const char* TAG = "Recording Engine:: %s";
 
-    string mRecordingSessionId = nullptr;
-    string mAppDir = nullptr;
+    string mRecordingFileDir = nullptr;
     bool mPlayback = true;
 
     int bakPlayHead = 0;

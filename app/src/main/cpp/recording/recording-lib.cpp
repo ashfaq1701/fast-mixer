@@ -33,14 +33,13 @@ extern "C" {
     }
 
     JNIEXPORT jboolean JNICALL
-    Java_com_bluehub_fastmixer_audio_RecordingEngine_create(JNIEnv *env, jclass, jstring appDirStr, jstring recordingSessionIdStr, jboolean  recordingScreenViewModelPassed) {
+    Java_com_bluehub_fastmixer_audio_RecordingEngine_create(JNIEnv *env, jclass, jstring recordingFileDir, jboolean  recordingScreenViewModelPassed) {
         if (!recordingEngine) {
-            auto appDir = java_str_to_c_str(env, appDirStr);
-            auto recordingSessionId = java_str_to_c_str(env, recordingSessionIdStr);
+            auto recordingFileDirStr = java_str_to_c_str(env, recordingFileDir);
 
             prepare_kotlin_recording_method_ids(env);
 
-            recordingEngine = new RecordingEngine(appDir, recordingSessionId, recordingScreenViewModelPassed);
+            recordingEngine = new RecordingEngine(recordingFileDirStr, recordingScreenViewModelPassed);
         }
         return (recordingEngine != nullptr);
     }
