@@ -1,22 +1,16 @@
 package com.bluehub.fastmixer
 
-import com.bluehub.fastmixer.common.di.components.DaggerApplicationComponent
-import dagger.android.AndroidInjector
-import dagger.android.support.DaggerApplication
+import android.app.Application
 import timber.log.Timber
+import dagger.hilt.android.HiltAndroidApp
 
-class MixerApplication: DaggerApplication() {
+@HiltAndroidApp
+class MixerApplication: Application() {
 
     override fun onCreate() {
         super.onCreate()
         if (BuildConfig.DEBUG) {
             Timber.plant(Timber.DebugTree())
         }
-    }
-
-    override fun applicationInjector(): AndroidInjector<out DaggerApplication> {
-        return DaggerApplicationComponent
-            .factory()
-            .create(this)
     }
 }

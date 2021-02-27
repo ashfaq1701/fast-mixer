@@ -1,8 +1,11 @@
 package com.bluehub.fastmixer.screens.mixing
 
 import androidx.lifecycle.MutableLiveData
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class PlayFlagStore {
+@Singleton
+class PlayFlagStore @Inject constructor() {
 
     val isPlaying: MutableLiveData<Boolean> = MutableLiveData()
     val isGroupPlaying: MutableLiveData<Boolean> = MutableLiveData()

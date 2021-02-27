@@ -6,11 +6,13 @@ import androidx.lifecycle.MutableLiveData
 import com.bluehub.fastmixer.R
 import com.bluehub.fastmixer.common.models.AudioFileUiState
 import com.bluehub.fastmixer.common.utils.Optional
-import com.bluehub.fastmixer.common.viewmodel.BaseViewModel
+import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
+@HiltViewModel
 class SegmentAdjustmentViewModel @Inject constructor(
-    val context: Context
+    @ApplicationContext val context: Context
 ) : BaseDialogViewModel() {
 
     private lateinit var _audioFileUiState: AudioFileUiState

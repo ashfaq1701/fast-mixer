@@ -4,17 +4,19 @@ import android.os.Bundle
 import android.view.*
 import android.widget.SeekBar
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.MutableLiveData
 import com.bluehub.fastmixer.R
 import com.bluehub.fastmixer.common.fragments.BaseFragment
 import com.bluehub.fastmixer.databinding.PlayFragmentBinding
-import kotlinx.android.synthetic.main.play_fragment.*
-import kotlinx.android.synthetic.main.view_loading.*
+import dagger.hilt.android.AndroidEntryPoint
 
-class PlayFragment(private val audioFilePath: String, val isLoading: MutableLiveData<Boolean>) : BaseFragment<PlayViewModel>() {
+@AndroidEntryPoint
+class PlayFragment (private val audioFilePath: String, val isLoading: MutableLiveData<Boolean>) : BaseFragment<PlayViewModel>() {
 
     private lateinit var binding: PlayFragmentBinding
-    override val viewModelClass = PlayViewModel::class
+
+    override val viewModel: PlayViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,

@@ -1,10 +1,12 @@
 package com.bluehub.fastmixer.activities
 
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import com.bluehub.fastmixer.R
-import dagger.android.support.DaggerAppCompatActivity
+import dagger.hilt.android.AndroidEntryPoint
 
-class MainActivity : DaggerAppCompatActivity() {
+@AndroidEntryPoint
+class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)

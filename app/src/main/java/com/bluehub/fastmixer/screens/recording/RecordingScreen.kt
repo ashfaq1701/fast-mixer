@@ -8,22 +8,25 @@ import android.widget.SeekBar
 import androidx.activity.*
 import androidx.appcompat.app.AlertDialog
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.bluehub.fastmixer.R
 import com.bluehub.fastmixer.common.fragments.BaseFragment
 import com.bluehub.fastmixer.common.models.ViewModelType
 import com.bluehub.fastmixer.databinding.RecordingScreenBinding
+import com.bluehub.fastmixer.screens.mixing.MixingScreenViewModel
 import com.bluehub.fastmixer.screens.recording.RecordingScreenDirections.actionRecordingScreenToMixingScreen
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.tbruyelle.rxpermissions3.Permission
 import com.tbruyelle.rxpermissions3.RxPermissions
 import com.visualizer.amplitude.AudioRecordView
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.view_loading.*
 import timber.log.Timber
 import javax.inject.Inject
 
-
-class RecordingScreen : BaseFragment<RecordingScreenViewModel>(ViewModelType.FRAGMENT_SCOPED) {
+@AndroidEntryPoint
+class RecordingScreen : BaseFragment<RecordingScreenViewModel>() {
 
     companion object {
         fun newInstance() = RecordingScreen()
@@ -31,7 +34,7 @@ class RecordingScreen : BaseFragment<RecordingScreenViewModel>(ViewModelType.FRA
 
     @Inject lateinit var rxPermission: RxPermissions
 
-    override val viewModelClass = RecordingScreenViewModel::class
+    override val viewModel: RecordingScreenViewModel by viewModels()
 
     private lateinit var dataBinding: RecordingScreenBinding
 
@@ -46,6 +49,7 @@ class RecordingScreen : BaseFragment<RecordingScreenViewModel>(ViewModelType.FRA
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
         requireActivity().onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
     }

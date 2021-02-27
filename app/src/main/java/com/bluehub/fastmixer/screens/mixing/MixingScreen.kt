@@ -7,24 +7,27 @@ import android.os.Bundle
 import android.view.*
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
+import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.transition.*
 import com.bluehub.fastmixer.R
 import com.bluehub.fastmixer.common.fragments.BaseFragment
-import com.bluehub.fastmixer.common.models.*
+import com.bluehub.fastmixer.common.models.AudioFileUiState
+import com.bluehub.fastmixer.common.models.AudioViewActionType
 import com.bluehub.fastmixer.databinding.MixingScreenBinding
 import com.bluehub.fastmixer.screens.mixing.MixingScreenDirections.actionMixingScreenToRecordingScreen
 import com.bluehub.fastmixer.screens.mixing.modals.*
+import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import timber.log.Timber
 
-class MixingScreen : BaseFragment<MixingScreenViewModel>(ViewModelType.NAV_SCOPED) {
+@AndroidEntryPoint
+class MixingScreen : BaseFragment<MixingScreenViewModel>() {
     companion object {
         fun newInstance() = MixingScreen()
     }
 
-    override val viewModelClass = MixingScreenViewModel::class
+    override val viewModel: MixingScreenViewModel by hiltNavGraphViewModels(R.id.nav_graph)
 
     private lateinit var dataBinding: MixingScreenBinding
 

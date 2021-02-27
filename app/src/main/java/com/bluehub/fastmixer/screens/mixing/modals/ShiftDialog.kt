@@ -4,15 +4,19 @@ import android.app.Dialog
 import android.os.Bundle
 import android.view.*
 import androidx.core.widget.doOnTextChanged
+import androidx.fragment.app.viewModels
 import com.bluehub.fastmixer.common.fragments.BaseDialogFragment
 import com.bluehub.fastmixer.common.models.AudioFileUiState
 import com.bluehub.fastmixer.databinding.ShiftDialogBinding
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.view_loading.*
 
+@AndroidEntryPoint
 class ShiftDialog(private val audioFileUiState: AudioFileUiState) : BaseDialogFragment<ShiftViewModel>() {
 
     private lateinit var binding: ShiftDialogBinding
-    override val viewModelClass = ShiftViewModel::class
+
+    override val viewModel: ShiftViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,

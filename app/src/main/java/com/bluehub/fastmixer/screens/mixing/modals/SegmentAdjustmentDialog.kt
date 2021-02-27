@@ -3,15 +3,19 @@ package com.bluehub.fastmixer.screens.mixing.modals
 import android.app.Dialog
 import android.os.Bundle
 import android.view.*
+import androidx.fragment.app.viewModels
 import androidx.core.widget.doOnTextChanged
 import com.bluehub.fastmixer.common.fragments.BaseDialogFragment
 import com.bluehub.fastmixer.common.models.AudioFileUiState
 import com.bluehub.fastmixer.databinding.SegmentAdjustmentDialogBinding
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class SegmentAdjustmentDialog(private val audioFileUiState: AudioFileUiState) : BaseDialogFragment<SegmentAdjustmentViewModel>() {
 
     private lateinit var binding: SegmentAdjustmentDialogBinding
-    override val viewModelClass = SegmentAdjustmentViewModel::class
+
+    override val viewModel: SegmentAdjustmentViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,

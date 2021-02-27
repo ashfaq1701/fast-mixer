@@ -3,17 +3,22 @@ package com.bluehub.fastmixer.screens.mixing.modals
 import android.app.Dialog
 import android.os.Bundle
 import android.view.*
+import androidx.fragment.app.viewModels
 import com.bluehub.fastmixer.R
 import com.bluehub.fastmixer.common.fragments.BaseDialogFragment
 import com.bluehub.fastmixer.databinding.GainAdjustmentDialogBinding
 import com.bluehub.fastmixer.screens.mixing.PlayFragment
 import com.warkiz.widget.*
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.view_loading.*
 
+
+@AndroidEntryPoint
 class GainAdjustmentDialog(private val audioFilePath: String) : BaseDialogFragment<GainAdjustmentViewModel>() {
 
     private lateinit var binding: GainAdjustmentDialogBinding
-    override val viewModelClass = GainAdjustmentViewModel::class
+
+    override val viewModel: GainAdjustmentViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,

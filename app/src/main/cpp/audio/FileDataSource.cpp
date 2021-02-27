@@ -352,7 +352,7 @@ void FileDataSource::muteAndCopyToClipboard(int64_t startPosition, int64_t endPo
 
     copy(oldBufferData + startIndexWithChannels, oldBufferData + endIndexWithChannels, clipboard.begin());
 
-    fill(oldBufferData + startIndexWithChannels, oldBufferData + endIndexWithChannels, 0.0f);
+    fill(oldBufferData + startIndexWithChannels, oldBufferData + endIndexWithChannels, 0);
 }
 
 void FileDataSource::pasteFromClipboard(int64_t position, vector<float>& clipboard) {

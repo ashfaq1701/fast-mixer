@@ -4,24 +4,13 @@ import android.app.AlertDialog
 import android.app.Dialog
 import android.view.View
 import android.view.Window
+import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import com.bluehub.fastmixer.R
-import com.bluehub.fastmixer.common.di.FragmentViewModelFactory
-import dagger.android.support.DaggerDialogFragment
-import javax.inject.Inject
-import kotlin.reflect.KClass
 
-abstract class BaseDialogFragment <T: ViewModel>() : DaggerDialogFragment() {
+abstract class BaseDialogFragment <T: ViewModel> : DialogFragment() {
 
-    protected abstract val viewModelClass: KClass<T>
-
-    @Inject
-    lateinit var viewModelFactory: FragmentViewModelFactory
-
-    protected val viewModel: T by lazy {
-        ViewModelProvider(this, viewModelFactory)[viewModelClass.java]
-    }
+    protected abstract val viewModel: T
 
     protected fun createDialog(view: View) : Dialog {
         return activity?.let { parentActivity ->

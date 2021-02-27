@@ -17,6 +17,7 @@ import io.reactivex.rxjava3.functions.Function
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import kotlin.math.*
 
 
@@ -32,6 +33,7 @@ class FileWaveView @JvmOverloads constructor(
 
     companion object {
         const val TAIL_WIDTH = 3
+        const val SAMPLE_MIN_THRESHOLD: Float = 1.0E-20F
     }
 
     private val mAudioFileUiState: BehaviorSubject<AudioFileUiState> = BehaviorSubject.create()
@@ -200,10 +202,14 @@ class FileWaveView @JvmOverloads constructor(
             return
         }
 
-        val maximumAbs = rawPts.fold(Float.MIN_VALUE) { acc, current ->
-            if (abs(current) > acc) {
+        val maximumAbs = rawPts.fold(0.0f) { acc, current ->
+            val maxAbs = if (abs(current) > acc) {
                 abs(current)
             } else acc
+
+            if (maxAbs < SAMPLE_MIN_THRESHOLD) {
+                0.0f
+            } else maxAbs
         }
 
         val maxToScale = height * 0.48

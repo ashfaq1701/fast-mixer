@@ -11,22 +11,24 @@ import com.bluehub.fastmixer.broadcastReceivers.AudioDeviceChangeListener
 import com.bluehub.fastmixer.common.repositories.AudioRepository
 import com.bluehub.fastmixer.common.viewmodel.BaseViewModel
 import com.bluehub.fastmixer.screens.mixing.AudioFileStore
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.*
 import timber.log.Timber
 import java.io.File
 import java.util.*
 import javax.inject.Inject
 
-class RecordingScreenViewModel @Inject constructor (val context: Context,
-                                                    val repository: RecordingRepository,
-                                                    private val audioRepository: AudioRepository,
-                                                    private val audioFileStore: AudioFileStore,
-                                                    private val audioDeviceChangeListener: AudioDeviceChangeListener)
+@HiltViewModel
+class RecordingScreenViewModel @Inject constructor (@ApplicationContext val context: Context,
+                                                        val repository: RecordingRepository,
+                                                        private val audioRepository: AudioRepository,
+                                                        private val audioFileStore: AudioFileStore,
+                                                        private val audioDeviceChangeListener: AudioDeviceChangeListener)
     : BaseViewModel() {
 
     companion object {
+
         private lateinit var instance: RecordingScreenViewModel
 
         fun setInstance(vmInstance: RecordingScreenViewModel) {

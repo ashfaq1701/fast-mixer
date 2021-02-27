@@ -7,18 +7,20 @@ import com.bluehub.fastmixer.common.models.AudioFileUiState
 import com.bluehub.fastmixer.common.models.AudioViewAction
 import com.bluehub.fastmixer.common.utils.*
 import com.bluehub.fastmixer.common.viewmodel.BaseViewModel
+import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.*
 import java.io.File
 import java.util.*
 import javax.inject.Inject
 
-
-class MixingScreenViewModel @Inject constructor(val context: Context,
-                                                private val fileManager: FileManager,
-                                                private val mixingRepository: MixingRepository,
-                                                private val audioFileStore: AudioFileStore,
-                                                private val playFlagStore: PlayFlagStore,
-                                                val fileWaveViewStore: FileWaveViewStore)
+@HiltViewModel
+class MixingScreenViewModel @Inject constructor(@ApplicationContext val context: Context,
+                                                    private val fileManager: FileManager,
+                                                    private val mixingRepository: MixingRepository,
+                                                    private val audioFileStore: AudioFileStore,
+                                                    private val playFlagStore: PlayFlagStore,
+                                                    val fileWaveViewStore: FileWaveViewStore)
     : BaseViewModel() {
 
     companion object {

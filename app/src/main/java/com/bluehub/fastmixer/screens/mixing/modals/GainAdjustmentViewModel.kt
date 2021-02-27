@@ -2,15 +2,17 @@ package com.bluehub.fastmixer.screens.mixing.modals
 
 import android.content.Context
 import androidx.lifecycle.*
-import com.bluehub.fastmixer.common.viewmodel.BaseViewModel
 import com.bluehub.fastmixer.screens.mixing.FileWaveViewStore
 import com.bluehub.fastmixer.screens.mixing.MixingRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@HiltViewModel
 class GainAdjustmentViewModel @Inject constructor(
-    val context: Context,
+    @ApplicationContext val context: Context,
     private val mixingRepository: MixingRepository,
     val fileWaveViewStore: FileWaveViewStore
 ) : BaseDialogViewModel() {

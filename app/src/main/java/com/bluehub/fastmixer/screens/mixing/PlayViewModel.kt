@@ -5,13 +5,16 @@ import androidx.lifecycle.*
 import com.bluehub.fastmixer.common.utils.areEqual
 import com.bluehub.fastmixer.common.utils.reInitList
 import com.bluehub.fastmixer.common.viewmodel.BaseViewModel
+import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.*
 import javax.inject.Inject
 
+@HiltViewModel
 class PlayViewModel @Inject constructor(
-    val context: Context,
+    @ApplicationContext val context: Context,
     private val mixingRepository: MixingRepository,
     private val audioFileStore: AudioFileStore,
     private val playFlagStore: PlayFlagStore) : BaseViewModel() {

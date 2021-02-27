@@ -8,8 +8,11 @@ import com.bluehub.fastmixer.common.utils.Optional
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import kotlinx.coroutines.*
 import java.util.*
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class FileWaveViewStore(val mixingRepository: MixingRepository) {
+@Singleton
+class FileWaveViewStore @Inject constructor(val mixingRepository: MixingRepository) {
     companion object {
         const val ZOOM_STEP = 1
     }

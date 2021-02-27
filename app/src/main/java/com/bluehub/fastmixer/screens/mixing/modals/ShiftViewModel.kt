@@ -7,13 +7,15 @@ import com.bluehub.fastmixer.common.config.Config
 import com.bluehub.fastmixer.common.models.AudioFileUiState
 import com.bluehub.fastmixer.screens.mixing.FileWaveViewStore
 import com.bluehub.fastmixer.screens.mixing.MixingRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import javax.inject.Inject
 
-class ShiftViewModel@Inject constructor(
-    val context: Context,
+@HiltViewModel
+class ShiftViewModel @Inject constructor(
+    @ApplicationContext val context: Context,
     val fileWaveViewStore: FileWaveViewStore,
     val mixingRepository: MixingRepository
 ) : BaseDialogViewModel() {
