@@ -95,7 +95,8 @@ private:
 
     function<void()> mStopPlaybackCallback = nullptr;
 
-    vector<int16_t> mData;
+    int16_t* mData = new int16_t[kMaxSamples]{0};
+    int32_t mWriteIndex = 0;
     int16_t* mBuff = new int16_t[kMaxSamples]{0};
 
     static void flush_to_file(int16_t* data, int32_t length, const string& recordingFilePath, shared_ptr<SndfileHandle>& recordingFile);
