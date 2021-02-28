@@ -18,7 +18,7 @@
 #define FAST_MIXER_FILEDATASOURCE_H
 
 #include <android/asset_manager.h>
-#include "../Constants.h"
+#include "../structs.h"
 #include "DataSource.h"
 #include "../utils/Utils.h"
 

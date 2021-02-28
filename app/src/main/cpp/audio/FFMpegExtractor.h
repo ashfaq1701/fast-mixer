@@ -12,6 +12,7 @@ extern "C" {
 }
 #include <string>
 #include "../Constants.h"
+#include "../structs.h"
 #include "../logging_macros.h"
 #include "vector"
 
@@ -26,7 +27,7 @@ public:
     };
     const char *mFilePath;
 
-    int64_t decode(vector<uint8_t>& targetData);
+    int64_t decode(shared_ptr<decode_buffer_data> buff);
 
     int mSampleRate = 0;
     int mChannelCount = 0;

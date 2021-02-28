@@ -110,7 +110,7 @@ AVStream *FFMpegExtractor::getBestAudioStream(AVFormatContext *avFormatContext) 
     }
 }
 
-int64_t FFMpegExtractor::decode(vector<uint8_t>& targetData) {
+int64_t FFMpegExtractor::decode(shared_ptr<decode_buffer_data> buff) {
     int returnValue = -1; // -1 indicates error
 
     // Create a buffer for FFmpeg to use for decoding (freed in the custom deleter below)
@@ -229,6 +229,8 @@ int64_t FFMpegExtractor::decode(vector<uint8_t>& targetData) {
 
     LOGD("DECODE START");
 
+    uint8_t* targetData = buff->ptr;
+
     // While there is more data to read, read it into the avPacket
     while (av_read_frame(formatContext.get(), &avPacket) == 0){
 
@@ -277,11 +279,20 @@ int64_t FFMpegExtractor::decode(vector<uint8_t>& targetData) {
 
             int64_t bytesToWrite = frame_count * sizeof(float) * mTargetProperties.channelCount;
 
-            if (bytesWritten + bytesToWrite > targetData.size()) {
-                targetData.resize(targetData.size() * 2);
+            if (bytesWritten + bytesToWrite > buff->countPoints) {
+
+                uint8_t* newBuff = new uint8_t [buff->countPoints * 2];
+                memcpy(newBuff, targetData, (size_t) buff->countPoints);
+
+                buff->countPoints = buff->countPoints * 2;
+                buff->ptr = move(newBuff);
+
+                delete [] targetData;
+
+                targetData = buff->ptr;
             }
 
-            memcpy(targetData.data() + bytesWritten, buffer1, (size_t)bytesToWrite);
+            memcpy(targetData + bytesWritten, buffer1, (size_t)bytesToWrite);
             bytesWritten += bytesToWrite;
             av_freep(&buffer1);
 

@@ -82,10 +82,15 @@ FileDataSource* FileDataSource::newFromCompressedFile(
         initialSize = initialSize * kMaxCompressionRatio;
     }
 
-    vector<uint8_t> decodedData;
-    decodedData.resize(initialSize);
+    uint8_t* decodedData = new uint8_t [initialSize];
+    decode_buffer_data buff = {
+            .ptr = decodedData,
+            .countPoints = (size_t) initialSize
+    };
 
-    int64_t bytesDecoded = ffmpegExtractor.decode(decodedData);
+    auto dataBuffer = make_shared<decode_buffer_data>(buff);
+
+    int64_t bytesDecoded = ffmpegExtractor.decode(dataBuffer);
 
     if (bytesDecoded <= 0) {
         return nullptr;
@@ -95,10 +100,9 @@ FileDataSource* FileDataSource::newFromCompressedFile(
 
     // Now we know the exact number of samples we can create a float array to hold the audio data
     auto outputBuffer = make_unique<float[]>(numSamples);
-    memcpy(outputBuffer.get(), decodedData.data(), (size_t)bytesDecoded);
+    memcpy(outputBuffer.get(), dataBuffer->ptr, (size_t)bytesDecoded);
 
-    vector <uint8_t> v;
-    decodedData.swap(v);
+    delete [] dataBuffer->ptr;
 
     return new FileDataSource(move(outputBuffer),
                               numSamples,
