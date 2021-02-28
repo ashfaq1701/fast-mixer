@@ -260,6 +260,7 @@ class RecordingScreenViewModel @Inject constructor (@ApplicationContext val cont
                 _isLoading.postValue(true)
 
                 if(_eventIsPlaying.value == false) {
+
                     if (repository.startPlaying()) {
                         _eventIsPlaying.postValue(true)
                     }
@@ -405,10 +406,6 @@ class RecordingScreenViewModel @Inject constructor (@ApplicationContext val cont
                     }
                 }
             }
-
-            val recordingFile = File(recordingFilePath)
-            val fileSize = recordingFile.length()
-            Timber.d("Recording File size is: $recordingFilePath, $fileSize")
 
             _eventGoBack.value = true
         }

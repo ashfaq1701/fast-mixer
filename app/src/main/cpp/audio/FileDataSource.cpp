@@ -17,6 +17,7 @@
 
 #include "../logging_macros.h"
 #include <oboe/Oboe.h>
+#include <vector>
 #include <regex>
 #include <string>
 #include <sys/stat.h>
@@ -75,9 +76,14 @@ FileDataSource* FileDataSource::newFromCompressedFile(
 
     auto ffmpegExtractor = FFMpegExtractor(filenameStr, targetProperties);
 
-    long maximumDataSizeInBytes = kMaxCompressionRatio * assetSize * sizeof(float);
+    long initialSize = assetSize * sizeof(float);
 
-    auto decodedData = new uint8_t [maximumDataSizeInBytes];
+    if (strEndedWith(filenameStr, ".mp3")) {
+        initialSize = initialSize * kMaxCompressionRatio;
+    }
+
+    vector<uint8_t> decodedData;
+    decodedData.resize(initialSize);
 
     int64_t bytesDecoded = ffmpegExtractor.decode(decodedData);
 
@@ -89,9 +95,10 @@ FileDataSource* FileDataSource::newFromCompressedFile(
 
     // Now we know the exact number of samples we can create a float array to hold the audio data
     auto outputBuffer = make_unique<float[]>(numSamples);
-    memcpy(outputBuffer.get(), decodedData, (size_t)bytesDecoded);
+    memcpy(outputBuffer.get(), decodedData.data(), (size_t)bytesDecoded);
 
-    delete [] decodedData;
+    vector <uint8_t> v;
+    decodedData.swap(v);
 
     return new FileDataSource(move(outputBuffer),
                               numSamples,

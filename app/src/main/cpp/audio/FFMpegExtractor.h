@@ -13,7 +13,7 @@ extern "C" {
 #include <string>
 #include "../Constants.h"
 #include "../logging_macros.h"
-#include "list"
+#include "vector"
 
 using namespace std;
 
@@ -26,7 +26,7 @@ public:
     };
     const char *mFilePath;
 
-    int64_t decode(uint8_t *targetData);
+    int64_t decode(vector<uint8_t>& targetData);
 
     int mSampleRate = 0;
     int mChannelCount = 0;

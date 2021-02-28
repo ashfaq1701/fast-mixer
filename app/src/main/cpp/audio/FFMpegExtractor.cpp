@@ -3,7 +3,6 @@
 //
 
 #include "FFMpegExtractor.h"
-#include "list"
 #include "../utils/Utils.h"
 
 constexpr int kInternalBufferSize = 1152;
@@ -111,7 +110,7 @@ AVStream *FFMpegExtractor::getBestAudioStream(AVFormatContext *avFormatContext) 
     }
 }
 
-int64_t FFMpegExtractor::decode(uint8_t *targetData) {
+int64_t FFMpegExtractor::decode(vector<uint8_t>& targetData) {
     int returnValue = -1; // -1 indicates error
 
     // Create a buffer for FFmpeg to use for decoding (freed in the custom deleter below)
@@ -277,7 +276,12 @@ int64_t FFMpegExtractor::decode(uint8_t *targetData) {
                     decodedFrame->nb_samples);
 
             int64_t bytesToWrite = frame_count * sizeof(float) * mTargetProperties.channelCount;
-            memcpy(targetData + bytesWritten, buffer1, (size_t)bytesToWrite);
+
+            if (bytesWritten + bytesToWrite > targetData.size()) {
+                targetData.resize(targetData.size() * 2);
+            }
+
+            memcpy(targetData.data() + bytesWritten, buffer1, (size_t)bytesToWrite);
             bytesWritten += bytesToWrite;
             av_freep(&buffer1);
 
