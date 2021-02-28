@@ -9,12 +9,10 @@
 #include <memory>
 #include <jni.h>
 #include "MixingEngine.h"
-#include "../SourceMapStore.h"
 #include "../logging_macros.h"
 #include "../jvm_env.h"
 
 static MixingEngine *mixingEngine = nullptr;
-static SourceMapStore *sourceMapStore = nullptr;
 
 extern "C" {
     extern "C" JNIEXPORT jint JNI_OnLoad(JavaVM* vm, void* reserved) {
@@ -47,8 +45,7 @@ extern "C" {
         if (!mixingEngine) {
             prepare_kotlin_mixing_method_ids(env);
 
-            sourceMapStore = SourceMapStore::getInstance();
-            mixingEngine = new MixingEngine(sourceMapStore);
+            mixingEngine = new MixingEngine();
         }
         return (mixingEngine != nullptr);
     }
@@ -60,6 +57,8 @@ extern "C" {
             return;
         }
         delete_kotlin_mixing_global_refs(env);
+        delete mixingEngine;
+
         mixingEngine = nullptr;
     }
 

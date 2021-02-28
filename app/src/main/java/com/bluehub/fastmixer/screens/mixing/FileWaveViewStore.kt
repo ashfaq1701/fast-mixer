@@ -5,13 +5,13 @@ import androidx.lifecycle.Observer
 import com.bluehub.fastmixer.common.models.AudioFileUiState
 import com.bluehub.fastmixer.common.models.AudioViewAction
 import com.bluehub.fastmixer.common.utils.Optional
+import dagger.hilt.android.scopes.ActivityRetainedScoped
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import kotlinx.coroutines.*
 import java.util.*
 import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
+@ActivityRetainedScoped
 class FileWaveViewStore @Inject constructor(val mixingRepository: MixingRepository) {
     companion object {
         const val ZOOM_STEP = 1

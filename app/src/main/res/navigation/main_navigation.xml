@@ -1,40 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+<navigation
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    app:startDestination="@id/nav_graph">
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/mixingScreen">
+    <fragment
+        android:id="@+id/mixingScreen"
+        android:label="MixingScreen"
+        android:name="com.bluehub.fastmixer.screens.mixing.MixingScreen"
+        tools:layout="@layout/mixing_screen">
 
-    <navigation android:id="@+id/nav_graph"
-        app:startDestination="@id/mixingScreen">
-        <fragment
-            android:id="@+id/mixingScreen"
-            android:name="com.bluehub.fastmixer.screens.mixing.MixingScreen"
-            android:label="MixingScreen"
-            tools:layout="@layout/mixing_screen">
+        <action
+            android:id="@+id/action_mixingScreen_to_recordingScreen"
+            app:destination="@id/recordingScreen" />
 
-            <action
-                android:id="@+id/action_mixingScreen_to_recordingScreen"
-                app:destination="@id/recordingScreen" />
+        <argument
+            android:defaultValue=""
+            android:name="recordedFilePath"
+            app:argType="string"
+            app:nullable="true" />
+    </fragment>
 
-            <argument
-                android:name="recordedFilePath"
-                android:defaultValue=""
-                app:argType="string"
-                app:nullable="true" />
-        </fragment>
+    <fragment
+        android:id="@+id/recordingScreen"
+        android:label="RecordingScreen"
+        android:name="com.bluehub.fastmixer.screens.recording.RecordingScreen"
+        tools:layout="@layout/recording_screen">
 
-        <fragment
-            android:id="@+id/recordingScreen"
-            android:name="com.bluehub.fastmixer.screens.recording.RecordingScreen"
-            android:label="RecordingScreen"
-            tools:layout="@layout/recording_screen">
-
-            <action
-                android:id="@+id/action_recordingScreen_to_mixingScreen"
-                app:destination="@id/mixingScreen"
-                app:popUpTo="@id/mixingScreen"
-                app:popUpToInclusive="true" />
-        </fragment>
-    </navigation>
+        <action
+            android:id="@+id/action_recordingScreen_to_mixingScreen"
+            app:destination="@id/mixingScreen"
+            app:popUpTo="@id/mixingScreen"
+            app:popUpToInclusive="true" />
+    </fragment>
 </navigation>

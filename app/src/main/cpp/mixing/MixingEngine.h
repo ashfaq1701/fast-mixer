@@ -19,7 +19,11 @@ using namespace std;
 class MixingEngine {
 
 public:
-    MixingEngine(SourceMapStore* sourceMapStore);
+
+    MixingEngine();
+
+    ~MixingEngine();
+
     void addFile(string filePath);
     unique_ptr<buffer_data> readSamples(string filePath, size_t countPoints);
     void deleteFile(string filePath);

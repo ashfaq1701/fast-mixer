@@ -7,10 +7,16 @@
 #include "../synthesizers/GainAdjustment.h"
 #include <utility>
 
-MixingEngine::MixingEngine(SourceMapStore* sourceMapStore) : mSourceMapStore(sourceMapStore) {
+MixingEngine::MixingEngine() {
+    mSourceMapStore = move(SourceMapStore::getInstance());
+
     mMixingIO.setStopPlaybackCallback([&] () {
         setStopPlayback();
     });
+}
+
+MixingEngine::~MixingEngine() {
+    SourceMapStore::reset();
 }
 
 void MixingEngine::addFile(string filePath) {

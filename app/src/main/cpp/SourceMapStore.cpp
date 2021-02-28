@@ -23,3 +23,7 @@ SourceMapStore::~SourceMapStore() {
     }
     sourceMap.clear();
 }
+
+void SourceMapStore::reset() {
+    mInstance = nullptr;
+}

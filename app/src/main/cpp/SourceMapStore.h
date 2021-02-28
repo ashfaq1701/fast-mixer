@@ -17,6 +17,8 @@ public:
 
     map<string, shared_ptr<FileDataSource>> sourceMap;
 
+    static void reset();
+
 private:
 
     SourceMapStore();
