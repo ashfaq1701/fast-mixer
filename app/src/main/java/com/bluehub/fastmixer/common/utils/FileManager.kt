@@ -1,13 +1,17 @@
 package com.bluehub.fastmixer.common.utils
 
 import android.content.ContentResolver
+import android.content.Context
 import android.database.Cursor
 import android.net.Uri
 import android.provider.OpenableColumns
+import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.*
 import javax.inject.Inject
 
-class FileManager @Inject constructor() {
+class FileManager @Inject constructor(
+    @ApplicationContext val context: Context
+) {
     fun removeFile(filePath: String) {
         val file = File(filePath)
         file.delete()
@@ -47,5 +51,16 @@ class FileManager @Inject constructor() {
             bis?.close()
             bos?.close()
         }
+    }
+
+    fun getFdForPath(path: String): Int? {
+        val file = File(path)
+        val uri = Uri.fromFile(file)
+        return getFdForUri(uri)
+    }
+
+    fun getFdForUri(uri: Uri): Int? {
+        val parcelFd = context.contentResolver.openFileDescriptor(uri, "r")
+        return parcelFd?.detachFd()
     }
 }

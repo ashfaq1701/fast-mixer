@@ -25,6 +25,7 @@ public:
     ~MixingEngine();
 
     void addFile(string filePath);
+    void addFileByFd(string fileId, int fd);
     unique_ptr<buffer_data> readSamples(string filePath, size_t countPoints);
     void deleteFile(string filePath);
     int64_t getAudioFileTotalSamples(string filePath);

@@ -10,9 +10,9 @@ class MixingRepository @Inject constructor(val mixingEngineProxy: MixingEnginePr
         mixingEngineProxy.create()
     }
 
-    suspend fun addFile(filePath: String) = withContext(Dispatchers.IO){
-        mixingEngineProxy.addFile(filePath)
-    }
+    fun addFile(filePath: String) = mixingEngineProxy.addFile(filePath)
+
+    fun addFileByFd(fileId: String, fd: Int) = mixingEngineProxy.addFileByFd(fileId, fd)
 
     fun readSamples(filePath: String, countPoints: Int): Array<Float> = mixingEngineProxy.readSamples(filePath, countPoints)
 
@@ -65,6 +65,8 @@ class MixingRepository @Inject constructor(val mixingEngineProxy: MixingEnginePr
     fun pasteFromClipboard(filePath: String, position: Int) = mixingEngineProxy.pasteFromClipboard(filePath, position)
 
     fun pasteNewFromClipboard(filePath: String) = mixingEngineProxy.pasteNewFromClipboard(filePath)
+
+    fun testFileUri(fd: Int) = mixingEngineProxy.testFileUri(fd)
 
     fun clearSources() {
         mixingEngineProxy.clearPlayerSources()

@@ -32,11 +32,16 @@ inline bool strEndedWith(string const &fullString, string const &ending) {
 }
 
 inline long getSizeOfFile(const char *fileName) {
-    struct stat st;
-    if(stat(fileName,&st)==0)
-        return (static_cast<long>(st.st_size));
-    else
+    FILE* fp = fopen(fileName,"rb");
+
+    if (!fp) {
         return -1;
+    }
+
+    fseek(fp, 0, SEEK_END);
+    int size = ftell(fp);
+    fclose(fp);
+    return size;
 }
 
 inline string java_str_to_c_str(JNIEnv * env, jstring jStr) {

@@ -10,6 +10,8 @@ class MixingEngine {
 
         @JvmStatic external fun addFile(filePath: String)
 
+        @JvmStatic external fun addFileByFd(fileId: String, fd: Int)
+
         @JvmStatic external fun readSamples(filePath: String, countPoints: Int): Array<Float>
 
         @JvmStatic external fun deleteFile(filePath: String)
@@ -53,6 +55,10 @@ class MixingEngine {
         @JvmStatic external fun pasteFromClipboard(filePath: String, position: Int)
 
         @JvmStatic external fun pasteNewFromClipboard(filePath: String)
+
+        @JvmStatic external fun testFileUri(fd: Int)
+
+        @JvmStatic external fun closeFd(fd: Int)
 
         @JvmStatic external fun delete()
     }

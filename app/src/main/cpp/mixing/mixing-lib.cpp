@@ -72,6 +72,16 @@ extern "C" {
         mixingEngine->addFile(move(filePathStr));
     }
 
+    JNIEXPORT void JNICALL
+    Java_com_bluehub_fastmixer_audio_MixingEngine_addFileByFd(JNIEnv *env, jclass, jstring fileId, jint fd) {
+        if (!mixingEngine) {
+            LOGE("addFileByFd: mixingEngine is null, you must call create() method before calling this method");
+            return;
+        }
+        auto fileIdStr = java_str_to_c_str(env, fileId);
+        mixingEngine->addFileByFd(move(filePathStr), fd);
+    }
+
     JNIEXPORT jobjectArray JNICALL
     Java_com_bluehub_fastmixer_audio_MixingEngine_readSamples(JNIEnv *env, jclass, jstring filePath, jint countPoints) {
         if (!mixingEngine) {
@@ -325,5 +335,26 @@ extern "C" {
 
         auto filePathStr = java_str_to_c_str(env, filePath);
         mixingEngine->pasteNewFromClipboard(filePathStr);
+    }
+
+    JNIEXPORT void  JNICALL
+    Java_com_bluehub_fastmixer_audio_MixingEngine_testFileUri(JNIEnv *env, jclass, jint fd) {
+        if (!mixingEngine) {
+            LOGE("testFileUri: mixingEngine is null, you must call create() method before calling this method");
+            return;
+        }
+
+        FILE* fl = fdopen(fd, "r");
+        if (!fl) {
+            LOGE("Failed to open asset %d", fd);
+            return;
+        } else {
+            LOGD("YES!! COULD OPEN FILE %d", fd);
+        }
+    }
+
+    JNIEXPORT void JNICALL
+    Java_com_bluehub_fastmixer_audio_MixingEngine_closeFd(JNIEnv *env, jclass, jint fd) {
+        close(fd);
     }
 }

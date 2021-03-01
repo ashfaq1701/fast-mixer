@@ -10,6 +10,7 @@ import com.bluehub.fastmixer.common.viewmodel.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.*
+import timber.log.Timber
 import java.io.File
 import java.util.*
 import javax.inject.Inject
@@ -144,6 +145,12 @@ class MixingScreenViewModel @Inject constructor(@ApplicationContext val context:
     }
 
     fun addReadFile(fileUri: Uri) {
+        Timber.d("READ FILE PATH: ${fileUri.path}")
+
+        val parcelFd = context.contentResolver.openFileDescriptor(fileUri, "r")
+
+        mixingRepository.testFileUri(parcelFd!!.detachFd())
+
         val fileName = fileManager.getFileNameFromUri(context.contentResolver, fileUri)
         viewModelScope.launch(Dispatchers.IO) {
             val newFilePath = fileName?.let { name ->

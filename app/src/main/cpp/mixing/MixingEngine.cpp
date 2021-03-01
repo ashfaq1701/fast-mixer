@@ -30,6 +30,10 @@ void MixingEngine::addFile(string filePath) {
     filePath.erase();
 }
 
+void MixingEngine::addFileByFd(string fileId, int fd) {
+
+}
+
 unique_ptr<buffer_data> MixingEngine::readSamples(string filePath, size_t countPoints) {
     auto it = mSourceMapStore->sourceMap.find(filePath);
     filePath.erase();
