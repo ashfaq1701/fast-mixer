@@ -237,8 +237,14 @@ int64_t FFMpegExtractor::decode(int fd, shared_ptr<decode_buffer_data> buff) {
 
             // Pass our compressed data into the codec
             result = avcodec_send_packet(codecContext.get(), &avPacket);
-            if (result != 0) {
+            if (result == AVERROR(EOF) || result == AVERROR(EINVAL)) {
+                LOGI("avcodec_send_packet aborting with unrecoverable error: %s", av_err2str(result));
                 goto cleanup;
+            } else if (result < 0) {
+                LOGI("avcodec_send_packet returned error: %s", av_err2str(result));
+                avPacket.size = 0;
+                avPacket.data = nullptr;
+                continue;
             }
 
             // Retrieve our raw data from the codec

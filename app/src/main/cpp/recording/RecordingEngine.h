@@ -28,20 +28,22 @@ public:
     void startRecording();
     void stopRecording();
 
+    void setupAudioSource(int fd);
+
     void startLivePlayback();
     void stopLivePlayback();
 
-    bool startPlayback(int fd);
-    bool startPlaybackWithMixingTracks(int fd);
+    bool startPlayback();
+    bool startPlaybackWithMixingTracks();
     void startPlayingWithMixingTracksWithoutSetup();
-    bool startMixingTracksPlayback(int fd);
+    bool startMixingTracksPlayback();
     void stopMixingTracksPlayback();
     void stopAndResetPlayback();
     void pausePlayback();
 
     void flushWriteBuffer();
-    void restartPlayback(int fd);
-    void restartPlaybackWithMixingTracks(int fd);
+    void restartPlayback();
+    void restartPlaybackWithMixingTracks();
 
     int getCurrentMax();
 
@@ -63,11 +65,11 @@ public:
 
     void stopPlaybackCallable();
 
-    bool startPlaybackCallable(int fd);
+    bool startPlaybackCallable();
 
-    bool startPlaybackWithMixingTracksCallable(int fd);
+    bool startPlaybackWithMixingTracksCallable();
 
-    bool startMixingTracksPlaybackCallable(int fd);
+    bool startMixingTracksPlaybackCallable();
 
     void addSourcesToPlayer(string* strArr, int count);
 
@@ -77,6 +79,7 @@ private:
 
     string mRecordingFileDir = nullptr;
     bool mPlayback = true;
+    bool isDirty = false;
 
     int bakPlayHead = 0;
 

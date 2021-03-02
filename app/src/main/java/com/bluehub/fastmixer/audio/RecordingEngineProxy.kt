@@ -9,6 +9,8 @@ class RecordingEngineProxy @Inject constructor(){
 
     fun delete() = RecordingEngine.delete()
 
+    fun setupAudioSource(fd: Int) = RecordingEngine.setupAudioSource(fd)
+
     fun startRecording() = RecordingEngine.startRecording()
 
     fun stopRecording() = RecordingEngine.stopRecording()
@@ -17,13 +19,13 @@ class RecordingEngineProxy @Inject constructor(){
 
     fun stopLivePlayback() = RecordingEngine.stopLivePlayback()
 
-    fun startPlayback(fd: Int): Boolean = RecordingEngine.startPlayback(fd)
+    fun startPlayback(): Boolean = RecordingEngine.startPlayback()
 
-    fun startPlaybackWithMixingTracks(fd: Int): Boolean = RecordingEngine.startPlaybackWithMixingTracks(fd)
+    fun startPlaybackWithMixingTracks(): Boolean = RecordingEngine.startPlaybackWithMixingTracks()
 
     fun startPlayingWithMixingTracksWithoutSetup() = RecordingEngine.startPlayingWithMixingTracksWithoutSetup()
 
-    fun startMixingTracksPlayback(fd: Int): Boolean = RecordingEngine.startMixingTracksPlayback(fd)
+    fun startMixingTracksPlayback(): Boolean = RecordingEngine.startMixingTracksPlayback()
 
     fun stopMixingTracksPlayback() = RecordingEngine.stopMixingTracksPlayback()
 
@@ -33,9 +35,9 @@ class RecordingEngineProxy @Inject constructor(){
 
     fun flushWriteBuffer() = RecordingEngine.flushWriteBuffer()
 
-    fun restartPlayback(fd: Int) = RecordingEngine.restartPlayback(fd)
+    fun restartPlayback() = RecordingEngine.restartPlayback()
 
-    fun restartPlaybackWithMixingTracks(fd: Int) = RecordingEngine.restartPlaybackWithMixingTracks(fd)
+    fun restartPlaybackWithMixingTracks() = RecordingEngine.restartPlaybackWithMixingTracks()
 
     fun getCurrentMax(): Int = RecordingEngine.getCurrentMax()
 

@@ -145,7 +145,10 @@ class RecordingScreenViewModel @Inject constructor (@ApplicationContext val cont
         if (_eventIsPlaying.value == true) {
             viewModelScope.launch {
                 withContext(Dispatchers.IO) {
-                    repository.restartPlayback(recordingFilePath)
+                    repository.run {
+                        setupAudioSource(recordingFilePath)
+                            ?.let(::restartPlayback)
+                    }
                 }
             }
         }
@@ -153,7 +156,10 @@ class RecordingScreenViewModel @Inject constructor (@ApplicationContext val cont
         if (_eventIsPlayingWithMixingTracks.value == true) {
             viewModelScope.launch {
                 withContext(Dispatchers.IO) {
-                    repository.restartPlaybackWithMixingTracks(recordingFilePath)
+                    repository.run {
+                        setupAudioSource(recordingFilePath)
+                            ?.let(::restartPlaybackWithMixingTracks)
+                    }
                 }
             }
         }
@@ -210,7 +216,10 @@ class RecordingScreenViewModel @Inject constructor (@ApplicationContext val cont
                     repository.resetCurrentMax()
 
                     if (mixingPlayActive.value == true) {
-                        repository.startMixingTracksPlaying(recordingFilePath)
+                        repository.run {
+                            setupAudioSource(recordingFilePath)
+                                ?.let(::startMixingTracksPlaying)
+                        }
                     }
 
                     repository.startRecording()
@@ -260,9 +269,11 @@ class RecordingScreenViewModel @Inject constructor (@ApplicationContext val cont
                 _isLoading.postValue(true)
 
                 if(_eventIsPlaying.value == false) {
-
-                    if (repository.startPlaying(recordingFilePath)) {
-                        _eventIsPlaying.postValue(true)
+                    repository.run {
+                        if (setupAudioSource(recordingFilePath)
+                                ?.let(::startPlaying) == true) {
+                            _eventIsPlaying.postValue(true)
+                        }
                     }
                 } else {
                     repository.pausePlaying()
@@ -280,8 +291,12 @@ class RecordingScreenViewModel @Inject constructor (@ApplicationContext val cont
                 _isLoading.postValue(true)
 
                 if(_eventIsPlayingWithMixingTracks.value == false) {
-                    if (repository.startPlayingWithMixingTracks(recordingFilePath)) {
-                        _eventIsPlayingWithMixingTracks.postValue(true)
+
+                    repository.run {
+                        if (setupAudioSource(recordingFilePath)
+                                ?.let(::startPlayingWithMixingTracks) == true) {
+                            _eventIsPlayingWithMixingTracks.postValue(true)
+                        }
                     }
                 } else {
                     repository.pausePlaying()
@@ -297,7 +312,10 @@ class RecordingScreenViewModel @Inject constructor (@ApplicationContext val cont
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 _isLoading.postValue(true)
-                repository.startPlaying(recordingFilePath)
+                repository.run {
+                    setupAudioSource(recordingFilePath)
+                        ?.let(::startPlaying)
+                }
                 _isLoading.postValue(false)
             }
         }

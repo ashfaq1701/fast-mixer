@@ -13,6 +13,8 @@ class RecordingEngine {
 
         @JvmStatic external fun delete()
 
+        @JvmStatic external fun setupAudioSource(fd: Int)
+
         @JvmStatic external fun startRecording()
 
         @JvmStatic external fun stopRecording()
@@ -21,13 +23,13 @@ class RecordingEngine {
 
         @JvmStatic external fun stopLivePlayback()
 
-        @JvmStatic external fun startPlayback(fd: Int): Boolean
+        @JvmStatic external fun startPlayback(): Boolean
 
-        @JvmStatic external fun startPlaybackWithMixingTracks(fd: Int): Boolean
+        @JvmStatic external fun startPlaybackWithMixingTracks(): Boolean
 
         @JvmStatic external fun startPlayingWithMixingTracksWithoutSetup()
 
-        @JvmStatic external fun startMixingTracksPlayback(fd: Int): Boolean
+        @JvmStatic external fun startMixingTracksPlayback(): Boolean
 
         @JvmStatic external fun stopMixingTracksPlayback()
 
@@ -37,9 +39,9 @@ class RecordingEngine {
 
         @JvmStatic external fun flushWriteBuffer()
 
-        @JvmStatic external fun restartPlayback(fd: Int)
+        @JvmStatic external fun restartPlayback()
 
-        @JvmStatic external fun restartPlaybackWithMixingTracks(fd: Int)
+        @JvmStatic external fun restartPlaybackWithMixingTracks()
 
         @JvmStatic external fun getCurrentMax(): Int
 

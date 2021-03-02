@@ -9,6 +9,12 @@ class RecordingRepository @Inject constructor(
     private val recordingEngineProxy: RecordingEngineProxy,
     private val fileManager: FileManager) {
 
+    fun setupAudioSource(filePath: String): Int? {
+        return fileManager.getFdForPath(filePath)?.also {
+            recordingEngineProxy.setupAudioSource(it)
+        }
+    }
+
     fun stopRecording() {
         recordingEngineProxy.stopRecording()
     }
@@ -21,20 +27,17 @@ class RecordingRepository @Inject constructor(
         recordingEngineProxy.stopLivePlayback()
     }
 
-    fun startPlaying(filePath: String): Boolean {
-        val fd = fileManager.getFdForPath(filePath) ?: return false
+    fun startPlaying(fd: Int): Boolean {
         try {
-            return recordingEngineProxy.startPlayback(fd)
+            return recordingEngineProxy.startPlayback()
         } finally {
             recordingEngineProxy.closeFd(fd)
         }
     }
 
-    fun startPlayingWithMixingTracks(filePath: String): Boolean {
-        val fd = fileManager.getFdForPath(filePath) ?: return false
-
+    fun startPlayingWithMixingTracks(fd: Int): Boolean {
         try {
-            return recordingEngineProxy.startPlaybackWithMixingTracks(fd)
+            return recordingEngineProxy.startPlaybackWithMixingTracks()
         } finally {
             recordingEngineProxy.closeFd(fd)
         }
@@ -44,11 +47,9 @@ class RecordingRepository @Inject constructor(
         recordingEngineProxy.startPlayingWithMixingTracksWithoutSetup()
     }
 
-    fun startMixingTracksPlaying(filePath: String): Boolean {
-        val fd = fileManager.getFdForPath(filePath) ?: return false
-
+    fun startMixingTracksPlaying(fd: Int): Boolean {
         try {
-            return recordingEngineProxy.startMixingTracksPlayback(fd)
+            return recordingEngineProxy.startMixingTracksPlayback()
         } finally {
             recordingEngineProxy.closeFd(fd)
         }
@@ -74,21 +75,17 @@ class RecordingRepository @Inject constructor(
         recordingEngineProxy.flushWriteBuffer()
     }
 
-    fun restartPlayback(filePath: String) {
-        val fd = fileManager.getFdForPath(filePath) ?: return
-
+    fun restartPlayback(fd: Int) {
         try {
-            recordingEngineProxy.restartPlayback(fd)
+            recordingEngineProxy.restartPlayback()
         } finally {
             recordingEngineProxy.closeFd(fd)
         }
     }
 
-    fun restartPlaybackWithMixingTracks(filePath: String) {
-        val fd = fileManager.getFdForPath(filePath) ?: return
-        
+    fun restartPlaybackWithMixingTracks(fd: Int) {
         try {
-            recordingEngineProxy.restartPlaybackWithMixingTracks(fd)
+            recordingEngineProxy.restartPlaybackWithMixingTracks()
         } finally {
             recordingEngineProxy.closeFd(fd)
         }
