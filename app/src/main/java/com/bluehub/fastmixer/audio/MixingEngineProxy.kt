@@ -5,9 +5,7 @@ import javax.inject.Inject
 class MixingEngineProxy @Inject constructor() {
     fun create() = MixingEngine.create()
 
-    fun addFile(filePath: String) = MixingEngine.addFile(filePath)
-
-    fun addFileByFd(fileId: String, fd: Int) = MixingEngine.addFileByFd(fileId, fd)
+    fun addFile(filePath: String, fd: Int) = MixingEngine.addFile(filePath, fd)
 
     fun readSamples(filePath: String, countPoints: Int) = MixingEngine.readSamples(filePath, countPoints)
 
@@ -52,8 +50,6 @@ class MixingEngineProxy @Inject constructor() {
     fun pasteFromClipboard(filePath: String, position: Int) = MixingEngine.pasteFromClipboard(filePath, position)
 
     fun pasteNewFromClipboard(filePath: String) = MixingEngine.pasteNewFromClipboard(filePath)
-
-    fun testFileUri(fd: Int) = MixingEngine.testFileUri(fd)
 
     fun closeFd(fd: Int) = MixingEngine.closeFd(fd)
 

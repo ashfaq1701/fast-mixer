@@ -34,7 +34,7 @@ public:
     bool startPlayback(int fd);
     bool startPlaybackWithMixingTracks(int fd);
     void startPlayingWithMixingTracksWithoutSetup();
-    bool startMixingTracksPlayback(fd);
+    bool startMixingTracksPlayback(int fd);
     void stopMixingTracksPlayback();
     void stopAndResetPlayback();
     void pausePlayback();

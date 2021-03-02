@@ -57,6 +57,7 @@ void FileDataSource::calculateProperties() {
 
 FileDataSource* FileDataSource::newFromCompressedFile(
         const char *filename,
+        int fd,
         const AudioProperties targetProperties) {
     string filenameStr(filename);
 
@@ -68,13 +69,13 @@ FileDataSource* FileDataSource::newFromCompressedFile(
     }
     fclose(fl);
 
-    off_t assetSize = getSizeOfFile(filenameStr.c_str());
+    off_t assetSize = getSizeOfFile(fd);
 
     // Allocate memory to store the decompressed audio. We don't know the exact
     // size of the decoded data until after decoding so we make an assumption about the
     // maximum compression ratio and the decoded sample format (float for FFmpeg, int16 for NDK).
 
-    auto ffmpegExtractor = FFMpegExtractor(filenameStr, targetProperties);
+    auto ffmpegExtractor = FFMpegExtractor(fd, targetProperties);
 
     long initialSize = assetSize * sizeof(float);
 

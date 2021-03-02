@@ -31,8 +31,8 @@ inline bool strEndedWith(string const &fullString, string const &ending) {
     }
 }
 
-inline long getSizeOfFile(const char *fileName) {
-    FILE* fp = fopen(fileName,"rb");
+inline long getSizeOfFile(int fd) {
+    FILE* fp = fdopen(fd,"rb");
 
     if (!fp) {
         return -1;

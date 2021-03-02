@@ -39,7 +39,7 @@ public:
         mRecordingFilePath = move(recordingFilePath);
     }
 
-    FileDataSource* setup_audio_source();
+    FileDataSource* setup_audio_source(int fd);
     void add_source_to_player(shared_ptr<DataSource> fileDataSource);
     void clear_audio_source();
 

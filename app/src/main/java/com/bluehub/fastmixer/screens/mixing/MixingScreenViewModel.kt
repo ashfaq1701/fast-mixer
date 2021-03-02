@@ -126,6 +126,7 @@ class MixingScreenViewModel @Inject constructor(@ApplicationContext val context:
 
     fun addRecordedFilePath(filePath: String) {
         if (!fileManager.fileExists(filePath)) return
+        val fd = fileManager.getFdForPath(filePath) ?: return
 
         audioFileStore.run {
             if (audioFiles.filter {
@@ -133,7 +134,9 @@ class MixingScreenViewModel @Inject constructor(@ApplicationContext val context:
                 }.count() == 0) {
                 viewModelScope.launch {
                     withContext(Dispatchers.IO) {
-                        mixingRepository.addFile(filePath)
+
+
+                        mixingRepository.addFile(filePath, fd)
                         val totalSamples = getTotalSamples(filePath)
                         audioFiles.add(AudioFileUiState.create(filePath, totalSamples))
                     }
@@ -145,26 +148,19 @@ class MixingScreenViewModel @Inject constructor(@ApplicationContext val context:
     }
 
     fun addReadFile(fileUri: Uri) {
-        Timber.d("READ FILE PATH: ${fileUri.path}")
+        val parcelFd = context.contentResolver.openFileDescriptor(fileUri, "r") ?: return
 
-        val parcelFd = context.contentResolver.openFileDescriptor(fileUri, "r")
+        val newFilePath = fileManager.getFileNameFromUri(context.contentResolver, fileUri)?.let {
+            val ext = File(it).extension
 
-        mixingRepository.testFileUri(parcelFd!!.detachFd())
+            val uid = UUID.randomUUID().toString()
+            "$uid.$ext"
+        }
 
-        val fileName = fileManager.getFileNameFromUri(context.contentResolver, fileUri)
         viewModelScope.launch(Dispatchers.IO) {
-            val newFilePath = fileName?.let { name ->
-                val fileInputStream = context.contentResolver.openInputStream(fileUri)
-                fileInputStream?.use {
-                    val dir = createImportedFileCacheDirectory()
-                    val importId = UUID.randomUUID().toString()
-
-                    fileManager.copyFileFromUri(it, name, dir, importId)
-                }
-            }
-
             newFilePath?.let { newPath ->
-                mixingRepository.addFile(newPath)
+                mixingRepository.addFile(newPath, parcelFd.detachFd())
+
                 val totalSamples = getTotalSamples(newPath)
 
                 audioFileStore.run {

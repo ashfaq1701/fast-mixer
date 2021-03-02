@@ -10,14 +10,14 @@ MixingIO::MixingIO() {
     mPlayer.reset(move(player));
 }
 
-shared_ptr<FileDataSource> MixingIO::readFile(string filename) {
+shared_ptr<FileDataSource> MixingIO::readFile(string filename, int fd) {
     AudioProperties targetProperties{
             .channelCount = MixingStreamConstants::mChannelCount,
             .sampleRate = MixingStreamConstants::mSampleRate
     };
 
     return shared_ptr<FileDataSource> {
-        FileDataSource::newFromCompressedFile(filename.c_str(), targetProperties)
+        FileDataSource::newFromCompressedFile(filename.c_str(), fd, targetProperties)
     };
 }
 

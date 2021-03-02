@@ -38,7 +38,7 @@ RecordingIO::RecordingIO() {
     taskQueue = new TaskQueue();
 }
 
-FileDataSource* RecordingIO::setup_audio_source() {
+FileDataSource* RecordingIO::setup_audio_source(int fd) {
     if (!validate_audio_file()) {
         return nullptr;
     }
@@ -48,7 +48,7 @@ FileDataSource* RecordingIO::setup_audio_source() {
             .sampleRate = RecordingStreamConstants::mSampleRate
     };
 
-    return FileDataSource::newFromCompressedFile(mRecordingFilePath.c_str(), targetProperties);
+    return FileDataSource::newFromCompressedFile(mRecordingFilePath.c_str(), fd, targetProperties);
 }
 
 void RecordingIO::add_source_to_player(shared_ptr<DataSource> fileDataSource) {

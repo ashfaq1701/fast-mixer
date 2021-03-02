@@ -88,7 +88,7 @@ bool RecordingEngine::startPlaybackCallable(int fd) {
     }
 
     mDataSource = shared_ptr<FileDataSource> {
-            move(mRecordingIO.setup_audio_source())
+            move(mRecordingIO.setup_audio_source(fd))
     };
 
     if (mDataSource) {
@@ -108,7 +108,7 @@ bool RecordingEngine::startPlaybackWithMixingTracksCallable(int fd) {
     }
 
     mDataSource = shared_ptr<FileDataSource> {
-            move(mRecordingIO.setup_audio_source())
+            move(mRecordingIO.setup_audio_source(fd))
     };
 
     map<string, shared_ptr<DataSource>> sourceMap;
@@ -160,7 +160,7 @@ bool RecordingEngine::startMixingTracksPlaybackCallable(int fd) {
     }
 
     mDataSource = shared_ptr<FileDataSource> {
-            move(mRecordingIO.setup_audio_source())
+            move(mRecordingIO.setup_audio_source(fd))
     };
 
     bakPlayHead = mRecordingIO.getCurrentPlaybackProgress();

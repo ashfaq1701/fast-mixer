@@ -7,8 +7,7 @@
 
 constexpr int kInternalBufferSize = 1152;
 
-FFMpegExtractor::FFMpegExtractor(const string &filePath, const AudioProperties targetProperties) {
-    mFilePath = filePath.c_str();
+FFMpegExtractor::FFMpegExtractor(const int fd, const AudioProperties targetProperties) : mFd(fd) {
     mTargetProperties = targetProperties;
 }
 
@@ -25,7 +24,7 @@ int read(void *data, uint8_t *buf, int buf_size) {
 int64_t seek(void *data, int64_t pos, int whence) {
     auto *hctx = (FFMpegExtractor*)data;
     if (whence == AVSEEK_SIZE) {
-        return getSizeOfFile(hctx->mFilePath);
+        return getSizeOfFile(hctx->mFd);
     }
     int rs = fseek(hctx->fp.get(), (long)pos, whence);
     if (rs != 0) {
@@ -118,7 +117,7 @@ int64_t FFMpegExtractor::decode(shared_ptr<decode_buffer_data> buff) {
 
     {
         FILE *tmp;
-        tmp = fopen(mFilePath, "rb");
+        tmp = fdopen(mFd, "rb");
         fp.reset(move(tmp));
     }
 
