@@ -177,6 +177,10 @@ void Player::setPlayHead(int32_t playHead) {
     int64_t maxTotalSourceFrames = getMaxTotalSourceFrames();
     if (playHead < maxTotalSourceFrames || playHead == 0) {
         mReadFrameIndex = playHead;
+
+        if (mSourceMap.size() == 1) {
+            mSourceMap.begin()->second->setPlayHead(mReadFrameIndex);
+        }
     }
 }
 

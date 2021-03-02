@@ -10,8 +10,6 @@ class MixingEngine {
 
         @JvmStatic external fun addFile(filePath: String, fd: Int)
 
-        @JvmStatic external fun addFileByFd(fileId: String, fd: Int)
-
         @JvmStatic external fun readSamples(filePath: String, countPoints: Int): Array<Float>
 
         @JvmStatic external fun deleteFile(filePath: String)
