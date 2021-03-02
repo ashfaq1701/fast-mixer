@@ -61,21 +61,21 @@ FileDataSource* FileDataSource::newFromCompressedFile(
         const AudioProperties targetProperties) {
     string filenameStr(filename);
 
-    FILE* fl = fopen(filenameStr.c_str(), "r");
+    FILE* fl = fdopen(dup(fd), "r");
     if (!fl) {
         LOGE("Failed to open asset %s", filenameStr.c_str());
         fclose(fl);
         return nullptr;
     }
-    fclose(fl);
 
-    off_t assetSize = getSizeOfFile(fd);
+    off_t assetSize = getSizeOfFile(fl);
+    fclose(fl);
 
     // Allocate memory to store the decompressed audio. We don't know the exact
     // size of the decoded data until after decoding so we make an assumption about the
     // maximum compression ratio and the decoded sample format (float for FFmpeg, int16 for NDK).
 
-    auto ffmpegExtractor = FFMpegExtractor(fd, targetProperties);
+    auto ffmpegExtractor = FFMpegExtractor(targetProperties);
 
     long initialSize = assetSize * sizeof(float);
 
@@ -91,7 +91,7 @@ FileDataSource* FileDataSource::newFromCompressedFile(
 
     auto dataBuffer = make_shared<decode_buffer_data>(buff);
 
-    int64_t bytesDecoded = ffmpegExtractor.decode(dataBuffer);
+    int64_t bytesDecoded = ffmpegExtractor.decode(dup(fd), dataBuffer);
 
     if (bytesDecoded <= 0) {
         return nullptr;

@@ -7,7 +7,7 @@
 
 constexpr int kInternalBufferSize = 1152;
 
-FFMpegExtractor::FFMpegExtractor(const int fd, const AudioProperties targetProperties) : mFd(fd) {
+FFMpegExtractor::FFMpegExtractor(const AudioProperties targetProperties) {
     mTargetProperties = targetProperties;
 }
 
@@ -24,7 +24,7 @@ int read(void *data, uint8_t *buf, int buf_size) {
 int64_t seek(void *data, int64_t pos, int whence) {
     auto *hctx = (FFMpegExtractor*)data;
     if (whence == AVSEEK_SIZE) {
-        return getSizeOfFile(hctx->mFd);
+        return getSizeOfFile(hctx->fp.get());
     }
     int rs = fseek(hctx->fp.get(), (long)pos, whence);
     if (rs != 0) {
@@ -109,7 +109,7 @@ AVStream *FFMpegExtractor::getBestAudioStream(AVFormatContext *avFormatContext) 
     }
 }
 
-int64_t FFMpegExtractor::decode(shared_ptr<decode_buffer_data> buff) {
+int64_t FFMpegExtractor::decode(int fd, shared_ptr<decode_buffer_data> buff) {
     int returnValue = -1; // -1 indicates error
 
     // Create a buffer for FFmpeg to use for decoding (freed in the custom deleter below)
@@ -117,7 +117,7 @@ int64_t FFMpegExtractor::decode(shared_ptr<decode_buffer_data> buff) {
 
     {
         FILE *tmp;
-        tmp = fdopen(mFd, "rb");
+        tmp = fdopen(fd, "rb");
         fp.reset(move(tmp));
     }
 

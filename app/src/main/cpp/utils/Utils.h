@@ -31,17 +31,18 @@ inline bool strEndedWith(string const &fullString, string const &ending) {
     }
 }
 
-inline long getSizeOfFile(int fd) {
-    FILE* fp = fdopen(fd,"rb");
+inline long getSizeOfFile(FILE* fp) {
 
     if (!fp) {
         return -1;
     }
 
-    fseek(fp, 0, SEEK_END);
-    int size = ftell(fp);
-    fclose(fp);
-    return size;
+    int prev=ftell(fp);
+    fseek(fp, 0L, SEEK_END);
+    long sz = ftell(fp);
+
+    fseek(fp,prev,SEEK_SET); //go back to where we were
+    return sz;
 }
 
 inline string java_str_to_c_str(JNIEnv * env, jstring jStr) {
