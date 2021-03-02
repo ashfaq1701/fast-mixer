@@ -31,17 +31,17 @@ public:
     void startLivePlayback();
     void stopLivePlayback();
 
-    bool startPlayback();
-    bool startPlaybackWithMixingTracks();
+    bool startPlayback(int fd);
+    bool startPlaybackWithMixingTracks(int fd);
     void startPlayingWithMixingTracksWithoutSetup();
-    bool startMixingTracksPlayback();
+    bool startMixingTracksPlayback(int fd);
     void stopMixingTracksPlayback();
     void stopAndResetPlayback();
     void pausePlayback();
 
     void flushWriteBuffer();
-    void restartPlayback();
-    void restartPlaybackWithMixingTracks();
+    void restartPlayback(int fd);
+    void restartPlaybackWithMixingTracks(int fd);
 
     int getCurrentMax();
 
@@ -63,11 +63,11 @@ public:
 
     void stopPlaybackCallable();
 
-    bool startPlaybackCallable();
+    bool startPlaybackCallable(int fd);
 
-    bool startPlaybackWithMixingTracksCallable();
+    bool startPlaybackWithMixingTracksCallable(int fd);
 
-    bool startMixingTracksPlaybackCallable();
+    bool startMixingTracksPlaybackCallable(int fd);
 
     void addSourcesToPlayer(string* strArr, int count);
 

@@ -17,7 +17,7 @@ using namespace std;
 class MixingIO {
 public:
     MixingIO();
-    shared_ptr<FileDataSource> readFile(string filename);
+    shared_ptr<FileDataSource> readFile(string filename, int fd);
     shared_ptr<BufferedDataSource> createClipboardDataSource(vector<float>& clipboard);
     void read_playback(float *targetData, int32_t numSamples);
 

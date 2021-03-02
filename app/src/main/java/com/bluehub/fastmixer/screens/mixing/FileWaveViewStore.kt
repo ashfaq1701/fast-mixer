@@ -302,10 +302,10 @@ class FileWaveViewStore @Inject constructor(val mixingRepository: MixingReposito
 
         if (!audioFileUiState.isPlaying.hasValue() || !audioFileUiState.isPlaying.value) {
             mixingRepository.setSourcePlayHead(filePath, playHead.toInt())
-            setPlaySliderPosition(audioFileUiState, playHeadPointer)
         } else {
             mixingRepository.setPlayerHead(playHead.toInt())
         }
+        setPlaySliderPosition(audioFileUiState, playHeadPointer)
 
         audioFileUiState.calculatePlaySliderPositionMs()
     }

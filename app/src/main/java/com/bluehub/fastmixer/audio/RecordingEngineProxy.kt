@@ -1,6 +1,5 @@
 package com.bluehub.fastmixer.audio
 
-import com.bluehub.fastmixer.audio.RecordingEngine
 import javax.inject.Inject
 
 class RecordingEngineProxy @Inject constructor(){
@@ -18,13 +17,13 @@ class RecordingEngineProxy @Inject constructor(){
 
     fun stopLivePlayback() = RecordingEngine.stopLivePlayback()
 
-    fun startPlayback(): Boolean = RecordingEngine.startPlayback()
+    fun startPlayback(fd: Int): Boolean = RecordingEngine.startPlayback(fd)
 
-    fun startPlaybackWithMixingTracks(): Boolean = RecordingEngine.startPlaybackWithMixingTracks()
+    fun startPlaybackWithMixingTracks(fd: Int): Boolean = RecordingEngine.startPlaybackWithMixingTracks(fd)
 
     fun startPlayingWithMixingTracksWithoutSetup() = RecordingEngine.startPlayingWithMixingTracksWithoutSetup()
 
-    fun startMixingTracksPlayback(): Boolean = RecordingEngine.startMixingTracksPlayback()
+    fun startMixingTracksPlayback(fd: Int): Boolean = RecordingEngine.startMixingTracksPlayback(fd)
 
     fun stopMixingTracksPlayback() = RecordingEngine.stopMixingTracksPlayback()
 
@@ -34,9 +33,9 @@ class RecordingEngineProxy @Inject constructor(){
 
     fun flushWriteBuffer() = RecordingEngine.flushWriteBuffer()
 
-    fun restartPlayback() = RecordingEngine.restartPlayback()
+    fun restartPlayback(fd: Int) = RecordingEngine.restartPlayback(fd)
 
-    fun restartPlaybackWithMixingTracks() = RecordingEngine.restartPlaybackWithMixingTracks()
+    fun restartPlaybackWithMixingTracks(fd: Int) = RecordingEngine.restartPlaybackWithMixingTracks(fd)
 
     fun getCurrentMax(): Int = RecordingEngine.getCurrentMax()
 
@@ -53,4 +52,6 @@ class RecordingEngineProxy @Inject constructor(){
     fun addSources(filePaths: Array<String>) = RecordingEngine.addSources(filePaths)
 
     fun resetRecordingEngine() = RecordingEngine.resetRecordingEngine()
+
+    fun closeFd(fd: Int) = RecordingEngine.closeFd(fd)
 }

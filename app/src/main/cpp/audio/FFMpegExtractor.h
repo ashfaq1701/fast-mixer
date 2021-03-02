@@ -20,14 +20,13 @@ using namespace std;
 
 class FFMpegExtractor {
 public:
-    FFMpegExtractor(const string &filePath, const AudioProperties targetProperties);
+    FFMpegExtractor(const AudioProperties targetProperties);
     std::unique_ptr<FILE, decltype(&fclose)> fp {
             nullptr,
             &fclose
     };
-    const char *mFilePath;
 
-    int64_t decode(shared_ptr<decode_buffer_data> buff);
+    int64_t decode(int fd, shared_ptr<decode_buffer_data> buff);
 
     int mSampleRate = 0;
     int mChannelCount = 0;

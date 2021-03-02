@@ -62,6 +62,7 @@ public:
 
     static FileDataSource* newFromCompressedFile(
             const char *filename,
+            int fd,
             const AudioProperties targetProperties);
 
     unique_ptr<buffer_data> readData(size_t numSamples);

@@ -52,18 +52,18 @@ void RecordingEngine::stopLivePlayback() {
     }
 }
 
-bool RecordingEngine::startPlayback() {
+bool RecordingEngine::startPlayback(int fd) {
     lock_guard<mutex> lock(playbackStreamMtx);
     LOGD(TAG, "startPlayback(): ");
 
-    return startPlaybackCallable();
+    return startPlaybackCallable(fd);
 }
 
-bool RecordingEngine::startPlaybackWithMixingTracks() {
+bool RecordingEngine::startPlaybackWithMixingTracks(int fd) {
     lock_guard<mutex> lock(playbackStreamMtx);
     LOGD(TAG, "startPlaybackWithMixingTracks(): ");
 
-    return startPlaybackWithMixingTracksCallable();
+    return startPlaybackWithMixingTracksCallable(fd);
 }
 
 void RecordingEngine::startPlayingWithMixingTracksWithoutSetup() {
@@ -80,7 +80,7 @@ void RecordingEngine::startPlayingWithMixingTracksWithoutSetup() {
     playbackStream.startStream();
 }
 
-bool RecordingEngine::startPlaybackCallable() {
+bool RecordingEngine::startPlaybackCallable(int fd) {
     if (!playbackStream.mStream) {
         if (playbackStream.openStream() != oboe::Result::OK) {
             return false;
@@ -88,7 +88,7 @@ bool RecordingEngine::startPlaybackCallable() {
     }
 
     mDataSource = shared_ptr<FileDataSource> {
-            move(mRecordingIO.setup_audio_source())
+            move(mRecordingIO.setup_audio_source(fd))
     };
 
     if (mDataSource) {
@@ -100,7 +100,7 @@ bool RecordingEngine::startPlaybackCallable() {
     return false;
 }
 
-bool RecordingEngine::startPlaybackWithMixingTracksCallable() {
+bool RecordingEngine::startPlaybackWithMixingTracksCallable(int fd) {
     if (!playbackStream.mStream) {
         if (playbackStream.openStream() != oboe::Result::OK) {
             return false;
@@ -108,7 +108,7 @@ bool RecordingEngine::startPlaybackWithMixingTracksCallable() {
     }
 
     mDataSource = shared_ptr<FileDataSource> {
-            move(mRecordingIO.setup_audio_source())
+            move(mRecordingIO.setup_audio_source(fd))
     };
 
     map<string, shared_ptr<DataSource>> sourceMap;
@@ -132,14 +132,14 @@ bool RecordingEngine::startPlaybackWithMixingTracksCallable() {
     return playbackStream.startStream() == oboe::Result::OK;
 }
 
-bool RecordingEngine::startMixingTracksPlayback() {
+bool RecordingEngine::startMixingTracksPlayback(int fd) {
     lock_guard<mutex> lock(playbackStreamMtx);
     LOGD(TAG, "startMixingTracksPlayback(): ");
 
-    return startMixingTracksPlaybackCallable();
+    return startMixingTracksPlaybackCallable(fd);
 }
 
-bool RecordingEngine::startMixingTracksPlaybackCallable() {
+bool RecordingEngine::startMixingTracksPlaybackCallable(int fd) {
     if (mSourceMapStore->sourceMap.size() == 0) return false;
 
     if (!playbackStream.mStream) {
@@ -160,7 +160,7 @@ bool RecordingEngine::startMixingTracksPlaybackCallable() {
     }
 
     mDataSource = shared_ptr<FileDataSource> {
-            move(mRecordingIO.setup_audio_source())
+            move(mRecordingIO.setup_audio_source(fd))
     };
 
     bakPlayHead = mRecordingIO.getCurrentPlaybackProgress();
@@ -248,16 +248,16 @@ void RecordingEngine::stopRecording() {
     }
 }
 
-void RecordingEngine::restartPlayback() {
+void RecordingEngine::restartPlayback(int fd) {
     lock_guard<mutex> lock(playbackStreamMtx);
     stopPlaybackCallable();
-    startPlaybackCallable();
+    startPlaybackCallable(fd);
 }
 
-void RecordingEngine::restartPlaybackWithMixingTracks() {
+void RecordingEngine::restartPlaybackWithMixingTracks(int fd) {
     lock_guard<mutex> lock(playbackStreamMtx);
     stopPlaybackCallable();
-    startPlaybackWithMixingTracksCallable();
+    startPlaybackWithMixingTracksCallable(fd);
 }
 
 void RecordingEngine::flushWriteBuffer() {

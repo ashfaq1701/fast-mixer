@@ -187,6 +187,8 @@ class MixingScreen : BaseFragment<MixingScreenViewModel>() {
     private fun openFilePicker() {
         val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
             type = "*/*"
+            flags = Intent.FLAG_GRANT_READ_URI_PERMISSION or
+                Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION
             val mimeTypes = arrayOf("audio/mpeg", "audio/x-wav")
             putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes)
             addCategory(Intent.CATEGORY_OPENABLE)

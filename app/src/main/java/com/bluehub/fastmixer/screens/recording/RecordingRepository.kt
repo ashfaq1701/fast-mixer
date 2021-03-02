@@ -1,11 +1,13 @@
 package com.bluehub.fastmixer.screens.recording
 
 import com.bluehub.fastmixer.audio.RecordingEngineProxy
+import com.bluehub.fastmixer.common.utils.FileManager
 import java.io.File
 import javax.inject.Inject
 
-class RecordingRepository @Inject
-    constructor(private val recordingEngineProxy: RecordingEngineProxy) {
+class RecordingRepository @Inject constructor(
+    private val recordingEngineProxy: RecordingEngineProxy,
+    private val fileManager: FileManager) {
 
     fun stopRecording() {
         recordingEngineProxy.stopRecording()
@@ -19,20 +21,37 @@ class RecordingRepository @Inject
         recordingEngineProxy.stopLivePlayback()
     }
 
-    fun startPlaying(): Boolean {
-        return recordingEngineProxy.startPlayback()
+    fun startPlaying(filePath: String): Boolean {
+        val fd = fileManager.getFdForPath(filePath) ?: return false
+        try {
+            return recordingEngineProxy.startPlayback(fd)
+        } finally {
+            recordingEngineProxy.closeFd(fd)
+        }
     }
 
-    fun startPlayingWithMixingTracks(): Boolean {
-        return recordingEngineProxy.startPlaybackWithMixingTracks()
+    fun startPlayingWithMixingTracks(filePath: String): Boolean {
+        val fd = fileManager.getFdForPath(filePath) ?: return false
+
+        try {
+            return recordingEngineProxy.startPlaybackWithMixingTracks(fd)
+        } finally {
+            recordingEngineProxy.closeFd(fd)
+        }
     }
 
     fun startPlayingWithMixingTracksWithoutSetup() {
         recordingEngineProxy.startPlayingWithMixingTracksWithoutSetup()
     }
 
-    fun startMixingTracksPlaying(): Boolean {
-        return recordingEngineProxy.startMixingTracksPlayback()
+    fun startMixingTracksPlaying(filePath: String): Boolean {
+        val fd = fileManager.getFdForPath(filePath) ?: return false
+
+        try {
+            return recordingEngineProxy.startMixingTracksPlayback(fd)
+        } finally {
+            recordingEngineProxy.closeFd(fd)
+        }
     }
 
     fun stopMixingTracksPlay() {
@@ -55,12 +74,24 @@ class RecordingRepository @Inject
         recordingEngineProxy.flushWriteBuffer()
     }
 
-    fun restartPlayback() {
-        recordingEngineProxy.restartPlayback()
+    fun restartPlayback(filePath: String) {
+        val fd = fileManager.getFdForPath(filePath) ?: return
+
+        try {
+            recordingEngineProxy.restartPlayback(fd)
+        } finally {
+            recordingEngineProxy.closeFd(fd)
+        }
     }
 
-    fun restartPlaybackWithMixingTracks() {
-        recordingEngineProxy.restartPlaybackWithMixingTracks()
+    fun restartPlaybackWithMixingTracks(filePath: String) {
+        val fd = fileManager.getFdForPath(filePath) ?: return
+        
+        try {
+            recordingEngineProxy.restartPlaybackWithMixingTracks(fd)
+        } finally {
+            recordingEngineProxy.closeFd(fd)
+        }
     }
 
     fun deleteAudioEngine() {

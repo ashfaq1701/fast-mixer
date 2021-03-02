@@ -10,8 +10,12 @@ class MixingRepository @Inject constructor(val mixingEngineProxy: MixingEnginePr
         mixingEngineProxy.create()
     }
 
-    suspend fun addFile(filePath: String) = withContext(Dispatchers.IO){
-        mixingEngineProxy.addFile(filePath)
+    fun addFile(filePath: String, fd: Int) {
+        try {
+            mixingEngineProxy.addFile(filePath, fd)
+        } finally {
+            mixingEngineProxy.closeFd(fd)
+        }
     }
 
     fun readSamples(filePath: String, countPoints: Int): Array<Float> = mixingEngineProxy.readSamples(filePath, countPoints)

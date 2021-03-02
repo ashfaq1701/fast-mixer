@@ -63,13 +63,13 @@ extern "C" {
     }
 
     JNIEXPORT void JNICALL
-    Java_com_bluehub_fastmixer_audio_MixingEngine_addFile(JNIEnv *env, jclass, jstring filePath) {
+    Java_com_bluehub_fastmixer_audio_MixingEngine_addFile(JNIEnv *env, jclass, jstring fileId, jint fd) {
         if (!mixingEngine) {
             LOGE("addFile: mixingEngine is null, you must call create() method before calling this method");
             return;
         }
-        auto filePathStr = java_str_to_c_str(env, filePath);
-        mixingEngine->addFile(move(filePathStr));
+        auto filePathStr = java_str_to_c_str(env, fileId);
+        mixingEngine->addFile(move(filePathStr), fd);
     }
 
     JNIEXPORT jobjectArray JNICALL
@@ -325,5 +325,10 @@ extern "C" {
 
         auto filePathStr = java_str_to_c_str(env, filePath);
         mixingEngine->pasteNewFromClipboard(filePathStr);
+    }
+
+    JNIEXPORT void JNICALL
+    Java_com_bluehub_fastmixer_audio_MixingEngine_closeFd(JNIEnv *env, jclass, jint fd) {
+        close(fd);
     }
 }
