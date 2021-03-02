@@ -382,7 +382,7 @@ class FileWaveView @JvmOverloads constructor(
         }
     }
 
-    private fun getSliderLeftPosition() = if (mAudioFileUiState.hasValue()) {
+    private fun getSliderLeftPosition(): Int = if (mAudioFileUiState.hasValue()) {
         if (mAudioFileUiState.value.playSliderPosition.hasValue()) {
             mAudioFileUiState.value.playSliderPosition.value
         } else 0
@@ -414,13 +414,16 @@ class FileWaveView @JvmOverloads constructor(
         if (::mAudioWidgetSlider.isInitialized) {
             val sliderLeft = getSliderLeftPosition()
             val sliderTop = 0
-            if (mAudioWidgetSlider.visibility != GONE) {
-                mAudioWidgetSlider.layout(
-                    sliderLeft,
-                    sliderTop,
-                    sliderLeft + mAudioWidgetSlider.measuredWidth,
-                    sliderTop + mAudioWidgetSlider.measuredHeight
-                )
+
+            mAudioWidgetSlider.run {
+                if (visibility != GONE && sliderLeft >= 0 && measuredWidth > 0) {
+                    layout(
+                        sliderLeft,
+                        sliderTop,
+                        sliderLeft + measuredWidth,
+                        sliderTop + measuredHeight
+                    )
+                }
             }
         }
 
@@ -432,7 +435,7 @@ class FileWaveView @JvmOverloads constructor(
 
                 val selectorTop = 0
 
-                if (it.visibility != GONE && it.measuredWidth > 0) {
+                if (it.visibility != GONE && it.measuredWidth > 0 && segmentSelectorLeft >= 0) {
                     it.layout(
                         segmentSelectorLeft,
                         selectorTop,
