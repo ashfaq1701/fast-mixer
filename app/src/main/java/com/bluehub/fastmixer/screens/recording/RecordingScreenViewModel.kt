@@ -146,8 +146,8 @@ class RecordingScreenViewModel @Inject constructor (@ApplicationContext val cont
             viewModelScope.launch {
                 withContext(Dispatchers.IO) {
                     repository.run {
-                        setupAudioSource(recordingFilePath)
-                            ?.let(::restartPlayback)
+                        val fd = setupAudioSource(recordingFilePath)
+                        restartPlayback(fd)
                     }
                 }
             }
@@ -157,8 +157,8 @@ class RecordingScreenViewModel @Inject constructor (@ApplicationContext val cont
             viewModelScope.launch {
                 withContext(Dispatchers.IO) {
                     repository.run {
-                        setupAudioSource(recordingFilePath)
-                            ?.let(::restartPlaybackWithMixingTracks)
+                        val fd = setupAudioSource(recordingFilePath)
+                        restartPlaybackWithMixingTracks(fd)
                     }
                 }
             }
@@ -217,8 +217,8 @@ class RecordingScreenViewModel @Inject constructor (@ApplicationContext val cont
 
                     if (mixingPlayActive.value == true) {
                         repository.run {
-                            setupAudioSource(recordingFilePath)
-                                ?.let(::startMixingTracksPlaying)
+                            val fd = setupAudioSource(recordingFilePath)
+                            startMixingTracksPlaying(fd)
                         }
                     }
 
@@ -293,8 +293,8 @@ class RecordingScreenViewModel @Inject constructor (@ApplicationContext val cont
                 if(_eventIsPlayingWithMixingTracks.value == false) {
 
                     repository.run {
-                        if (setupAudioSource(recordingFilePath)
-                                ?.let(::startPlayingWithMixingTracks) == true) {
+                        val fd = setupAudioSource(recordingFilePath)
+                        if (startPlayingWithMixingTracks(fd)) {
                             _eventIsPlayingWithMixingTracks.postValue(true)
                         }
                     }

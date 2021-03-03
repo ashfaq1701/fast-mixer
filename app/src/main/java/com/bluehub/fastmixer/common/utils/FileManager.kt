@@ -55,8 +55,10 @@ class FileManager @Inject constructor(
 
     fun getFdForPath(path: String): Int? {
         val file = File(path)
-        val uri = Uri.fromFile(file)
-        return getFdForUri(uri)
+        return if (file.exists()) {
+            val uri = Uri.fromFile(file)
+            getFdForUri(uri)
+        } else null
     }
 
     fun getFdForUri(uri: Uri): Int? {

@@ -35,11 +35,11 @@ class RecordingRepository @Inject constructor(
         }
     }
 
-    fun startPlayingWithMixingTracks(fd: Int): Boolean {
+    fun startPlayingWithMixingTracks(fd: Int?): Boolean {
         try {
             return recordingEngineProxy.startPlaybackWithMixingTracks()
         } finally {
-            recordingEngineProxy.closeFd(fd)
+            fd?.let(recordingEngineProxy::closeFd)
         }
     }
 
@@ -47,11 +47,11 @@ class RecordingRepository @Inject constructor(
         recordingEngineProxy.startPlayingWithMixingTracksWithoutSetup()
     }
 
-    fun startMixingTracksPlaying(fd: Int): Boolean {
+    fun startMixingTracksPlaying(fd: Int?): Boolean {
         try {
             return recordingEngineProxy.startMixingTracksPlayback()
         } finally {
-            recordingEngineProxy.closeFd(fd)
+            fd?.let(recordingEngineProxy::closeFd)
         }
     }
 
@@ -75,19 +75,19 @@ class RecordingRepository @Inject constructor(
         recordingEngineProxy.flushWriteBuffer()
     }
 
-    fun restartPlayback(fd: Int) {
+    fun restartPlayback(fd: Int?) {
         try {
             recordingEngineProxy.restartPlayback()
         } finally {
-            recordingEngineProxy.closeFd(fd)
+            fd?.let(recordingEngineProxy::closeFd)
         }
     }
 
-    fun restartPlaybackWithMixingTracks(fd: Int) {
+    fun restartPlaybackWithMixingTracks(fd: Int?) {
         try {
             recordingEngineProxy.restartPlaybackWithMixingTracks()
         } finally {
-            recordingEngineProxy.closeFd(fd)
+            fd?.let(recordingEngineProxy::closeFd)
         }
     }
 
