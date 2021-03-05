@@ -129,5 +129,7 @@
                     app:clickListener="@{mixingScreenViewModel.groupReset}" />
             </LinearLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <include layout="@layout/view_loading" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

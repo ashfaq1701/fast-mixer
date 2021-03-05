@@ -40,6 +40,10 @@ class MixingScreenViewModel @Inject constructor(@ApplicationContext val context:
         }
     }
 
+    private val _isLoading: MutableLiveData<Boolean> = MutableLiveData()
+    val isLoading: LiveData<Boolean>
+        get() = _isLoading
+
     private val _audioFilesLiveData = MutableLiveData<MutableList<AudioFileUiState>>(mutableListOf())
     val audioFilesLiveData: LiveData<MutableList<AudioFileUiState>>
         get() = _audioFilesLiveData
@@ -133,15 +137,17 @@ class MixingScreenViewModel @Inject constructor(@ApplicationContext val context:
                     it.path == filePath
                 }.count() == 0) {
                 viewModelScope.launch {
+                    _isLoading.value = true
+
                     withContext(Dispatchers.IO) {
-
-
                         mixingRepository.addFile(filePath, fd)
                         val totalSamples = getTotalSamples(filePath)
                         audioFiles.add(AudioFileUiState.create(filePath, totalSamples))
                     }
                     _audioFilesLiveData.value = audioFiles
                     _itemAddedIdx.value = audioFiles.size - 1
+
+                    _isLoading.value = false
                 }
             }
         }
@@ -158,6 +164,8 @@ class MixingScreenViewModel @Inject constructor(@ApplicationContext val context:
         }
 
         viewModelScope.launch(Dispatchers.IO) {
+            _isLoading.postValue(true)
+
             newFilePath?.let { newPath ->
                 mixingRepository.addFile(newPath, parcelFd.detachFd())
 
@@ -172,6 +180,8 @@ class MixingScreenViewModel @Inject constructor(@ApplicationContext val context:
                     }
                 }
             }
+
+            _isLoading.postValue(false)
         }
     }
 
@@ -290,6 +300,8 @@ class MixingScreenViewModel @Inject constructor(@ApplicationContext val context:
 
     private fun groupPlay() {
         viewModelScope.launch(Dispatchers.IO) {
+            _isLoading.postValue(true)
+
             val pathList = audioFileStore.audioFiles.map { it.path }
             if (!playList.areEqual(pathList)) {
                 mixingRepository.loadFiles(pathList)
@@ -297,13 +309,19 @@ class MixingScreenViewModel @Inject constructor(@ApplicationContext val context:
             }
             mixingRepository.startPlayback()
             playFlagStore.isGroupPlaying.postValue(true)
+
+            _isLoading.postValue(false)
         }
     }
 
     private fun groupPause() {
         viewModelScope.launch(Dispatchers.IO) {
+            _isLoading.postValue(true)
+
             mixingRepository.pausePlayback()
             playFlagStore.isGroupPlaying.postValue(false)
+
+            _isLoading.postValue(false)
         }
     }
 
@@ -316,7 +334,6 @@ class MixingScreenViewModel @Inject constructor(@ApplicationContext val context:
     }
 
     fun cutToClipboard(audioFileUiState: AudioFileUiState) {
-
         viewModelScope.launch(Dispatchers.IO) {
             audioFileUiState.run {
                 audioFileUiState.isLoading.onNext(true)
@@ -355,6 +372,7 @@ class MixingScreenViewModel @Inject constructor(@ApplicationContext val context:
     fun muteAndCopyToClipboard(audioFileUiState: AudioFileUiState) {
 
         viewModelScope.launch(Dispatchers.IO) {
+
             audioFileUiState.run {
                 audioFileUiState.isLoading.onNext(true)
                 val result = mixingRepository.muteAndCopyToClipboard(path, segmentStartSampleValue, segmentEndSampleValue)
@@ -386,6 +404,8 @@ class MixingScreenViewModel @Inject constructor(@ApplicationContext val context:
         val fileId = UUID.randomUUID().toString()
 
         viewModelScope.launch {
+            _isLoading.postValue(true)
+
             audioFileStore.run {
                 withContext(Dispatchers.IO) {
                     mixingRepository.pasteNewFromClipboard(fileId)
@@ -395,6 +415,8 @@ class MixingScreenViewModel @Inject constructor(@ApplicationContext val context:
                 _audioFilesLiveData.value = audioFiles
                 _itemAddedIdx.value = audioFiles.size - 1
             }
+
+            _isLoading.postValue(false)
         }
     }
 

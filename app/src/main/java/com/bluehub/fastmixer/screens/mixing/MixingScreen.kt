@@ -20,6 +20,7 @@ import com.bluehub.fastmixer.screens.mixing.MixingScreenDirections.actionMixingS
 import com.bluehub.fastmixer.screens.mixing.modals.*
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import kotlinx.android.synthetic.main.view_loading.*
 
 @AndroidEntryPoint
 class MixingScreen : BaseFragment<MixingScreenViewModel>() {
@@ -176,6 +177,14 @@ class MixingScreen : BaseFragment<MixingScreenViewModel>() {
             .subscribe {
                 dataBinding.pasteAsNew.setIsEnabled(it)
             }
+
+        viewModel.isLoading.observe(viewLifecycleOwner, {
+            if (it) {
+                pbLoading.visibility = View.VISIBLE
+            } else {
+                pbLoading.visibility = View.GONE
+            }
+        })
     }
 
     private fun setupAnimations() {
