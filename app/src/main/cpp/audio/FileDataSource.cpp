@@ -76,8 +76,6 @@ FileDataSource* FileDataSource::newFromCompressedFile(
 
     int64_t totalBytes = ffmpegExtractor.getTotalBytes(dup(fd));
 
-    LOGD("TOTAL BYTES COUNT %lld", totalBytes);
-
     if (totalBytes <= 0) {
         return nullptr;
     }
