@@ -21,12 +21,16 @@ using namespace std;
 class FFMpegExtractor {
 public:
     FFMpegExtractor(const AudioProperties targetProperties);
-    std::unique_ptr<FILE, decltype(&fclose)> fp {
+    std::unique_ptr<FILE, void(*)(FILE *)> fp {
             nullptr,
-            &fclose
+            [](FILE *f) {
+                fseek(f, 0, SEEK_SET);
+                fclose(f);
+            }
     };
 
-    int64_t decode(int fd, shared_ptr<decode_buffer_data> buff);
+    int64_t decode(int fd, uint8_t *targetData);
+    int64_t getTotalBytes(int fd);
 
     int mSampleRate = 0;
     int mChannelCount = 0;
@@ -45,6 +49,8 @@ private:
     bool getStreamInfo(AVFormatContext *avFormatContext);
 
     AVStream* getBestAudioStream(AVFormatContext *avFormatContext);
+
+    int64_t decodeOp(int fd, uint8_t* targetData, function<void(uint8_t *, int64_t, short *, int64_t)> f);
 
     void printCodecParameters(AVCodecParameters *params);
 };

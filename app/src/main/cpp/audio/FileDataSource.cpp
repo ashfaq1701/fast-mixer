@@ -68,30 +68,22 @@ FileDataSource* FileDataSource::newFromCompressedFile(
         return nullptr;
     }
 
-    off_t assetSize = getSizeOfFile(fl);
-    fclose(fl);
-
     // Allocate memory to store the decompressed audio. We don't know the exact
     // size of the decoded data until after decoding so we make an assumption about the
     // maximum compression ratio and the decoded sample format (float for FFmpeg, int16 for NDK).
 
     auto ffmpegExtractor = FFMpegExtractor(targetProperties);
 
-    long initialSize = assetSize * sizeof(float);
+    int64_t totalBytes = ffmpegExtractor.getTotalBytes(dup(fd));
 
-    if (strEndedWith(filenameStr, ".mp3")) {
-        initialSize = initialSize * kMaxCompressionRatio;
+    LOGD("TOTAL BYTES COUNT %lld", totalBytes);
+
+    if (totalBytes <= 0) {
+        return nullptr;
     }
 
-    uint8_t* decodedData = new uint8_t [initialSize];
-    decode_buffer_data buff = {
-            .ptr = decodedData,
-            .countPoints = (size_t) initialSize
-    };
-
-    auto dataBuffer = make_shared<decode_buffer_data>(buff);
-
-    int64_t bytesDecoded = ffmpegExtractor.decode(dup(fd), dataBuffer);
+    uint8_t* decodedData = new uint8_t [totalBytes];
+    int64_t bytesDecoded = ffmpegExtractor.decode(dup(fd), decodedData);
 
     if (bytesDecoded <= 0) {
         return nullptr;
@@ -100,10 +92,7 @@ FileDataSource* FileDataSource::newFromCompressedFile(
     auto numSamples = bytesDecoded / sizeof(float);
 
     // Now we know the exact number of samples we can create a float array to hold the audio data
-    auto outputBuffer = make_unique<float[]>(numSamples);
-    memcpy(outputBuffer.get(), dataBuffer->ptr, (size_t)bytesDecoded);
-
-    delete [] dataBuffer->ptr;
+    auto outputBuffer = unique_ptr<float[]>((float*) decodedData);
 
     return new FileDataSource(move(outputBuffer),
                               numSamples,
@@ -320,12 +309,12 @@ int64_t FileDataSource::cutToClipboard(int64_t startPosition, int64_t endPositio
             mPlayHead = startPosition;
         }
     } else if (mPlayHead > endPosition) {
-       auto newPlayHead = mPlayHead - (endPosition - startPosition + 1);
-       if (newPlayHead < 0) {
-           newPlayHead = 0;
-       }
+        auto newPlayHead = mPlayHead - (endPosition - startPosition + 1);
+        if (newPlayHead < 0) {
+            newPlayHead = 0;
+        }
 
-       mPlayHead = newPlayHead;
+        mPlayHead = newPlayHead;
     }
 
     return mPlayHead;
