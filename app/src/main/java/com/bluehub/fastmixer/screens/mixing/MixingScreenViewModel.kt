@@ -40,6 +40,8 @@ class MixingScreenViewModel @Inject constructor(@ApplicationContext val context:
         }
     }
 
+    private var seekbarTimer: Timer? = null
+
     private val _isLoading: MutableLiveData<Boolean> = MutableLiveData()
     val isLoading: LiveData<Boolean>
         get() = _isLoading
@@ -73,6 +75,22 @@ class MixingScreenViewModel @Inject constructor(@ApplicationContext val context:
 
     val isGroupPlaying: LiveData<Boolean>
         get() = playFlagStore.isGroupPlaying
+
+    private val _isGroupPlayOverlayOpen: MutableLiveData<Boolean> = MutableLiveData()
+    val isGroupPlayOverlayOpen: LiveData<Boolean>
+        get() = _isGroupPlayOverlayOpen
+
+    val isGroupOverlayCancelEnabled = MediatorLiveData<Boolean>().apply {
+        addSource(isGroupPlaying) { value -> setValue(!value) }
+    }
+
+    private val _groupPlaySeekbarProgress = MutableLiveData(0)
+    val groupPlaySeekbarProgress: LiveData<Int>
+        get() = _groupPlaySeekbarProgress
+
+    private val _groupPlaySeekbarMaxValue = MutableLiveData<Int>(0)
+    val groupPlaySeekbarMaxValue: LiveData<Int>
+        get() = _groupPlaySeekbarMaxValue
 
     private val _clipboardHasData = MutableLiveData(false)
     val clipboardHasData: LiveData<Boolean>
@@ -307,10 +325,12 @@ class MixingScreenViewModel @Inject constructor(@ApplicationContext val context:
                 mixingRepository.loadFiles(pathList)
                 playList.reInitList(pathList)
             }
-            mixingRepository.startPlayback()
+            startGroupPlay()
             playFlagStore.isGroupPlaying.postValue(true)
 
             _isLoading.postValue(false)
+
+            _isGroupPlayOverlayOpen.postValue(true)
         }
     }
 
@@ -318,12 +338,43 @@ class MixingScreenViewModel @Inject constructor(@ApplicationContext val context:
         viewModelScope.launch(Dispatchers.IO) {
             _isLoading.postValue(true)
 
-            mixingRepository.pausePlayback()
+            pauseGroupPlay()
             playFlagStore.isGroupPlaying.postValue(false)
 
-            _isLoading.postValue(false)
+             _isLoading.postValue(false)
         }
     }
+
+    fun startGroupPlay() {
+        viewModelScope.launch(Dispatchers.IO) {
+
+            if (_isLoading.value == false) {
+                _isLoading.postValue(true)
+            }
+
+            mixingRepository.startPlayback()
+
+            if (_isLoading.value == true) {
+                _isLoading.postValue(false)
+            }
+        }
+    }
+
+    fun pauseGroupPlay() {
+        viewModelScope.launch(Dispatchers.IO) {
+            if (_isLoading.value == false) {
+                _isLoading.postValue(true)
+            }
+
+            mixingRepository.pausePlayback()
+
+            if (_isLoading.value == true) {
+                _isLoading.postValue(false)
+            }
+        }
+    }
+
+    fun setPlayerHead(playHead: Int) = mixingRepository.setPlayerHead(playHead)
 
     fun toggleGroupPlay() {
         if (playFlagStore.isGroupPlaying.value == null || playFlagStore.isGroupPlaying.value == false) {
@@ -420,13 +471,39 @@ class MixingScreenViewModel @Inject constructor(@ApplicationContext val context:
         }
     }
 
+    fun closeGroupPlayingOverlay() {
+        _isGroupPlayOverlayOpen.value = false
+    }
+
+    fun applyCommonSegmentBounds() {
+        _isGroupPlayOverlayOpen.value = false
+    }
+
     fun resetStates() {
         audioViewAction.value = null
+    }
+
+    fun startGroupPlayTimer() {
+        _groupPlaySeekbarProgress.value = 0
+        _groupPlaySeekbarMaxValue.value = mixingRepository.getTotalSampleFrames()
+        stopGroupPlayTimer()
+        seekbarTimer = Timer()
+        seekbarTimer?.schedule(object: TimerTask() {
+            override fun run() {
+                _groupPlaySeekbarProgress.postValue(mixingRepository.getCurrentPlaybackProgress())
+            }
+        }, 0, 10)
+    }
+
+    fun stopGroupPlayTimer() {
+        seekbarTimer?.cancel()
+        seekbarTimer = null
     }
 
     override fun onCleared() {
         super.onCleared()
         mixingRepository.pausePlayback()
+        stopGroupPlayTimer()
         mixingRepository.clearSources()
         mixingRepository.deleteMixingEngine()
         fileWaveViewStore.cleanup()
