@@ -12,14 +12,14 @@
             android:layout_width="@dimen/audio_segment_selector_edge_width"
             android:layout_height="match_parent"
             app:layout_constraintStart_toStartOf="parent"
-            android:background="@color/grey"/>
+            android:background="@color/gray"/>
 
         <View
             android:id="@+id/rightEdge"
             android:layout_width="@dimen/audio_segment_selector_edge_width"
             android:layout_height="match_parent"
             app:layout_constraintEnd_toEndOf="parent"
-            android:background="@color/grey"/>
+            android:background="@color/gray"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

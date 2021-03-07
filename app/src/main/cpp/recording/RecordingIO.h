@@ -75,6 +75,10 @@ public:
 
     bool checkPlayerSources(map<string, shared_ptr<DataSource>> playMap);
 
+    void reserveRecordingBuffer();
+
+    void clearRecordingBuffer();
+
 private:
     const char* TAG = "RecordingIO:: %d";
 

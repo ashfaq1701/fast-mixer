@@ -34,6 +34,12 @@ RecordingEngine::~RecordingEngine() {
 
 void RecordingEngine::setupAudioSource(int fd) {
     if (isDirty) {
+
+        if (mDataSource) {
+            mDataSource->deleteBuffers();
+            mDataSource.reset();
+        }
+
         mDataSource = shared_ptr<FileDataSource>{
                 move(mRecordingIO.setup_audio_source(fd))
         };
@@ -230,6 +236,8 @@ void RecordingEngine::startRecording() {
     lock_guard<mutex> lock(recordingStreamMtx);
     LOGD(TAG, "startRecording(): ");
     isDirty = true;
+
+    mRecordingIO.reserveRecordingBuffer();
     recordingStream.startStream();
 }
 
@@ -241,6 +249,7 @@ void RecordingEngine::stopRecording() {
         if (recordingStream.mStream->getState() != oboe::StreamState::Closed) {
             recordingStream.stopStream();
             flushWriteBuffer();
+            mRecordingIO.clearRecordingBuffer();
         } else {
             recordingStream.resetStream();
         }

@@ -19,6 +19,7 @@ import com.bluehub.fastmixer.common.models.AudioViewActionType
 import com.bluehub.fastmixer.databinding.MixingScreenBinding
 import com.bluehub.fastmixer.screens.mixing.MixingScreenDirections.actionMixingScreenToRecordingScreen
 import com.bluehub.fastmixer.screens.mixing.modals.*
+import com.google.android.material.slider.Slider
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.view_loading.*
@@ -204,32 +205,36 @@ class MixingScreen : BaseFragment<MixingScreenViewModel>() {
         })
 
         viewModel.groupPlaySeekbarMaxValue.observe(viewLifecycleOwner, {
-            dataBinding.groupPlaySeekbar.max = it
+            dataBinding.groupPlaySeekbar.valueTo = it.toFloat()
+
+            dataBinding.groupPlayBoundRangeSlider.valueTo = it.toFloat()
+            dataBinding.groupPlayBoundRangeSlider.setValues(0.0f, it.toFloat())
         })
 
         viewModel.groupPlaySeekbarProgress.observe(viewLifecycleOwner, {
-            dataBinding.groupPlaySeekbar.progress = it
+            dataBinding.groupPlaySeekbar.value = it.toFloat()
         })
     }
 
     private fun setupView() {
-        dataBinding.groupPlaySeekbar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
-                if (fromUser) {
-                    viewModel.setPlayerHead(progress)
-                }
-            }
 
-            override fun onStartTrackingTouch(seekBar: SeekBar) {
+        dataBinding.groupPlaySeekbar.addOnSliderTouchListener(object : Slider.OnSliderTouchListener {
+            override fun onStartTrackingTouch(slider: Slider) {
                 if (viewModel.isGroupPlaying.value == true) {
                     viewModel.pauseGroupPlay()
                 }
             }
 
-            override fun onStopTrackingTouch(seekBar: SeekBar) {
+            override fun onStopTrackingTouch(slider: Slider) {
                 if (viewModel.isGroupPlaying.value == true) {
                     viewModel.startGroupPlay()
                 }
+            }
+        })
+
+        dataBinding.groupPlaySeekbar.addOnChangeListener(Slider.OnChangeListener { _, value, fromUser ->
+            if (fromUser) {
+                viewModel.setPlayerHead(value.toInt())
             }
         })
     }

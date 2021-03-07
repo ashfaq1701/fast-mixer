@@ -80,6 +80,8 @@ public:
 
     void pasteFromClipboard(int64_t position, vector<float>& clipboard);
 
+    void deleteBuffers();
+
 protected:
 
     FileDataSource(unique_ptr<float[]> data, size_t size,

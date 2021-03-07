@@ -60,6 +60,8 @@
             app:layout_constraintBottom_toTopOf="@id/drawerContainer"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
+            android:clickable="true"
+            android:focusable="true"
             android:visibility="gone"
             tools:visibility="visible">
 
@@ -72,12 +74,23 @@
                 android:background="@drawable/rect_transparent"
                 android:backgroundTint="@color/colorGrayTransparent">
 
-                <SeekBar
+                <com.google.android.material.slider.Slider
                     android:id="@+id/groupPlaySeekbar"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginVertical="@dimen/play_screen_seekbar_margin" />
+                    android:valueFrom="0.0"
+                    android:valueTo="100.0"
+                    android:value="0.0"
+                    android:layout_marginTop="@dimen/mixing_screen_seekbar_margin_top"
+                    android:layout_marginBottom="@dimen/mixing_screen_seekbar_margin_bottom" />
 
+                <com.google.android.material.slider.RangeSlider
+                    android:id="@+id/groupPlayBoundRangeSlider"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:valueFrom="0.0"
+                    android:valueTo="100.0"
+                    app:values="@array/initial_range_slider_values" />
 
                 <LinearLayout
                     android:layout_width="match_parent"

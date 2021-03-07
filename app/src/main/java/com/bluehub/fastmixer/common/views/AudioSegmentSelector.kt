@@ -36,7 +36,7 @@ class AudioSegmentSelector(context: Context, attributeSet: AttributeSet?)
     }
 
     fun disableLeftEdge() {
-        leftEdge.backgroundTintList = AppCompatResources.getColorStateList(context, R.color.grey)
+        leftEdge.backgroundTintList = AppCompatResources.getColorStateList(context, R.color.gray)
         leftEdgeActivated = false
     }
 
@@ -46,7 +46,7 @@ class AudioSegmentSelector(context: Context, attributeSet: AttributeSet?)
     }
 
     fun disableRightEdge() {
-        rightEdge.backgroundTintList = AppCompatResources.getColorStateList(context, R.color.grey)
+        rightEdge.backgroundTintList = AppCompatResources.getColorStateList(context, R.color.gray)
         rightEdgeActivated = false
     }
 

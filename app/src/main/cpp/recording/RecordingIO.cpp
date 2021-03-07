@@ -36,8 +36,15 @@ RecordingIO::RecordingIO() {
     Player* player = new Player();
     mPlayer.reset(move(player));
 
+    taskQueue = move(new TaskQueue());
+}
+
+void RecordingIO::reserveRecordingBuffer() {
     mData.reserve(kMaxSamples);
-    taskQueue = new TaskQueue();
+}
+
+void RecordingIO::clearRecordingBuffer() {
+    mData.resize(0);
 }
 
 FileDataSource* RecordingIO::setup_audio_source(int fd) {

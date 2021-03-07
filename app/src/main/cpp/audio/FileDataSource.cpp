@@ -381,3 +381,11 @@ void FileDataSource::pasteFromClipboard(int64_t position, vector<float>& clipboa
     mBuffer.reset(move(newBuffer));
     mBufferSize += clipboard.size();
 }
+
+void FileDataSource::deleteBuffers() {
+    mBuffer.reset(nullptr);
+    mBufferSize = 0;
+
+    mBackupBuffer.reset(nullptr);
+    mBackupBufferSize = 0;
+}
