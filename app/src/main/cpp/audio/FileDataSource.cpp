@@ -78,16 +78,25 @@ FileDataSource* FileDataSource::newFromCompressedFile(
     // size of the decoded data until after decoding so we make an assumption about the
     // maximum compression ratio and the decoded sample format (float for FFmpeg, int16 for NDK).
 
+    off_t assetSize = getSizeOfFile(fl);
+    fclose(fl);
+
     FFMpegExtractor ffmpegExtractor;
 
-    int64_t totalBytes = ffmpegExtractor.getTotalBytes(dup(fd), targetProperties);
+    long initialSize =  assetSize * sizeof(float);
 
-    if (totalBytes <= 0) {
-        return nullptr;
+    if (strEndedWith(filenameStr, ".mp3")) {
+        initialSize = initialSize * kMaxCompressionRatio;
     }
 
-    uint8_t* decodedData = new uint8_t [totalBytes];
-    int64_t bytesDecoded = ffmpegExtractor.decode(dup(fd), decodedData, targetProperties);
+    uint8_t* decodedData = new uint8_t [initialSize];
+    decode_buffer_data buff = {
+            .ptr = decodedData,
+            .countPoints = (size_t) initialSize
+    };
+
+    auto dataBuffer = make_shared<decode_buffer_data>(buff);
+    int64_t bytesDecoded = ffmpegExtractor.decode(dup(fd), dataBuffer, targetProperties);
 
     if (bytesDecoded <= 0) {
         return nullptr;
@@ -97,7 +106,7 @@ FileDataSource* FileDataSource::newFromCompressedFile(
 
     // Now we know the exact number of samples we can create a float array to hold the audio data
     auto outputBuffer = bufferDataType {
-        move((float*) decodedData),
+        move((float*) dataBuffer->ptr),
         FileDataSource::deleter
     };
 

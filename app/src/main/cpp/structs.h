@@ -17,6 +17,11 @@ struct recording_method_ids {
     jmethodID recordingScreenVMTogglePlay;
 };
 
+struct decode_buffer_data {
+    uint8_t *ptr;
+    size_t countPoints;
+};
+
 struct buffer_data {
     float *ptr;
     size_t countPoints; ///< size left in the buffer

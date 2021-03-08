@@ -105,7 +105,7 @@ AVStream *FFMpegExtractor::getBestAudioStream(AVFormatContext *avFormatContext) 
     }
 }
 
-int64_t FFMpegExtractor::decodeOp(int fd, uint8_t* targetData, AudioProperties targetProperties, function<void(uint8_t *, int64_t, short *, int64_t)> f) {
+int64_t FFMpegExtractor::decodeOp(int fd, shared_ptr<decode_buffer_data> buff, AudioProperties targetProperties, function<void(shared_ptr<decode_buffer_data>, int64_t, short *, int64_t)> f) {
     int returnValue = -1; // -1 indicates error
 
     // Create a buffer for FFmpeg to use for decoding (freed in the custom deleter below)
@@ -278,7 +278,19 @@ int64_t FFMpegExtractor::decodeOp(int fd, uint8_t* targetData, AudioProperties t
 
             int64_t bytesToWrite = frame_count * sizeof(float) * targetProperties.channelCount;
 
-            f(targetData, bytesWritten, buffer1, bytesToWrite);
+            if (bytesWritten + bytesToWrite > buff->countPoints) {
+                uint8_t* oldBuff = buff->ptr;
+
+                uint8_t* newBuff = new uint8_t [buff->countPoints * 2];
+                memcpy(newBuff, oldBuff, (size_t) buff->countPoints);
+
+                buff->countPoints = buff->countPoints * 2;
+                buff->ptr = move(newBuff);
+
+                delete [] oldBuff;
+            }
+
+            f(buff, bytesWritten, buffer1, bytesToWrite);
             bytesWritten += bytesToWrite;
             av_freep(&buffer1);
 
@@ -298,18 +310,11 @@ int64_t FFMpegExtractor::decodeOp(int fd, uint8_t* targetData, AudioProperties t
     return returnValue;
 }
 
-int64_t FFMpegExtractor::decode(int fd, uint8_t *targetData, AudioProperties targetProperties) {
-    function<void(uint8_t*, int, short*, int64_t)> f = [] (uint8_t* targetData, int64_t bytesWritten, short* buffer1, int64_t bytesToWrite) {
-        memcpy(targetData + bytesWritten, buffer1, (size_t)bytesToWrite);
+int64_t FFMpegExtractor::decode(int fd, shared_ptr<decode_buffer_data> buff, AudioProperties targetProperties) {
+    function<void(shared_ptr<decode_buffer_data>, int, short*, int64_t)> f = [] (shared_ptr<decode_buffer_data> targetData, int64_t bytesWritten, short* buffer1, int64_t bytesToWrite) {
+        memcpy(targetData->ptr + bytesWritten, buffer1, (size_t)bytesToWrite);
     };
-    auto decodedBytes = decodeOp(fd, targetData, targetProperties, f);
-    return decodedBytes;
-}
-
-int64_t FFMpegExtractor::getTotalBytes(int fd, AudioProperties targetProperties) {
-    function<void(uint8_t*, int, short*, int64_t)> f = [] (uint8_t* targetData, int64_t bytesWritten, short* buffer1, int64_t bytesToWrite) {};
-
-    auto decodedBytes = decodeOp(fd, nullptr, targetProperties, f);
+    auto decodedBytes = decodeOp(fd, buff, targetProperties, f);
     return decodedBytes;
 }
 
