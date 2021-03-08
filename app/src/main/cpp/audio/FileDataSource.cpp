@@ -28,13 +28,19 @@
 constexpr int kMaxCompressionRatio { 12 };
 
 FileDataSource::FileDataSource (
-        unique_ptr<float[]> data,
+        unique_ptr<float[], function<void(float*)>> data,
         size_t size,
         const AudioProperties properties) :
         mBuffer(move(data)), mBufferSize(size), mProperties(properties) {
 
     calculateProperties();
 }
+
+function<void(float*)> FileDataSource::deleter = [](float *data) {
+    if (data) {
+        delete[] data;
+    }
+};
 
 void FileDataSource::calculateProperties() {
     auto data = getData();
@@ -90,7 +96,10 @@ FileDataSource* FileDataSource::newFromCompressedFile(
     auto numSamples = bytesDecoded / sizeof(float);
 
     // Now we know the exact number of samples we can create a float array to hold the audio data
-    auto outputBuffer = unique_ptr<float[]>(move((float*) decodedData));
+    auto outputBuffer = bufferDataType {
+        move((float*) decodedData),
+        FileDataSource::deleter
+    };
 
     return new FileDataSource(move(outputBuffer),
                               numSamples,
@@ -206,7 +215,10 @@ int64_t FileDataSource::getSelectionEnd() {
 }
 
 void FileDataSource::setBackupBufferData(float* &&data, int64_t numSamples) {
-    mBackupBuffer = unique_ptr<float[]>(move(data));
+    mBackupBuffer = bufferDataType {
+        move(data),
+        FileDataSource::deleter
+    };
     mBackupBufferSize = numSamples;
 }
 
@@ -227,13 +239,20 @@ int64_t FileDataSource::getSampleSize() {
 
 void FileDataSource::resetBackupBufferData() {
     if (mBackupBuffer) {
-        mBackupBuffer = unique_ptr<float[]>{nullptr};
+        mBackupBuffer = bufferDataType {
+            nullptr,
+            FileDataSource::deleter
+        };
+
+        mBackupBufferSize = 0;
     }
 }
 
 void FileDataSource::applyBackupBufferData() {
     if (mBackupBuffer) {
         mBuffer.swap(mBackupBuffer);
+
+        mBufferSize = mBackupBufferSize;
     }
     resetBackupBufferData();
     calculateProperties();
@@ -267,7 +286,10 @@ int64_t FileDataSource::shiftBySamples(int64_t position, int64_t numSamples) {
 
     copy(oldBufferData + fillStartPosition, oldBufferData + mBufferSize, newBuffer + fillEndPosition);
 
-    mBuffer.reset(move(newBuffer));
+    mBuffer = bufferDataType {
+        move(newBuffer),
+        FileDataSource::deleter
+    };
     mBufferSize = newBufferSize;
 
     return position + numSamples;
@@ -297,7 +319,10 @@ int64_t FileDataSource::cutToClipboard(int64_t startPosition, int64_t endPositio
     copy(oldBufferData, oldBufferData + startIndexWithChannels, newBuffer);
     copy(oldBufferData + endIndexWithChannels, oldBufferData + mBufferSize, newBuffer + startIndexWithChannels);
 
-    mBuffer.reset(move(newBuffer));
+    mBuffer = bufferDataType {
+        move(newBuffer),
+        FileDataSource::deleter
+    };
     mBufferSize = mBufferSize - numElements;
 
     if (mPlayHead >= startPosition && mPlayHead <= endPosition) {
@@ -378,14 +403,10 @@ void FileDataSource::pasteFromClipboard(int64_t position, vector<float>& clipboa
                         newBuffer + pasteIndex + clipboard.size());
     }
 
-    mBuffer.reset(move(newBuffer));
+    mBuffer = bufferDataType {
+        move(newBuffer),
+        FileDataSource::deleter
+    };
     mBufferSize += clipboard.size();
 }
 
-void FileDataSource::deleteBuffers() {
-    mBuffer.reset(nullptr);
-    mBufferSize = 0;
-
-    mBackupBuffer.reset(nullptr);
-    mBackupBufferSize = 0;
-}

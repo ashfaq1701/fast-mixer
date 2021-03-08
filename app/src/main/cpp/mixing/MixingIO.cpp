@@ -17,7 +17,10 @@ shared_ptr<FileDataSource> MixingIO::readFile(string filename, int fd) {
     };
 
     return shared_ptr<FileDataSource> {
-        FileDataSource::newFromCompressedFile(filename.c_str(), fd, targetProperties)
+        FileDataSource::newFromCompressedFile(filename.c_str(), fd, targetProperties),
+        [](FileDataSource *source) {
+            delete source;
+        }
     };
 }
 
@@ -28,7 +31,10 @@ shared_ptr<BufferedDataSource> MixingIO::createClipboardDataSource(vector<float>
     };
 
     return shared_ptr<BufferedDataSource> {
-        BufferedDataSource::newFromClipboard(clipboard, targetProperties)
+        BufferedDataSource::newFromClipboard(clipboard, targetProperties),
+        [](BufferedDataSource *source) {
+            delete source;
+        }
     };
 }
 

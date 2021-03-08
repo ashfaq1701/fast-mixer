@@ -3,6 +3,7 @@ package com.bluehub.fastmixer.screens.recording
 import android.content.Context
 import android.content.IntentFilter
 import android.media.AudioManager
+import android.os.Environment
 import androidx.databinding.Bindable
 import androidx.lifecycle.*
 import com.bluehub.fastmixer.BR
@@ -44,7 +45,15 @@ class RecordingScreenViewModel @Inject constructor (@ApplicationContext val cont
         }
     }
 
-    private val cacheDir = context.cacheDir.absolutePath
+    private val cacheDir by lazy {
+        val recordingDirectory = "${context.getExternalFilesDir(null)?.absolutePath}/recording"
+        val recordingFile = File(recordingDirectory)
+        if (!recordingFile.exists()) {
+            recordingFile.mkdir()
+        }
+        recordingDirectory
+    }
+
     private val recordingSessionId = UUID.randomUUID().toString()
     private val recordingFileDirectory: String
         get() {
@@ -53,6 +62,7 @@ class RecordingScreenViewModel @Inject constructor (@ApplicationContext val cont
 
     val recordingFilePath: String
         get() {
+            Timber.d("Recording file path: $recordingFileDirectory/recording.wav")
             return "$recordingFileDirectory/recording.wav"
         }
 

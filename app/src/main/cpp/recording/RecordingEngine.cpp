@@ -36,12 +36,14 @@ void RecordingEngine::setupAudioSource(int fd) {
     if (isDirty) {
 
         if (mDataSource) {
-            mDataSource->deleteBuffers();
-            mDataSource.reset();
+            mDataSource = shared_ptr<FileDataSource> {nullptr};
         }
 
         mDataSource = shared_ptr<FileDataSource>{
-                move(mRecordingIO.setup_audio_source(fd))
+                move(mRecordingIO.setup_audio_source(fd)),
+                [](FileDataSource *source) {
+                    delete source;
+                }
         };
 
         isDirty = false;

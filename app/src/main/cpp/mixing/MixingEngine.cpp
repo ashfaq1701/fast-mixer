@@ -46,7 +46,6 @@ unique_ptr<buffer_data> MixingEngine::readSamples(string filePath, size_t countP
 void MixingEngine::deleteFile(string filePath) {
     auto it = mSourceMapStore->sourceMap.find(filePath);
     if (it != mSourceMapStore->sourceMap.end()) {
-        it->second.reset();
         mSourceMapStore->sourceMap.erase(filePath);
     }
     filePath.erase();
