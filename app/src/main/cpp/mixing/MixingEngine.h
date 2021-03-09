@@ -72,7 +72,7 @@ private:
 
     MixingIO mMixingIO;
 
-    SourceMapStore* mSourceMapStore;
+    shared_ptr<SourceMapStore> mSourceMapStore;
 
     vector<float> clipboard;
 

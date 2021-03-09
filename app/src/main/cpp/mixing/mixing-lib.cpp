@@ -11,6 +11,7 @@
 #include "MixingEngine.h"
 #include "../logging_macros.h"
 #include "../jvm_env.h"
+#include <fcntl.h>
 
 static MixingEngine *mixingEngine = nullptr;
 
@@ -329,6 +330,8 @@ extern "C" {
 
     JNIEXPORT void JNICALL
     Java_com_bluehub_fastmixer_audio_MixingEngine_closeFd(JNIEnv *env, jclass, jint fd) {
-        close(fd);
+        if (fcntl(fd, F_GETFD) != -1 || errno != EBADF) {
+            close(fd);
+        }
     }
 }

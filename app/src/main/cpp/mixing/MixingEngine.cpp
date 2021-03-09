@@ -48,6 +48,7 @@ void MixingEngine::deleteFile(string filePath) {
     if (it != mSourceMapStore->sourceMap.end()) {
         mSourceMapStore->sourceMap.erase(filePath);
     }
+
     filePath.erase();
 }
 

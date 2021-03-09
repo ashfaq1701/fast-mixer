@@ -43,7 +43,7 @@ android {
                     if (rootProject.ext.useHWASAN == true) {
                         abiFilters.addAll(SupportedABIs)
                         arguments "-DANDROID_STL=c++_shared", "-DUSEHWASAN=ON"
-                    } else if (rootProject.ext.useASAN == false) {
+                    } else if (rootProject.ext.useASAN == true) {
                         arguments "-DUSEASAN=ON"
                     }
                 }

@@ -87,7 +87,7 @@ private:
     mutex livePlaybackStreamMtx;
     mutex playbackStreamMtx;
 
-    SourceMapStore* mSourceMapStore;
+    shared_ptr<SourceMapStore> mSourceMapStore;
     RecordingIO mRecordingIO;
 
     shared_ptr<FileDataSource> mDataSource {nullptr};

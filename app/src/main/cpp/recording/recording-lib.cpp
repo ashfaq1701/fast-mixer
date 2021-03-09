@@ -8,6 +8,7 @@
 #include "../logging_macros.h"
 #include "../jvm_env.h"
 #include <android/asset_manager_jni.h>
+#include <fcntl.h>
 
 static RecordingEngine *recordingEngine = nullptr;
 
@@ -271,6 +272,8 @@ extern "C" {
 
     JNIEXPORT void JNICALL
     Java_com_bluehub_fastmixer_audio_RecordingEngine_closeFd(JNIEnv *env, jclass, jint fd) {
-        close(fd);
+        if (fcntl(fd, F_GETFD) != -1 || errno != EBADF) {
+            close(fd);
+        }
     }
 }

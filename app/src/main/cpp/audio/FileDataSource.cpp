@@ -24,6 +24,7 @@
 #include "FileDataSource.h"
 #include "FFMpegExtractor.h"
 #include <regex>
+#include <fcntl.h>
 
 constexpr int kMaxCompressionRatio { 12 };
 
@@ -67,6 +68,10 @@ FileDataSource* FileDataSource::newFromCompressedFile(
         const AudioProperties targetProperties) {
     string filenameStr(filename);
 
+    if (fcntl(fd, F_GETFD) == -1 || errno == EBADF) {
+        return nullptr;
+    }
+
     FILE* fl = fdopen(dup(fd), "r");
     if (!fl) {
         LOGE("Failed to open asset %s", filenameStr.c_str());
@@ -81,7 +86,9 @@ FileDataSource* FileDataSource::newFromCompressedFile(
     off_t assetSize = getSizeOfFile(fl);
     fclose(fl);
 
-    FFMpegExtractor ffmpegExtractor;
+    auto ffmpegExtractor = shared_ptr<FFMpegExtractor> {
+        new FFMpegExtractor()
+    };
 
     long initialSize =  assetSize * sizeof(float);
 
@@ -90,13 +97,14 @@ FileDataSource* FileDataSource::newFromCompressedFile(
     }
 
     uint8_t* decodedData = new uint8_t [initialSize];
-    decode_buffer_data buff = {
-            .ptr = decodedData,
-            .countPoints = (size_t) initialSize
-    };
 
-    auto dataBuffer = make_shared<decode_buffer_data>(buff);
-    int64_t bytesDecoded = ffmpegExtractor.decode(dup(fd), dataBuffer, targetProperties);
+    auto dataBuffer = shared_ptr<decode_buffer_data> {
+        new decode_buffer_data {
+                .ptr = decodedData,
+                .countPoints = (size_t) initialSize
+        }
+    };
+    int64_t bytesDecoded = ffmpegExtractor->decode(dup(fd), dataBuffer, targetProperties);
 
     if (bytesDecoded <= 0) {
         return nullptr;

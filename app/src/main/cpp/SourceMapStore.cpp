@@ -4,13 +4,15 @@
 
 #include "SourceMapStore.h"
 
-SourceMapStore* SourceMapStore::mInstance = nullptr;
+shared_ptr<SourceMapStore> SourceMapStore::mInstance {nullptr};
 
 SourceMapStore::SourceMapStore() {}
 
-SourceMapStore* SourceMapStore::getInstance() {
-    if (mInstance == nullptr) {
-        mInstance = new SourceMapStore();
+shared_ptr<SourceMapStore> SourceMapStore::getInstance() {
+    if (!mInstance) {
+        mInstance = shared_ptr<SourceMapStore> {
+            new SourceMapStore()
+        };
     }
 
     return mInstance;
@@ -25,5 +27,5 @@ SourceMapStore::~SourceMapStore() {
 }
 
 void SourceMapStore::reset() {
-    mInstance = nullptr;
+    mInstance = shared_ptr<SourceMapStore> {nullptr};
 }
