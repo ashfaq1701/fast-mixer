@@ -509,7 +509,7 @@ class FileWaveView @JvmOverloads constructor(
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
-        if (!::mPlotPoints.isInitialized) {
+        if (!::mPlotPoints.isInitialized || mPlotPoints.isEmpty()) {
             return
         }
 
