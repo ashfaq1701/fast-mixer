@@ -7,8 +7,6 @@ import android.os.*
 import android.util.AttributeSet
 import android.view.*
 import androidx.core.content.ContextCompat
-import androidx.databinding.BindingMethod
-import androidx.databinding.BindingMethods
 import com.bluehub.fastmixer.R
 import com.bluehub.fastmixer.common.models.AudioFileUiState
 import com.bluehub.fastmixer.screens.mixing.FileWaveViewStore
@@ -16,15 +14,8 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.functions.Function
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import kotlinx.coroutines.*
-import timber.log.Timber
 import kotlin.math.*
 
-
-@BindingMethods(value = [
-    BindingMethod(type = FileWaveView::class, attribute = "samplesReader", method = "setSamplesReader"),
-    BindingMethod(type = FileWaveView::class, attribute = "audioFileUiState", method = "setAudioFileUiState"),
-    BindingMethod(type = FileWaveView::class, attribute = "fileWaveViewStore", method = "setFileWaveViewStore")
-])
 class FileWaveView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null

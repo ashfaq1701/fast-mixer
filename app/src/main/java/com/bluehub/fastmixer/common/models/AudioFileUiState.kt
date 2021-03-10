@@ -20,7 +20,7 @@ data class AudioFileUiState(
     var segmentStartSample: BehaviorSubject<Optional<Int>>,
     var segmentEndSample: BehaviorSubject<Optional<Int>>,
     var playTimer: Timer?
-) : Serializable {
+) {
 
     companion object {
         fun create(filePath: String, numSamples: Int): AudioFileUiState {

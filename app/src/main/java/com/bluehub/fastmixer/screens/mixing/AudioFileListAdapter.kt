@@ -23,9 +23,12 @@ class AudioFileListAdapter(
 
     class ViewHolder private constructor(val binding: ListItemAudioFileBinding): RecyclerView.ViewHolder(binding.root) {
         fun bind(item: AudioFileUiState, clickListener: AudioFileEventListeners, fileWaveViewStore: FileWaveViewStore) {
-            binding.audioFileUiState = item
-            binding.eventListener = clickListener
-            binding.fileWaveViewStore = fileWaveViewStore
+            binding.fileWaveViewWidget.apply {
+                setAudioFileUiState(item)
+                setAudioFileEventListeners(clickListener)
+                setFileWaveViewStore(fileWaveViewStore)
+            }
+
             binding.executePendingBindings()
         }
 
