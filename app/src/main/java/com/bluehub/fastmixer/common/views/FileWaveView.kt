@@ -15,8 +15,7 @@ import com.bluehub.fastmixer.screens.mixing.FileWaveViewStore
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.functions.Function
 import io.reactivex.rxjava3.subjects.BehaviorSubject
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import timber.log.Timber
 import kotlin.math.*
 
@@ -42,7 +41,7 @@ class FileWaveView @JvmOverloads constructor(
 
     private lateinit var mAudioWidgetSlider: AudioWidgetSlider
 
-    var mRawPoints: BehaviorSubject<Array<Float>> = BehaviorSubject.create()
+    private lateinit var mRawPoints: Array<Float>
 
     private lateinit var mPlotPoints: Array<Float>
 
@@ -123,9 +122,6 @@ class FileWaveView @JvmOverloads constructor(
     }
 
     private fun setupObservers() {
-        mRawPoints.subscribe { ptsArr ->
-            processPlotPoints(ptsArr)
-        }
 
         mAudioFileUiState.value.displayPtsCount
             .observeOn(
@@ -189,38 +185,46 @@ class FileWaveView @JvmOverloads constructor(
 
         val numPts = getNumPtsToPlot()
 
-        if (!mRawPoints.hasValue() || mRawPoints.value.size != numPts || forceFetch) {
+        if (!::mRawPoints.isInitialized || mRawPoints.size != numPts || forceFetch) {
             mFileWaveViewStore.value.coroutineScope.launch {
-                mRawPoints.onNext(mSamplesReader.value.apply(numPts).await())
+                withContext(Dispatchers.IO) {
+                    mRawPoints = mSamplesReader.value.apply(numPts).await()
+                }
+
+                forceFetch = false
+                processPlotPoints()
             }
-            forceFetch = false
         }
     }
 
-    private fun processPlotPoints(rawPts: Array<Float>) {
-        if (rawPts.isEmpty()) {
+    private fun processPlotPoints() {
+        if (!::mRawPoints.isInitialized || mRawPoints.isEmpty()) {
             return
         }
 
-        val maximumAbs = rawPts.fold(0.0f) { acc, current ->
-            val maxAbs = if (abs(current) > acc) {
-                abs(current)
-            } else acc
+        mFileWaveViewStore.value.coroutineScope.launch {
+            withContext(Dispatchers.IO) {
+                val maximumAbs = mRawPoints.fold(0.0f) { acc, current ->
+                    val maxAbs = if (abs(current) > acc) {
+                        abs(current)
+                    } else acc
 
-            if (maxAbs < SAMPLE_MIN_THRESHOLD) {
-                0.0f
-            } else maxAbs
+                    if (maxAbs < SAMPLE_MIN_THRESHOLD) {
+                        0.0f
+                    } else maxAbs
+                }
+
+                val maxToScale = height * 0.48
+
+                mPlotPoints = mRawPoints.map { current ->
+                    if (maximumAbs != 0.0f) {
+                        ((current / maximumAbs) * maxToScale.toFloat())
+                    } else 0.0f
+                }.toTypedArray()
+            }
+
+            invalidate()
         }
-
-        val maxToScale = height * 0.48
-
-        mPlotPoints = rawPts.map { current ->
-            if (maximumAbs != 0.0f) {
-                ((current / maximumAbs) * maxToScale.toFloat())
-            } else 0.0f
-        }.toTypedArray()
-
-        invalidate()
     }
 
     private fun checkAttrs() {

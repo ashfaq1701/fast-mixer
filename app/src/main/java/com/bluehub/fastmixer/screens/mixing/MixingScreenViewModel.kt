@@ -203,15 +203,6 @@ class MixingScreenViewModel @Inject constructor(@ApplicationContext val context:
         }
     }
 
-    private fun createImportedFileCacheDirectory(): String {
-        val cacheDir = "${context.cacheDir}/imported"
-        val fileObj = File(cacheDir)
-        if (!fileObj.exists()) {
-            fileObj.mkdir()
-        }
-        return cacheDir
-    }
-
     fun readSamples(filePath: String) = fun(countPoints: Int): Deferred<Array<Float>> =
         viewModelScope.async {
             mixingRepository.readSamples(filePath, countPoints)

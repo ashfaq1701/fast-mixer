@@ -46,7 +46,7 @@ class RecordingScreenViewModel @Inject constructor (@ApplicationContext val cont
     }
 
     private val cacheDir by lazy {
-        val recordingDirectory = "${context.getExternalFilesDir(null)?.absolutePath}/recording"
+        val recordingDirectory = "${context.cacheDir.absolutePath}/recording"
         val recordingFile = File(recordingDirectory)
         if (!recordingFile.exists()) {
             recordingFile.mkdir()
