@@ -158,7 +158,7 @@ class MixingScreenViewModel @Inject constructor(@ApplicationContext val context:
                     _isLoading.value = true
 
                     withContext(Dispatchers.IO) {
-                        mixingRepository.addFile(filePath, fd)
+                        mixingRepository.addFile(filePath, fd.fd)
                         val totalSamples = getTotalSamples(filePath)
                         audioFiles.add(AudioFileUiState.create(filePath, totalSamples))
                     }
@@ -185,7 +185,7 @@ class MixingScreenViewModel @Inject constructor(@ApplicationContext val context:
             _isLoading.postValue(true)
 
             newFilePath?.let { newPath ->
-                mixingRepository.addFile(newPath, parcelFd.detachFd())
+                mixingRepository.addFile(newPath, parcelFd.fd)
 
                 val totalSamples = getTotalSamples(newPath)
 

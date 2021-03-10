@@ -54,6 +54,4 @@ class RecordingEngineProxy @Inject constructor(){
     fun addSources(filePaths: Array<String>) = RecordingEngine.addSources(filePaths)
 
     fun resetRecordingEngine() = RecordingEngine.resetRecordingEngine()
-
-    fun closeFd(fd: Int) = RecordingEngine.closeFd(fd)
 }

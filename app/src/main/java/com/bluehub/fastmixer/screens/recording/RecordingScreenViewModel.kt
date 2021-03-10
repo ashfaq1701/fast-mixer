@@ -3,7 +3,6 @@ package com.bluehub.fastmixer.screens.recording
 import android.content.Context
 import android.content.IntentFilter
 import android.media.AudioManager
-import android.os.Environment
 import androidx.databinding.Bindable
 import androidx.lifecycle.*
 import com.bluehub.fastmixer.BR
@@ -156,8 +155,8 @@ class RecordingScreenViewModel @Inject constructor (@ApplicationContext val cont
             viewModelScope.launch {
                 withContext(Dispatchers.IO) {
                     repository.run {
-                        val fd = setupAudioSource(recordingFilePath)
-                        restartPlayback(fd)
+                        setupAudioSource(recordingFilePath)
+                        restartPlayback()
                     }
                 }
             }
@@ -167,8 +166,8 @@ class RecordingScreenViewModel @Inject constructor (@ApplicationContext val cont
             viewModelScope.launch {
                 withContext(Dispatchers.IO) {
                     repository.run {
-                        val fd = setupAudioSource(recordingFilePath)
-                        restartPlaybackWithMixingTracks(fd)
+                        setupAudioSource(recordingFilePath)
+                        restartPlaybackWithMixingTracks()
                     }
                 }
             }
@@ -227,8 +226,8 @@ class RecordingScreenViewModel @Inject constructor (@ApplicationContext val cont
 
                     if (mixingPlayActive.value == true) {
                         repository.run {
-                            val fd = setupAudioSource(recordingFilePath)
-                            startMixingTracksPlaying(fd)
+                            setupAudioSource(recordingFilePath)
+                            startMixingTracksPlaying()
                         }
                     }
 
@@ -280,8 +279,7 @@ class RecordingScreenViewModel @Inject constructor (@ApplicationContext val cont
 
                 if(_eventIsPlaying.value == false) {
                     repository.run {
-                        if (setupAudioSource(recordingFilePath)
-                                ?.let(::startPlaying) == true) {
+                        if (setupAudioSource(recordingFilePath) && startPlaying()) {
                             _eventIsPlaying.postValue(true)
                         }
                     }
@@ -303,8 +301,8 @@ class RecordingScreenViewModel @Inject constructor (@ApplicationContext val cont
                 if(_eventIsPlayingWithMixingTracks.value == false) {
 
                     repository.run {
-                        val fd = setupAudioSource(recordingFilePath)
-                        if (startPlayingWithMixingTracks(fd)) {
+                        setupAudioSource(recordingFilePath)
+                        if (startPlayingWithMixingTracks()) {
                             _eventIsPlayingWithMixingTracks.postValue(true)
                         }
                     }
@@ -323,8 +321,7 @@ class RecordingScreenViewModel @Inject constructor (@ApplicationContext val cont
             withContext(Dispatchers.IO) {
                 _isLoading.postValue(true)
                 repository.run {
-                    setupAudioSource(recordingFilePath)
-                        ?.let(::startPlaying)
+                    setupAudioSource(recordingFilePath) && startPlaying()
                 }
                 _isLoading.postValue(false)
             }

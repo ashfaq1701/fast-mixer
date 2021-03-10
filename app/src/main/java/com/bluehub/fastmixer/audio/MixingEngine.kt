@@ -54,8 +54,6 @@ class MixingEngine {
 
         @JvmStatic external fun pasteNewFromClipboard(filePath: String)
 
-        @JvmStatic external fun closeFd(fd: Int)
-
         @JvmStatic external fun delete()
     }
 }

@@ -269,11 +269,4 @@ extern "C" {
         }
         return recordingEngine->resetAudioEngine();
     }
-
-    JNIEXPORT void JNICALL
-    Java_com_bluehub_fastmixer_audio_RecordingEngine_closeFd(JNIEnv *env, jclass, jint fd) {
-        if (fcntl(fd, F_GETFD) != -1 || errno != EBADF) {
-            close(fd);
-        }
-    }
 }

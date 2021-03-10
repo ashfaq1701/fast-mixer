@@ -51,7 +51,5 @@ class MixingEngineProxy @Inject constructor() {
 
     fun pasteNewFromClipboard(filePath: String) = MixingEngine.pasteNewFromClipboard(filePath)
 
-    fun closeFd(fd: Int) = MixingEngine.closeFd(fd)
-
     fun delete() = MixingEngine.delete()
 }

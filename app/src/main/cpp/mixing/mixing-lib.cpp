@@ -327,11 +327,4 @@ extern "C" {
         auto filePathStr = java_str_to_c_str(env, filePath);
         mixingEngine->pasteNewFromClipboard(filePathStr);
     }
-
-    JNIEXPORT void JNICALL
-    Java_com_bluehub_fastmixer_audio_MixingEngine_closeFd(JNIEnv *env, jclass, jint fd) {
-        if (fcntl(fd, F_GETFD) != -1 || errno != EBADF) {
-            close(fd);
-        }
-    }
 }
