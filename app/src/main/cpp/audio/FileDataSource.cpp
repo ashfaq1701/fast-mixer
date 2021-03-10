@@ -123,7 +123,7 @@ FileDataSource* FileDataSource::newFromCompressedFile(
                               move(targetProperties));
 }
 
-unique_ptr<buffer_data> FileDataSource::readData(size_t countPoints) {
+shared_ptr<buffer_data> FileDataSource::readData(size_t countPoints) {
 
     float * dataPtr = mBuffer.get();
     int channelCount = mProperties.channelCount;
@@ -165,11 +165,10 @@ unique_ptr<buffer_data> FileDataSource::readData(size_t countPoints) {
         selectedSamples[i] = maxValue;
     }
 
-    buffer_data buff = {
-            .ptr = selectedSamples,
+    return shared_ptr<buffer_data> { new buffer_data {
+            .ptr = move(selectedSamples),
             .countPoints = samplesToHandle
-    };
-    return make_unique<buffer_data>(buff);
+    }};
 }
 
 const float* FileDataSource::getMainBufferData() {

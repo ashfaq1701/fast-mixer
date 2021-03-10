@@ -30,15 +30,14 @@ void MixingEngine::addFile(string filePath, int fd) {
     filePath.erase();
 }
 
-unique_ptr<buffer_data> MixingEngine::readSamples(string filePath, size_t countPoints) {
+shared_ptr<buffer_data> MixingEngine::readSamples(string filePath, size_t countPoints) {
     auto it = mSourceMapStore->sourceMap.find(filePath);
     filePath.erase();
     if (it == mSourceMapStore->sourceMap.end()) {
-        buffer_data emptyData {
+        return shared_ptr<buffer_data>(new buffer_data {
                 .ptr = nullptr,
                 .countPoints = 0
-        };
-        return make_unique<buffer_data>(emptyData);
+        });
     }
     return it->second->readData(countPoints);
 }

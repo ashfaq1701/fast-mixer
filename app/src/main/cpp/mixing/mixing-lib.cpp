@@ -86,7 +86,7 @@ extern "C" {
         jmethodID floatConstructor = env->GetMethodID(floatCls, "<init>", "(F)V");
 
         jobjectArray result;
-        buffer_data* data = mixingEngine->readSamples(filePathStr, countPoints).release();
+        auto data = mixingEngine->readSamples(filePathStr, countPoints);
 
         float* dataSamples = data->ptr;
 
@@ -99,7 +99,7 @@ extern "C" {
         }
 
         env->DeleteLocalRef(floatCls);
-        delete(data);
+        data.reset();
 
         return result;
     }
