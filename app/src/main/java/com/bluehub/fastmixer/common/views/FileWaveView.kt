@@ -45,6 +45,8 @@ class FileWaveView @JvmOverloads constructor(
 
     private lateinit var mPlotPoints: Array<Float>
 
+    private var mBitmap: Bitmap? = null
+
     private var attrsLoaded: BehaviorSubject<Boolean> = BehaviorSubject.create()
 
     private var forceFetch = false
@@ -187,7 +189,7 @@ class FileWaveView @JvmOverloads constructor(
 
         if (!::mRawPoints.isInitialized || mRawPoints.size != numPts || forceFetch) {
             mFileWaveViewStore.value.coroutineScope.launch {
-                withContext(Dispatchers.IO) {
+                withContext(Dispatchers.Default) {
                     mRawPoints = mSamplesReader.value.apply(numPts).await()
                 }
 
@@ -203,7 +205,7 @@ class FileWaveView @JvmOverloads constructor(
         }
 
         mFileWaveViewStore.value.coroutineScope.launch {
-            withContext(Dispatchers.IO) {
+            withContext(Dispatchers.Default) {
                 val maximumAbs = mRawPoints.fold(0.0f) { acc, current ->
                     val maxAbs = if (abs(current) > acc) {
                         abs(current)
@@ -221,6 +223,41 @@ class FileWaveView @JvmOverloads constructor(
                         ((current / maximumAbs) * maxToScale.toFloat())
                     } else 0.0f
                 }.toTypedArray()
+            }
+
+            createAndDrawCanvas()
+        }
+    }
+
+    private fun createAndDrawCanvas() {
+        if (!::mPlotPoints.isInitialized || mPlotPoints.isEmpty()) {
+            return
+        }
+
+        mFileWaveViewStore.value.coroutineScope.launch {
+            withContext(Dispatchers.Default) {
+                val numPts = getNumPtsToPlot()
+                val widthPtRatio = numPts / mPlotPoints.size
+                val ptsDistance: Int = if (widthPtRatio >= 1) widthPtRatio else 1
+
+                var currentPoint = 0
+
+                val baseLevel = height / 2
+
+                mBitmap =
+                    Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888).also { bitmap ->
+                        val canvas = Canvas(bitmap)
+                        mPlotPoints.forEach { item ->
+                            canvas.drawLine(
+                                currentPoint.toFloat(),
+                                baseLevel.toFloat(),
+                                currentPoint.toFloat(),
+                                (baseLevel - item),
+                                paint
+                            )
+                            currentPoint += ptsDistance
+                        }
+                    }
             }
 
             invalidate()
@@ -509,21 +546,8 @@ class FileWaveView @JvmOverloads constructor(
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
-        if (!::mPlotPoints.isInitialized || mPlotPoints.isEmpty()) {
-            return
-        }
-
-        val numPts = getNumPtsToPlot()
-        val widthPtRatio = numPts / mPlotPoints.size
-        val ptsDistance: Int = if (widthPtRatio >= 1) widthPtRatio else 1
-
-        var currentPoint = 0
-
-        val baseLevel = height / 2
-
-        mPlotPoints.forEach { item ->
-            canvas.drawLine(currentPoint.toFloat(), baseLevel.toFloat(), currentPoint.toFloat(), (baseLevel - item), paint)
-            currentPoint += ptsDistance
+        mBitmap?.let { b ->
+            canvas.drawBitmap(b, 0.0f, 0.0f, paint)
         }
     }
 }
