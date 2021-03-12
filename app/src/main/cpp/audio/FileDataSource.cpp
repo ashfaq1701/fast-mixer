@@ -84,11 +84,11 @@ FileDataSource* FileDataSource::newFromCompressedFile(
 
     double duration = ffmpegExtractor->getDuration(dup(fd));
 
-    int64_t initialSize = (int64_t) ceil(duration) * targetProperties.channelCount * targetProperties.sampleRate * sizeof(float);
+    int64_t initialSize = (int64_t) ceil(duration) * targetProperties.channelCount * targetProperties.sampleRate;
 
-    uint8_t* decodedData = new uint8_t [initialSize];
+    auto outputBuffer = make_unique<float[]>(initialSize);
 
-    ffmpegExtractor->getDuration(dup(fd));
+    uint8_t* decodedData = (uint8_t *) outputBuffer.get();
 
     int64_t bytesDecoded = ffmpegExtractor->decode(dup(fd), decodedData, targetProperties);
 
@@ -97,9 +97,6 @@ FileDataSource* FileDataSource::newFromCompressedFile(
     }
 
     auto numSamples = bytesDecoded / sizeof(float);
-
-    auto outputBuffer = make_unique<float[]>(numSamples);
-    memcpy(outputBuffer.get(), decodedData, (size_t)bytesDecoded);
 
     return new FileDataSource(move(outputBuffer),
                               numSamples,

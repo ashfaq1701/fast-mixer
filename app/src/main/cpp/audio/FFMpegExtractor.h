@@ -31,10 +31,6 @@ public:
     double getDuration(int fd);
     int64_t decode(int fd, uint8_t* targetData, AudioProperties targetProperties);
 
-    int mSampleRate = 0;
-    int mChannelCount = 0;
-    int mAudioFormat = 0;
-
 private:
 
     bool createAVIOContext(uint8_t *buffer, uint32_t bufferSize,
