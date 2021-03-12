@@ -5,15 +5,12 @@
 #include "BufferedDataSource.h"
 
 BufferedDataSource::BufferedDataSource(
-        bufferDataType data,
+        unique_ptr<float[]> data,
         size_t size,
         const AudioProperties properties) : FileDataSource(move(data), size, properties) {}
 
 BufferedDataSource* BufferedDataSource::newFromClipboard(vector<float>& clipboard, const AudioProperties targetProperties) {
-    auto outputBuffer = bufferDataType {
-        new float[clipboard.size()],
-        FileDataSource::deleter
-    };
+    auto outputBuffer = make_unique<float[]>(clipboard.size());
 
     copy(clipboard.begin(), clipboard.end(), outputBuffer.get());
 

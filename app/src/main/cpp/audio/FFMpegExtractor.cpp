@@ -105,7 +105,63 @@ AVStream *FFMpegExtractor::getBestAudioStream(AVFormatContext *avFormatContext) 
     }
 }
 
-int64_t FFMpegExtractor::decodeOp(int fd, shared_ptr<decode_buffer_data> buff, AudioProperties targetProperties, function<void(shared_ptr<decode_buffer_data>, int64_t, short *, int64_t)> f) {
+double FFMpegExtractor::getDuration(int fd) {
+    int returnValue = -1; // -1 indicates error
+
+    // Create a buffer for FFmpeg to use for decoding (freed in the custom deleter below)
+    auto buffer = reinterpret_cast<uint8_t*>(av_malloc(kInternalBufferSize));
+
+    {
+        FILE *tmp;
+        tmp = fdopen(fd, "rb");
+        fp.reset(move(tmp));
+    }
+
+    std::unique_ptr<AVIOContext, void(*)(AVIOContext *)> ioContext {
+            nullptr,
+            [](AVIOContext *c) {
+                if (c->buffer) av_free(c->buffer);
+                avio_context_free(&c);
+            }
+    };
+    {
+        AVIOContext *tmp = nullptr;
+        if (!createAVIOContext(buffer, kInternalBufferSize, &tmp)) {
+            LOGE("Could not create an AVIOContext");
+            return returnValue;
+        }
+        ioContext.reset(tmp);
+    }
+
+    std::unique_ptr<AVFormatContext, decltype(&avformat_free_context)> formatContext {
+            nullptr,
+            &avformat_free_context
+    };
+    {
+        AVFormatContext *tmp;
+        if (!createAVFormatContext(ioContext.get(), &tmp)) return returnValue;
+        formatContext.reset(tmp);
+    }
+
+    if (!openAVFormatContext(formatContext.get())) return returnValue;
+
+    if (!getStreamInfo(formatContext.get())) return returnValue;
+
+    AVStream *stream = getBestAudioStream(formatContext.get());
+
+    if (stream == nullptr || stream->codecpar == nullptr){
+        LOGE("Could not find a suitable audio stream to decode");
+        return returnValue;
+    }
+
+    double divideFactor = (double) 1 / av_q2d(stream->time_base);
+
+    double durationOfAudio = (double) stream->duration / divideFactor;
+
+    return durationOfAudio;
+}
+
+int64_t FFMpegExtractor::decode(int fd, uint8_t* targetData, AudioProperties targetProperties) {
     int returnValue = -1; // -1 indicates error
 
     // Create a buffer for FFmpeg to use for decoding (freed in the custom deleter below)
@@ -231,14 +287,8 @@ int64_t FFMpegExtractor::decodeOp(int fd, shared_ptr<decode_buffer_data> buff, A
 
             // Pass our compressed data into the codec
             result = avcodec_send_packet(codecContext.get(), &avPacket);
-            if (result == AVERROR(EOF) || result == AVERROR(EINVAL)) {
-                LOGI("avcodec_send_packet aborting with unrecoverable error: %s", av_err2str(result));
+            if (result != 0) {
                 goto cleanup;
-            } else if (result < 0) {
-                LOGI("avcodec_send_packet returned error: %s", av_err2str(result));
-                avPacket.size = 0;
-                avPacket.data = nullptr;
-                continue;
             }
 
             // Retrieve our raw data from the codec
@@ -278,19 +328,7 @@ int64_t FFMpegExtractor::decodeOp(int fd, shared_ptr<decode_buffer_data> buff, A
 
             int64_t bytesToWrite = frame_count * sizeof(float) * targetProperties.channelCount;
 
-            if (bytesWritten + bytesToWrite > buff->countPoints) {
-                uint8_t* oldBuff = buff->ptr;
-
-                uint8_t* newBuff = new uint8_t [buff->countPoints * 2];
-                memcpy(newBuff, oldBuff, (size_t) buff->countPoints);
-
-                buff->countPoints = buff->countPoints * 2;
-                buff->ptr = move(newBuff);
-
-                delete [] oldBuff;
-            }
-
-            f(buff, bytesWritten, buffer1, bytesToWrite);
+            memcpy(targetData + bytesWritten, buffer1, (size_t)bytesToWrite);
             bytesWritten += bytesToWrite;
             av_freep(&buffer1);
 
@@ -308,14 +346,6 @@ int64_t FFMpegExtractor::decodeOp(int fd, shared_ptr<decode_buffer_data> buff, A
         returnValue = bytesWritten;
     }
     return returnValue;
-}
-
-int64_t FFMpegExtractor::decode(int fd, shared_ptr<decode_buffer_data> buff, AudioProperties targetProperties) {
-    function<void(shared_ptr<decode_buffer_data>, int, short*, int64_t)> f = [] (shared_ptr<decode_buffer_data> targetData, int64_t bytesWritten, short* buffer1, int64_t bytesToWrite) {
-        memcpy(targetData->ptr + bytesWritten, buffer1, (size_t)bytesToWrite);
-    };
-    auto decodedBytes = decodeOp(fd, buff, targetProperties, f);
-    return decodedBytes;
 }
 
 void FFMpegExtractor::printCodecParameters(AVCodecParameters *params) {

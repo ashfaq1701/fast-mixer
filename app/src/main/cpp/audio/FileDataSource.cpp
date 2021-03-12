@@ -29,19 +29,13 @@
 constexpr int kMaxCompressionRatio { 12 };
 
 FileDataSource::FileDataSource (
-        unique_ptr<float[], function<void(float*)>> data,
+        unique_ptr<float[]> data,
         size_t size,
         const AudioProperties properties) :
         mBuffer(move(data)), mBufferSize(size), mProperties(properties) {
 
     calculateProperties();
 }
-
-function<void(float*)> FileDataSource::deleter = [](float *data) {
-    if (data) {
-        delete[] data;
-    }
-};
 
 void FileDataSource::calculateProperties() {
     auto data = getData();
@@ -78,33 +72,25 @@ FileDataSource* FileDataSource::newFromCompressedFile(
         fclose(fl);
         return nullptr;
     }
+    fclose(fl);
 
     // Allocate memory to store the decompressed audio. We don't know the exact
     // size of the decoded data until after decoding so we make an assumption about the
     // maximum compression ratio and the decoded sample format (float for FFmpeg, int16 for NDK).
 
-    off_t assetSize = getSizeOfFile(fl);
-    fclose(fl);
-
     auto ffmpegExtractor = shared_ptr<FFMpegExtractor> {
         new FFMpegExtractor()
     };
 
-    long initialSize =  assetSize * sizeof(float);
+    double duration = ffmpegExtractor->getDuration(dup(fd));
 
-    if (strEndedWith(filenameStr, ".mp3")) {
-        initialSize = initialSize * kMaxCompressionRatio;
-    }
+    int64_t initialSize = (int64_t) ceil(duration) * targetProperties.channelCount * targetProperties.sampleRate * sizeof(float);
 
     uint8_t* decodedData = new uint8_t [initialSize];
 
-    auto dataBuffer = shared_ptr<decode_buffer_data> {
-        new decode_buffer_data {
-                .ptr = decodedData,
-                .countPoints = (size_t) initialSize
-        }
-    };
-    int64_t bytesDecoded = ffmpegExtractor->decode(dup(fd), dataBuffer, targetProperties);
+    ffmpegExtractor->getDuration(dup(fd));
+
+    int64_t bytesDecoded = ffmpegExtractor->decode(dup(fd), decodedData, targetProperties);
 
     if (bytesDecoded <= 0) {
         return nullptr;
@@ -112,11 +98,8 @@ FileDataSource* FileDataSource::newFromCompressedFile(
 
     auto numSamples = bytesDecoded / sizeof(float);
 
-    // Now we know the exact number of samples we can create a float array to hold the audio data
-    auto outputBuffer = bufferDataType {
-        move((float*) dataBuffer->ptr),
-        FileDataSource::deleter
-    };
+    auto outputBuffer = make_unique<float[]>(numSamples);
+    memcpy(outputBuffer.get(), decodedData, (size_t)bytesDecoded);
 
     return new FileDataSource(move(outputBuffer),
                               numSamples,
@@ -231,9 +214,8 @@ int64_t FileDataSource::getSelectionEnd() {
 }
 
 void FileDataSource::setBackupBufferData(float* &&data, int64_t numSamples) {
-    mBackupBuffer = bufferDataType {
-        move(data),
-        FileDataSource::deleter
+    mBackupBuffer = unique_ptr<float[]> {
+        move(data)
     };
     mBackupBufferSize = numSamples;
 }
@@ -255,9 +237,8 @@ int64_t FileDataSource::getSampleSize() {
 
 void FileDataSource::resetBackupBufferData() {
     if (mBackupBuffer) {
-        mBackupBuffer = bufferDataType {
-            nullptr,
-            FileDataSource::deleter
+        mBackupBuffer = unique_ptr<float[]> {
+            nullptr
         };
 
         mBackupBufferSize = 0;
@@ -302,9 +283,8 @@ int64_t FileDataSource::shiftBySamples(int64_t position, int64_t numSamples) {
 
     copy(oldBufferData + fillStartPosition, oldBufferData + mBufferSize, newBuffer + fillEndPosition);
 
-    mBuffer = bufferDataType {
-        move(newBuffer),
-        FileDataSource::deleter
+    mBuffer = unique_ptr<float[]> {
+        move(newBuffer)
     };
     mBufferSize = newBufferSize;
 
@@ -335,9 +315,8 @@ int64_t FileDataSource::cutToClipboard(int64_t startPosition, int64_t endPositio
     copy(oldBufferData, oldBufferData + startIndexWithChannels, newBuffer);
     copy(oldBufferData + endIndexWithChannels, oldBufferData + mBufferSize, newBuffer + startIndexWithChannels);
 
-    mBuffer = bufferDataType {
-        move(newBuffer),
-        FileDataSource::deleter
+    mBuffer = unique_ptr<float[]> {
+        move(newBuffer)
     };
     mBufferSize = mBufferSize - numElements;
 
@@ -419,9 +398,8 @@ void FileDataSource::pasteFromClipboard(int64_t position, vector<float>& clipboa
                         newBuffer + pasteIndex + clipboard.size());
     }
 
-    mBuffer = bufferDataType {
-        move(newBuffer),
-        FileDataSource::deleter
+    mBuffer = unique_ptr<float[]> {
+        move(newBuffer)
     };
     mBufferSize += clipboard.size();
 }

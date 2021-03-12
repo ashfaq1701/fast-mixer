@@ -28,8 +28,8 @@ public:
             }
     };
 
-    int64_t decode(int fd, shared_ptr<decode_buffer_data> buff, AudioProperties targetProperties);
-    int64_t getTotalBytes(int fd, AudioProperties targetProperties);
+    double getDuration(int fd);
+    int64_t decode(int fd, uint8_t* targetData, AudioProperties targetProperties);
 
     int mSampleRate = 0;
     int mChannelCount = 0;
@@ -47,8 +47,6 @@ private:
     bool getStreamInfo(AVFormatContext *avFormatContext);
 
     AVStream* getBestAudioStream(AVFormatContext *avFormatContext);
-
-    int64_t decodeOp(int fd, shared_ptr<decode_buffer_data> buff, AudioProperties targetProperties, function<void(shared_ptr<decode_buffer_data>, int64_t, short *, int64_t)> f);
 
     void printCodecParameters(AVCodecParameters *params);
 };

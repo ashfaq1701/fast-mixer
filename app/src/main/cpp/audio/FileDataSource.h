@@ -27,8 +27,6 @@ using namespace std;
 #define AUDIO_CHANNEL_STEREO 2
 #define MIN_NUMBER_OF_BYTES_PER_SAMPLE 1
 
-typedef unique_ptr<float[], function<void(float*)>> bufferDataType;
-
 class FileDataSource : public DataSource {
 
 public:
@@ -84,24 +82,18 @@ public:
 
 protected:
 
-    FileDataSource(bufferDataType data, size_t size,
+    FileDataSource(unique_ptr<float[]> data, size_t size,
                    const AudioProperties properties);
-
-    static function<void(float*)> deleter;
-
-
 
 private:
 
     void calculateProperties();
 
-    bufferDataType mBuffer {
-        nullptr,
-        deleter
+    unique_ptr<float[]> mBuffer {
+        nullptr
     };
-    bufferDataType mBackupBuffer {
-        nullptr,
-        deleter
+    unique_ptr<float[]> mBackupBuffer {
+        nullptr
     };
 
     int64_t mBufferSize;

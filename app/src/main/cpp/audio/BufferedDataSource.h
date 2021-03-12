@@ -16,7 +16,7 @@ public:
     static BufferedDataSource* newFromClipboard(vector<float>& clipboard, const AudioProperties targetProperties);
 
 private:
-    BufferedDataSource(bufferDataType data, size_t size, const AudioProperties properties);
+    BufferedDataSource(unique_ptr<float[]> data, size_t size, const AudioProperties properties);
 };
 
 
