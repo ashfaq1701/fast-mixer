@@ -39,6 +39,11 @@ public:
 
     void setPlayHead(int position);
 
+    void setPlayerBoundStart(int64_t boundStart);
+    void setPlayerBoundEnd(int64_t boundEnd);
+    void resetPlayerBoundStart();
+    void resetPlayerBoundEnd();
+
 private:
     shared_ptr<Player> mPlayer {nullptr};
 };

@@ -83,3 +83,19 @@ int MixingIO::getCurrentPlaybackProgress() {
 void MixingIO::setPlayHead(int position) {
     mPlayer->setPlayHead(position);
 }
+
+void MixingIO::setPlayerBoundStart(int64_t boundStart) {
+    mPlayer->setPlayerBoundStart(boundStart);
+}
+
+void MixingIO::setPlayerBoundEnd(int64_t boundEnd) {
+    mPlayer->setPlayerBoundEnd(boundEnd);
+}
+
+void MixingIO::resetPlayerBoundStart() {
+    mPlayer->resetPlayerBoundStart();
+}
+
+void MixingIO::resetPlayerBoundEnd() {
+    mPlayer->resetPlayerBoundEnd();
+}

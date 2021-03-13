@@ -66,6 +66,14 @@ public:
 
     void pasteNewFromClipboard(string fileId);
 
+    void setPlayerBoundStart(int64_t boundStart);
+
+    void setPlayerBoundEnd(int64_t boundEnd);
+
+    void resetPlayerBoundStart();
+
+    void resetPlayerBoundEnd();
+
 private:
 
     const char* TAG = "Mixing Engine:: %s";

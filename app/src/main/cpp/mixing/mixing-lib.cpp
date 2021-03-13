@@ -327,4 +327,44 @@ extern "C" {
         auto filePathStr = java_str_to_c_str(env, filePath);
         mixingEngine->pasteNewFromClipboard(filePathStr);
     }
+
+    JNIEXPORT void  JNICALL
+    Java_com_bluehub_fastmixer_audio_MixingEngine_setPlayerBoundStart(JNIEnv *env, jclass, jint playerBoundStart) {
+        if (!mixingEngine) {
+            LOGE("setPlayerBoundStart: mixingEngine is null, you must call create() method before calling this method");
+            return;
+        }
+
+        mixingEngine->setPlayerBoundStart(playerBoundStart);
+    }
+
+    JNIEXPORT void  JNICALL
+    Java_com_bluehub_fastmixer_audio_MixingEngine_setPlayerBoundEnd(JNIEnv *env, jclass, jint playerBoundEnd) {
+        if (!mixingEngine) {
+            LOGE("setPlayerBoundEnd: mixingEngine is null, you must call create() method before calling this method");
+            return;
+        }
+
+        mixingEngine->setPlayerBoundEnd(playerBoundEnd);
+    }
+
+    JNIEXPORT void  JNICALL
+    Java_com_bluehub_fastmixer_audio_MixingEngine_resetPlayerBoundStart(JNIEnv *env, jclass) {
+        if (!mixingEngine) {
+            LOGE("resetPlayerBoundStart: mixingEngine is null, you must call create() method before calling this method");
+            return;
+        }
+
+        mixingEngine->resetPlayerBoundStart();
+    }
+
+    JNIEXPORT void  JNICALL
+    Java_com_bluehub_fastmixer_audio_MixingEngine_resetPlayerBoundEnd(JNIEnv *env, jclass) {
+        if (!mixingEngine) {
+            LOGE("resetPlayerBoundEnd: mixingEngine is null, you must call create() method before calling this method");
+            return;
+        }
+
+        mixingEngine->resetPlayerBoundEnd();
+    }
 }

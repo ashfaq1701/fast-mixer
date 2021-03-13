@@ -54,6 +54,14 @@ class MixingEngine {
 
         @JvmStatic external fun pasteNewFromClipboard(filePath: String)
 
+        @JvmStatic external fun setPlayerBoundStart(playerBoundStart: Int)
+
+        @JvmStatic external fun setPlayerBoundEnd(playerBoundEnd: Int)
+
+        @JvmStatic external fun resetPlayerBoundStart()
+
+        @JvmStatic external fun resetPlayerBoundEnd()
+
         @JvmStatic external fun delete()
     }
 }

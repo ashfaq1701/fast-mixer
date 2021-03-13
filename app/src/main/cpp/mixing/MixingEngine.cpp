@@ -307,3 +307,19 @@ void MixingEngine::pasteNewFromClipboard(string fileId) {
     mSourceMapStore->sourceMap.insert(pair<string, shared_ptr<FileDataSource>>(fileId, move(source)));
     fileId.erase();
 }
+
+void MixingEngine::setPlayerBoundStart(int64_t boundStart) {
+    mMixingIO.setPlayerBoundStart(boundStart);
+}
+
+void MixingEngine::setPlayerBoundEnd(int64_t boundEnd) {
+    mMixingIO.setPlayerBoundEnd(boundEnd);
+}
+
+void MixingEngine::resetPlayerBoundStart() {
+    mMixingIO.resetPlayerBoundStart();
+}
+
+void MixingEngine::resetPlayerBoundEnd() {
+    mMixingIO.resetPlayerBoundEnd();
+}

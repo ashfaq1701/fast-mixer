@@ -80,6 +80,13 @@ class MixingScreenViewModel @Inject constructor(@ApplicationContext val context:
     val isGroupPlayOverlayOpen: LiveData<Boolean>
         get() = _isGroupPlayOverlayOpen
 
+    private val _playerBoundStartPosition: MutableLiveData<Int?> = MutableLiveData(null)
+
+    private val _playerBoundEndPosition: MutableLiveData<Int?> = MutableLiveData(null)
+
+    val arePlayerBoundsSet: Boolean
+        get() = _playerBoundStartPosition.value != null && _playerBoundEndPosition.value != null
+
     val isGroupOverlayCancelEnabled = MediatorLiveData<Boolean>().apply {
         addSource(isGroupPlaying) { value -> setValue(!value) }
     }
@@ -462,12 +469,57 @@ class MixingScreenViewModel @Inject constructor(@ApplicationContext val context:
         }
     }
 
+    fun setPlayerBoundStart(playerBoundStart: Int) {
+        _playerBoundStartPosition.value = playerBoundStart
+        mixingRepository.setPlayerBoundStart(playerBoundStart)
+    }
+
+    fun setPlayerBoundEnd(playerBoundEnd: Int) {
+        _playerBoundEndPosition.value = playerBoundEnd
+        mixingRepository.setPlayerBoundEnd(playerBoundEnd)
+    }
+
+    fun resetPlayerBoundStart() {
+        _playerBoundStartPosition.value = null
+        mixingRepository.resetPlayerBoundStart()
+    }
+
+    fun resetPlayerBoundEnd() {
+        _playerBoundEndPosition.value = null
+        mixingRepository.resetPlayerBoundEnd()
+    }
+
     fun closeGroupPlayingOverlay() {
+        resetPlayerBoundStart()
+        resetPlayerBoundEnd()
+
+        if (isGroupPlaying.value == true) {
+            groupPause()
+        }
+
         _isGroupPlayOverlayOpen.value = false
     }
 
     fun applyCommonSegmentBounds() {
-        _isGroupPlayOverlayOpen.value = false
+        applyPlayerBoundToAllSources()
+        closeGroupPlayingOverlay()
+    }
+
+    private fun applyPlayerBoundToAllSources() {
+        if (!arePlayerBoundsSet) return
+
+        audioFileStore.audioFiles.forEach { audioFile ->
+            val startPos = _playerBoundStartPosition.value ?: -1
+            val endPos = _playerBoundEndPosition.value ?: -1
+
+            if (startPos != -1 && endPos != -1) {
+                audioFile.applySegmentBounds(startPos, endPos)
+
+                audioFile.run {
+                    mixingRepository.setSourceBounds(path, segmentStartSampleValue, segmentEndSampleValue)
+                }
+            }
+        }
     }
 
     fun resetStates() {

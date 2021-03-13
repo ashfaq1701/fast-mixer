@@ -19,6 +19,7 @@ import com.bluehub.fastmixer.common.models.AudioViewActionType
 import com.bluehub.fastmixer.databinding.MixingScreenBinding
 import com.bluehub.fastmixer.screens.mixing.MixingScreenDirections.actionMixingScreenToRecordingScreen
 import com.bluehub.fastmixer.screens.mixing.modals.*
+import com.google.android.material.slider.RangeSlider
 import com.google.android.material.slider.Slider
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
@@ -125,6 +126,8 @@ class MixingScreen : BaseFragment<MixingScreenViewModel>() {
         })
 
         viewModel.isGroupPlaying.observe(viewLifecycleOwner, {
+            dataBinding.groupPlayBoundRangeSlider.isEnabled = !it
+
             if (it) {
                 dataBinding.groupPlayPause.setBtnDrawable(
                     ContextCompat.getDrawable(requireContext(), R.drawable.group_pause_button)
@@ -208,7 +211,10 @@ class MixingScreen : BaseFragment<MixingScreenViewModel>() {
             dataBinding.groupPlaySeekbar.valueTo = it.toFloat()
 
             dataBinding.groupPlayBoundRangeSlider.valueTo = it.toFloat()
-            dataBinding.groupPlayBoundRangeSlider.setValues(0.0f, it.toFloat())
+
+            if (!viewModel.arePlayerBoundsSet) {
+                dataBinding.groupPlayBoundRangeSlider.setValues(0.0f, it.toFloat())
+            }
         })
 
         viewModel.groupPlaySeekbarProgress.observe(viewLifecycleOwner, {
@@ -235,6 +241,19 @@ class MixingScreen : BaseFragment<MixingScreenViewModel>() {
         dataBinding.groupPlaySeekbar.addOnChangeListener(Slider.OnChangeListener { _, value, fromUser ->
             if (fromUser) {
                 viewModel.setPlayerHead(value.toInt())
+            }
+        })
+
+        dataBinding.groupPlayBoundRangeSlider.addOnSliderTouchListener(object : RangeSlider.OnSliderTouchListener {
+            override fun onStartTrackingTouch(slider: RangeSlider) {}
+
+            override fun onStopTrackingTouch(slider: RangeSlider) {
+                val sliderBoundValues = slider.values
+
+                if (sliderBoundValues.size == 2) {
+                    viewModel.setPlayerBoundStart(sliderBoundValues[0].toInt())
+                    viewModel.setPlayerBoundEnd(sliderBoundValues[1].toInt())
+                }
             }
         })
     }
