@@ -18,6 +18,7 @@ import com.tbruyelle.rxpermissions3.Permission
 import com.tbruyelle.rxpermissions3.RxPermissions
 import com.visualizer.amplitude.AudioRecordView
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.android.synthetic.main.recording_screen.*
 import kotlinx.android.synthetic.main.view_loading.*
 import javax.inject.Inject
 
@@ -152,6 +153,26 @@ class RecordingScreen : BaseFragment<RecordingScreenViewModel>() {
 
                 viewModel.resetRequestRecordingPermission()
             }
+        })
+
+        viewModel.isRecordButtonEnabled.observe(viewLifecycleOwner, {
+            toggleRecord.isEnabled = it
+        })
+
+        viewModel.isPlayButtonEnabled.observe(viewLifecycleOwner, {
+            togglePlay.isEnabled = it
+        })
+
+        viewModel.isPlayWithMixingTracksButtonEnabled.observe(viewLifecycleOwner, {
+            togglePlayWithMixingTracks.isEnabled = it
+        })
+
+        viewModel.isPlaySeekbarEnabled.observe(viewLifecycleOwner, {
+            recordingSeekbar.isEnabled = it
+        })
+
+        viewModel.isResetButtonEnabled.observe(viewLifecycleOwner, {
+            reset.isEnabled = it
         })
     }
 

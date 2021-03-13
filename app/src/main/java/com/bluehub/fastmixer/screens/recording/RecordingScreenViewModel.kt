@@ -9,6 +9,7 @@ import com.bluehub.fastmixer.BR
 import com.bluehub.fastmixer.R
 import com.bluehub.fastmixer.broadcastReceivers.AudioDeviceChangeListener
 import com.bluehub.fastmixer.common.repositories.AudioRepository
+import com.bluehub.fastmixer.common.utils.*
 import com.bluehub.fastmixer.common.viewmodel.BaseViewModel
 import com.bluehub.fastmixer.screens.mixing.AudioFileStore
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -130,6 +131,41 @@ class RecordingScreenViewModel @Inject constructor (@ApplicationContext val cont
 
 
     val mixingPlayActive = MutableLiveData<Boolean>(false)
+
+    val isRecordButtonEnabled = BooleanCombinedLiveData(
+        true,
+        _eventIsPlaying, _eventIsPlayingWithMixingTracks
+    ) { acc, curr ->
+        acc && !curr
+    }
+
+    val isPlayButtonEnabled = BooleanCombinedLiveData(
+        true,
+        _eventIsRecording, _eventIsPlayingWithMixingTracks
+    ) { acc, curr ->
+        acc && !curr
+    }
+
+    val isPlayWithMixingTracksButtonEnabled = BooleanCombinedLiveData(
+        true,
+        _eventIsRecording, _eventIsPlaying
+    ) { acc, curr ->
+        acc && !curr
+    }
+
+    val isResetButtonEnabled = BooleanCombinedLiveData(
+        true,
+        _eventIsRecording, _eventIsPlaying, _eventIsPlayingWithMixingTracks
+    ) { acc, curr ->
+        acc && !curr
+    }
+
+    val isPlaySeekbarEnabled = BooleanCombinedLiveData(
+        false,
+        _eventIsPlaying, _eventIsPlayingWithMixingTracks
+    ) { acc, curr ->
+        acc || curr
+    }
 
     val headphoneConnectedCallback: () -> Unit = {
         if (_eventLivePlaybackSet.value == true) {
@@ -506,7 +542,7 @@ class RecordingScreenViewModel @Inject constructor (@ApplicationContext val cont
 
                 _recordingTimerText.postValue(timeStr)
             }
-        }, 0, 1000)
+        }, 0, 500)
     }
 
     fun stopTrackingSeekbarTimer() {
