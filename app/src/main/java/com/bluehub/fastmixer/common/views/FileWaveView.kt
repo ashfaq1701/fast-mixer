@@ -33,6 +33,7 @@ class FileWaveView @JvmOverloads constructor(
     private lateinit var mAudioWidgetSlider: AudioWidgetSlider
 
     private lateinit var mRawPoints: Array<Float>
+    private var mRawPointsSize: Int = 0
 
     private lateinit var mPlotPoints: Array<Float>
 
@@ -178,10 +179,11 @@ class FileWaveView @JvmOverloads constructor(
 
         val numPts = getNumPtsToPlot()
 
-        if (!::mRawPoints.isInitialized || mRawPoints.size != numPts || forceFetch) {
+        if (!::mRawPoints.isInitialized || mRawPointsSize != numPts || forceFetch) {
             mFileWaveViewStore.value.coroutineScope.launch {
                 withContext(Dispatchers.Default) {
                     mRawPoints = mSamplesReader.value.apply(numPts).await()
+                    mRawPointsSize = mRawPoints.size
                 }
 
                 forceFetch = false
@@ -214,6 +216,8 @@ class FileWaveView @JvmOverloads constructor(
                         ((current / maximumAbs) * maxToScale.toFloat())
                     } else 0.0f
                 }.toTypedArray()
+
+                mRawPoints.dropWhile { true }
             }
 
             createAndDrawCanvas()
@@ -249,6 +253,8 @@ class FileWaveView @JvmOverloads constructor(
                             currentPoint += ptsDistance
                         }
                     }
+
+                mPlotPoints.dropWhile { true }
             }
 
             invalidate()

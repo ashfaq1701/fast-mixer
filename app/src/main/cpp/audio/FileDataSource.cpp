@@ -88,9 +88,7 @@ FileDataSource* FileDataSource::newFromCompressedFile(
 
     auto outputBuffer = make_unique<float[]>(initialSize);
 
-    uint8_t* decodedData = (uint8_t *) outputBuffer.get();
-
-    int64_t bytesDecoded = ffmpegExtractor->decode(dup(fd), decodedData, targetProperties);
+    int64_t bytesDecoded = ffmpegExtractor->decode(dup(fd), (uint8_t *) outputBuffer.get(), targetProperties);
 
     if (bytesDecoded <= 0) {
         return nullptr;
