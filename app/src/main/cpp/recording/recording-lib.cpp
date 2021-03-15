@@ -8,6 +8,7 @@
 #include "../logging_macros.h"
 #include "../jvm_env.h"
 #include <android/asset_manager_jni.h>
+#include <fcntl.h>
 
 static RecordingEngine *recordingEngine = nullptr;
 
@@ -267,10 +268,5 @@ extern "C" {
             return;
         }
         return recordingEngine->resetAudioEngine();
-    }
-
-    JNIEXPORT void JNICALL
-    Java_com_bluehub_fastmixer_audio_RecordingEngine_closeFd(JNIEnv *env, jclass, jint fd) {
-        close(fd);
     }
 }

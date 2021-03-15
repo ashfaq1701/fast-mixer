@@ -30,15 +30,14 @@ void MixingEngine::addFile(string filePath, int fd) {
     filePath.erase();
 }
 
-unique_ptr<buffer_data> MixingEngine::readSamples(string filePath, size_t countPoints) {
+shared_ptr<buffer_data> MixingEngine::readSamples(string filePath, size_t countPoints) {
     auto it = mSourceMapStore->sourceMap.find(filePath);
     filePath.erase();
     if (it == mSourceMapStore->sourceMap.end()) {
-        buffer_data emptyData {
+        return shared_ptr<buffer_data>(new buffer_data {
                 .ptr = nullptr,
                 .countPoints = 0
-        };
-        return make_unique<buffer_data>(emptyData);
+        });
     }
     return it->second->readData(countPoints);
 }
@@ -46,9 +45,9 @@ unique_ptr<buffer_data> MixingEngine::readSamples(string filePath, size_t countP
 void MixingEngine::deleteFile(string filePath) {
     auto it = mSourceMapStore->sourceMap.find(filePath);
     if (it != mSourceMapStore->sourceMap.end()) {
-        it->second.reset();
         mSourceMapStore->sourceMap.erase(filePath);
     }
+
     filePath.erase();
 }
 
@@ -307,4 +306,20 @@ void MixingEngine::pasteNewFromClipboard(string fileId) {
     shared_ptr<BufferedDataSource> source = mMixingIO.createClipboardDataSource(clipboard);
     mSourceMapStore->sourceMap.insert(pair<string, shared_ptr<FileDataSource>>(fileId, move(source)));
     fileId.erase();
+}
+
+void MixingEngine::setPlayerBoundStart(int64_t boundStart) {
+    mMixingIO.setPlayerBoundStart(boundStart);
+}
+
+void MixingEngine::setPlayerBoundEnd(int64_t boundEnd) {
+    mMixingIO.setPlayerBoundEnd(boundEnd);
+}
+
+void MixingEngine::resetPlayerBoundStart() {
+    mMixingIO.resetPlayerBoundStart();
+}
+
+void MixingEngine::resetPlayerBoundEnd() {
+    mMixingIO.resetPlayerBoundEnd();
 }

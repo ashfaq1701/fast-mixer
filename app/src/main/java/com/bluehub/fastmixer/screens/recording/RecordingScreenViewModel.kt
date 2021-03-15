@@ -9,6 +9,7 @@ import com.bluehub.fastmixer.BR
 import com.bluehub.fastmixer.R
 import com.bluehub.fastmixer.broadcastReceivers.AudioDeviceChangeListener
 import com.bluehub.fastmixer.common.repositories.AudioRepository
+import com.bluehub.fastmixer.common.utils.*
 import com.bluehub.fastmixer.common.viewmodel.BaseViewModel
 import com.bluehub.fastmixer.screens.mixing.AudioFileStore
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -44,7 +45,15 @@ class RecordingScreenViewModel @Inject constructor (@ApplicationContext val cont
         }
     }
 
-    private val cacheDir = context.cacheDir.absolutePath
+    private val cacheDir by lazy {
+        val recordingDirectory = "${context.cacheDir.absolutePath}/recording"
+        val recordingFile = File(recordingDirectory)
+        if (!recordingFile.exists()) {
+            recordingFile.mkdir()
+        }
+        recordingDirectory
+    }
+
     private val recordingSessionId = UUID.randomUUID().toString()
     private val recordingFileDirectory: String
         get() {
@@ -53,6 +62,7 @@ class RecordingScreenViewModel @Inject constructor (@ApplicationContext val cont
 
     val recordingFilePath: String
         get() {
+            Timber.d("Recording file path: $recordingFileDirectory/recording.wav")
             return "$recordingFileDirectory/recording.wav"
         }
 
@@ -122,6 +132,41 @@ class RecordingScreenViewModel @Inject constructor (@ApplicationContext val cont
 
     val mixingPlayActive = MutableLiveData<Boolean>(false)
 
+    val isRecordButtonEnabled = BooleanCombinedLiveData(
+        true,
+        _eventIsPlaying, _eventIsPlayingWithMixingTracks
+    ) { acc, curr ->
+        acc && !curr
+    }
+
+    val isPlayButtonEnabled = BooleanCombinedLiveData(
+        true,
+        _eventIsRecording, _eventIsPlayingWithMixingTracks
+    ) { acc, curr ->
+        acc && !curr
+    }
+
+    val isPlayWithMixingTracksButtonEnabled = BooleanCombinedLiveData(
+        true,
+        _eventIsRecording, _eventIsPlaying
+    ) { acc, curr ->
+        acc && !curr
+    }
+
+    val isResetButtonEnabled = BooleanCombinedLiveData(
+        true,
+        _eventIsRecording, _eventIsPlaying, _eventIsPlayingWithMixingTracks
+    ) { acc, curr ->
+        acc && !curr
+    }
+
+    val isPlaySeekbarEnabled = BooleanCombinedLiveData(
+        false,
+        _eventIsPlaying, _eventIsPlayingWithMixingTracks
+    ) { acc, curr ->
+        acc || curr
+    }
+
     val headphoneConnectedCallback: () -> Unit = {
         if (_eventLivePlaybackSet.value == true) {
             _eventLivePlaybackSet.value = audioRepository.isHeadphoneConnected()
@@ -146,8 +191,8 @@ class RecordingScreenViewModel @Inject constructor (@ApplicationContext val cont
             viewModelScope.launch {
                 withContext(Dispatchers.IO) {
                     repository.run {
-                        val fd = setupAudioSource(recordingFilePath)
-                        restartPlayback(fd)
+                        setupAudioSource(recordingFilePath)
+                        restartPlayback()
                     }
                 }
             }
@@ -157,8 +202,8 @@ class RecordingScreenViewModel @Inject constructor (@ApplicationContext val cont
             viewModelScope.launch {
                 withContext(Dispatchers.IO) {
                     repository.run {
-                        val fd = setupAudioSource(recordingFilePath)
-                        restartPlaybackWithMixingTracks(fd)
+                        setupAudioSource(recordingFilePath)
+                        restartPlaybackWithMixingTracks()
                     }
                 }
             }
@@ -217,8 +262,8 @@ class RecordingScreenViewModel @Inject constructor (@ApplicationContext val cont
 
                     if (mixingPlayActive.value == true) {
                         repository.run {
-                            val fd = setupAudioSource(recordingFilePath)
-                            startMixingTracksPlaying(fd)
+                            setupAudioSource(recordingFilePath)
+                            startMixingTracksPlaying()
                         }
                     }
 
@@ -270,8 +315,7 @@ class RecordingScreenViewModel @Inject constructor (@ApplicationContext val cont
 
                 if(_eventIsPlaying.value == false) {
                     repository.run {
-                        if (setupAudioSource(recordingFilePath)
-                                ?.let(::startPlaying) == true) {
+                        if (setupAudioSource(recordingFilePath) && startPlaying()) {
                             _eventIsPlaying.postValue(true)
                         }
                     }
@@ -293,8 +337,8 @@ class RecordingScreenViewModel @Inject constructor (@ApplicationContext val cont
                 if(_eventIsPlayingWithMixingTracks.value == false) {
 
                     repository.run {
-                        val fd = setupAudioSource(recordingFilePath)
-                        if (startPlayingWithMixingTracks(fd)) {
+                        setupAudioSource(recordingFilePath)
+                        if (startPlayingWithMixingTracks()) {
                             _eventIsPlayingWithMixingTracks.postValue(true)
                         }
                     }
@@ -313,8 +357,7 @@ class RecordingScreenViewModel @Inject constructor (@ApplicationContext val cont
             withContext(Dispatchers.IO) {
                 _isLoading.postValue(true)
                 repository.run {
-                    setupAudioSource(recordingFilePath)
-                        ?.let(::startPlaying)
+                    setupAudioSource(recordingFilePath) && startPlaying()
                 }
                 _isLoading.postValue(false)
             }
@@ -499,7 +542,7 @@ class RecordingScreenViewModel @Inject constructor (@ApplicationContext val cont
 
                 _recordingTimerText.postValue(timeStr)
             }
-        }, 0, 1000)
+        }, 0, 500)
     }
 
     fun stopTrackingSeekbarTimer() {

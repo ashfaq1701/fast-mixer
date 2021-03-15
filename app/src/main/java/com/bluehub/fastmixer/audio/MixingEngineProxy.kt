@@ -51,7 +51,13 @@ class MixingEngineProxy @Inject constructor() {
 
     fun pasteNewFromClipboard(filePath: String) = MixingEngine.pasteNewFromClipboard(filePath)
 
-    fun closeFd(fd: Int) = MixingEngine.closeFd(fd)
+    fun setPlayerBoundStart(playerBoundStart: Int) = MixingEngine.setPlayerBoundStart(playerBoundStart)
+
+    fun setPlayerBoundEnd(playerBoundEnd: Int) = MixingEngine.setPlayerBoundEnd(playerBoundEnd)
+
+    fun resetPlayerBoundStart() = MixingEngine.resetPlayerBoundStart()
+
+    fun resetPlayerBoundEnd() = MixingEngine.resetPlayerBoundEnd()
 
     fun delete() = MixingEngine.delete()
 }

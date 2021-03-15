@@ -16,7 +16,7 @@
         tools:context=".screens.mixing.MixingScreen">
 
         <com.visualizer.amplitude.AudioRecordView
-            android:id="@+id/recording_visualizer"
+            android:id="@+id/recordingVisualizer"
             android:layout_width="wrap_content"
             android:layout_height="@dimen/recording_visualizer_height"
             app:chunkAlignTo="bottom"
@@ -31,63 +31,63 @@
             app:layout_constraintStart_toStartOf="parent" />
 
         <SeekBar
-            android:id="@+id/recording_seekbar"
+            android:id="@+id/recordingSeekbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/recording_visualizer"
-            app:layout_constraintStart_toStartOf="@+id/recording_visualizer"
+            app:layout_constraintTop_toBottomOf="@id/recordingVisualizer"
+            app:layout_constraintStart_toStartOf="@+id/recordingVisualizer"
             android:layout_marginVertical="@dimen/play_seekbar_margin" />
 
         <CheckBox
-            android:id="@+id/live_playback_enabled"
+            android:id="@+id/livePlaybackEnabled"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:checked="@={viewModel.livePlaybackActive}"
             android:text="@string/live_playback_enabled"
-            app:layout_constraintTop_toBottomOf="@id/recording_seekbar"
-            app:layout_constraintStart_toStartOf="@id/recording_seekbar" />
+            app:layout_constraintTop_toBottomOf="@id/recordingSeekbar"
+            app:layout_constraintStart_toStartOf="@id/recordingSeekbar" />
 
         <CheckBox
-            android:id="@+id/mixing_play_enabled"
+            android:id="@+id/mixingPlayEnabled"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/recording_screen_checkbox_margin_start"
             android:checked="@={viewModel.mixingPlayActive}"
             android:text="@string/mixing_play_enabled"
-            app:layout_constraintStart_toEndOf="@id/live_playback_enabled"
-            app:layout_constraintTop_toBottomOf="@id/recording_seekbar" />
+            app:layout_constraintStart_toEndOf="@id/livePlaybackEnabled"
+            app:layout_constraintTop_toBottomOf="@id/recordingSeekbar" />
 
         <Button
-            android:id="@+id/toggle_record"
+            android:id="@+id/toggleRecord"
             android:layout_width="@dimen/record_button_width"
             android:layout_height="@dimen/record_button_height"
             android:textSize="@dimen/button_text_size"
             android:onClick="@{() -> viewModel.toggleRecording()}"
             android:text="@{viewModel.recordingLabel}"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintBottom_toTopOf="@id/go_back" />
+            app:layout_constraintBottom_toTopOf="@id/goBack" />
 
         <Button
-            android:id="@+id/toggle_play"
+            android:id="@+id/togglePlay"
             android:layout_width="@dimen/record_button_width"
             android:layout_height="@dimen/record_button_height"
             android:textSize="@dimen/button_text_size"
             android:onClick="@{() -> viewModel.togglePlay()}"
             android:text="@string/play_label"
-            app:layout_constraintStart_toEndOf="@id/toggle_record"
-            app:layout_constraintEnd_toStartOf="@+id/toggle_play_with_mixing_tracks"
-            app:layout_constraintBottom_toTopOf="@id/go_back" />
+            app:layout_constraintStart_toEndOf="@id/toggleRecord"
+            app:layout_constraintEnd_toStartOf="@+id/togglePlayWithMixingTracks"
+            app:layout_constraintBottom_toTopOf="@id/goBack" />
 
         <Button
-            android:id="@+id/toggle_play_with_mixing_tracks"
+            android:id="@+id/togglePlayWithMixingTracks"
             android:layout_width="@dimen/record_button_width"
             android:layout_height="@dimen/record_button_height"
             android:textSize="@dimen/button_text_size"
             android:onClick="@{() -> viewModel.togglePlayWithMixingTracks()}"
             android:text="@string/play_mixed_label"
-            app:layout_constraintStart_toEndOf="@id/toggle_play"
+            app:layout_constraintStart_toEndOf="@id/togglePlay"
             app:layout_constraintEnd_toStartOf="@+id/reset"
-            app:layout_constraintBottom_toTopOf="@id/go_back" />
+            app:layout_constraintBottom_toTopOf="@id/goBack" />
 
         <Button
             android:id="@+id/reset"
@@ -97,22 +97,22 @@
             android:onClick="@{() -> viewModel.reset()}"
             android:text="@string/reset"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toTopOf="@id/go_back" />
+            app:layout_constraintBottom_toTopOf="@id/goBack" />
 
         <Button
-            android:id="@+id/go_back"
+            android:id="@+id/goBack"
             android:layout_width="match_parent"
             android:layout_height="@dimen/record_button_height"
             android:textSize="@dimen/button_text_size"
             android:onClick="@{() -> viewModel.setGoBack()}"
             android:text="@string/done"
             app:layout_constraintEnd_toEndOf="@id/reset"
-            app:layout_constraintStart_toStartOf="@+id/toggle_record"
+            app:layout_constraintStart_toStartOf="@+id/toggleRecord"
             app:layout_constraintBottom_toBottomOf="parent"
             android:layout_marginBottom="20dp" />
 
         <TextView
-            android:id="@+id/textView"
+            android:id="@+id/recordingTimerText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@{viewModel.recordingTimerText}"

@@ -4,6 +4,7 @@ import android.content.ContentResolver
 import android.content.Context
 import android.database.Cursor
 import android.net.Uri
+import android.os.ParcelFileDescriptor
 import android.provider.OpenableColumns
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.*
@@ -53,7 +54,7 @@ class FileManager @Inject constructor(
         }
     }
 
-    fun getFdForPath(path: String): Int? {
+    fun getFdForPath(path: String): ParcelFileDescriptor? {
         val file = File(path)
         return if (file.exists()) {
             val uri = Uri.fromFile(file)
@@ -61,8 +62,7 @@ class FileManager @Inject constructor(
         } else null
     }
 
-    fun getFdForUri(uri: Uri): Int? {
-        val parcelFd = context.contentResolver.openFileDescriptor(uri, "r")
-        return parcelFd?.detachFd()
+    private fun getFdForUri(uri: Uri): ParcelFileDescriptor? {
+        return context.contentResolver.openFileDescriptor(uri, "r")
     }
 }

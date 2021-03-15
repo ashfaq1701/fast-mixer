@@ -40,6 +40,12 @@ class MixingScreenViewModel @Inject constructor(@ApplicationContext val context:
         }
     }
 
+    private var seekbarTimer: Timer? = null
+
+    private val _isLoading: MutableLiveData<Boolean> = MutableLiveData()
+    val isLoading: LiveData<Boolean>
+        get() = _isLoading
+
     private val _audioFilesLiveData = MutableLiveData<MutableList<AudioFileUiState>>(mutableListOf())
     val audioFilesLiveData: LiveData<MutableList<AudioFileUiState>>
         get() = _audioFilesLiveData
@@ -69,6 +75,29 @@ class MixingScreenViewModel @Inject constructor(@ApplicationContext val context:
 
     val isGroupPlaying: LiveData<Boolean>
         get() = playFlagStore.isGroupPlaying
+
+    private val _isGroupPlayOverlayOpen: MutableLiveData<Boolean> = MutableLiveData()
+    val isGroupPlayOverlayOpen: LiveData<Boolean>
+        get() = _isGroupPlayOverlayOpen
+
+    private val _playerBoundStartPosition: MutableLiveData<Int?> = MutableLiveData(null)
+
+    private val _playerBoundEndPosition: MutableLiveData<Int?> = MutableLiveData(null)
+
+    val arePlayerBoundsSet: Boolean
+        get() = _playerBoundStartPosition.value != null && _playerBoundEndPosition.value != null
+
+    val isGroupOverlayCancelEnabled = MediatorLiveData<Boolean>().apply {
+        addSource(isGroupPlaying) { value -> setValue(!value) }
+    }
+
+    private val _groupPlaySeekbarProgress = MutableLiveData(0)
+    val groupPlaySeekbarProgress: LiveData<Int>
+        get() = _groupPlaySeekbarProgress
+
+    private val _groupPlaySeekbarMaxValue = MutableLiveData<Int>(0)
+    val groupPlaySeekbarMaxValue: LiveData<Int>
+        get() = _groupPlaySeekbarMaxValue
 
     private val _clipboardHasData = MutableLiveData(false)
     val clipboardHasData: LiveData<Boolean>
@@ -133,15 +162,17 @@ class MixingScreenViewModel @Inject constructor(@ApplicationContext val context:
                     it.path == filePath
                 }.count() == 0) {
                 viewModelScope.launch {
+                    _isLoading.value = true
+
                     withContext(Dispatchers.IO) {
-
-
-                        mixingRepository.addFile(filePath, fd)
+                        mixingRepository.addFile(filePath, fd.fd)
                         val totalSamples = getTotalSamples(filePath)
                         audioFiles.add(AudioFileUiState.create(filePath, totalSamples))
                     }
                     _audioFilesLiveData.value = audioFiles
                     _itemAddedIdx.value = audioFiles.size - 1
+
+                    _isLoading.value = false
                 }
             }
         }
@@ -158,8 +189,10 @@ class MixingScreenViewModel @Inject constructor(@ApplicationContext val context:
         }
 
         viewModelScope.launch(Dispatchers.IO) {
+            _isLoading.postValue(true)
+
             newFilePath?.let { newPath ->
-                mixingRepository.addFile(newPath, parcelFd.detachFd())
+                mixingRepository.addFile(newPath, parcelFd.fd)
 
                 val totalSamples = getTotalSamples(newPath)
 
@@ -172,16 +205,9 @@ class MixingScreenViewModel @Inject constructor(@ApplicationContext val context:
                     }
                 }
             }
-        }
-    }
 
-    private fun createImportedFileCacheDirectory(): String {
-        val cacheDir = "${context.cacheDir}/imported"
-        val fileObj = File(cacheDir)
-        if (!fileObj.exists()) {
-            fileObj.mkdir()
+            _isLoading.postValue(false)
         }
-        return cacheDir
     }
 
     fun readSamples(filePath: String) = fun(countPoints: Int): Deferred<Array<Float>> =
@@ -290,22 +316,63 @@ class MixingScreenViewModel @Inject constructor(@ApplicationContext val context:
 
     private fun groupPlay() {
         viewModelScope.launch(Dispatchers.IO) {
+            _isLoading.postValue(true)
+
             val pathList = audioFileStore.audioFiles.map { it.path }
             if (!playList.areEqual(pathList)) {
                 mixingRepository.loadFiles(pathList)
                 playList.reInitList(pathList)
             }
-            mixingRepository.startPlayback()
+            startGroupPlay()
             playFlagStore.isGroupPlaying.postValue(true)
+
+            _isLoading.postValue(false)
+
+            _isGroupPlayOverlayOpen.postValue(true)
         }
     }
 
     private fun groupPause() {
         viewModelScope.launch(Dispatchers.IO) {
-            mixingRepository.pausePlayback()
+            _isLoading.postValue(true)
+
+            pauseGroupPlay()
             playFlagStore.isGroupPlaying.postValue(false)
+
+             _isLoading.postValue(false)
         }
     }
+
+    fun startGroupPlay() {
+        viewModelScope.launch(Dispatchers.IO) {
+
+            if (_isLoading.value == false) {
+                _isLoading.postValue(true)
+            }
+
+            mixingRepository.startPlayback()
+
+            if (_isLoading.value == true) {
+                _isLoading.postValue(false)
+            }
+        }
+    }
+
+    fun pauseGroupPlay() {
+        viewModelScope.launch(Dispatchers.IO) {
+            if (_isLoading.value == false) {
+                _isLoading.postValue(true)
+            }
+
+            mixingRepository.pausePlayback()
+
+            if (_isLoading.value == true) {
+                _isLoading.postValue(false)
+            }
+        }
+    }
+
+    fun setPlayerHead(playHead: Int) = mixingRepository.setPlayerHead(playHead)
 
     fun toggleGroupPlay() {
         if (playFlagStore.isGroupPlaying.value == null || playFlagStore.isGroupPlaying.value == false) {
@@ -316,7 +383,6 @@ class MixingScreenViewModel @Inject constructor(@ApplicationContext val context:
     }
 
     fun cutToClipboard(audioFileUiState: AudioFileUiState) {
-
         viewModelScope.launch(Dispatchers.IO) {
             audioFileUiState.run {
                 audioFileUiState.isLoading.onNext(true)
@@ -355,6 +421,7 @@ class MixingScreenViewModel @Inject constructor(@ApplicationContext val context:
     fun muteAndCopyToClipboard(audioFileUiState: AudioFileUiState) {
 
         viewModelScope.launch(Dispatchers.IO) {
+
             audioFileUiState.run {
                 audioFileUiState.isLoading.onNext(true)
                 val result = mixingRepository.muteAndCopyToClipboard(path, segmentStartSampleValue, segmentEndSampleValue)
@@ -386,6 +453,8 @@ class MixingScreenViewModel @Inject constructor(@ApplicationContext val context:
         val fileId = UUID.randomUUID().toString()
 
         viewModelScope.launch {
+            _isLoading.postValue(true)
+
             audioFileStore.run {
                 withContext(Dispatchers.IO) {
                     mixingRepository.pasteNewFromClipboard(fileId)
@@ -395,6 +464,61 @@ class MixingScreenViewModel @Inject constructor(@ApplicationContext val context:
                 _audioFilesLiveData.value = audioFiles
                 _itemAddedIdx.value = audioFiles.size - 1
             }
+
+            _isLoading.postValue(false)
+        }
+    }
+
+    fun setPlayerBoundStart(playerBoundStart: Int) {
+        _playerBoundStartPosition.value = playerBoundStart
+        mixingRepository.setPlayerBoundStart(playerBoundStart)
+    }
+
+    fun setPlayerBoundEnd(playerBoundEnd: Int) {
+        _playerBoundEndPosition.value = playerBoundEnd
+        mixingRepository.setPlayerBoundEnd(playerBoundEnd)
+    }
+
+    fun resetPlayerBoundStart() {
+        _playerBoundStartPosition.value = null
+        mixingRepository.resetPlayerBoundStart()
+    }
+
+    fun resetPlayerBoundEnd() {
+        _playerBoundEndPosition.value = null
+        mixingRepository.resetPlayerBoundEnd()
+    }
+
+    fun closeGroupPlayingOverlay() {
+        resetPlayerBoundStart()
+        resetPlayerBoundEnd()
+
+        if (isGroupPlaying.value == true) {
+            groupPause()
+        }
+
+        _isGroupPlayOverlayOpen.value = false
+    }
+
+    fun applyCommonSegmentBounds() {
+        applyPlayerBoundToAllSources()
+        closeGroupPlayingOverlay()
+    }
+
+    private fun applyPlayerBoundToAllSources() {
+        if (!arePlayerBoundsSet) return
+
+        audioFileStore.audioFiles.forEach { audioFile ->
+            val startPos = _playerBoundStartPosition.value ?: -1
+            val endPos = _playerBoundEndPosition.value ?: -1
+
+            if (startPos != -1 && endPos != -1) {
+                audioFile.applySegmentBounds(startPos, endPos)
+
+                audioFile.run {
+                    mixingRepository.setSourceBounds(path, segmentStartSampleValue, segmentEndSampleValue)
+                }
+            }
         }
     }
 
@@ -402,9 +526,27 @@ class MixingScreenViewModel @Inject constructor(@ApplicationContext val context:
         audioViewAction.value = null
     }
 
+    fun startGroupPlayTimer() {
+        _groupPlaySeekbarProgress.value = 0
+        _groupPlaySeekbarMaxValue.value = mixingRepository.getTotalSampleFrames()
+        stopGroupPlayTimer()
+        seekbarTimer = Timer()
+        seekbarTimer?.schedule(object: TimerTask() {
+            override fun run() {
+                _groupPlaySeekbarProgress.postValue(mixingRepository.getCurrentPlaybackProgress())
+            }
+        }, 0, 10)
+    }
+
+    fun stopGroupPlayTimer() {
+        seekbarTimer?.cancel()
+        seekbarTimer = null
+    }
+
     override fun onCleared() {
         super.onCleared()
         mixingRepository.pausePlayback()
+        stopGroupPlayTimer()
         mixingRepository.clearSources()
         mixingRepository.deleteMixingEngine()
         fileWaveViewStore.cleanup()

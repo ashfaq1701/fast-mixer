@@ -58,7 +58,5 @@ class RecordingEngine {
         @JvmStatic external fun addSources(filePaths: Array<String>)
 
         @JvmStatic external fun resetRecordingEngine()
-
-        @JvmStatic external fun closeFd(fd: Int)
     }
 }

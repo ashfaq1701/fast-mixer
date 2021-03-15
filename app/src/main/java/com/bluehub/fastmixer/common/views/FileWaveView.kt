@@ -7,25 +7,15 @@ import android.os.*
 import android.util.AttributeSet
 import android.view.*
 import androidx.core.content.ContextCompat
-import androidx.databinding.BindingMethod
-import androidx.databinding.BindingMethods
 import com.bluehub.fastmixer.R
 import com.bluehub.fastmixer.common.models.AudioFileUiState
 import com.bluehub.fastmixer.screens.mixing.FileWaveViewStore
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.functions.Function
 import io.reactivex.rxjava3.subjects.BehaviorSubject
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.launch
-import timber.log.Timber
+import kotlinx.coroutines.*
 import kotlin.math.*
 
-
-@BindingMethods(value = [
-    BindingMethod(type = FileWaveView::class, attribute = "samplesReader", method = "setSamplesReader"),
-    BindingMethod(type = FileWaveView::class, attribute = "audioFileUiState", method = "setAudioFileUiState"),
-    BindingMethod(type = FileWaveView::class, attribute = "fileWaveViewStore", method = "setFileWaveViewStore")
-])
 class FileWaveView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null
@@ -42,9 +32,12 @@ class FileWaveView @JvmOverloads constructor(
 
     private lateinit var mAudioWidgetSlider: AudioWidgetSlider
 
-    var mRawPoints: BehaviorSubject<Array<Float>> = BehaviorSubject.create()
+    private lateinit var mRawPoints: Array<Float>
+    private var mRawPointsSize: Int = 0
 
     private lateinit var mPlotPoints: Array<Float>
+
+    private var mBitmap: Bitmap? = null
 
     private var attrsLoaded: BehaviorSubject<Boolean> = BehaviorSubject.create()
 
@@ -123,9 +116,6 @@ class FileWaveView @JvmOverloads constructor(
     }
 
     private fun setupObservers() {
-        mRawPoints.subscribe { ptsArr ->
-            processPlotPoints(ptsArr)
-        }
 
         mAudioFileUiState.value.displayPtsCount
             .observeOn(
@@ -189,38 +179,86 @@ class FileWaveView @JvmOverloads constructor(
 
         val numPts = getNumPtsToPlot()
 
-        if (!mRawPoints.hasValue() || mRawPoints.value.size != numPts || forceFetch) {
+        if (!::mRawPoints.isInitialized || mRawPointsSize != numPts || forceFetch) {
             mFileWaveViewStore.value.coroutineScope.launch {
-                mRawPoints.onNext(mSamplesReader.value.apply(numPts).await())
+                withContext(Dispatchers.Default) {
+                    mRawPoints = mSamplesReader.value.apply(numPts).await()
+                    mRawPointsSize = mRawPoints.size
+                }
+
+                forceFetch = false
+                processPlotPoints()
             }
-            forceFetch = false
         }
     }
 
-    private fun processPlotPoints(rawPts: Array<Float>) {
-        if (rawPts.isEmpty()) {
+    private fun processPlotPoints() {
+        if (!::mRawPoints.isInitialized || mRawPoints.isEmpty()) {
             return
         }
 
-        val maximumAbs = rawPts.fold(0.0f) { acc, current ->
-            val maxAbs = if (abs(current) > acc) {
-                abs(current)
-            } else acc
+        mFileWaveViewStore.value.coroutineScope.launch {
+            withContext(Dispatchers.Default) {
+                val maximumAbs = mRawPoints.fold(0.0f) { acc, current ->
+                    val maxAbs = if (abs(current) > acc) {
+                        abs(current)
+                    } else acc
 
-            if (maxAbs < SAMPLE_MIN_THRESHOLD) {
-                0.0f
-            } else maxAbs
+                    if (maxAbs < SAMPLE_MIN_THRESHOLD) {
+                        0.0f
+                    } else maxAbs
+                }
+
+                val maxToScale = height * 0.48
+
+                mPlotPoints = mRawPoints.map { current ->
+                    if (maximumAbs != 0.0f) {
+                        ((current / maximumAbs) * maxToScale.toFloat())
+                    } else 0.0f
+                }.toTypedArray()
+
+                mRawPoints.dropWhile { true }
+            }
+
+            createAndDrawCanvas()
+        }
+    }
+
+    private fun createAndDrawCanvas() {
+        if (!::mPlotPoints.isInitialized || mPlotPoints.isEmpty()) {
+            return
         }
 
-        val maxToScale = height * 0.48
+        mFileWaveViewStore.value.coroutineScope.launch {
+            withContext(Dispatchers.Default) {
+                val numPts = getNumPtsToPlot()
+                val widthPtRatio = numPts / mPlotPoints.size
+                val ptsDistance: Int = if (widthPtRatio >= 1) widthPtRatio else 1
 
-        mPlotPoints = rawPts.map { current ->
-            if (maximumAbs != 0.0f) {
-                ((current / maximumAbs) * maxToScale.toFloat())
-            } else 0.0f
-        }.toTypedArray()
+                var currentPoint = 0
 
-        invalidate()
+                val baseLevel = height / 2
+
+                mBitmap =
+                    Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888).also { bitmap ->
+                        val canvas = Canvas(bitmap)
+                        mPlotPoints.forEach { item ->
+                            canvas.drawLine(
+                                currentPoint.toFloat(),
+                                baseLevel.toFloat(),
+                                currentPoint.toFloat(),
+                                (baseLevel - item),
+                                paint
+                            )
+                            currentPoint += ptsDistance
+                        }
+                    }
+
+                mPlotPoints.dropWhile { true }
+            }
+
+            invalidate()
+        }
     }
 
     private fun checkAttrs() {
@@ -505,21 +543,8 @@ class FileWaveView @JvmOverloads constructor(
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
-        if (!::mPlotPoints.isInitialized) {
-            return
-        }
-
-        val numPts = getNumPtsToPlot()
-        val widthPtRatio = numPts / mPlotPoints.size
-        val ptsDistance: Int = if (widthPtRatio >= 1) widthPtRatio else 1
-
-        var currentPoint = 0
-
-        val baseLevel = height / 2
-
-        mPlotPoints.forEach { item ->
-            canvas.drawLine(currentPoint.toFloat(), baseLevel.toFloat(), currentPoint.toFloat(), (baseLevel - item), paint)
-            currentPoint += ptsDistance
+        mBitmap?.let { b ->
+            canvas.drawBitmap(b, 0.0f, 0.0f, paint)
         }
     }
 }

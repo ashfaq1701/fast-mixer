@@ -7,10 +7,6 @@
 
 constexpr int kInternalBufferSize = 1152;
 
-FFMpegExtractor::FFMpegExtractor(const AudioProperties targetProperties) {
-    mTargetProperties = targetProperties;
-}
-
 int read(void *data, uint8_t *buf, int buf_size) {
     auto *hctx = (FFMpegExtractor*)data;
     size_t len = fread(buf, 1, buf_size, hctx->fp.get());
@@ -109,7 +105,63 @@ AVStream *FFMpegExtractor::getBestAudioStream(AVFormatContext *avFormatContext) 
     }
 }
 
-int64_t FFMpegExtractor::decodeOp(int fd, uint8_t* targetData, function<void(uint8_t *, int64_t, short *, int64_t)> f) {
+double FFMpegExtractor::getDuration(int fd) {
+    int returnValue = -1; // -1 indicates error
+
+    // Create a buffer for FFmpeg to use for decoding (freed in the custom deleter below)
+    auto buffer = reinterpret_cast<uint8_t*>(av_malloc(kInternalBufferSize));
+
+    {
+        FILE *tmp;
+        tmp = fdopen(fd, "rb");
+        fp.reset(move(tmp));
+    }
+
+    std::unique_ptr<AVIOContext, void(*)(AVIOContext *)> ioContext {
+            nullptr,
+            [](AVIOContext *c) {
+                if (c->buffer) av_free(c->buffer);
+                avio_context_free(&c);
+            }
+    };
+    {
+        AVIOContext *tmp = nullptr;
+        if (!createAVIOContext(buffer, kInternalBufferSize, &tmp)) {
+            LOGE("Could not create an AVIOContext");
+            return returnValue;
+        }
+        ioContext.reset(tmp);
+    }
+
+    std::unique_ptr<AVFormatContext, decltype(&avformat_free_context)> formatContext {
+            nullptr,
+            &avformat_free_context
+    };
+    {
+        AVFormatContext *tmp;
+        if (!createAVFormatContext(ioContext.get(), &tmp)) return returnValue;
+        formatContext.reset(tmp);
+    }
+
+    if (!openAVFormatContext(formatContext.get())) return returnValue;
+
+    if (!getStreamInfo(formatContext.get())) return returnValue;
+
+    AVStream *stream = getBestAudioStream(formatContext.get());
+
+    if (stream == nullptr || stream->codecpar == nullptr){
+        LOGE("Could not find a suitable audio stream to decode");
+        return returnValue;
+    }
+
+    double divideFactor = (double) 1 / av_q2d(stream->time_base);
+
+    double durationOfAudio = (double) stream->duration / divideFactor;
+
+    return durationOfAudio;
+}
+
+int64_t FFMpegExtractor::decode(int fd, uint8_t* targetData, AudioProperties targetProperties) {
     int returnValue = -1; // -1 indicates error
 
     // Create a buffer for FFmpeg to use for decoding (freed in the custom deleter below)
@@ -192,16 +244,16 @@ int64_t FFMpegExtractor::decodeOp(int fd, uint8_t* targetData, function<void(uin
     }
 
     // prepare resampler
-    int32_t outChannelLayout = (1 << mTargetProperties.channelCount) - 1;
+    int32_t outChannelLayout = (1 << targetProperties.channelCount) - 1;
     LOGD("Channel layout %d", outChannelLayout);
 
     SwrContext *swr = swr_alloc();
     av_opt_set_int(swr, "in_channel_count", stream->codecpar->channels, 0);
-    av_opt_set_int(swr, "out_channel_count", mTargetProperties.channelCount, 0);
+    av_opt_set_int(swr, "out_channel_count", targetProperties.channelCount, 0);
     av_opt_set_int(swr, "in_channel_layout", stream->codecpar->channel_layout, 0);
     av_opt_set_int(swr, "out_channel_layout", outChannelLayout, 0);
     av_opt_set_int(swr, "in_sample_rate", stream->codecpar->sample_rate, 0);
-    av_opt_set_int(swr, "out_sample_rate", mTargetProperties.sampleRate, 0);
+    av_opt_set_int(swr, "out_sample_rate", targetProperties.sampleRate, 0);
     av_opt_set_int(swr, "in_sample_fmt", stream->codecpar->format, 0);
     av_opt_set_sample_fmt(swr, "out_sample_fmt", AV_SAMPLE_FMT_FLT, 0);
     av_opt_set_int(swr, "force_resampling", 1, 0);
@@ -236,12 +288,11 @@ int64_t FFMpegExtractor::decodeOp(int fd, uint8_t* targetData, function<void(uin
             // Pass our compressed data into the codec
             result = avcodec_send_packet(codecContext.get(), &avPacket);
             if (result == AVERROR(EOF) || result == AVERROR(EINVAL)) {
-                LOGI("avcodec_send_packet aborting with unrecoverable error: %s", av_err2str(result));
+                LOGE("avcodec_send_packet aborting with unrecoverable error: %s", av_err2str(result));
                 goto cleanup;
             } else if (result < 0) {
                 LOGI("avcodec_send_packet returned error: %s", av_err2str(result));
-                avPacket.size = 0;
-                avPacket.data = nullptr;
+                av_packet_unref(&avPacket);
                 continue;
             }
 
@@ -250,8 +301,7 @@ int64_t FFMpegExtractor::decodeOp(int fd, uint8_t* targetData, function<void(uin
             if (result == AVERROR(EAGAIN)) {
                 // The codec needs more data before it can decode
                 LOGI("avcodec_receive_frame returned EAGAIN");
-                avPacket.size = 0;
-                avPacket.data = nullptr;
+                av_packet_unref(&avPacket);
                 continue;
             } else if (result != 0) {
                 LOGE("avcodec_receive_frame error: %s", av_err2str(result));
@@ -261,7 +311,7 @@ int64_t FFMpegExtractor::decodeOp(int fd, uint8_t* targetData, function<void(uin
             // DO RESAMPLING
             auto dst_nb_samples = (int32_t) av_rescale_rnd(
                     swr_get_delay(swr, decodedFrame->sample_rate) + decodedFrame->nb_samples,
-                    mTargetProperties.sampleRate,
+                    targetProperties.sampleRate,
                     decodedFrame->sample_rate,
                     AV_ROUND_UP);
 
@@ -269,7 +319,7 @@ int64_t FFMpegExtractor::decodeOp(int fd, uint8_t* targetData, function<void(uin
             av_samples_alloc(
                     (uint8_t **) &buffer1,
                     nullptr,
-                    mTargetProperties.channelCount,
+                    targetProperties.channelCount,
                     dst_nb_samples,
                     AV_SAMPLE_FMT_FLT,
                     0);
@@ -280,14 +330,13 @@ int64_t FFMpegExtractor::decodeOp(int fd, uint8_t* targetData, function<void(uin
                     (const uint8_t **) decodedFrame->data,
                     decodedFrame->nb_samples);
 
-            int64_t bytesToWrite = frame_count * sizeof(float) * mTargetProperties.channelCount;
+            int64_t bytesToWrite = frame_count * sizeof(float) * targetProperties.channelCount;
 
-            f(targetData, bytesWritten, buffer1, bytesToWrite);
+            memcpy(targetData + bytesWritten, buffer1, (size_t)bytesToWrite);
             bytesWritten += bytesToWrite;
             av_freep(&buffer1);
 
-            avPacket.size = 0;
-            avPacket.data = nullptr;
+            av_packet_unref(&avPacket);
         }
     }
 
@@ -300,21 +349,6 @@ int64_t FFMpegExtractor::decodeOp(int fd, uint8_t* targetData, function<void(uin
         returnValue = bytesWritten;
     }
     return returnValue;
-}
-
-int64_t FFMpegExtractor::decode(int fd, uint8_t *targetData) {
-    function<void(uint8_t*, int, short*, int64_t)> f = [] (uint8_t* targetData, int64_t bytesWritten, short* buffer1, int64_t bytesToWrite) {
-        memcpy(targetData + bytesWritten, buffer1, (size_t)bytesToWrite);
-    };
-    auto decodedBytes = decodeOp(fd, targetData, f);
-    return decodedBytes;
-}
-
-int64_t FFMpegExtractor::getTotalBytes(int fd) {
-    function<void(uint8_t*, int, short*, int64_t)> f = [] (uint8_t* targetData, int64_t bytesWritten, short* buffer1, int64_t bytesToWrite) {};
-
-    auto decodedBytes = decodeOp(fd, nullptr, f);
-    return decodedBytes;
 }
 
 void FFMpegExtractor::printCodecParameters(AVCodecParameters *params) {

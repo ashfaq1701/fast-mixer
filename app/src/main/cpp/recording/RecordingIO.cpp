@@ -35,7 +35,16 @@ bool RecordingIO::check_if_live_playback_read_completed() {
 RecordingIO::RecordingIO() {
     Player* player = new Player();
     mPlayer.reset(move(player));
-    taskQueue = new TaskQueue();
+
+    taskQueue = move(new TaskQueue());
+}
+
+void RecordingIO::reserveRecordingBuffer() {
+    mData.reserve(kMaxSamples);
+}
+
+void RecordingIO::clearRecordingBuffer() {
+    mData.resize(0);
 }
 
 FileDataSource* RecordingIO::setup_audio_source(int fd) {
@@ -92,12 +101,12 @@ int32_t RecordingIO::write(const int16_t *sourceData, int32_t numSamples) {
     flushed.wait(lck, check_if_flush_completed);
     lck.unlock();
 
-    if (mWriteIndex + numSamples >= kMaxSamples) {
+    if (mData.size() + numSamples >= kMaxSamples) {
         flush_buffer();
     }
 
     for(int i = 0; i < numSamples; i++) {
-        mData[mWriteIndex++] = sourceData[i] * gain_factor;
+        mData.push_back(sourceData[i] * gain_factor);
         if (currentMax < abs(sourceData[i])) {
             currentMax = abs(sourceData[i]);
         }
@@ -109,13 +118,13 @@ int32_t RecordingIO::write(const int16_t *sourceData, int32_t numSamples) {
 
 void RecordingIO::flush_buffer() {
 
-    if (mWriteIndex > 0) {
+    if (mData.size() > 0) {
 
         ongoing_flush_completed = false;
 
-        int numItems = mWriteIndex;
+        int numItems = mData.size();
 
-        copy(mData, mData + mWriteIndex, mBuff);
+        copy(mData.begin(), mData.begin() + numItems, mBuff);
 
         taskQueue->enqueue(move([&]() {
             flush_to_file(mBuff, numItems, mRecordingFilePath, mRecordingFile);
@@ -126,8 +135,7 @@ void RecordingIO::flush_buffer() {
         livePlaybackRead.wait(lck, check_if_live_playback_read_completed);
         lck.unlock();
 
-        fill(mData, mData + mWriteIndex, 0);
-        mWriteIndex = 0;
+        mData.clear();
         mLivePlaybackReadIndex = 0;
 
         ongoing_flush_completed = true;
@@ -136,29 +144,28 @@ void RecordingIO::flush_buffer() {
 }
 
 int32_t RecordingIO::read_live_playback(int16_t *targetData, int32_t numSamples) {
-    if (mLivePlaybackReadIndex > mWriteIndex) {
+    if (mLivePlaybackReadIndex > mData.size()) {
         return 0;
     }
+    int32_t framesRead = 0;
     auto framesToCopy = numSamples;
-    if (mLivePlaybackReadIndex + numSamples > mWriteIndex) {
-        framesToCopy = mWriteIndex - mLivePlaybackReadIndex;
+    if (mLivePlaybackReadIndex + numSamples >= mData.size()) {
+        framesToCopy = mData.size() - mLivePlaybackReadIndex;
     }
     if (framesToCopy > 0) {
 
         // Set the flag so that any flush action waits
         live_playback_read_completed = false;
-
-        copy(mData + mLivePlaybackReadIndex, mData + mLivePlaybackReadIndex + framesToCopy, targetData);
-
+        copy(mData.begin() + mLivePlaybackReadIndex, mData.begin() + mLivePlaybackReadIndex + framesToCopy, targetData);
         mLivePlaybackReadIndex += framesToCopy;
         live_playback_read_completed = true;
         livePlaybackRead.notify_all();
     }
-    return framesToCopy;
+    return framesRead;
 }
 
 void RecordingIO::sync_live_playback() {
-    mLivePlaybackReadIndex = mWriteIndex;
+    mLivePlaybackReadIndex = mData.size();
 }
 
 void RecordingIO::setLivePlaybackEnabled(bool livePlaybackEnabled) {

@@ -25,7 +25,7 @@ public:
     ~MixingEngine();
 
     void addFile(string filePath, int fd);
-    unique_ptr<buffer_data> readSamples(string filePath, size_t countPoints);
+    shared_ptr<buffer_data> readSamples(string filePath, size_t countPoints);
     void deleteFile(string filePath);
     int64_t getAudioFileTotalSamples(string filePath);
 
@@ -66,13 +66,21 @@ public:
 
     void pasteNewFromClipboard(string fileId);
 
+    void setPlayerBoundStart(int64_t boundStart);
+
+    void setPlayerBoundEnd(int64_t boundEnd);
+
+    void resetPlayerBoundStart();
+
+    void resetPlayerBoundEnd();
+
 private:
 
     const char* TAG = "Mixing Engine:: %s";
 
     MixingIO mMixingIO;
 
-    SourceMapStore* mSourceMapStore;
+    shared_ptr<SourceMapStore> mSourceMapStore;
 
     vector<float> clipboard;
 

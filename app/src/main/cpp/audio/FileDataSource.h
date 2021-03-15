@@ -65,7 +65,7 @@ public:
             int fd,
             const AudioProperties targetProperties);
 
-    unique_ptr<buffer_data> readData(size_t numSamples);
+    shared_ptr<buffer_data> readData(size_t numSamples);
 
     void applyBackupBufferData();
     void resetBackupBufferData();
@@ -89,8 +89,12 @@ private:
 
     void calculateProperties();
 
-    unique_ptr<float[]> mBuffer;
-    unique_ptr<float[]> mBackupBuffer {nullptr};
+    unique_ptr<float[]> mBuffer {
+        nullptr
+    };
+    unique_ptr<float[]> mBackupBuffer {
+        nullptr
+    };
 
     int64_t mBufferSize;
     int64_t mBackupBufferSize = 0;

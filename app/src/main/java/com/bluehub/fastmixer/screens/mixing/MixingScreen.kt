@@ -5,6 +5,7 @@ import android.content.ContentResolver
 import android.content.Intent
 import android.os.Bundle
 import android.view.*
+import android.widget.SeekBar
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
@@ -18,8 +19,11 @@ import com.bluehub.fastmixer.common.models.AudioViewActionType
 import com.bluehub.fastmixer.databinding.MixingScreenBinding
 import com.bluehub.fastmixer.screens.mixing.MixingScreenDirections.actionMixingScreenToRecordingScreen
 import com.bluehub.fastmixer.screens.mixing.modals.*
+import com.google.android.material.slider.RangeSlider
+import com.google.android.material.slider.Slider
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import kotlinx.android.synthetic.main.view_loading.*
 
 @AndroidEntryPoint
 class MixingScreen : BaseFragment<MixingScreenViewModel>() {
@@ -69,6 +73,7 @@ class MixingScreen : BaseFragment<MixingScreenViewModel>() {
         resolver = requireContext().contentResolver
 
         setupViewModel()
+        setupView()
         setupAnimations()
 
         return dataBinding.root
@@ -79,12 +84,11 @@ class MixingScreen : BaseFragment<MixingScreenViewModel>() {
         viewModel.closeBottomDrawer()
 
         viewModel.eventDrawerOpen.observe(viewLifecycleOwner, { isOpen ->
-            TransitionManager.beginDelayedTransition(dataBinding.bottomDrawerContainer, transition)
             if (isOpen) {
-                dataBinding.drawerContainer.visibility = View.VISIBLE
+                showBottomDrawer()
                 dataBinding.drawerControl.setImageResource(R.drawable.drawer_control_button_close)
             } else {
-                dataBinding.drawerContainer.visibility = View.GONE
+                hideBottomDrawer()
                 dataBinding.drawerControl.setImageResource(R.drawable.drawer_control_button_open)
             }
         })
@@ -122,6 +126,8 @@ class MixingScreen : BaseFragment<MixingScreenViewModel>() {
         })
 
         viewModel.isGroupPlaying.observe(viewLifecycleOwner, {
+            dataBinding.groupPlayBoundRangeSlider.isEnabled = !it
+
             if (it) {
                 dataBinding.groupPlayPause.setBtnDrawable(
                     ContextCompat.getDrawable(requireContext(), R.drawable.group_pause_button)
@@ -129,6 +135,8 @@ class MixingScreen : BaseFragment<MixingScreenViewModel>() {
                 dataBinding.groupPlayPause.setBtnLabel(
                     requireContext().getString(R.string.pause)
                 )
+
+                viewModel.startGroupPlayTimer()
             } else {
                 dataBinding.groupPlayPause.setBtnDrawable(
                     ContextCompat.getDrawable(requireContext(), R.drawable.group_play_button)
@@ -136,6 +144,8 @@ class MixingScreen : BaseFragment<MixingScreenViewModel>() {
                 dataBinding.groupPlayPause.setBtnLabel(
                     requireContext().getString(R.string.play)
                 )
+
+                viewModel.stopGroupPlayTimer()
             }
         })
 
@@ -176,12 +186,92 @@ class MixingScreen : BaseFragment<MixingScreenViewModel>() {
             .subscribe {
                 dataBinding.pasteAsNew.setIsEnabled(it)
             }
+
+        viewModel.isLoading.observe(viewLifecycleOwner, {
+            if (it) {
+                pbLoading.visibility = View.VISIBLE
+            } else {
+                pbLoading.visibility = View.GONE
+            }
+        })
+
+        viewModel.isGroupPlayOverlayOpen.observe(viewLifecycleOwner, {
+            if (it) {
+                dataBinding.groupPlayOverlay.visibility = View.VISIBLE
+            } else {
+                dataBinding.groupPlayOverlay.visibility = View.GONE
+            }
+        })
+
+        viewModel.isGroupOverlayCancelEnabled.observe(viewLifecycleOwner, {
+            dataBinding.closeGroupPlayOverlay.isEnabled = it
+        })
+
+        viewModel.groupPlaySeekbarMaxValue.observe(viewLifecycleOwner, {
+            dataBinding.groupPlaySeekbar.valueTo = it.toFloat()
+
+            dataBinding.groupPlayBoundRangeSlider.valueTo = it.toFloat()
+
+            if (!viewModel.arePlayerBoundsSet) {
+                dataBinding.groupPlayBoundRangeSlider.setValues(0.0f, it.toFloat())
+            }
+        })
+
+        viewModel.groupPlaySeekbarProgress.observe(viewLifecycleOwner, {
+            dataBinding.groupPlaySeekbar.value = it.toFloat()
+        })
+    }
+
+    private fun setupView() {
+
+        dataBinding.groupPlaySeekbar.addOnSliderTouchListener(object : Slider.OnSliderTouchListener {
+            override fun onStartTrackingTouch(slider: Slider) {
+                if (viewModel.isGroupPlaying.value == true) {
+                    viewModel.pauseGroupPlay()
+                }
+            }
+
+            override fun onStopTrackingTouch(slider: Slider) {
+                if (viewModel.isGroupPlaying.value == true) {
+                    viewModel.startGroupPlay()
+                }
+            }
+        })
+
+        dataBinding.groupPlaySeekbar.addOnChangeListener(Slider.OnChangeListener { _, value, fromUser ->
+            if (fromUser) {
+                viewModel.setPlayerHead(value.toInt())
+            }
+        })
+
+        dataBinding.groupPlayBoundRangeSlider.addOnSliderTouchListener(object : RangeSlider.OnSliderTouchListener {
+            override fun onStartTrackingTouch(slider: RangeSlider) {}
+
+            override fun onStopTrackingTouch(slider: RangeSlider) {
+                val sliderBoundValues = slider.values
+
+                if (sliderBoundValues.size == 2) {
+                    viewModel.setPlayerBoundStart(sliderBoundValues[0].toInt())
+                    viewModel.setPlayerBoundEnd(sliderBoundValues[1].toInt())
+                }
+            }
+        })
     }
 
     private fun setupAnimations() {
         transition = Slide()
         transition.duration = 400
         transition.addTarget(R.id.drawerContainer)
+    }
+
+    private fun showBottomDrawer() {
+        TransitionManager.beginDelayedTransition(dataBinding.drawerContainer, transition)
+        dataBinding.drawerContainer.visibility = View.VISIBLE
+    }
+
+    private fun hideBottomDrawer() {
+        TransitionManager.beginDelayedTransition(dataBinding.drawerContainer, transition)
+        dataBinding.drawerContainer.visibility = View.GONE
     }
 
     private fun openFilePicker() {

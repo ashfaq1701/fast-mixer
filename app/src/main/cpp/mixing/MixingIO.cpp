@@ -17,7 +17,10 @@ shared_ptr<FileDataSource> MixingIO::readFile(string filename, int fd) {
     };
 
     return shared_ptr<FileDataSource> {
-        FileDataSource::newFromCompressedFile(filename.c_str(), fd, targetProperties)
+        FileDataSource::newFromCompressedFile(filename.c_str(), fd, targetProperties),
+        [](FileDataSource *source) {
+            delete source;
+        }
     };
 }
 
@@ -28,7 +31,10 @@ shared_ptr<BufferedDataSource> MixingIO::createClipboardDataSource(vector<float>
     };
 
     return shared_ptr<BufferedDataSource> {
-        BufferedDataSource::newFromClipboard(clipboard, targetProperties)
+        BufferedDataSource::newFromClipboard(clipboard, targetProperties),
+        [](BufferedDataSource *source) {
+            delete source;
+        }
     };
 }
 
@@ -76,4 +82,20 @@ int MixingIO::getCurrentPlaybackProgress() {
 
 void MixingIO::setPlayHead(int position) {
     mPlayer->setPlayHead(position);
+}
+
+void MixingIO::setPlayerBoundStart(int64_t boundStart) {
+    mPlayer->setPlayerBoundStart(boundStart);
+}
+
+void MixingIO::setPlayerBoundEnd(int64_t boundEnd) {
+    mPlayer->setPlayerBoundEnd(boundEnd);
+}
+
+void MixingIO::resetPlayerBoundStart() {
+    mPlayer->resetPlayerBoundStart();
+}
+
+void MixingIO::resetPlayerBoundEnd() {
+    mPlayer->resetPlayerBoundEnd();
 }

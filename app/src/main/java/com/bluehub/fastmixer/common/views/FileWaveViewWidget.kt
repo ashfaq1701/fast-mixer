@@ -9,40 +9,18 @@ import android.widget.HorizontalScrollView
 import android.widget.PopupMenu
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
-import androidx.databinding.BindingMethod
-import androidx.databinding.BindingMethods
 import com.bluehub.fastmixer.R
 import com.bluehub.fastmixer.common.models.*
 import com.bluehub.fastmixer.databinding.FileWaveViewWidgetBinding
-import com.bluehub.fastmixer.screens.mixing.*
+import com.bluehub.fastmixer.screens.mixing.AudioFileEventListeners
+import com.bluehub.fastmixer.screens.mixing.FileWaveViewStore
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import kotlinx.android.synthetic.main.file_wave_view_widget.view.*
-import kotlinx.android.synthetic.main.view_loading.*
 import kotlinx.android.synthetic.main.view_loading.view.*
 import java.util.*
 
-@BindingMethods(
-    value = [
-        BindingMethod(
-            type = FileWaveViewWidget::class,
-            attribute = "audioFileUiState",
-            method = "setAudioFileUiState"
-        ),
-        BindingMethod(
-            type = FileWaveViewWidget::class,
-            attribute = "audioFileEventListeners",
-            method = "setAudioFileEventListeners"
-        ),
-        BindingMethod(
-            type = FileWaveViewWidget::class,
-            attribute = "fileWaveViewStore",
-            method = "setFileWaveViewStore"
-        )
-    ]
-)
 class FileWaveViewWidget(context: Context, attributeSet: AttributeSet?)
     : ConstraintLayout(context, attributeSet) {
 
@@ -285,10 +263,7 @@ class FileWaveViewWidget(context: Context, attributeSet: AttributeSet?)
             binding = FileWaveViewWidgetBinding.inflate(inflater, this, true)
 
             binding.apply {
-                audioFileUiState = mAudioFileUiState.value
-                eventListener = mAudioFileEventListeners.value
                 waveViewEventListeners = waveViewEvListeners
-                fileWaveViewStore = mFileWaveViewStore.value
 
                 fileWaveViewScrollBar.setHorizontalScrollView(fileWaveViewScroll)
                 fileWaveViewScrollBar.setControlledView(fileWaveView)
@@ -302,6 +277,14 @@ class FileWaveViewWidget(context: Context, attributeSet: AttributeSet?)
                     setupRightSliderTouchEvent(event)
                     true
                 }
+            }
+
+            binding.fileWaveView.apply {
+                setAudioFileUiState(mAudioFileUiState.value)
+                setSamplesReader(
+                    mAudioFileEventListeners.value.readSamplesCallbackWithIndex(mAudioFileUiState.value.path)
+                )
+                setFileWaveViewStore(mFileWaveViewStore.value)
             }
 
             mFileWaveViewScroll = binding.fileWaveViewScroll

@@ -18,11 +18,6 @@ android {
         targetSdkVersion 30
         versionCode 1
         versionName "1.0"
-        if (rootProject.ext.useASAN == true) {
-            manifestPlaceholders = [debuggable: "true"]
-        } else {
-            manifestPlaceholders = [debuggable: "false"]
-        }
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         externalNativeBuild {
@@ -38,18 +33,22 @@ android {
 
     buildTypes {
         debug {
+            manifestPlaceholders = [extractNativeLibs: "true"]
+
             externalNativeBuild {
                 cmake {
                     if (rootProject.ext.useHWASAN == true) {
                         abiFilters.addAll(SupportedABIs)
                         arguments "-DANDROID_STL=c++_shared", "-DUSEHWASAN=ON"
-                    } else if (rootProject.ext.useASAN == false) {
+                    } else if (rootProject.ext.useASAN == true) {
                         arguments "-DUSEASAN=ON"
                     }
                 }
             }
         }
         release {
+            manifestPlaceholders = [extractNativeLibs: "false"]
+
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }

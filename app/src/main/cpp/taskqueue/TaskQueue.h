@@ -19,7 +19,7 @@ class TaskQueue {
 public:
     TaskQueue() {
         deque<function<void()>> qu;
-        q = make_unique<deque<function<void()>>>(qu);
+        q = make_unique<deque<function<void()>>>(move(qu));
         start_queue();
     }
 

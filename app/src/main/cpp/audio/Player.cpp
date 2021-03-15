@@ -74,6 +74,10 @@ void Player::renderAudio(float *targetData, int32_t numFrames) {
             }
         }
 
+        if (mSourceBoundStart >= 0 && mSourceBoundEnd >= 0 && !(mReadFrameIndex >= mSourceBoundStart && mReadFrameIndex <= mSourceBoundEnd)) {
+            mReadFrameIndex = mSourceBoundStart;
+        }
+
         float allMaxValue = getMaxValueAcrossSources();
 
         int64_t sourceFramesUpperBound = getMaxTotalSourceFrames();
@@ -81,6 +85,15 @@ void Player::renderAudio(float *targetData, int32_t numFrames) {
             if (selectionEnd >= 0) {
                 sourceFramesUpperBound = selectionEnd + 1;
             }
+        }
+
+        if (mSourceBoundEnd >= 0) {
+            sourceFramesUpperBound = mSourceBoundEnd + 1;
+        }
+
+        int64_t sourceFramesLowerBound = 0;
+        if (mSourceBoundStart >= 0) {
+            sourceFramesLowerBound = mSourceBoundStart;
         }
 
         int64_t framesToRenderFromData = numFrames;
@@ -124,7 +137,7 @@ void Player::renderAudio(float *targetData, int32_t numFrames) {
                 if (mSourceMap.size() == 1 && selectionStart >= 0) {
                     mReadFrameIndex = selectionStart;
                 } else {
-                    mReadFrameIndex = 0;
+                    mReadFrameIndex = sourceFramesLowerBound;
                 }
                 break;
             }
@@ -270,4 +283,20 @@ void Player::updateAddedMax() {
     for (auto it = workers.begin(); it != workers.end(); ++it) {
         it->join();
     }
+}
+
+void Player::setPlayerBoundStart(int64_t boundStart) {
+    mSourceBoundStart = boundStart;
+}
+
+void Player::setPlayerBoundEnd(int64_t boundEnd) {
+    mSourceBoundEnd = boundEnd;
+}
+
+void Player::resetPlayerBoundStart() {
+    mSourceBoundStart = -1;
+}
+
+void Player::resetPlayerBoundEnd() {
+    mSourceBoundEnd = -1;
 }

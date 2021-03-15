@@ -13,8 +13,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        android:debuggable="${debuggable}"
-        android:extractNativeLibs="${debuggable}">
+        android:extractNativeLibs="${extractNativeLibs}">
         <activity android:name=".activities.MainActivity"
             android:configChanges="orientation|screenSize">
             <intent-filter>

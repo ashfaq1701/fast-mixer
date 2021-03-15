@@ -24,6 +24,7 @@
 #include "FileDataSource.h"
 #include "FFMpegExtractor.h"
 #include <regex>
+#include <fcntl.h>
 
 constexpr int kMaxCompressionRatio { 12 };
 
@@ -61,27 +62,33 @@ FileDataSource* FileDataSource::newFromCompressedFile(
         const AudioProperties targetProperties) {
     string filenameStr(filename);
 
+    if (fcntl(fd, F_GETFD) == -1 || errno == EBADF) {
+        return nullptr;
+    }
+
     FILE* fl = fdopen(dup(fd), "r");
     if (!fl) {
         LOGE("Failed to open asset %s", filenameStr.c_str());
         fclose(fl);
         return nullptr;
     }
+    fclose(fl);
 
     // Allocate memory to store the decompressed audio. We don't know the exact
     // size of the decoded data until after decoding so we make an assumption about the
     // maximum compression ratio and the decoded sample format (float for FFmpeg, int16 for NDK).
 
-    auto ffmpegExtractor = FFMpegExtractor(targetProperties);
+    auto ffmpegExtractor = shared_ptr<FFMpegExtractor> {
+        new FFMpegExtractor()
+    };
 
-    int64_t totalBytes = ffmpegExtractor.getTotalBytes(dup(fd));
+    double duration = ffmpegExtractor->getDuration(dup(fd));
 
-    if (totalBytes <= 0) {
-        return nullptr;
-    }
+    int64_t initialSize = (int64_t) ceil(duration) * targetProperties.channelCount * targetProperties.sampleRate;
 
-    uint8_t* decodedData = new uint8_t [totalBytes];
-    int64_t bytesDecoded = ffmpegExtractor.decode(dup(fd), decodedData);
+    auto outputBuffer = make_unique<float[]>(initialSize);
+
+    int64_t bytesDecoded = ffmpegExtractor->decode(dup(fd), (uint8_t *) outputBuffer.get(), targetProperties);
 
     if (bytesDecoded <= 0) {
         return nullptr;
@@ -89,15 +96,12 @@ FileDataSource* FileDataSource::newFromCompressedFile(
 
     auto numSamples = bytesDecoded / sizeof(float);
 
-    // Now we know the exact number of samples we can create a float array to hold the audio data
-    auto outputBuffer = unique_ptr<float[]>((float*) decodedData);
-
     return new FileDataSource(move(outputBuffer),
                               numSamples,
                               move(targetProperties));
 }
 
-unique_ptr<buffer_data> FileDataSource::readData(size_t countPoints) {
+shared_ptr<buffer_data> FileDataSource::readData(size_t countPoints) {
 
     float * dataPtr = mBuffer.get();
     int channelCount = mProperties.channelCount;
@@ -139,11 +143,10 @@ unique_ptr<buffer_data> FileDataSource::readData(size_t countPoints) {
         selectedSamples[i] = maxValue;
     }
 
-    buffer_data buff = {
-            .ptr = selectedSamples,
+    return shared_ptr<buffer_data> { new buffer_data {
+            .ptr = move(selectedSamples),
             .countPoints = samplesToHandle
-    };
-    return make_unique<buffer_data>(buff);
+    }};
 }
 
 const float* FileDataSource::getMainBufferData() {
@@ -206,7 +209,9 @@ int64_t FileDataSource::getSelectionEnd() {
 }
 
 void FileDataSource::setBackupBufferData(float* &&data, int64_t numSamples) {
-    mBackupBuffer = unique_ptr<float[]>(move(data));
+    mBackupBuffer = unique_ptr<float[]> {
+        move(data)
+    };
     mBackupBufferSize = numSamples;
 }
 
@@ -227,13 +232,19 @@ int64_t FileDataSource::getSampleSize() {
 
 void FileDataSource::resetBackupBufferData() {
     if (mBackupBuffer) {
-        mBackupBuffer = unique_ptr<float[]>{nullptr};
+        mBackupBuffer = unique_ptr<float[]> {
+            nullptr
+        };
+
+        mBackupBufferSize = 0;
     }
 }
 
 void FileDataSource::applyBackupBufferData() {
     if (mBackupBuffer) {
         mBuffer.swap(mBackupBuffer);
+
+        mBufferSize = mBackupBufferSize;
     }
     resetBackupBufferData();
     calculateProperties();
@@ -267,7 +278,9 @@ int64_t FileDataSource::shiftBySamples(int64_t position, int64_t numSamples) {
 
     copy(oldBufferData + fillStartPosition, oldBufferData + mBufferSize, newBuffer + fillEndPosition);
 
-    mBuffer.reset(move(newBuffer));
+    mBuffer = unique_ptr<float[]> {
+        move(newBuffer)
+    };
     mBufferSize = newBufferSize;
 
     return position + numSamples;
@@ -297,7 +310,9 @@ int64_t FileDataSource::cutToClipboard(int64_t startPosition, int64_t endPositio
     copy(oldBufferData, oldBufferData + startIndexWithChannels, newBuffer);
     copy(oldBufferData + endIndexWithChannels, oldBufferData + mBufferSize, newBuffer + startIndexWithChannels);
 
-    mBuffer.reset(move(newBuffer));
+    mBuffer = unique_ptr<float[]> {
+        move(newBuffer)
+    };
     mBufferSize = mBufferSize - numElements;
 
     if (mPlayHead >= startPosition && mPlayHead <= endPosition) {
@@ -378,6 +393,9 @@ void FileDataSource::pasteFromClipboard(int64_t position, vector<float>& clipboa
                         newBuffer + pasteIndex + clipboard.size());
     }
 
-    mBuffer.reset(move(newBuffer));
+    mBuffer = unique_ptr<float[]> {
+        move(newBuffer)
+    };
     mBufferSize += clipboard.size();
 }
+

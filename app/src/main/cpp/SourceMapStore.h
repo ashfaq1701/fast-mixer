@@ -12,18 +12,18 @@ class SourceMapStore {
 
 public:
 
-    static SourceMapStore* mInstance;
-    static SourceMapStore* getInstance();
+    static shared_ptr<SourceMapStore> mInstance;
+    static shared_ptr<SourceMapStore> getInstance();
 
     map<string, shared_ptr<FileDataSource>> sourceMap;
 
     static void reset();
 
+    ~SourceMapStore();
+
 private:
 
     SourceMapStore();
-
-    ~SourceMapStore();
 };
 
 

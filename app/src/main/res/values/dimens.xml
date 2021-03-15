@@ -70,4 +70,7 @@
     <dimen name="segment_adjustment_error_height">20dp</dimen>
 
     <dimen name="shift_dialog_height">200dp</dimen>
+
+    <dimen name="mixing_screen_seekbar_margin_top">20dp</dimen>
+    <dimen name="mixing_screen_seekbar_margin_bottom">10dp</dimen>
 </resources>

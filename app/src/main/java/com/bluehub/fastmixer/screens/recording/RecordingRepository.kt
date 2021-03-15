@@ -9,10 +9,10 @@ class RecordingRepository @Inject constructor(
     private val recordingEngineProxy: RecordingEngineProxy,
     private val fileManager: FileManager) {
 
-    fun setupAudioSource(filePath: String): Int? {
+    fun setupAudioSource(filePath: String): Boolean {
         return fileManager.getFdForPath(filePath)?.also {
-            recordingEngineProxy.setupAudioSource(it)
-        }
+            recordingEngineProxy.setupAudioSource(it.fd)
+        } != null
     }
 
     fun stopRecording() {
@@ -27,32 +27,20 @@ class RecordingRepository @Inject constructor(
         recordingEngineProxy.stopLivePlayback()
     }
 
-    fun startPlaying(fd: Int): Boolean {
-        try {
-            return recordingEngineProxy.startPlayback()
-        } finally {
-            recordingEngineProxy.closeFd(fd)
-        }
+    fun startPlaying(): Boolean {
+        return recordingEngineProxy.startPlayback()
     }
 
-    fun startPlayingWithMixingTracks(fd: Int?): Boolean {
-        try {
-            return recordingEngineProxy.startPlaybackWithMixingTracks()
-        } finally {
-            fd?.let(recordingEngineProxy::closeFd)
-        }
+    fun startPlayingWithMixingTracks(): Boolean {
+        return recordingEngineProxy.startPlaybackWithMixingTracks()
     }
 
     fun startPlayingWithMixingTracksWithoutSetup() {
         recordingEngineProxy.startPlayingWithMixingTracksWithoutSetup()
     }
 
-    fun startMixingTracksPlaying(fd: Int?): Boolean {
-        try {
-            return recordingEngineProxy.startMixingTracksPlayback()
-        } finally {
-            fd?.let(recordingEngineProxy::closeFd)
-        }
+    fun startMixingTracksPlaying(): Boolean {
+        return recordingEngineProxy.startMixingTracksPlayback()
     }
 
     fun stopMixingTracksPlay() {
@@ -75,20 +63,12 @@ class RecordingRepository @Inject constructor(
         recordingEngineProxy.flushWriteBuffer()
     }
 
-    fun restartPlayback(fd: Int?) {
-        try {
-            recordingEngineProxy.restartPlayback()
-        } finally {
-            fd?.let(recordingEngineProxy::closeFd)
-        }
+    fun restartPlayback() {
+        recordingEngineProxy.restartPlayback()
     }
 
-    fun restartPlaybackWithMixingTracks(fd: Int?) {
-        try {
-            recordingEngineProxy.restartPlaybackWithMixingTracks()
-        } finally {
-            fd?.let(recordingEngineProxy::closeFd)
-        }
+    fun restartPlaybackWithMixingTracks() {
+        recordingEngineProxy.restartPlaybackWithMixingTracks()
     }
 
     fun deleteAudioEngine() {

@@ -20,7 +20,7 @@ data class AudioFileUiState(
     var segmentStartSample: BehaviorSubject<Optional<Int>>,
     var segmentEndSample: BehaviorSubject<Optional<Int>>,
     var playTimer: Timer?
-) : Serializable {
+) {
 
     companion object {
         fun create(filePath: String, numSamples: Int): AudioFileUiState {
@@ -171,5 +171,30 @@ data class AudioFileUiState(
             position.coerceAtMost(numPtsToPlot - 1)
                 .coerceAtLeast(0)
         )
+    }
+
+    fun clearSegmentBounds() {
+        segmentStartSample.onNext(Optional.empty())
+        segmentEndSample.onNext(Optional.empty())
+
+        showSegmentSelector.onNext(false)
+    }
+
+    fun applySegmentBounds(left: Int, right: Int) {
+        if (showSegmentSelector.value) {
+            clearSegmentBounds()
+        }
+
+        if (left >= numSamples) return
+
+        var rightBound = right;
+        if (right >= numSamples) {
+            rightBound = numSamples - 1
+        }
+
+        segmentStartSample.onNext(Optional.of(left))
+        segmentEndSample.onNext(Optional.of(rightBound))
+
+        showSegmentSelector.onNext(true)
     }
 }

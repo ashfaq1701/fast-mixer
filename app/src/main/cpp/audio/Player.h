@@ -71,12 +71,20 @@ public:
     void clearSources();
     void syncPlayHeads();
 
+    void setPlayerBoundStart(int64_t boundStart);
+    void setPlayerBoundEnd(int64_t boundEnd);
+    void resetPlayerBoundStart();
+    void resetPlayerBoundEnd();
+
 private:
     int32_t mReadFrameIndex = 0;
     float addedMaxSampleValue = FLT_MIN;
     atomic<bool> mIsPlaying { false };
     function<void(void)> mStopPlaybackCallback = nullptr;
     map<string, shared_ptr<DataSource>> mSourceMap;
+
+    int64_t mSourceBoundStart = -1;
+    int64_t mSourceBoundEnd = -1;
 
     void updateAddedMax();
     void renderSilence(float*, int32_t);
