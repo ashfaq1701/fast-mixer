@@ -287,8 +287,14 @@ int64_t FFMpegExtractor::decode(int fd, uint8_t* targetData, AudioProperties tar
 
             // Pass our compressed data into the codec
             result = avcodec_send_packet(codecContext.get(), &avPacket);
-            if (result != 0) {
+            if (result == AVERROR(EOF) || result == AVERROR(EINVAL)) {
+                LOGE("avcodec_send_packet aborting with unrecoverable error: %s", av_err2str(result));
                 goto cleanup;
+            } else if (result < 0) {
+                LOGI("avcodec_send_packet returned error: %s", av_err2str(result));
+                avPacket.size = 0;
+                avPacket.data = nullptr;
+                continue;
             }
 
             // Retrieve our raw data from the codec
@@ -341,6 +347,9 @@ int64_t FFMpegExtractor::decode(int fd, uint8_t* targetData, AudioProperties tar
     LOGD("DECODE END");
 
     cleanup:
+
+    avPacket.size = 0;
+    avPacket.data = nullptr;
 
     if (bytesWritten > 0) {
         returnValue = bytesWritten;
