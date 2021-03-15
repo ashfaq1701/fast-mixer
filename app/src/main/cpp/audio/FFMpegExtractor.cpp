@@ -292,8 +292,7 @@ int64_t FFMpegExtractor::decode(int fd, uint8_t* targetData, AudioProperties tar
                 goto cleanup;
             } else if (result < 0) {
                 LOGI("avcodec_send_packet returned error: %s", av_err2str(result));
-                avPacket.size = 0;
-                avPacket.data = nullptr;
+                av_packet_unref(&avPacket);
                 continue;
             }
 
@@ -302,8 +301,7 @@ int64_t FFMpegExtractor::decode(int fd, uint8_t* targetData, AudioProperties tar
             if (result == AVERROR(EAGAIN)) {
                 // The codec needs more data before it can decode
                 LOGI("avcodec_receive_frame returned EAGAIN");
-                avPacket.size = 0;
-                avPacket.data = nullptr;
+                av_packet_unref(&avPacket);
                 continue;
             } else if (result != 0) {
                 LOGE("avcodec_receive_frame error: %s", av_err2str(result));
@@ -338,8 +336,7 @@ int64_t FFMpegExtractor::decode(int fd, uint8_t* targetData, AudioProperties tar
             bytesWritten += bytesToWrite;
             av_freep(&buffer1);
 
-            avPacket.size = 0;
-            avPacket.data = nullptr;
+            av_packet_unref(&avPacket);
         }
     }
 
@@ -347,9 +344,6 @@ int64_t FFMpegExtractor::decode(int fd, uint8_t* targetData, AudioProperties tar
     LOGD("DECODE END");
 
     cleanup:
-
-    avPacket.size = 0;
-    avPacket.data = nullptr;
 
     if (bytesWritten > 0) {
         returnValue = bytesWritten;
