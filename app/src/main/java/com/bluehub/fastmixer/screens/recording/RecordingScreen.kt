@@ -250,8 +250,6 @@ class RecordingScreen : BaseFragment<RecordingScreenViewModel>() {
         audioRecordView.recreate()
 
         setupVisualizerObserver()
-
-
     }
 
 }
