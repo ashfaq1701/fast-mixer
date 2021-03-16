@@ -35,6 +35,7 @@
     <string name="play_head_label">Play Head:</string>
     <string name="start_ms">Start (ms)</string>
     <string name="duration_ms">Duration (ms)</string>
+    <string name="output_file_name">File name</string>
 
     <string name="error_segment_bounds_required">Segment start and duration has to be set</string>
     <string name="error_segment_duration_should_be_less_than_duration">Segment duration should be less than file duration</string>
@@ -49,5 +50,6 @@
     <string name="paste">Paste</string>
     <string name="paste_new">Paste New</string>
     <string name="mute">Mute</string>
+    <string name="wav_extension">.wav</string>
 
 </resources>

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/segment_adjustment_dialog_height"
+        android:minWidth="@dimen/dialog_min_width"
+        android:minHeight="@dimen/shift_dialog_height"
+        android:paddingHorizontal="@dimen/dialog_layout_padding"
+        android:paddingVertical="@dimen/dialog_vertical_padding"
+        tools:context=".screens.mixing.modals.WriteDialog">
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/writeFileName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:hint="@string/output_file_name">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/shiftDuration"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="number" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/wav_extension"
+            android:layout_marginEnd="@dimen/file_extension_margin_right"
+            app:layout_constraintTop_toTopOf="@id/writeFileName"
+            app:layout_constraintBottom_toBottomOf="@id/writeFileName"
+            app:layout_constraintEnd_toEndOf="@id/writeFileName" />
+
+        <TextView
+            android:id="@+id/errorText"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/segment_adjustment_error_height"
+            app:layout_constraintBottom_toTopOf="@id/performWrite"
+            app:layout_constraintStart_toStartOf="parent"
+            android:gravity="center"
+            android:layout_marginBottom="@dimen/segment_adjustment_error_margin_bottom"
+            android:textColor="@color/red"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:text="Could not save data" />
+
+        <Button
+            android:id="@+id/performWrite"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/common_save"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/cancelWrite"
+            android:layout_marginEnd="@dimen/dialog_button_margin" />
+
+        <Button
+            android:id="@+id/cancelWrite"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/common_close"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginEnd="@dimen/dialog_button_margin"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

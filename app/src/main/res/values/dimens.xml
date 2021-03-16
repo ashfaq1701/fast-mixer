@@ -73,4 +73,6 @@
 
     <dimen name="mixing_screen_seekbar_margin_top">20dp</dimen>
     <dimen name="mixing_screen_seekbar_margin_bottom">10dp</dimen>
+
+    <dimen name="file_extension_margin_right">20dp</dimen>
 </resources>
