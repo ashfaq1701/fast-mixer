@@ -308,6 +308,10 @@ void MixingEngine::pasteNewFromClipboard(string fileId) {
     fileId.erase();
 }
 
+void writeToDisk() {
+
+}
+
 void MixingEngine::setPlayerBoundStart(int64_t boundStart) {
     mMixingIO.setPlayerBoundStart(boundStart);
 }
