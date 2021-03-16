@@ -74,6 +74,8 @@ public:
 
     void resetPlayerBoundEnd();
 
+    bool writeToFile(string* filePaths, int count, int fd);
+
 private:
 
     const char* TAG = "Mixing Engine:: %s";

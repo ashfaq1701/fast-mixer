@@ -75,4 +75,5 @@
     <dimen name="mixing_screen_seekbar_margin_bottom">10dp</dimen>
 
     <dimen name="file_extension_margin_right">20dp</dimen>
+    <dimen name="file_clear_margin_right">10dp</dimen>
 </resources>

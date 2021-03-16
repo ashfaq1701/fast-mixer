@@ -57,6 +57,11 @@ void MixingIO::addSourceMap(map<string, shared_ptr<DataSource>> playMap) {
     syncPlayHeads();
 }
 
+bool MixingIO::writeSourcesToFile(map<string, shared_ptr<DataSource>> playMap, int fd) {
+    MixedAudioWriter mixedAudioWriter(playMap);
+    mixedAudioWriter.writeToFile(fd);
+}
+
 void MixingIO::syncPlayHeads() {
     mPlayer->syncPlayHeads();
 }

@@ -74,6 +74,8 @@ class MixingRepository @Inject constructor(val mixingEngineProxy: MixingEnginePr
 
     fun resetPlayerBoundEnd() = mixingEngineProxy.resetPlayerBoundEnd()
 
+    fun writeToFile(pathList: List<String>, fd: Int) = mixingEngineProxy.writeToFile(pathList.toTypedArray(), fd)
+
     fun clearSources() {
         mixingEngineProxy.clearPlayerSources()
     }

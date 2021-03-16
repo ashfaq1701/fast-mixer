@@ -46,6 +46,7 @@ add_library( # Sets the name of the library.
         audio/FileDataSource.cpp
         audio/BufferedDataSource.cpp
         audio/SourceStore.cpp
+        audio/MixedAudioWriter.cpp
         audio/Player.cpp
         audio/FFMpegExtractor.cpp
         recording/recording-lib.cpp

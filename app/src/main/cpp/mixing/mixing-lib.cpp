@@ -358,6 +358,26 @@ extern "C" {
         mixingEngine->resetPlayerBoundStart();
     }
 
+    JNIEXPORT jboolean JNICALL
+    Java_com_bluehub_fastmixer_audio_MixingEngine_writeToFile(JNIEnv *env, jclass, jobjectArray filePaths, jint fd) {
+        if (!mixingEngine) {
+            LOGE("writeToFile: mixingEngine is null, you must call create() method before calling this method");
+            return false;
+        }
+
+        jint numElements = env->GetArrayLength(filePaths);
+        string strArr[numElements];
+
+        for (int i = 0; i < numElements; i++) {
+            jstring elem = (jstring) env->GetObjectArrayElement(filePaths, i);
+            strArr[i] = java_str_to_c_str(env, elem);
+        }
+
+        string* strPtr = strArr;
+
+        return mixingEngine->writeToFile(strPtr, numElements, fd);
+    }
+
     JNIEXPORT void  JNICALL
     Java_com_bluehub_fastmixer_audio_MixingEngine_resetPlayerBoundEnd(JNIEnv *env, jclass) {
         if (!mixingEngine) {

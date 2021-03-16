@@ -11,6 +11,7 @@
 #include <BufferedDataSource.h>
 #include "streams/MixingStreamConstants.h"
 #include "../audio/Player.h"
+#include "../audio/MixedAudioWriter.h"
 
 using namespace std;
 
@@ -43,6 +44,8 @@ public:
     void setPlayerBoundEnd(int64_t boundEnd);
     void resetPlayerBoundStart();
     void resetPlayerBoundEnd();
+
+    bool writeSourcesToFile(map<string, shared_ptr<DataSource>> playMap, int fd);
 
 private:
     shared_ptr<Player> mPlayer {nullptr};

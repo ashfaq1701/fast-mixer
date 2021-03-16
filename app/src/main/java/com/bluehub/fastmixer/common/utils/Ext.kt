@@ -9,3 +9,10 @@ fun <T> MutableList<T>.reInitList(anotherList: List<T>) {
     removeAll { true }
     this.addAll(anotherList)
 }
+
+fun getRandomString(length: Int) : String {
+    val allowedChars = ('A'..'Z') + ('a'..'z') + ('0'..'9')
+    return (1..length)
+        .map { allowedChars.random() }
+        .joinToString("")
+}

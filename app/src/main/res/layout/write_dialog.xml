@@ -14,7 +14,7 @@
         tools:context=".screens.mixing.modals.WriteDialog">
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/writeFileName"
+            android:id="@+id/writeFileNameLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:layout_constraintTop_toTopOf="parent"
@@ -22,7 +22,7 @@
             android:hint="@string/output_file_name">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/shiftDuration"
+                android:id="@+id/writeFileName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="number" />
@@ -30,13 +30,24 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <TextView
+            android:id="@+id/fileExtensionText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/wav_extension"
             android:layout_marginEnd="@dimen/file_extension_margin_right"
-            app:layout_constraintTop_toTopOf="@id/writeFileName"
-            app:layout_constraintBottom_toBottomOf="@id/writeFileName"
-            app:layout_constraintEnd_toEndOf="@id/writeFileName" />
+            app:layout_constraintTop_toTopOf="@id/writeFileNameLayout"
+            app:layout_constraintBottom_toBottomOf="@id/writeFileNameLayout"
+            app:layout_constraintEnd_toEndOf="@id/writeFileNameLayout" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/clearAmountIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="@id/writeFileNameLayout"
+            app:layout_constraintBottom_toBottomOf="@id/writeFileNameLayout"
+            app:layout_constraintEnd_toStartOf="@id/fileExtensionText"
+            android:layout_marginEnd="@dimen/file_clear_margin_right"
+            app:srcCompat="@drawable/ic_clear" />
 
         <TextView
             android:id="@+id/errorText"
@@ -67,5 +78,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginEnd="@dimen/dialog_button_margin"/>
+
+        <include layout="@layout/view_loading" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

@@ -62,6 +62,8 @@ class MixingEngine {
 
         @JvmStatic external fun resetPlayerBoundEnd()
 
+        @JvmStatic external fun writeToFile(pathList: Array<String>, fd: Int): Boolean
+
         @JvmStatic external fun delete()
     }
 }
