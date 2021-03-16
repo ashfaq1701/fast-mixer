@@ -2,6 +2,7 @@ package com.bluehub.fastmixer.screens.recording
 
 import android.Manifest
 import android.content.DialogInterface
+import android.content.res.Configuration
 import android.os.Bundle
 import android.view.*
 import android.widget.SeekBar
@@ -20,6 +21,7 @@ import com.visualizer.amplitude.AudioRecordView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.recording_screen.*
 import kotlinx.android.synthetic.main.view_loading.*
+import timber.log.Timber
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -118,11 +120,7 @@ class RecordingScreen : BaseFragment<RecordingScreenViewModel>() {
             }
         })
 
-        viewModel.audioVisualizerMaxAmplitude.observe(viewLifecycleOwner, {
-            if (viewModel.audioVisualizerRunning.value == true) {
-                audioRecordView.update(it)
-            }
-        })
+        setupVisualizerObserver()
 
         viewModel.audioVisualizerRunning.observe(viewLifecycleOwner, {
             audioRecordView.recreate()
@@ -173,6 +171,14 @@ class RecordingScreen : BaseFragment<RecordingScreenViewModel>() {
 
         viewModel.isResetButtonEnabled.observe(viewLifecycleOwner, {
             reset.isEnabled = it
+        })
+    }
+
+    private fun setupVisualizerObserver() {
+        viewModel.audioVisualizerMaxAmplitude.observe(viewLifecycleOwner, {
+            if (viewModel.audioVisualizerRunning.value == true) {
+                audioRecordView.update(it)
+            }
         })
     }
 
@@ -234,6 +240,18 @@ class RecordingScreen : BaseFragment<RecordingScreenViewModel>() {
 
         alertBuilder.setCancelable(false)
             .show()
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+
+        viewModel.audioVisualizerMaxAmplitude.removeObservers(viewLifecycleOwner)
+
+        audioRecordView.recreate()
+
+        setupVisualizerObserver()
+
+
     }
 
 }

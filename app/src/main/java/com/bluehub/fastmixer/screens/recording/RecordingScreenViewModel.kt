@@ -9,7 +9,7 @@ import com.bluehub.fastmixer.BR
 import com.bluehub.fastmixer.R
 import com.bluehub.fastmixer.broadcastReceivers.AudioDeviceChangeListener
 import com.bluehub.fastmixer.common.repositories.AudioRepository
-import com.bluehub.fastmixer.common.utils.*
+import com.bluehub.fastmixer.common.utils.BooleanCombinedLiveData
 import com.bluehub.fastmixer.common.viewmodel.BaseViewModel
 import com.bluehub.fastmixer.screens.mixing.AudioFileStore
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -70,31 +70,31 @@ class RecordingScreenViewModel @Inject constructor (@ApplicationContext val cont
     private var seekbarTimer: Timer? = null
     private var recordingTimer: Timer?  = null
 
-    private val _isLoading = MutableLiveData<Boolean>(false)
+    private val _isLoading = MutableLiveData(false)
     val isLoading: LiveData<Boolean>
         get() = _isLoading
 
-    private val _eventIsRecording = MutableLiveData<Boolean>(false)
+    private val _eventIsRecording = MutableLiveData(false)
     val eventIsRecording: LiveData<Boolean>
         get() = _eventIsRecording
 
-    private val _eventIsPlaying = MutableLiveData<Boolean>(false)
+    private val _eventIsPlaying = MutableLiveData(false)
     val eventIsPlaying: LiveData<Boolean>
         get() = _eventIsPlaying
 
-    private val _eventIsPlayingWithMixingTracks = MutableLiveData<Boolean>(false)
+    private val _eventIsPlayingWithMixingTracks = MutableLiveData(false)
     val eventIsPlayingWithMixingTracks: LiveData<Boolean>
         get() = _eventIsPlayingWithMixingTracks
 
-    private val _eventLivePlaybackSet = MutableLiveData<Boolean>(false)
+    private val _eventLivePlaybackSet = MutableLiveData(false)
 
-    private val _eventGoBack = MutableLiveData<Boolean>(false)
+    private val _eventGoBack = MutableLiveData(false)
     val eventGoBack: LiveData<Boolean>
         get() = _eventGoBack
 
-    private val _recordingPermissionGranted = MutableLiveData<Boolean>(false)
+    private val _recordingPermissionGranted = MutableLiveData(false)
 
-    private val _requestRecordingPermission = MutableLiveData<Boolean>(false)
+    private val _requestRecordingPermission = MutableLiveData(false)
     val requestRecordingPermission: LiveData<Boolean>
         get() = _requestRecordingPermission
 
@@ -105,32 +105,32 @@ class RecordingScreenViewModel @Inject constructor (@ApplicationContext val cont
             context.getString(R.string.start_recording_label)
     }
 
-    private val _seekbarProgress = MutableLiveData<Int>(0)
+    private val _seekbarProgress = MutableLiveData(0)
     val seekbarProgress: LiveData<Int>
         get() = _seekbarProgress
 
-    private val _seekbarMaxValue = MutableLiveData<Int>(0)
+    private val _seekbarMaxValue = MutableLiveData(0)
     val seekbarMaxValue: LiveData<Int>
         get() = _seekbarMaxValue
 
-    private val _audioVisualizerMaxAmplitude = MutableLiveData<Int>(0)
+    private val _audioVisualizerMaxAmplitude = MutableLiveData<Int>()
     val audioVisualizerMaxAmplitude: LiveData<Int>
         get() = _audioVisualizerMaxAmplitude
 
-    private val _audioVisualizerRunning = MutableLiveData<Boolean>(false)
+    private val _audioVisualizerRunning = MutableLiveData(false)
     val audioVisualizerRunning: LiveData<Boolean>
         get() = _audioVisualizerRunning
 
-    private val _recordingTimerText = MutableLiveData<String>("00:00")
+    private val _recordingTimerText = MutableLiveData("00:00")
     val recordingTimerText: LiveData<String>
         get() = _recordingTimerText
 
-    private val _livePlaybackEnabled = MutableLiveData<Boolean>(false)
+    private val _livePlaybackEnabled = MutableLiveData(false)
     val livePlaybackEnabled: LiveData<Boolean>
         get() = _livePlaybackEnabled
 
 
-    val mixingPlayActive = MutableLiveData<Boolean>(false)
+    val mixingPlayActive = MutableLiveData(false)
 
     val isRecordButtonEnabled = BooleanCombinedLiveData(
         true,
@@ -491,7 +491,9 @@ class RecordingScreenViewModel @Inject constructor (@ApplicationContext val cont
         visualizerTimer = Timer()
         visualizerTimer?.schedule(object : TimerTask() {
             override fun run() {
-                _audioVisualizerMaxAmplitude.postValue(repository.getCurrentMax())
+                viewModelScope.launch {
+                    _audioVisualizerMaxAmplitude.value = repository.getCurrentMax()
+                }
             }
         }, 0, 50)
     }
