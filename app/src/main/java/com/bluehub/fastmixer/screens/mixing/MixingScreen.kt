@@ -57,7 +57,6 @@ class MixingScreen : BaseFragment<MixingScreenViewModel>() {
         binding.lifecycleOwner = viewLifecycleOwner
 
         audioFileListAdapter = AudioFileListAdapter(
-            viewModel.audioFileStore.audioFiles,
             AudioFileEventListeners(
                 { filePath: String -> viewModel.readSamples(filePath) },
                 { filePath: String -> viewModel.deleteFile(filePath) },
@@ -100,6 +99,10 @@ class MixingScreen : BaseFragment<MixingScreenViewModel>() {
                 findNavController().navigate(actionMixingScreenToRecordingScreen())
                 viewModel.onRecordNavigated()
             }
+        })
+
+        viewModel.audioFilesLiveData.observe(viewLifecycleOwner, {
+            audioFileListAdapter.submitList(it)
         })
 
         viewModel.itemRemovedIdx.observe(viewLifecycleOwner, {

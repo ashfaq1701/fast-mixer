@@ -16,11 +16,11 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MixingScreenViewModel @Inject constructor(@ApplicationContext val context: Context,
-                                                    private val fileManager: FileManager,
-                                                    private val mixingRepository: MixingRepository,
-                                                    private val playFlagStore: PlayFlagStore,
-                                                    val fileWaveViewStore: FileWaveViewStore,
-                                                    val audioFileStore: AudioFileStore)
+                                                private val fileManager: FileManager,
+                                                private val audioFileStore: AudioFileStore,
+                                                private val mixingRepository: MixingRepository,
+                                                private val playFlagStore: PlayFlagStore,
+                                                val fileWaveViewStore: FileWaveViewStore)
     : BaseViewModel() {
 
     companion object {
