@@ -18,9 +18,9 @@ import javax.inject.Inject
 class MixingScreenViewModel @Inject constructor(@ApplicationContext val context: Context,
                                                     private val fileManager: FileManager,
                                                     private val mixingRepository: MixingRepository,
-                                                    private val audioFileStore: AudioFileStore,
                                                     private val playFlagStore: PlayFlagStore,
-                                                    val fileWaveViewStore: FileWaveViewStore)
+                                                    val fileWaveViewStore: FileWaveViewStore,
+                                                    val audioFileStore: AudioFileStore)
     : BaseViewModel() {
 
     companion object {
@@ -49,6 +49,10 @@ class MixingScreenViewModel @Inject constructor(@ApplicationContext val context:
     val audioFilesLiveData: LiveData<MutableList<AudioFileUiState>>
         get() = _audioFilesLiveData
 
+    private val _audioFileToAdd = MutableLiveData<AudioFileUiState?>(null)
+    val audioFileToAdd: LiveData<AudioFileUiState?>
+        get() = _audioFileToAdd
+
     private val _eventDrawerOpen = MutableLiveData<Boolean>()
     val eventDrawerOpen: LiveData<Boolean>
         get() = _eventDrawerOpen
@@ -61,13 +65,9 @@ class MixingScreenViewModel @Inject constructor(@ApplicationContext val context:
     val eventRead: LiveData<Boolean>
         get() = _eventRead
 
-    private val _itemRemovedIdx = MutableLiveData<Int>()
-    val itemRemovedIdx: LiveData<Int>
-        get() = _itemRemovedIdx
-
-    private val _itemAddedIdx = MutableLiveData<Int>()
-    val itemAddedIdx: LiveData<Int>
-        get() = _itemAddedIdx
+    private val _itemRemoveIdx = MutableLiveData<Int>()
+    val itemRemoveIdx: LiveData<Int>
+        get() = _itemRemoveIdx
 
     val isPlaying: LiveData<Boolean>
         get() = playFlagStore.isPlaying
@@ -157,10 +157,6 @@ class MixingScreenViewModel @Inject constructor(@ApplicationContext val context:
         _eventRecord.value = false
     }
 
-    fun resetItemAddedIdx() {
-        _itemAddedIdx.value = null
-    }
-
     fun toggleBottomDrawer() {
         _eventDrawerOpen.value = _eventDrawerOpen.value == null || _eventDrawerOpen.value == false
     }
@@ -169,6 +165,10 @@ class MixingScreenViewModel @Inject constructor(@ApplicationContext val context:
         if (_eventDrawerOpen.value == true) {
             _eventDrawerOpen.value = false
         }
+    }
+
+    fun setAudioFileLiveData(audioFileList: MutableList<AudioFileUiState>) {
+        _audioFilesLiveData.value = audioFileList
     }
 
     fun addRecordedFilePath(filePath: String) {
@@ -185,10 +185,8 @@ class MixingScreenViewModel @Inject constructor(@ApplicationContext val context:
                     withContext(Dispatchers.IO) {
                         mixingRepository.addFile(filePath, fd.fd)
                         val totalSamples = getTotalSamples(filePath)
-                        audioFiles.add(AudioFileUiState.create(filePath, totalSamples))
+                        _audioFileToAdd.postValue(AudioFileUiState.create(filePath, totalSamples))
                     }
-                    _audioFilesLiveData.value = audioFiles
-                    _itemAddedIdx.value = audioFiles.size - 1
 
                     _isLoading.value = false
                 }
@@ -215,12 +213,7 @@ class MixingScreenViewModel @Inject constructor(@ApplicationContext val context:
                 val totalSamples = getTotalSamples(newPath)
 
                 audioFileStore.run {
-                    audioFiles.add(AudioFileUiState.create(newPath, totalSamples))
-
-                    withContext(Dispatchers.Main) {
-                        _audioFilesLiveData.value = audioFiles
-                        _itemAddedIdx.value = audioFiles.size - 1
-                    }
+                    _audioFileToAdd.postValue(AudioFileUiState.create(newPath, totalSamples))
                 }
             }
 
@@ -252,8 +245,8 @@ class MixingScreenViewModel @Inject constructor(@ApplicationContext val context:
                 val firstIdx = idxToRemove.firstOrNull()
 
                 firstIdx?.let {
-                    val removedFile = audioFiles.removeAt(it)
-                    fileManager.removeFile(removedFile.path)
+                    val removeFile = audioFiles[it]
+                    fileManager.removeFile(removeFile.path)
 
                     playFlagStore.apply {
                         if (isPlaying.value == true) {
@@ -263,8 +256,7 @@ class MixingScreenViewModel @Inject constructor(@ApplicationContext val context:
                         }
                     }
 
-                    _audioFilesLiveData.value = audioFiles
-                    _itemRemovedIdx.value = it
+                    _itemRemoveIdx.value = it
                 }
             }
         }
@@ -313,8 +305,8 @@ class MixingScreenViewModel @Inject constructor(@ApplicationContext val context:
         }
     }
 
-    fun resetItemRemovedIdx() {
-        _itemRemovedIdx.value = null
+    fun resetItemRemoveIdx() {
+        _itemRemoveIdx.value = null
     }
 
 
@@ -477,10 +469,8 @@ class MixingScreenViewModel @Inject constructor(@ApplicationContext val context:
                 withContext(Dispatchers.IO) {
                     mixingRepository.pasteNewFromClipboard(fileId)
                     val totalSamples = getTotalSamples(fileId)
-                    audioFiles.add(AudioFileUiState.create(fileId, totalSamples))
+                    _audioFileToAdd.postValue(AudioFileUiState.create(fileId, totalSamples))
                 }
-                _audioFilesLiveData.value = audioFiles
-                _itemAddedIdx.value = audioFiles.size - 1
             }
 
             _isLoading.postValue(false)
@@ -546,6 +536,10 @@ class MixingScreenViewModel @Inject constructor(@ApplicationContext val context:
 
     fun resetOpenWriteDialog() {
         _actionOpenWriteDialog.value = false
+    }
+
+    fun resetAudioFileToAdd() {
+        _audioFileToAdd.value = null
     }
 
     fun startGroupPlayTimer() {

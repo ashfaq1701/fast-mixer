@@ -8,13 +8,20 @@ import com.bluehub.fastmixer.databinding.ListItemAudioFileBinding
 import kotlinx.coroutines.Deferred
 
 class AudioFileListAdapter(
+    private val audioFileList: MutableList<AudioFileUiState>,
+    private val audioFileLiveDataSetter: (MutableList<AudioFileUiState>) -> Unit,
     private val clickListener: AudioFileEventListeners,
     private val fileWaveViewStore: FileWaveViewStore)
     : ListAdapter<AudioFileUiState, AudioFileListAdapter.ViewHolder>(AudioFileDiffCallback()) {
+
+    init {
+        submitList(audioFileList)
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val holder = ViewHolder.from(parent)
-        holder.setIsRecyclable(false)
-        return holder
+        return ViewHolder.from(parent).also {
+            it.setIsRecyclable(false)
+        }
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -41,16 +48,18 @@ class AudioFileListAdapter(
         }
     }
 
-    fun notifyAddItem(pos: Int) {
-        notifyItemInserted(pos)
-        notifyItemChanged(pos)
+    fun addItem(audioFileUiState: AudioFileUiState) {
+        audioFileList.add(audioFileUiState)
+        submitList(audioFileList)
         notifyDataSetChanged()
+        audioFileLiveDataSetter(audioFileList)
     }
 
-    fun notifyRemoveItem(pos: Int) {
-        notifyItemRemoved(pos)
-        notifyItemRangeChanged(pos, itemCount)
+    fun removeAtIndex(removeIdx: Int) {
+        audioFileList.removeAt(removeIdx)
+        submitList(audioFileList)
         notifyDataSetChanged()
+        audioFileLiveDataSetter(audioFileList)
     }
 }
 

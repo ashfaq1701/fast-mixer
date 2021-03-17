@@ -58,13 +58,16 @@ class MixingScreen : BaseFragment<MixingScreenViewModel>() {
         binding.lifecycleOwner = viewLifecycleOwner
 
         audioFileListAdapter = AudioFileListAdapter(
+            viewModel.audioFileStore.audioFiles,
+            { audioFileList: MutableList<AudioFileUiState> ->viewModel.setAudioFileLiveData(audioFileList) },
             AudioFileEventListeners(
                 { filePath: String -> viewModel.readSamples(filePath) },
                 { filePath: String -> viewModel.deleteFile(filePath) },
                 { filePath: String -> viewModel.togglePlay(filePath) }
             ),
-            viewModel.fileWaveViewStore,
+            viewModel.fileWaveViewStore
         )
+
         binding.audioFileListView.adapter = audioFileListAdapter
 
         navArguments.recordedFilePath?.let {
@@ -101,21 +104,17 @@ class MixingScreen : BaseFragment<MixingScreenViewModel>() {
             }
         })
 
-        viewModel.audioFilesLiveData.observe(viewLifecycleOwner, {
-            audioFileListAdapter.submitList(it)
-        })
-
-        viewModel.itemAddedIdx.observe(viewLifecycleOwner, {
-            if (it != null) {
-                audioFileListAdapter.notifyAddItem(it)
-                viewModel.resetItemAddedIdx()
+        viewModel.audioFileToAdd.observe(viewLifecycleOwner, {
+            it?.let { audioFileUiState ->
+                audioFileListAdapter.addItem(audioFileUiState)
+                viewModel.resetAudioFileToAdd()
             }
         })
 
-        viewModel.itemRemovedIdx.observe(viewLifecycleOwner, {
-            if (it != null) {
-                audioFileListAdapter.notifyRemoveItem(it)
-                viewModel.resetItemRemovedIdx()
+        viewModel.itemRemoveIdx.observe(viewLifecycleOwner, {
+            it?.let { removeIdx ->
+                audioFileListAdapter.removeAtIndex(removeIdx)
+                viewModel.resetItemRemoveIdx()
             }
         })
 
