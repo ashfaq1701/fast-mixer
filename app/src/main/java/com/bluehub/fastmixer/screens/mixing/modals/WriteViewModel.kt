@@ -26,36 +26,16 @@ class WriteViewModel @Inject constructor(
     val fileName: LiveData<String>
         get() = _fileName
 
-    private val writeFileDirectory: String?
-        get() = context.getExternalFilesDir(null)?.absolutePath
-
-    private val _writtenFilePath: MutableLiveData<String?> = MutableLiveData(null)
-    val writtenFilePath: LiveData<String?>
-        get() = _writtenFilePath
+    private val _writtenFileName: MutableLiveData<String?> = MutableLiveData(null)
+    val writtenFileName: LiveData<String?>
+        get() = _writtenFileName
 
     init {
-        _fileName.value = getRandomString(10)
+        _fileName.value = getRandomString(15)
     }
 
     fun setFileName(name: String) {
         _fileName.value = name
-    }
-
-    private fun createAndGetFilePath(directory: String, fileName: String) : String? {
-        val targetDir = "$directory/output/"
-        val filePath = "$targetDir$fileName.wav"
-
-        val fileObj = File(filePath)
-
-        return if (fileObj.exists()) {
-            null
-        } else {
-            File(targetDir).mkdirs()
-
-            fileObj.createNewFile()
-
-            filePath
-        }
     }
 
     fun performWrite() {
@@ -70,17 +50,8 @@ class WriteViewModel @Inject constructor(
             return
         }
 
-        val writeDir = writeFileDirectory ?: run {
-            errorLiveData.value = context.getString(R.string.error_file_write_directory_could_not_be_obtained)
-            return
-        }
-
-        val filePath = createAndGetFilePath(writeDir, fileNameStr) ?: run {
-            errorLiveData.value = context.getString(R.string.error_file_exists_in_target_directory)
-            return
-        }
-
-        val fd = fileManager.getReadWriteFdForPath(filePath)?.fd ?: run {
+        val fileNameWithExt = "$fileNameStr.wav"
+        val fd = fileManager.getFileDescriptorForMedia(fileNameWithExt)?.fd ?: run {
             errorLiveData.value = context.getString(R.string.error_could_not_use_file_for_write)
             return
         }
@@ -94,16 +65,15 @@ class WriteViewModel @Inject constructor(
             isLoading.postValue(false)
 
             if (writeResult) {
-                _writtenFilePath.postValue(filePath)
+                _writtenFileName.postValue(fileNameWithExt)
             } else {
-                File(filePath).delete()
                 errorLiveData.value = context.getString(R.string.error_file_write_failed)
             }
         }
     }
 
-    fun resetWrittenFilePath() {
-        _writtenFilePath.value = null
+    fun resetWrittenFileName() {
+        _writtenFileName.value = null
     }
 
     fun cancelWrite() {

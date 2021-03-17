@@ -88,13 +88,13 @@ class WriteDialog : BaseDialogFragment<WriteViewModel>() {
             binding.errorText.text = it
         })
 
-        viewModel.writtenFilePath.observe(viewLifecycleOwner, { maybeFilePath ->
-            maybeFilePath?.let { filePath ->
+        viewModel.writtenFileName.observe(viewLifecycleOwner, { maybeFileName ->
+            maybeFileName?.let { fileName ->
 
-                val infoTxt = requireContext().getString(R.string.info_file_wrote_to_directory) + "\n$filePath"
+                val infoTxt = requireContext().getString(R.string.info_file_wrote_as_media) + "\n$fileName"
                 Toast.makeText(requireContext(), infoTxt, Toast.LENGTH_LONG).show()
 
-                viewModel.resetWrittenFilePath()
+                viewModel.resetWrittenFileName()
                 viewModel.closeDialog()
             }
         })

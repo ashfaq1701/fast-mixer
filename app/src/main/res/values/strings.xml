@@ -52,7 +52,7 @@
     <string name="error_could_not_use_file_for_write">Couldn\'t use file for write</string>
     <string name="error_file_write_failed">Write to target file failed</string>
 
-    <string name="info_file_wrote_to_directory">File wrote to directory</string>
+    <string name="info_file_wrote_as_media">File wrote as media</string>
 
     <string name="cut">Cut</string>
     <string name="copy">Copy</string>
