@@ -98,15 +98,21 @@ class FileWaveViewWidget(context: Context, attributeSet: AttributeSet?)
     }
 
     fun setAudioFileUiState(audioFileUiState: AudioFileUiState) {
-        mAudioFileUiState.onNext(audioFileUiState)
+        if (!mAudioFileUiState.hasValue() || mAudioFileUiState.value.path != audioFileUiState.path) {
+            mAudioFileUiState.onNext(audioFileUiState)
+        }
     }
 
     fun setAudioFileEventListeners(audioFileEventListeners: AudioFileEventListeners) {
-        mAudioFileEventListeners.onNext(audioFileEventListeners)
+        if (!mAudioFileEventListeners.hasValue()) {
+            mAudioFileEventListeners.onNext(audioFileEventListeners)
+        }
     }
 
     fun setFileWaveViewStore(fileWaveViewStore: FileWaveViewStore) {
-        mFileWaveViewStore.onNext(fileWaveViewStore)
+        if (!mFileWaveViewStore.hasValue()) {
+            mFileWaveViewStore.onNext(fileWaveViewStore)
+        }
     }
 
     private fun setupObservers() {
