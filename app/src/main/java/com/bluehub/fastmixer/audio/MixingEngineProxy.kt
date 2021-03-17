@@ -59,5 +59,7 @@ class MixingEngineProxy @Inject constructor() {
 
     fun resetPlayerBoundEnd() = MixingEngine.resetPlayerBoundEnd()
 
+    fun writeToFile(pathList: Array<String>, fd: Int) = MixingEngine.writeToFile(pathList, fd)
+
     fun delete() = MixingEngine.delete()
 }

@@ -10,7 +10,7 @@ class RecordingRepository @Inject constructor(
     private val fileManager: FileManager) {
 
     fun setupAudioSource(filePath: String): Boolean {
-        return fileManager.getFdForPath(filePath)?.also {
+        return fileManager.getReadOnlyFdForPath(filePath)?.also {
             recordingEngineProxy.setupAudioSource(it.fd)
         } != null
     }

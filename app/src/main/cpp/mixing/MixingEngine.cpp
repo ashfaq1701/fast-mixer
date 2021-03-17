@@ -308,6 +308,10 @@ void MixingEngine::pasteNewFromClipboard(string fileId) {
     fileId.erase();
 }
 
+void writeToDisk() {
+
+}
+
 void MixingEngine::setPlayerBoundStart(int64_t boundStart) {
     mMixingIO.setPlayerBoundStart(boundStart);
 }
@@ -318,6 +322,24 @@ void MixingEngine::setPlayerBoundEnd(int64_t boundEnd) {
 
 void MixingEngine::resetPlayerBoundStart() {
     mMixingIO.resetPlayerBoundStart();
+}
+
+bool MixingEngine::writeToFile(string* filePaths, int count, int fd) {
+
+    map<string, shared_ptr<DataSource>> sourcesMap;
+
+    for (int i = 0; i < count; i++) {
+        auto it = mSourceMapStore->sourceMap.find(filePaths[i]);
+        if (it != mSourceMapStore->sourceMap.end()) {
+            sourcesMap.insert(pair<string, shared_ptr<FileDataSource>>(it->first, it->second));
+        }
+    }
+
+    for (int i = 0; i < count; i++) {
+        filePaths[i].erase();
+    }
+
+    return mMixingIO.writeSourcesToFile(sourcesMap, fd);
 }
 
 void MixingEngine::resetPlayerBoundEnd() {

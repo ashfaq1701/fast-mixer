@@ -1,11 +1,13 @@
 package com.bluehub.fastmixer.common.utils
 
-import android.content.ContentResolver
-import android.content.Context
+import android.content.*
 import android.database.Cursor
 import android.net.Uri
+import android.os.Build
 import android.os.ParcelFileDescriptor
+import android.provider.MediaStore
 import android.provider.OpenableColumns
+import android.webkit.MimeTypeMap
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.*
 import javax.inject.Inject
@@ -28,41 +30,38 @@ class FileManager @Inject constructor(
         }
     }
 
-    fun getExtension(fileName: String) = fileName.substring(fileName.lastIndexOf("."))
-
-    fun copyFileFromUri(inputStream: InputStream, fileName: String, dir: String, newName: String): String {
-        val newPath = "$dir/$newName${getExtension(fileName)}"
-
-        var bis: BufferedInputStream? = null
-        var bos: BufferedOutputStream? = null
-
-        return try {
-            bis = BufferedInputStream(inputStream)
-            bos = BufferedOutputStream(FileOutputStream(newPath, false))
-
-            val buf = ByteArray(1024)
-            bis.read(buf)
-
-            do {
-                bos.write(buf)
-            } while (bis.read(buf) != -1)
-
-            newPath
-        } finally {
-            bis?.close()
-            bos?.close()
-        }
-    }
-
-    fun getFdForPath(path: String): ParcelFileDescriptor? {
+    fun getReadOnlyFdForPath(path: String): ParcelFileDescriptor? {
         val file = File(path)
         return if (file.exists()) {
             val uri = Uri.fromFile(file)
-            getFdForUri(uri)
+            getReadOnlyFdForUri(uri)
         } else null
     }
 
-    private fun getFdForUri(uri: Uri): ParcelFileDescriptor? {
+    private fun getReadOnlyFdForUri(uri: Uri): ParcelFileDescriptor? {
         return context.contentResolver.openFileDescriptor(uri, "r")
+    }
+
+    fun getFileDescriptorForMedia(fileName: String): ParcelFileDescriptor? {
+        val resolver = context.contentResolver
+
+        val audioCollection =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                MediaStore.Audio.Media.getContentUri(
+                    MediaStore.VOLUME_EXTERNAL_PRIMARY
+                )
+            } else {
+                MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
+            }
+
+        val newAudioDetails = ContentValues().apply {
+            put(MediaStore.Audio.Media.DISPLAY_NAME, fileName)
+            put(MediaStore.Audio.Media.MIME_TYPE, MimeTypeMap.getSingleton().getMimeTypeFromExtension("wav"))
+        }
+
+        return resolver
+            .insert(audioCollection, newAudioDetails)?.let {
+                resolver.openFileDescriptor(it, "rw")
+            }
     }
 }

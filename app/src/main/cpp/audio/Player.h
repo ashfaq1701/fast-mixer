@@ -28,11 +28,12 @@
 #include <android/asset_manager.h>
 
 #include "IRenderableAudio.h"
+#include "SourceStore.h"
 #include "DataSource.h"
 
 using namespace std;
 
-class Player : public IRenderableAudio{
+class Player : public IRenderableAudio, public SourceStore {
 
 public:
     /**
@@ -44,7 +45,8 @@ public:
      */
 
     Player(map<string, shared_ptr<DataSource>> sourceMap, function<void(void)> stopPlaybackCallback)
-        : mSourceMap{ sourceMap } {
+        : SourceStore(sourceMap) {
+
         mStopPlaybackCallback = stopPlaybackCallback;
 
         if (mSourceMap.size() > 1) {
@@ -62,11 +64,9 @@ public:
     void renderAudio(float *targetData, int32_t numFrames);
     void resetPlayHead() { mReadFrameIndex = 0; };
     int32_t getPlayHead() { return mReadFrameIndex; }
-    int64_t getMaxTotalSourceFrames();
 
     void setPlayHead(int32_t playHead);
     void setPlaying(bool isPlaying) { mIsPlaying = isPlaying; };
-    int64_t getTotalSampleFrames();
 
     void clearSources();
     void syncPlayHeads();
@@ -78,17 +78,13 @@ public:
 
 private:
     int32_t mReadFrameIndex = 0;
-    float addedMaxSampleValue = FLT_MIN;
     atomic<bool> mIsPlaying { false };
     function<void(void)> mStopPlaybackCallback = nullptr;
-    map<string, shared_ptr<DataSource>> mSourceMap;
 
     int64_t mSourceBoundStart = -1;
     int64_t mSourceBoundEnd = -1;
 
-    void updateAddedMax();
     void renderSilence(float*, int32_t);
-    float getMaxValueAcrossSources();
 };
 
 #endif //RHYTHMGAME_SOUNDRECORDING_H

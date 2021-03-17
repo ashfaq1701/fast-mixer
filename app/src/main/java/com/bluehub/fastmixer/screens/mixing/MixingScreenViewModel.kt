@@ -10,7 +10,6 @@ import com.bluehub.fastmixer.common.viewmodel.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.*
-import timber.log.Timber
 import java.io.File
 import java.util.*
 import javax.inject.Inject
@@ -103,12 +102,29 @@ class MixingScreenViewModel @Inject constructor(@ApplicationContext val context:
     val clipboardHasData: LiveData<Boolean>
         get() = _clipboardHasData
 
+    private val _actionOpenWriteDialog = MutableLiveData(false)
+    val actionOpenWriteDialog: LiveData<Boolean>
+        get() = _actionOpenWriteDialog
+
     private val playList: MutableList<String> = mutableListOf()
 
     val audioViewAction: MutableLiveData<AudioViewAction?> = MutableLiveData<AudioViewAction?>()
 
+    private val isLoadedFilesEmpty = Transformations.map(_audioFilesLiveData) {
+        it == null || it.size == 0
+    }
+
+    val writeButtonEnabled = BooleanCombinedLiveData(
+        true,
+        isLoadedFilesEmpty, actionOpenWriteDialog
+    ) { acc, curr ->
+        acc && !curr
+    }
+
     init {
         mixingRepository.createMixingEngine()
+
+        _audioFilesLiveData.value = audioFileStore.audioFiles
 
         fileWaveViewStore.run {
             setAudioFilesLiveData(audioFilesLiveData)
@@ -132,7 +148,9 @@ class MixingScreenViewModel @Inject constructor(@ApplicationContext val context:
     }
 
     fun onSaveToDisk() {
-
+        if (_actionOpenWriteDialog.value == false) {
+            _actionOpenWriteDialog.value = true
+        }
     }
 
     fun onRecordNavigated() {
@@ -155,7 +173,7 @@ class MixingScreenViewModel @Inject constructor(@ApplicationContext val context:
 
     fun addRecordedFilePath(filePath: String) {
         if (!fileManager.fileExists(filePath)) return
-        val fd = fileManager.getFdForPath(filePath) ?: return
+        val fd = fileManager.getReadOnlyFdForPath(filePath) ?: return
 
         audioFileStore.run {
             if (audioFiles.filter {
@@ -524,6 +542,10 @@ class MixingScreenViewModel @Inject constructor(@ApplicationContext val context:
 
     fun resetStates() {
         audioViewAction.value = null
+    }
+
+    fun resetOpenWriteDialog() {
+        _actionOpenWriteDialog.value = false
     }
 
     fun startGroupPlayTimer() {

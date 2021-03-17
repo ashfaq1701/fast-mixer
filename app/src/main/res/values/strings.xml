@@ -35,6 +35,7 @@
     <string name="play_head_label">Play Head:</string>
     <string name="start_ms">Start (ms)</string>
     <string name="duration_ms">Duration (ms)</string>
+    <string name="output_file_name">File name</string>
 
     <string name="error_segment_bounds_required">Segment start and duration has to be set</string>
     <string name="error_segment_duration_should_be_less_than_duration">Segment duration should be less than file duration</string>
@@ -44,10 +45,20 @@
     <string name="error_shift_duration_required">Shift duration has to be set</string>
     <string name="error_play_head_required">Play head has to be set</string>
     <string name="error_play_head_should_be_less_than_numsamples">Play head should be less than total samples</string>
+
+    <string name="error_write_file_name_cannot_be_empty">File name can\'t be empty</string>
+    <string name="error_file_write_directory_could_not_be_obtained">File write directory couldn\'t be obtained</string>
+    <string name="error_file_exists_in_target_directory">File exists in target directory</string>
+    <string name="error_could_not_use_file_for_write">Couldn\'t use file for write</string>
+    <string name="error_file_write_failed">Write to target file failed</string>
+
+    <string name="info_file_wrote_as_media">File wrote as media</string>
+
     <string name="cut">Cut</string>
     <string name="copy">Copy</string>
     <string name="paste">Paste</string>
     <string name="paste_new">Paste New</string>
     <string name="mute">Mute</string>
+    <string name="wav_extension">.wav</string>
 
 </resources>

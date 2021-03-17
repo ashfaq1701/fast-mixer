@@ -1,13 +1,13 @@
 package com.bluehub.fastmixer.screens.mixing
 
 import android.app.Activity
-import android.content.ContentResolver
-import android.content.Intent
+import android.content.*
 import android.os.Bundle
 import android.view.*
-import android.widget.SeekBar
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -24,6 +24,7 @@ import com.google.android.material.slider.Slider
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.view_loading.*
+import timber.log.Timber
 
 @AndroidEntryPoint
 class MixingScreen : BaseFragment<MixingScreenViewModel>() {
@@ -33,7 +34,7 @@ class MixingScreen : BaseFragment<MixingScreenViewModel>() {
 
     override val viewModel: MixingScreenViewModel by hiltNavGraphViewModels(R.id.nav_graph)
 
-    private lateinit var dataBinding: MixingScreenBinding
+    private lateinit var binding: MixingScreenBinding
 
     private lateinit var audioFileListAdapter: AudioFileListAdapter
 
@@ -47,14 +48,14 @@ class MixingScreen : BaseFragment<MixingScreenViewModel>() {
             inflater: LayoutInflater, container: ViewGroup?,
             savedInstanceState: Bundle?
     ): View {
-        dataBinding = DataBindingUtil
+        binding = DataBindingUtil
             .inflate(inflater, R.layout.mixing_screen, container, false)
 
         viewModel.resetStates()
         MixingScreenViewModel.setInstance(viewModel)
-        dataBinding.mixingScreenViewModel = viewModel
+        binding.mixingScreenViewModel = viewModel
 
-        dataBinding.lifecycleOwner = viewLifecycleOwner
+        binding.lifecycleOwner = viewLifecycleOwner
 
         audioFileListAdapter = AudioFileListAdapter(
             AudioFileEventListeners(
@@ -64,7 +65,7 @@ class MixingScreen : BaseFragment<MixingScreenViewModel>() {
             ),
             viewModel.fileWaveViewStore,
         )
-        dataBinding.audioFileListView.adapter = audioFileListAdapter
+        binding.audioFileListView.adapter = audioFileListAdapter
 
         navArguments.recordedFilePath?.let {
             if (it.isNotEmpty()) viewModel.addRecordedFilePath(it)
@@ -76,7 +77,7 @@ class MixingScreen : BaseFragment<MixingScreenViewModel>() {
         setupView()
         setupAnimations()
 
-        return dataBinding.root
+        return binding.root
     }
 
     private fun setupViewModel() {
@@ -86,10 +87,10 @@ class MixingScreen : BaseFragment<MixingScreenViewModel>() {
         viewModel.eventDrawerOpen.observe(viewLifecycleOwner, { isOpen ->
             if (isOpen) {
                 showBottomDrawer()
-                dataBinding.drawerControl.setImageResource(R.drawable.drawer_control_button_close)
+                binding.drawerControl.setImageResource(R.drawable.drawer_control_button_close)
             } else {
                 hideBottomDrawer()
-                dataBinding.drawerControl.setImageResource(R.drawable.drawer_control_button_open)
+                binding.drawerControl.setImageResource(R.drawable.drawer_control_button_open)
             }
         })
 
@@ -126,22 +127,22 @@ class MixingScreen : BaseFragment<MixingScreenViewModel>() {
         })
 
         viewModel.isGroupPlaying.observe(viewLifecycleOwner, {
-            dataBinding.groupPlayBoundRangeSlider.isEnabled = !it
+            binding.groupPlayBoundRangeSlider.isEnabled = !it
 
             if (it) {
-                dataBinding.groupPlayPause.setBtnDrawable(
+                binding.groupPlayPause.setBtnDrawable(
                     ContextCompat.getDrawable(requireContext(), R.drawable.group_pause_button)
                 )
-                dataBinding.groupPlayPause.setBtnLabel(
+                binding.groupPlayPause.setBtnLabel(
                     requireContext().getString(R.string.pause)
                 )
 
                 viewModel.startGroupPlayTimer()
             } else {
-                dataBinding.groupPlayPause.setBtnDrawable(
+                binding.groupPlayPause.setBtnDrawable(
                     ContextCompat.getDrawable(requireContext(), R.drawable.group_play_button)
                 )
-                dataBinding.groupPlayPause.setBtnLabel(
+                binding.groupPlayPause.setBtnLabel(
                     requireContext().getString(R.string.play)
                 )
 
@@ -150,7 +151,7 @@ class MixingScreen : BaseFragment<MixingScreenViewModel>() {
         })
 
         viewModel.isPlaying.observe(viewLifecycleOwner, {
-            dataBinding.groupPlayPause.setBtnEnabled(!it)
+            binding.groupPlayPause.setBtnEnabled(!it)
         })
 
         viewModel.audioViewAction.observe(viewLifecycleOwner, {
@@ -184,7 +185,7 @@ class MixingScreen : BaseFragment<MixingScreenViewModel>() {
         viewModel.fileWaveViewStore.isPasteEnabled
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe {
-                dataBinding.pasteAsNew.setIsEnabled(it)
+                binding.pasteAsNew.setIsEnabled(it)
             }
 
         viewModel.isLoading.observe(viewLifecycleOwner, {
@@ -197,34 +198,44 @@ class MixingScreen : BaseFragment<MixingScreenViewModel>() {
 
         viewModel.isGroupPlayOverlayOpen.observe(viewLifecycleOwner, {
             if (it) {
-                dataBinding.groupPlayOverlay.visibility = View.VISIBLE
+                binding.groupPlayOverlay.visibility = View.VISIBLE
             } else {
-                dataBinding.groupPlayOverlay.visibility = View.GONE
+                binding.groupPlayOverlay.visibility = View.GONE
             }
         })
 
         viewModel.isGroupOverlayCancelEnabled.observe(viewLifecycleOwner, {
-            dataBinding.closeGroupPlayOverlay.isEnabled = it
+            binding.closeGroupPlayOverlay.isEnabled = it
         })
 
         viewModel.groupPlaySeekbarMaxValue.observe(viewLifecycleOwner, {
-            dataBinding.groupPlaySeekbar.valueTo = it.toFloat()
+            binding.groupPlaySeekbar.valueTo = it.toFloat()
 
-            dataBinding.groupPlayBoundRangeSlider.valueTo = it.toFloat()
+            binding.groupPlayBoundRangeSlider.valueTo = it.toFloat()
 
             if (!viewModel.arePlayerBoundsSet) {
-                dataBinding.groupPlayBoundRangeSlider.setValues(0.0f, it.toFloat())
+                binding.groupPlayBoundRangeSlider.setValues(0.0f, it.toFloat())
             }
         })
 
         viewModel.groupPlaySeekbarProgress.observe(viewLifecycleOwner, {
-            dataBinding.groupPlaySeekbar.value = it.toFloat()
+            binding.groupPlaySeekbar.value = it.toFloat()
+        })
+
+        viewModel.actionOpenWriteDialog.observe(viewLifecycleOwner, {
+            if (it) {
+                showWriteFileDialog()
+            }
+        })
+
+        viewModel.writeButtonEnabled.observe(viewLifecycleOwner, {
+            binding.writeToDisk.isEnabled = it
         })
     }
 
     private fun setupView() {
 
-        dataBinding.groupPlaySeekbar.addOnSliderTouchListener(object : Slider.OnSliderTouchListener {
+        binding.groupPlaySeekbar.addOnSliderTouchListener(object : Slider.OnSliderTouchListener {
             override fun onStartTrackingTouch(slider: Slider) {
                 if (viewModel.isGroupPlaying.value == true) {
                     viewModel.pauseGroupPlay()
@@ -238,13 +249,13 @@ class MixingScreen : BaseFragment<MixingScreenViewModel>() {
             }
         })
 
-        dataBinding.groupPlaySeekbar.addOnChangeListener(Slider.OnChangeListener { _, value, fromUser ->
+        binding.groupPlaySeekbar.addOnChangeListener(Slider.OnChangeListener { _, value, fromUser ->
             if (fromUser) {
                 viewModel.setPlayerHead(value.toInt())
             }
         })
 
-        dataBinding.groupPlayBoundRangeSlider.addOnSliderTouchListener(object : RangeSlider.OnSliderTouchListener {
+        binding.groupPlayBoundRangeSlider.addOnSliderTouchListener(object : RangeSlider.OnSliderTouchListener {
             override fun onStartTrackingTouch(slider: RangeSlider) {}
 
             override fun onStopTrackingTouch(slider: RangeSlider) {
@@ -265,13 +276,13 @@ class MixingScreen : BaseFragment<MixingScreenViewModel>() {
     }
 
     private fun showBottomDrawer() {
-        TransitionManager.beginDelayedTransition(dataBinding.drawerContainer, transition)
-        dataBinding.drawerContainer.visibility = View.VISIBLE
+        TransitionManager.beginDelayedTransition(binding.drawerContainer, transition)
+        binding.drawerContainer.visibility = View.VISIBLE
     }
 
     private fun hideBottomDrawer() {
-        TransitionManager.beginDelayedTransition(dataBinding.drawerContainer, transition)
-        dataBinding.drawerContainer.visibility = View.GONE
+        TransitionManager.beginDelayedTransition(binding.drawerContainer, transition)
+        binding.drawerContainer.visibility = View.GONE
     }
 
     private fun openFilePicker() {
@@ -309,6 +320,23 @@ class MixingScreen : BaseFragment<MixingScreenViewModel>() {
     private fun showShiftFragment(audioFile: AudioFileUiState) {
         val shiftDialog = ShiftDialog(audioFile)
         shiftDialog.show(requireActivity().supportFragmentManager, "shift")
+    }
+
+    private fun showWriteFileDialog() {
+        val writeDialog = WriteDialog()
+
+        val fragmentManager = requireActivity().supportFragmentManager
+
+        writeDialog.show(fragmentManager, "write")
+
+        fragmentManager.registerFragmentLifecycleCallbacks(object : FragmentManager.FragmentLifecycleCallbacks() {
+            override fun onFragmentViewDestroyed(fm: FragmentManager, f: Fragment) {
+                super.onFragmentViewDestroyed(fm, f)
+
+                viewModel.resetOpenWriteDialog()
+                fragmentManager.unregisterFragmentLifecycleCallbacks(this)
+            }
+        }, false)
     }
 }
 
