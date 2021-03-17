@@ -54,15 +54,27 @@ class FileManager @Inject constructor(
         }
     }
 
-    fun getFdForPath(path: String): ParcelFileDescriptor? {
+    fun getReadOnlyFdForPath(path: String): ParcelFileDescriptor? {
         val file = File(path)
         return if (file.exists()) {
             val uri = Uri.fromFile(file)
-            getFdForUri(uri)
+            getReadOnlyFdForUri(uri)
         } else null
     }
 
-    private fun getFdForUri(uri: Uri): ParcelFileDescriptor? {
+    fun getReadWriteFdForPath(path: String): ParcelFileDescriptor? {
+        val file = File(path)
+        return if (file.exists()) {
+            val uri = Uri.fromFile(file)
+            getReadWriteFdForUri(uri)
+        } else null
+    }
+
+    private fun getReadOnlyFdForUri(uri: Uri): ParcelFileDescriptor? {
         return context.contentResolver.openFileDescriptor(uri, "r")
+    }
+
+    private fun getReadWriteFdForUri(uri: Uri): ParcelFileDescriptor? {
+        return context.contentResolver.openFileDescriptor(uri, "rw")
     }
 }

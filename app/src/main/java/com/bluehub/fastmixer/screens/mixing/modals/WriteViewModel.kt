@@ -11,9 +11,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import java.io.File
-import java.util.*
 import javax.inject.Inject
 
 @HiltViewModel
@@ -45,7 +43,7 @@ class WriteViewModel @Inject constructor(
 
     private fun createAndGetFilePath(directory: String, fileName: String) : String? {
         val targetDir = "$directory/output/"
-        val filePath = "$targetDir$fileName"
+        val filePath = "$targetDir$fileName.wav"
 
         val fileObj = File(filePath)
 
@@ -82,7 +80,7 @@ class WriteViewModel @Inject constructor(
             return
         }
 
-        val fd = fileManager.getFdForPath(filePath)?.fd ?: run {
+        val fd = fileManager.getReadWriteFdForPath(filePath)?.fd ?: run {
             errorLiveData.value = context.getString(R.string.error_could_not_use_file_for_write)
             return
         }

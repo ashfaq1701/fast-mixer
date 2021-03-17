@@ -10,7 +10,6 @@ import com.bluehub.fastmixer.common.viewmodel.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.*
-import timber.log.Timber
 import java.io.File
 import java.util.*
 import javax.inject.Inject
@@ -174,7 +173,7 @@ class MixingScreenViewModel @Inject constructor(@ApplicationContext val context:
 
     fun addRecordedFilePath(filePath: String) {
         if (!fileManager.fileExists(filePath)) return
-        val fd = fileManager.getFdForPath(filePath) ?: return
+        val fd = fileManager.getReadOnlyFdForPath(filePath) ?: return
 
         audioFileStore.run {
             if (audioFiles.filter {
