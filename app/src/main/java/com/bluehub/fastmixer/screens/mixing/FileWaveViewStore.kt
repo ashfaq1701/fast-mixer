@@ -52,7 +52,7 @@ class FileWaveViewStore @Inject constructor(val mixingRepository: MixingReposito
             } else listOf()
         }
 
-    val coroutineScope = CoroutineScope(Job() + Dispatchers.Main)
+    val coroutineScope = CoroutineScope(Job() + Dispatchers.Default)
 
     private val fileListObserver: Observer<MutableList<AudioFileUiState>> = Observer {
         calculateSampleCountEachView()
@@ -107,24 +107,28 @@ class FileWaveViewStore @Inject constructor(val mixingRepository: MixingReposito
     }
 
     private fun updateDisplayPoints() {
-        val measuredWidth = if (measuredWidthObservable.hasValue()) {
-            measuredWidthObservable.value
-        } else 0
+        coroutineScope.launch(Dispatchers.Default) {
+            val measuredWidth = if (measuredWidthObservable.hasValue()) {
+                measuredWidthObservable.value
+            } else 0
 
-        val maxNumSamples = audioFileUiStateList.fold(0) { maxSamples, audioFile ->
-            if (maxSamples < audioFile.numSamples) {
-                audioFile.numSamples
-            } else maxSamples
-        }
+            val maxNumSamples = audioFileUiStateList.fold(0) { maxSamples, audioFile ->
+                if (maxSamples < audioFile.numSamples) {
+                    audioFile.numSamples
+                } else maxSamples
+            }
 
-        audioFileUiStateList.forEach { audioFileUiState ->
-            val numPts = (audioFileUiState.numSamples.toFloat() / maxNumSamples.toFloat()) * measuredWidth
+            audioFileUiStateList.forEach { audioFileUiState ->
+                val numPts =
+                    (audioFileUiState.numSamples.toFloat() / maxNumSamples.toFloat()) * measuredWidth
 
-            val newSliderPos = recalculatePlaySliderPositionByDisplayPtsCount(audioFileUiState, numPts.toInt())
-            setPlaySliderPosition(audioFileUiState, newSliderPos)
+                val newSliderPos =
+                    recalculatePlaySliderPositionByDisplayPtsCount(audioFileUiState, numPts.toInt())
+                setPlaySliderPosition(audioFileUiState, newSliderPos)
 
-            audioFileUiState.displayPtsCount.onNext(numPts.toInt())
+                audioFileUiState.displayPtsCount.onNext(numPts.toInt())
 
+            }
         }
     }
 
@@ -353,16 +357,18 @@ class FileWaveViewStore @Inject constructor(val mixingRepository: MixingReposito
     fun recalculateAudioSegment(filePath: String, playSliderPositionSamples: Int? = null) {
         val audioFileUiState = findAudioFileUiState(filePath) ?: return
 
-        audioFileUiState.run {
-            numSamples = mixingRepository.getTotalSamples(filePath)
+        coroutineScope.launch(Dispatchers.Default) {
+            audioFileUiState.run {
+                numSamples = mixingRepository.getTotalSamples(filePath)
 
-            reRender.onNext(true)
+                reRender.onNext(true)
 
-            calculateSampleCountEachView()
+                calculateSampleCountEachView()
 
-            playSliderPositionSamples?.let {
-                val playSliderPos = (it.toFloat() / numSamples.toFloat()) * numPtsToPlot.toFloat()
-                setPlayHead(path, playSliderPos.toInt())
+                playSliderPositionSamples?.let {
+                    val playSliderPos = (it.toFloat() / numSamples.toFloat()) * numPtsToPlot.toFloat()
+                    setPlayHead(path, playSliderPos.toInt())
+                }
             }
         }
     }

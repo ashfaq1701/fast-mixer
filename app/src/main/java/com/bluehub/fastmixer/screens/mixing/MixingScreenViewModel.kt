@@ -223,7 +223,7 @@ class MixingScreenViewModel @Inject constructor(@ApplicationContext val context:
     }
 
     fun readSamples(filePath: String) = fun(countPoints: Int): Deferred<Array<Float>> =
-        viewModelScope.async {
+        viewModelScope.async(Dispatchers.Default) {
             mixingRepository.readSamples(filePath, countPoints)
         }
 
