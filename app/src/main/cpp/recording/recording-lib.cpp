@@ -10,7 +10,7 @@
 #include <android/asset_manager_jni.h>
 #include <fcntl.h>
 
-static RecordingEngine *recordingEngine = nullptr;
+static unique_ptr<RecordingEngine> recordingEngine { nullptr };
 
 extern "C" {
     void prepare_kotlin_recording_method_ids(JNIEnv *env) {
@@ -40,7 +40,9 @@ extern "C" {
 
             prepare_kotlin_recording_method_ids(env);
 
-            recordingEngine = new RecordingEngine(recordingFileDirStr, recordingScreenViewModelPassed);
+            recordingEngine = unique_ptr<RecordingEngine> {
+                new RecordingEngine(recordingFileDirStr, recordingScreenViewModelPassed)
+            };
         }
         return (recordingEngine != nullptr);
     }
@@ -51,8 +53,7 @@ extern "C" {
             return;
         }
         delete_kotlin_recording_global_refs(env);
-        delete recordingEngine;
-        recordingEngine = nullptr;
+        recordingEngine.reset();
     }
 
     JNIEXPORT void JNICALL

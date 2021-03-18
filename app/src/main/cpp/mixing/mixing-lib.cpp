@@ -13,7 +13,7 @@
 #include "../jvm_env.h"
 #include <fcntl.h>
 
-static MixingEngine *mixingEngine = nullptr;
+static unique_ptr<MixingEngine> mixingEngine {nullptr};
 
 extern "C" {
     extern "C" JNIEXPORT jint JNI_OnLoad(JavaVM* vm, void* reserved) {
@@ -46,7 +46,7 @@ extern "C" {
         if (!mixingEngine) {
             prepare_kotlin_mixing_method_ids(env);
 
-            mixingEngine = new MixingEngine();
+            mixingEngine = unique_ptr<MixingEngine> { new MixingEngine() };
         }
         return (mixingEngine != nullptr);
     }
@@ -58,9 +58,8 @@ extern "C" {
             return;
         }
         delete_kotlin_mixing_global_refs(env);
-        delete mixingEngine;
 
-        mixingEngine = nullptr;
+        mixingEngine.reset();
     }
 
     JNIEXPORT void JNICALL

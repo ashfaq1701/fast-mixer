@@ -6,6 +6,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
     app:startDestination="@id/mixingScreen">
+
     <fragment
         android:id="@+id/mixingScreen"
         android:label="MixingScreen"
