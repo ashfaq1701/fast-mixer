@@ -42,6 +42,8 @@ class AudioFileListAdapter(
 
     fun addAtIndex(addIdx: Int) {
         notifyItemInserted(addIdx)
+        // https://stackoverflow.com/questions/35653439/recycler-view-inconsistency-detected-invalid-view-holder-adapter-positionviewh
+        notifyDataSetChanged()
     }
 
     fun removeAtIndex(removeIdx: Int) {

@@ -65,17 +65,15 @@ class MixingScreen : BaseFragment<MixingScreenViewModel>() {
             viewModel.fileWaveViewStore
         )
 
-        binding.audioFileListView.adapter = audioFileListAdapter
-
-        navArguments.recordedFilePath?.let {
-            if (it.isNotEmpty()) viewModel.addRecordedFilePath(it)
-        }
-
         resolver = requireContext().contentResolver
 
         setupViewModel()
         setupView()
         setupAnimations()
+
+        navArguments.recordedFilePath?.let {
+            if (it.isNotEmpty()) viewModel.addRecordedFilePath(it)
+        }
 
         return binding.root
     }
@@ -233,6 +231,8 @@ class MixingScreen : BaseFragment<MixingScreenViewModel>() {
     }
 
     private fun setupView() {
+
+        binding.audioFileListView.adapter = audioFileListAdapter
 
         binding.groupPlaySeekbar.addOnSliderTouchListener(object : Slider.OnSliderTouchListener {
             override fun onStartTrackingTouch(slider: Slider) {
