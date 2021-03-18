@@ -265,6 +265,8 @@ class FileWaveViewWidget(context: Context, attributeSet: AttributeSet?)
                 ::toggleSegmentSelector
             )
 
+            removeAllViews()
+
             val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
             binding = FileWaveViewWidgetBinding.inflate(inflater, this, true)
 
