@@ -16,11 +16,11 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MixingScreenViewModel @Inject constructor(@ApplicationContext val context: Context,
-                                                    private val fileManager: FileManager,
-                                                    private val mixingRepository: MixingRepository,
-                                                    private val audioFileStore: AudioFileStore,
-                                                    private val playFlagStore: PlayFlagStore,
-                                                    val fileWaveViewStore: FileWaveViewStore)
+                                                private val fileManager: FileManager,
+                                                private val audioFileStore: AudioFileStore,
+                                                private val mixingRepository: MixingRepository,
+                                                private val playFlagStore: PlayFlagStore,
+                                                val fileWaveViewStore: FileWaveViewStore)
     : BaseViewModel() {
 
     companion object {
@@ -66,7 +66,7 @@ class MixingScreenViewModel @Inject constructor(@ApplicationContext val context:
         get() = _itemRemovedIdx
 
     private val _itemAddedIdx = MutableLiveData<Int>()
-    val itemAddedIdx: LiveData<Int>
+    val itemAddedIndex: LiveData<Int>
         get() = _itemAddedIdx
 
     val isPlaying: LiveData<Boolean>
@@ -157,10 +157,6 @@ class MixingScreenViewModel @Inject constructor(@ApplicationContext val context:
         _eventRecord.value = false
     }
 
-    fun resetItemAddedIdx() {
-        _itemAddedIdx.value = null
-    }
-
     fun toggleBottomDrawer() {
         _eventDrawerOpen.value = _eventDrawerOpen.value == null || _eventDrawerOpen.value == false
     }
@@ -186,9 +182,10 @@ class MixingScreenViewModel @Inject constructor(@ApplicationContext val context:
                         mixingRepository.addFile(filePath, fd.fd)
                         val totalSamples = getTotalSamples(filePath)
                         audioFiles.add(AudioFileUiState.create(filePath, totalSamples))
+
+                        _audioFilesLiveData.postValue(audioFiles)
+                        _itemAddedIdx.postValue(audioFiles.size - 1)
                     }
-                    _audioFilesLiveData.value = audioFiles
-                    _itemAddedIdx.value = audioFiles.size - 1
 
                     _isLoading.value = false
                 }
@@ -216,11 +213,8 @@ class MixingScreenViewModel @Inject constructor(@ApplicationContext val context:
 
                 audioFileStore.run {
                     audioFiles.add(AudioFileUiState.create(newPath, totalSamples))
-
-                    withContext(Dispatchers.Main) {
-                        _audioFilesLiveData.value = audioFiles
-                        _itemAddedIdx.value = audioFiles.size - 1
-                    }
+                    _audioFilesLiveData.postValue(audioFiles)
+                    _itemAddedIdx.postValue(audioFiles.size - 1)
                 }
             }
 
@@ -229,7 +223,7 @@ class MixingScreenViewModel @Inject constructor(@ApplicationContext val context:
     }
 
     fun readSamples(filePath: String) = fun(countPoints: Int): Deferred<Array<Float>> =
-        viewModelScope.async {
+        viewModelScope.async(Dispatchers.Default) {
             mixingRepository.readSamples(filePath, countPoints)
         }
 
@@ -252,8 +246,8 @@ class MixingScreenViewModel @Inject constructor(@ApplicationContext val context:
                 val firstIdx = idxToRemove.firstOrNull()
 
                 firstIdx?.let {
-                    val removedFile = audioFiles.removeAt(it)
-                    fileManager.removeFile(removedFile.path)
+                    val removeFile = audioFiles.removeAt(it)
+                    fileManager.removeFile(removeFile.path)
 
                     playFlagStore.apply {
                         if (isPlaying.value == true) {
@@ -313,7 +307,7 @@ class MixingScreenViewModel @Inject constructor(@ApplicationContext val context:
         }
     }
 
-    fun resetItemRemovedIdx() {
+    fun resetItemRemoveIdx() {
         _itemRemovedIdx.value = null
     }
 
@@ -478,9 +472,9 @@ class MixingScreenViewModel @Inject constructor(@ApplicationContext val context:
                     mixingRepository.pasteNewFromClipboard(fileId)
                     val totalSamples = getTotalSamples(fileId)
                     audioFiles.add(AudioFileUiState.create(fileId, totalSamples))
+                    _audioFilesLiveData.postValue(audioFiles)
+                    _itemAddedIdx.postValue(audioFiles.size - 1)
                 }
-                _audioFilesLiveData.value = audioFiles
-                _itemAddedIdx.value = audioFiles.size - 1
             }
 
             _isLoading.postValue(false)

@@ -9,6 +9,7 @@ import android.view.*
 import androidx.core.content.ContextCompat
 import com.bluehub.fastmixer.R
 import com.bluehub.fastmixer.common.models.AudioFileUiState
+import com.bluehub.fastmixer.common.utils.getCurrentBackground
 import com.bluehub.fastmixer.screens.mixing.FileWaveViewStore
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.functions.Function
@@ -60,6 +61,19 @@ class FileWaveView @JvmOverloads constructor(
 
     private var mAudioSegmentSelector: AudioSegmentSelector? = null
 
+    private val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        style = Paint.Style.FILL
+        textAlign = Paint.Align.CENTER
+        textSize = 15.0f
+        typeface = Typeface.create("", Typeface.BOLD)
+        color = ContextCompat.getColor(context, R.color.colorAccent)
+    }
+
+    private val clearPaint = Paint().apply {
+        style = Paint.Style.FILL
+        color = getCurrentBackground() ?: Color.WHITE
+    }
+
     init {
         attrsLoaded.subscribe {
             if (it) {
@@ -74,14 +88,6 @@ class FileWaveView @JvmOverloads constructor(
         gestureDetector = GestureDetector(context, gestureListener)
 
         setWillNotDraw(false)
-    }
-
-    private val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        style = Paint.Style.FILL
-        textAlign = Paint.Align.CENTER
-        textSize = 15.0f
-        typeface = Typeface.create("", Typeface.BOLD)
-        color = ContextCompat.getColor(context, R.color.colorAccent)
     }
 
     fun setAudioFileUiState(audioFileUiState: AudioFileUiState) {
@@ -542,6 +548,8 @@ class FileWaveView @JvmOverloads constructor(
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
+
+        canvas.drawRect(left.toFloat(), top.toFloat(), right.toFloat(), bottom.toFloat(), clearPaint)
 
         mBitmap?.let { b ->
             canvas.drawBitmap(b, 0.0f, 0.0f, paint)

@@ -11,14 +11,13 @@ class AudioFileListAdapter(
     private val clickListener: AudioFileEventListeners,
     private val fileWaveViewStore: FileWaveViewStore)
     : ListAdapter<AudioFileUiState, AudioFileListAdapter.ViewHolder>(AudioFileDiffCallback()) {
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val holder = ViewHolder.from(parent)
-        holder.setIsRecyclable(false)
-        return holder
+        return ViewHolder.from(parent)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(getItem(position)!!, clickListener, fileWaveViewStore)
+        holder.bind(getItem(position), clickListener, fileWaveViewStore)
     }
 
     class ViewHolder private constructor(val binding: ListItemAudioFileBinding): RecyclerView.ViewHolder(binding.root) {
@@ -41,16 +40,12 @@ class AudioFileListAdapter(
         }
     }
 
-    fun notifyAddItem(pos: Int) {
-        notifyItemInserted(pos)
-        notifyItemChanged(pos)
-        notifyDataSetChanged()
+    fun addAtIndex(addIdx: Int) {
+        notifyItemInserted(addIdx)
     }
 
-    fun notifyRemoveItem(pos: Int) {
-        notifyItemRemoved(pos)
-        notifyItemRangeChanged(pos, itemCount)
-        notifyDataSetChanged()
+    fun removeAtIndex(removeIdx: Int) {
+        notifyItemRemoved(removeIdx)
     }
 }
 

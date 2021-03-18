@@ -24,7 +24,6 @@ import com.google.android.material.slider.Slider
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.view_loading.*
-import timber.log.Timber
 
 @AndroidEntryPoint
 class MixingScreen : BaseFragment<MixingScreenViewModel>() {
@@ -63,8 +62,9 @@ class MixingScreen : BaseFragment<MixingScreenViewModel>() {
                 { filePath: String -> viewModel.deleteFile(filePath) },
                 { filePath: String -> viewModel.togglePlay(filePath) }
             ),
-            viewModel.fileWaveViewStore,
+            viewModel.fileWaveViewStore
         )
+
         binding.audioFileListView.adapter = audioFileListAdapter
 
         navArguments.recordedFilePath?.let {
@@ -105,17 +105,16 @@ class MixingScreen : BaseFragment<MixingScreenViewModel>() {
             audioFileListAdapter.submitList(it)
         })
 
-        viewModel.itemAddedIdx.observe(viewLifecycleOwner, {
-            if (it != null) {
-                audioFileListAdapter.notifyAddItem(it)
-                viewModel.resetItemAddedIdx()
+        viewModel.itemRemovedIdx.observe(viewLifecycleOwner, {
+            it?.let { removedIdx ->
+                audioFileListAdapter.removeAtIndex(removedIdx)
+                viewModel.resetItemRemoveIdx()
             }
         })
 
-        viewModel.itemRemovedIdx.observe(viewLifecycleOwner, {
-            if (it != null) {
-                audioFileListAdapter.notifyRemoveItem(it)
-                viewModel.resetItemRemovedIdx()
+        viewModel.itemAddedIndex.observe(viewLifecycleOwner, {
+            it?.let { addedIdx ->
+                audioFileListAdapter.addAtIndex(addedIdx)
             }
         })
 
