@@ -187,11 +187,8 @@ class FileWaveView @JvmOverloads constructor(
 
         if (!::mRawPoints.isInitialized || mRawPointsSize != numPts || forceFetch) {
             mFileWaveViewStore.value.coroutineScope.launch {
-                withContext(Dispatchers.Default) {
-                    mRawPoints = mSamplesReader.value.apply(numPts).await()
-                    mRawPointsSize = mRawPoints.size
-                }
-
+                mRawPoints = mSamplesReader.value.apply(numPts).await()
+                mRawPointsSize = mRawPoints.size
                 forceFetch = false
                 processPlotPoints()
             }
