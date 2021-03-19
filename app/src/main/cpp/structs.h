@@ -7,6 +7,11 @@
 
 #include <jni.h>
 
+struct AudioProperties {
+    int32_t channelCount;
+    int32_t sampleRate;
+};
+
 struct mixing_method_ids {
     jclass mixingScreenVM;
     jmethodID mixingScreenVMSetStopPlayback;
