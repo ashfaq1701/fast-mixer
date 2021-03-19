@@ -127,6 +127,8 @@ class MixingScreenViewModel @Inject constructor(@ApplicationContext val context:
         _audioFilesLiveData.value = audioFileStore.audioFiles
 
         fileWaveViewStore.run {
+            recreateCoroutineScopeIfCancelled()
+
             setAudioFilesLiveData(audioFilesLiveData)
             setIsPlayingLiveData(isPlaying)
             setIsGroupPlayingLiveData(isGroupPlaying)
@@ -564,7 +566,8 @@ class MixingScreenViewModel @Inject constructor(@ApplicationContext val context:
         mixingRepository.pausePlayback()
         stopGroupPlayTimer()
         mixingRepository.clearSources()
-        mixingRepository.deleteMixingEngine()
         fileWaveViewStore.cleanup()
+        audioFileStore.clearSources()
+        mixingRepository.deleteMixingEngine()
     }
 }

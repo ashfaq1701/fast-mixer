@@ -11,4 +11,8 @@ class AudioFileStore @Inject constructor() {
     fun findAudioFileByPath(filePath: String) : AudioFileUiState? {
         return audioFiles.find { it.path == filePath }
     }
+
+    fun clearSources() {
+        audioFiles.clear()
+    }
 }

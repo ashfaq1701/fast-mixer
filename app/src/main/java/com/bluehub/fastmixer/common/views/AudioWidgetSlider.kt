@@ -4,9 +4,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.LinearLayout
-import androidx.constraintlayout.widget.ConstraintLayout
 import com.bluehub.fastmixer.databinding.AudioWidgetSliderBinding
-import timber.log.Timber
 
 class AudioWidgetSlider(context: Context, attributeSet: AttributeSet?)
     : LinearLayout(context, attributeSet) {

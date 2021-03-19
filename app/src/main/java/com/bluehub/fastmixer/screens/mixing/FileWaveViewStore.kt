@@ -52,7 +52,7 @@ class FileWaveViewStore @Inject constructor(val mixingRepository: MixingReposito
             } else listOf()
         }
 
-    val coroutineScope = CoroutineScope(Job() + Dispatchers.Default)
+    var coroutineScope = CoroutineScope(Job() + Dispatchers.Default)
 
     private val fileListObserver: Observer<MutableList<AudioFileUiState>> = Observer {
         calculateSampleCountEachView()
@@ -94,6 +94,12 @@ class FileWaveViewStore @Inject constructor(val mixingRepository: MixingReposito
     fun setClipboardHasDataLiveData(clipboardHasDataLiveData: LiveData<Boolean>) {
         mClipboardHasDataLiveData = clipboardHasDataLiveData
         mClipboardHasDataLiveData.observeForever(clipboardHasDataObserver)
+    }
+
+    fun recreateCoroutineScopeIfCancelled() {
+        if (!coroutineScope.isActive) {
+            coroutineScope = CoroutineScope(Job() + Dispatchers.Default)
+        }
     }
 
     fun updateMeasuredWidth(width: Int) {

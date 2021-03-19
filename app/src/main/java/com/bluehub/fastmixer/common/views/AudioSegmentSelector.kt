@@ -4,12 +4,10 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
-import android.widget.Button
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.bluehub.fastmixer.R
 import com.bluehub.fastmixer.databinding.AudioSegmentSelectorBinding
-import timber.log.Timber
 
 class AudioSegmentSelector(context: Context, attributeSet: AttributeSet?)
     : ConstraintLayout(context, attributeSet) {

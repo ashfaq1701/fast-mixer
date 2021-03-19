@@ -15,7 +15,6 @@ import com.bluehub.fastmixer.screens.mixing.AudioFileStore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.*
-import timber.log.Timber
 import java.io.File
 import java.util.*
 import javax.inject.Inject
@@ -62,7 +61,6 @@ class RecordingScreenViewModel @Inject constructor (@ApplicationContext val cont
 
     val recordingFilePath: String
         get() {
-            Timber.d("Recording file path: $recordingFileDirectory/recording.wav")
             return "$recordingFileDirectory/recording.wav"
         }
 

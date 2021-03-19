@@ -21,7 +21,6 @@ import com.visualizer.amplitude.AudioRecordView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.recording_screen.*
 import kotlinx.android.synthetic.main.view_loading.*
-import timber.log.Timber
 import javax.inject.Inject
 
 @AndroidEntryPoint
