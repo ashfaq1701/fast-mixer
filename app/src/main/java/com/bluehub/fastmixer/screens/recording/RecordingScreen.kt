@@ -171,6 +171,10 @@ class RecordingScreen : BaseFragment<RecordingScreenViewModel>() {
         viewModel.isResetButtonEnabled.observe(viewLifecycleOwner, {
             reset.isEnabled = it
         })
+
+        viewModel.isGoBackButtonEnabled.observe(viewLifecycleOwner, {
+            goBack.isEnabled = it
+        })
     }
 
     private fun setupVisualizerObserver() {

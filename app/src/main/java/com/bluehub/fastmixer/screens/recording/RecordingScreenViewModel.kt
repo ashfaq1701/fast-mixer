@@ -132,28 +132,28 @@ class RecordingScreenViewModel @Inject constructor (@ApplicationContext val cont
 
     val isRecordButtonEnabled = BooleanCombinedLiveData(
         true,
-        _eventIsPlaying, _eventIsPlayingWithMixingTracks
+        _eventIsPlaying, _eventIsPlayingWithMixingTracks, _isLoading
     ) { acc, curr ->
         acc && !curr
     }
 
     val isPlayButtonEnabled = BooleanCombinedLiveData(
         true,
-        _eventIsRecording, _eventIsPlayingWithMixingTracks
+        _eventIsRecording, _eventIsPlayingWithMixingTracks, _isLoading
     ) { acc, curr ->
         acc && !curr
     }
 
     val isPlayWithMixingTracksButtonEnabled = BooleanCombinedLiveData(
         true,
-        _eventIsRecording, _eventIsPlaying
+        _eventIsRecording, _eventIsPlaying, _isLoading
     ) { acc, curr ->
         acc && !curr
     }
 
     val isResetButtonEnabled = BooleanCombinedLiveData(
         true,
-        _eventIsRecording, _eventIsPlaying, _eventIsPlayingWithMixingTracks
+        _eventIsRecording, _eventIsPlaying, _eventIsPlayingWithMixingTracks, _isLoading
     ) { acc, curr ->
         acc && !curr
     }
@@ -163,6 +163,13 @@ class RecordingScreenViewModel @Inject constructor (@ApplicationContext val cont
         _eventIsPlaying, _eventIsPlayingWithMixingTracks
     ) { acc, curr ->
         acc || curr
+    }
+
+    val isGoBackButtonEnabled = BooleanCombinedLiveData(
+        true,
+        _isLoading
+    ) { acc, curr ->
+        acc && !curr
     }
 
     val headphoneConnectedCallback: () -> Unit = {
@@ -425,6 +432,8 @@ class RecordingScreenViewModel @Inject constructor (@ApplicationContext val cont
     }
 
     fun setGoBack() {
+
+        if (_isLoading.value == true) return
 
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
