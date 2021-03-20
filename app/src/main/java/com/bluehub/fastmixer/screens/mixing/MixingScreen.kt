@@ -228,6 +228,14 @@ class MixingScreen : BaseFragment<MixingScreenViewModel>() {
         viewModel.writeButtonEnabled.observe(viewLifecycleOwner, {
             binding.writeToDisk.isEnabled = it
         })
+
+        viewModel.readButtonEnabled.observe(viewLifecycleOwner, {
+            binding.readFromDisk.isEnabled = it
+        })
+
+        viewModel.recordButtonEnabled.observe(viewLifecycleOwner, {
+            binding.goToRecord.isEnabled = it
+        })
     }
 
     private fun setupView() {
