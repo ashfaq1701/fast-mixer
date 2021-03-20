@@ -9,7 +9,7 @@
 
 using namespace std;
 
-class LivePlaybackStream: public RecordingBaseStream, public oboe::AudioStreamDataCallback, public oboe::AudioStreamErrorCallback {
+class LivePlaybackStream: public RecordingBaseStream, public oboe::AudioStreamDataCallback {
 public:
     LivePlaybackStream(RecordingIO* recordingIO);
 
@@ -31,7 +31,6 @@ public:
 private:
     const char* TAG = "Live Playback Stream:: %s";
 
-    void onErrorAfterClose(oboe::AudioStream* audioStream, oboe::Result result);
 };
 
 

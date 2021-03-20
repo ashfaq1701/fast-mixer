@@ -88,7 +88,9 @@ private:
 
     mutex playbackStreamMtx;
 
-    MixingPlaybackStream playbackStream = MixingPlaybackStream(&mMixingIO);
+    unique_ptr<MixingPlaybackStream> playbackStream {
+        new MixingPlaybackStream(&mMixingIO)
+    };
 
     bool startPlaybackCallable();
 

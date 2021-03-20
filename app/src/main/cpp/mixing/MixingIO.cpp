@@ -71,7 +71,14 @@ void MixingIO::read_playback(float *targetData, int32_t numSamples) {
 }
 
 void MixingIO::setStopPlaybackCallback(function<void()> stopPlaybackCallback) {
+    mStopPlaybackCallback = stopPlaybackCallback;
     mPlayer->setPlaybackCallback(stopPlaybackCallback);
+}
+
+void MixingIO::runStopPlaybackCallback() {
+    if (mStopPlaybackCallback) {
+        mStopPlaybackCallback();
+    }
 }
 
 int MixingIO::getTotalSampleFrames() {

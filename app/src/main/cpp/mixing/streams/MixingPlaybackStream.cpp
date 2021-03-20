@@ -43,7 +43,6 @@ MixingPlaybackStream::setupMixingPlaybackStreamParameters(oboe::AudioStreamBuild
             ->setSharingMode(oboe::SharingMode::Exclusive)
             ->setPerformanceMode(oboe::PerformanceMode::LowLatency)
             ->setDataCallback(audioStreamCallback)
-            ->setErrorCallback(reinterpret_cast<AudioStreamErrorCallback *>(audioStreamCallback))
             ->setDeviceId(deviceId)
             ->setDirection(oboe::Direction::Output)
             ->setSampleRate(sampleRate)
@@ -54,10 +53,15 @@ MixingPlaybackStream::setupMixingPlaybackStreamParameters(oboe::AudioStreamBuild
 oboe::DataCallbackResult
 MixingPlaybackStream::onAudioReady(oboe::AudioStream *audioStream, void *audioData,
                              int32_t numFrames) {
-    if (audioStream && audioStream->getState() != oboe::StreamState::Closed) {
+    if (audioStream && audioData && audioStream->getState() == oboe::StreamState::Started) {
         return processPlaybackFrame(audioStream, static_cast<float_t *>(audioData), numFrames,
                                     audioStream->getChannelCount());
     }
+
+    if (mMixingIO) {
+        mMixingIO->runStopPlaybackCallback();
+    }
+
     return oboe::DataCallbackResult::Stop;
 }
 
@@ -67,8 +71,4 @@ MixingPlaybackStream::processPlaybackFrame(oboe::AudioStream *audioStream, float
     fillArrayWithZeros(audioData, numFrames);
     mMixingIO->read_playback(audioData, numFrames);
     return oboe::DataCallbackResult::Continue;
-}
-
-void MixingPlaybackStream::onErrorAfterClose(oboe::AudioStream *audioStream, oboe::Result result) {
-    mStream.reset();
 }

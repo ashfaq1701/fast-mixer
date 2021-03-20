@@ -48,7 +48,6 @@ PlaybackStream::setupPlaybackStreamParameters(oboe::AudioStreamBuilder *builder,
             ->setSharingMode(oboe::SharingMode::Shared)
             ->setPerformanceMode(oboe::PerformanceMode::LowLatency)
             ->setDataCallback(audioStreamCallback)
-            ->setErrorCallback(reinterpret_cast<AudioStreamErrorCallback *>(audioStreamCallback))
             ->setDeviceId(deviceId)
             ->setDirection(oboe::Direction::Output)
             ->setSampleRate(sampleRate)
@@ -59,25 +58,22 @@ PlaybackStream::setupPlaybackStreamParameters(oboe::AudioStreamBuilder *builder,
 oboe::DataCallbackResult
 PlaybackStream::onAudioReady(oboe::AudioStream *audioStream, void *audioData,
                                int32_t numFrames) {
-    if (audioStream && audioStream->getState() != oboe::StreamState::Closed) {
+    if (audioStream && audioData && audioStream->getState() == oboe::StreamState::Started) {
         return processPlaybackFrame(audioStream, static_cast<float_t *>(audioData), numFrames,
                                     audioStream->getChannelCount());
     }
+
+    if (mRecordingIO) {
+        mRecordingIO->runStopPlaybackCallback();
+    }
+
     return oboe::DataCallbackResult::Stop;
 }
 
 oboe::DataCallbackResult
 PlaybackStream::processPlaybackFrame(oboe::AudioStream *audioStream, float *audioData,
                                        int32_t numFrames, int32_t channelCount) {
-    if (mStream->getState() != oboe::StreamState::Started) {
-        return oboe::DataCallbackResult::Stop;
-    }
-
     fillArrayWithZeros(audioData, numFrames);
     mRecordingIO->read_playback(audioData, numFrames);
     return oboe::DataCallbackResult::Continue;
-}
-
-void PlaybackStream::onErrorAfterClose(oboe::AudioStream *audioStream, oboe::Result result) {
-    mStream.reset();
 }

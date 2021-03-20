@@ -35,7 +35,6 @@ RecordingStream::setupRecordingStreamParameters(oboe::AudioStreamBuilder *builde
             ->setPerformanceMode(oboe::PerformanceMode::LowLatency)
             ->setInputPreset(RecordingStreamConstants::mRecordingPreset)
             ->setDataCallback(this)
-            ->setErrorCallback(this)
             ->setDeviceId(RecordingStreamConstants::mRecordingDeviceId)
             ->setDirection(oboe::Direction::Input)
             ->setChannelCount(RecordingStreamConstants::mInputChannelCount);
@@ -45,10 +44,11 @@ RecordingStream::setupRecordingStreamParameters(oboe::AudioStreamBuilder *builde
 
 oboe::DataCallbackResult
 RecordingStream::onAudioReady(oboe::AudioStream *audioStream, void *audioData, int32_t numFrames) {
-    if (audioStream && audioStream->getState() != oboe::StreamState::Closed) {
+    if (audioStream && audioData && audioStream->getState() == oboe::StreamState::Started) {
         return processRecordingFrames(audioStream, static_cast<int16_t *>(audioData),
                                       numFrames * audioStream->getChannelCount());
     }
+
     return oboe::DataCallbackResult::Stop;
 }
 
@@ -57,8 +57,4 @@ RecordingStream::processRecordingFrames(oboe::AudioStream *audioStream, int16_t 
                                           int32_t numFrames) {
     int32_t framesWritten = mRecordingIO->write(audioData, numFrames);
     return oboe::DataCallbackResult::Continue;
-}
-
-void RecordingStream::onErrorAfterClose(oboe::AudioStream *audioStream, oboe::Result result) {
-    mStream.reset();
 }

@@ -79,6 +79,8 @@ public:
 
     void clearRecordingBuffer();
 
+    void runStopPlaybackCallback();
+
 private:
     const char* TAG = "RecordingIO:: %d";
 

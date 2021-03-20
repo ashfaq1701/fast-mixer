@@ -73,19 +73,19 @@ bool MixingEngine::startPlayback() {
 void MixingEngine::pausePlayback() {
     lock_guard<mutex> lock(playbackStreamMtx);
     LOGD(TAG, "pausePlayback(): ");
-    playbackStream.stopStream();
+    playbackStream->stopStream();
 }
 
 bool MixingEngine::startPlaybackCallable() {
-    if (!playbackStream.mStream) {
-        if (playbackStream.openStream() != oboe::Result::OK) {
+    if (!playbackStream->mStream) {
+        if (playbackStream->openStream() != oboe::Result::OK) {
             return false;
         }
     }
 
     mMixingIO.syncPlayHeads();
     mMixingIO.setPlaying(true);
-    return playbackStream.startStream() == oboe::Result::OK;
+    return playbackStream->startStream() == oboe::Result::OK;
 }
 
 void MixingEngine::stopPlaybackCallable() {
@@ -94,11 +94,11 @@ void MixingEngine::stopPlaybackCallable() {
 }
 
 void MixingEngine::closePlaybackStream() {
-    if (playbackStream.mStream) {
-        if (playbackStream.mStream->getState() != oboe::StreamState::Closed) {
-            playbackStream.stopStream();
+    if (playbackStream->mStream) {
+        if (playbackStream->mStream->getState() != oboe::StreamState::Closed) {
+            playbackStream->stopStream();
         } else {
-            playbackStream.resetStream();
+            playbackStream->resetStream();
         }
     }
 }

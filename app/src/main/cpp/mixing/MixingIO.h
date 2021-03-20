@@ -47,8 +47,12 @@ public:
 
     bool writeSourcesToFile(map<string, shared_ptr<DataSource>> playMap, int fd);
 
+    void runStopPlaybackCallback();
+
 private:
     shared_ptr<Player> mPlayer {nullptr};
+
+    function<void(void)> mStopPlaybackCallback = nullptr;
 };
 
 

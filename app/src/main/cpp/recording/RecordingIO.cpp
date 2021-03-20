@@ -190,6 +190,12 @@ void RecordingIO::setStopPlaybackCallback(function<void()> stopPlaybackCallback)
     mPlayer->setPlaybackCallback(mStopPlaybackCallback);
 }
 
+void RecordingIO::runStopPlaybackCallback() {
+    if (mStopPlaybackCallback) {
+        mStopPlaybackCallback();
+    }
+}
+
 int RecordingIO::getTotalSampleFrames() {
     if (mPlayer) {
         return mPlayer->getTotalSampleFrames();
