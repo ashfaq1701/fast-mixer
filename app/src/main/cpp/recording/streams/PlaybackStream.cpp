@@ -69,7 +69,7 @@ PlaybackStream::onAudioReady(oboe::AudioStream *audioStream, void *audioData,
 oboe::DataCallbackResult
 PlaybackStream::processPlaybackFrame(oboe::AudioStream *audioStream, float *audioData,
                                        int32_t numFrames, int32_t channelCount) {
-    if (audioData) {
+    if (audioData && audioStream->getState() == oboe::StreamState::Started) {
         fillArrayWithZeros(audioData, numFrames);
         mRecordingIO->read_playback(audioData, numFrames);
     }

@@ -55,7 +55,7 @@ RecordingStream::onAudioReady(oboe::AudioStream *audioStream, void *audioData, i
 oboe::DataCallbackResult
 RecordingStream::processRecordingFrames(oboe::AudioStream *audioStream, int16_t *audioData,
                                           int32_t numFrames) {
-    if (audioData) {
+    if (audioData && audioStream->getState() == oboe::StreamState::Started) {
         int32_t framesWritten = mRecordingIO->write(audioData, numFrames);
     }
     return oboe::DataCallbackResult::Continue;
