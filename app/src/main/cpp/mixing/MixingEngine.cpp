@@ -10,7 +10,7 @@
 MixingEngine::MixingEngine() {
     mSourceMapStore = move(SourceMapStore::getInstance());
 
-    mMixingIO.setStopPlaybackCallback([&] () {
+    mMixingIO->setStopPlaybackCallback([&] () {
         setStopPlayback();
     });
 }
@@ -25,7 +25,7 @@ void MixingEngine::addFile(string filePath, int fd) {
         filePath.erase();
         return;
     }
-    shared_ptr<FileDataSource> source = mMixingIO.readFile(filePath, fd);
+    shared_ptr<FileDataSource> source = mMixingIO->readFile(filePath, fd);
     mSourceMapStore->sourceMap.insert(pair<string, shared_ptr<FileDataSource>>(filePath, move(source)));
     filePath.erase();
 }
@@ -83,14 +83,14 @@ bool MixingEngine::startPlaybackCallable() {
         }
     }
 
-    mMixingIO.syncPlayHeads();
-    mMixingIO.setPlaying(true);
+    mMixingIO->syncPlayHeads();
+    mMixingIO->setPlaying(true);
     return playbackStream->startStream() == oboe::Result::OK;
 }
 
 void MixingEngine::stopPlaybackCallable() {
     closePlaybackStream();
-    mMixingIO.setPlaying(false);
+    mMixingIO->setPlaying(false);
 }
 
 void MixingEngine::closePlaybackStream() {
@@ -104,7 +104,7 @@ void MixingEngine::closePlaybackStream() {
 }
 
 void MixingEngine::addSourcesToPlayer(string* strArr, int count) {
-    mMixingIO.clearPlayerSources();
+    mMixingIO->clearPlayerSources();
 
     map<string, shared_ptr<DataSource>> playMap;
 
@@ -119,7 +119,7 @@ void MixingEngine::addSourcesToPlayer(string* strArr, int count) {
         strArr[i].erase();
     }
 
-    mMixingIO.addSourceMap(playMap);
+    mMixingIO->addSourceMap(playMap);
 }
 
 void MixingEngine::setStopPlayback() {
@@ -131,19 +131,19 @@ void MixingEngine::setStopPlayback() {
 }
 
 void MixingEngine::clearPlayerSources() {
-    mMixingIO.clearPlayerSources();
+    mMixingIO->clearPlayerSources();
 }
 
 int MixingEngine::getTotalSampleFrames() {
-    return mMixingIO.getTotalSampleFrames();
+    return mMixingIO->getTotalSampleFrames();
 }
 
 int MixingEngine::getCurrentPlaybackProgress() {
-    return mMixingIO.getCurrentPlaybackProgress();
+    return mMixingIO->getCurrentPlaybackProgress();
 }
 
 void MixingEngine::setPlayerHead(int playHead) {
-    mMixingIO.setPlayHead(playHead);
+    mMixingIO->setPlayHead(playHead);
 }
 
 void MixingEngine::setSourcePlayHead(string filePath, int playHead) {
@@ -303,7 +303,7 @@ void MixingEngine::pasteNewFromClipboard(string fileId) {
         return;
     }
 
-    shared_ptr<BufferedDataSource> source = mMixingIO.createClipboardDataSource(clipboard);
+    shared_ptr<BufferedDataSource> source = mMixingIO->createClipboardDataSource(clipboard);
     mSourceMapStore->sourceMap.insert(pair<string, shared_ptr<FileDataSource>>(fileId, move(source)));
     fileId.erase();
 }
@@ -313,15 +313,15 @@ void writeToDisk() {
 }
 
 void MixingEngine::setPlayerBoundStart(int64_t boundStart) {
-    mMixingIO.setPlayerBoundStart(boundStart);
+    mMixingIO->setPlayerBoundStart(boundStart);
 }
 
 void MixingEngine::setPlayerBoundEnd(int64_t boundEnd) {
-    mMixingIO.setPlayerBoundEnd(boundEnd);
+    mMixingIO->setPlayerBoundEnd(boundEnd);
 }
 
 void MixingEngine::resetPlayerBoundStart() {
-    mMixingIO.resetPlayerBoundStart();
+    mMixingIO->resetPlayerBoundStart();
 }
 
 bool MixingEngine::writeToFile(string* filePaths, int count, int fd) {
@@ -339,9 +339,9 @@ bool MixingEngine::writeToFile(string* filePaths, int count, int fd) {
         filePaths[i].erase();
     }
 
-    return mMixingIO.writeSourcesToFile(sourcesMap, fd);
+    return mMixingIO->writeSourcesToFile(sourcesMap, fd);
 }
 
 void MixingEngine::resetPlayerBoundEnd() {
-    mMixingIO.resetPlayerBoundEnd();
+    mMixingIO->resetPlayerBoundEnd();
 }

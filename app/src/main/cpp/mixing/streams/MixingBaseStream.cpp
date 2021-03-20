@@ -4,6 +4,6 @@
 
 #include "MixingBaseStream.h"
 
-MixingBaseStream::MixingBaseStream(MixingIO *mixingIO) : BaseStream() {
+MixingBaseStream::MixingBaseStream(shared_ptr<MixingIO> mixingIO) : BaseStream() {
     mMixingIO = mixingIO;
 }

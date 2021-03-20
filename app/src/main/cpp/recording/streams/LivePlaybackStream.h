@@ -11,7 +11,7 @@ using namespace std;
 
 class LivePlaybackStream: public RecordingBaseStream, public oboe::AudioStreamDataCallback {
 public:
-    LivePlaybackStream(RecordingIO* recordingIO);
+    LivePlaybackStream(shared_ptr<RecordingIO> recordingIO);
 
     oboe::Result openStream();
 

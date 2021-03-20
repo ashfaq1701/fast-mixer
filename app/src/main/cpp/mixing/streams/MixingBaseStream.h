@@ -11,8 +11,8 @@
 
 class MixingBaseStream : public BaseStream {
 public:
-    MixingBaseStream(MixingIO* mixingIO);
-    MixingIO* mMixingIO;
+    MixingBaseStream(shared_ptr<MixingIO> mixingIO);
+    shared_ptr<MixingIO> mMixingIO;
 };
 
 

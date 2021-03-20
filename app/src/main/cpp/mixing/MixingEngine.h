@@ -80,7 +80,9 @@ private:
 
     const char* TAG = "Mixing Engine:: %s";
 
-    MixingIO mMixingIO;
+    shared_ptr<MixingIO> mMixingIO {
+        new MixingIO()
+    };
 
     shared_ptr<SourceMapStore> mSourceMapStore;
 
@@ -89,7 +91,7 @@ private:
     mutex playbackStreamMtx;
 
     unique_ptr<MixingPlaybackStream> playbackStream {
-        new MixingPlaybackStream(&mMixingIO)
+        new MixingPlaybackStream(mMixingIO)
     };
 
     bool startPlaybackCallable();

@@ -13,7 +13,7 @@ class MixingPlaybackStream : public MixingBaseStream, public oboe::AudioStreamDa
 
 public:
 
-    MixingPlaybackStream(MixingIO* mixingIO);
+    MixingPlaybackStream(shared_ptr<MixingIO> mixingIO);
 
     oboe::Result openStream();
 

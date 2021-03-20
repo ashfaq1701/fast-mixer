@@ -5,7 +5,7 @@
 #include <cassert>
 #include "MixingPlaybackStream.h"
 
-MixingPlaybackStream::MixingPlaybackStream(MixingIO* mixingIO): MixingBaseStream(mixingIO) {}
+MixingPlaybackStream::MixingPlaybackStream(shared_ptr<MixingIO> mixingIO): MixingBaseStream(mixingIO) {}
 
 oboe::Result MixingPlaybackStream::openStream() {
     LOGD(TAG, "openMixingPlaybackStream(): ");

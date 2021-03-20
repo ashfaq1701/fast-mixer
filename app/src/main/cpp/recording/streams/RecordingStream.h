@@ -11,7 +11,7 @@ using namespace std;
 
 class RecordingStream: public RecordingBaseStream, public oboe::AudioStreamDataCallback {
 public:
-    RecordingStream(RecordingIO* recordingIO);
+    RecordingStream(shared_ptr<RecordingIO> recordingIO);
 
     oboe::Result openStream();
 
