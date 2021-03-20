@@ -14,6 +14,4 @@ int32_t RecordingStreamConstants::mPlaybackDeviceId = oboe::kUnspecified;
 int32_t RecordingStreamConstants::mFramesPerBurst{};
 int32_t RecordingStreamConstants::mRecordingDeviceId = oboe::kUnspecified;
 oboe::AudioFormat RecordingStreamConstants::mPlaybackFormat = oboe::AudioFormat::Float;
-// 5ms of audio data at a sampling rate of 48kHz
-int32_t RecordingStreamConstants::mRecordingFramesPerCallback = 144;
-int32_t RecordingStreamConstants::mLivePlaybackFramesPerCallback = RecordingStreamConstants::mRecordingFramesPerCallback;
+oboe::InputPreset RecordingStreamConstants::mRecordingPreset = oboe::InputPreset::VoicePerformance;

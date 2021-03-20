@@ -51,8 +51,7 @@ LivePlaybackStream::setupLivePlaybackStreamParameters(oboe::AudioStreamBuilder *
             ->setDeviceId(deviceId)
             ->setDirection(oboe::Direction::Output)
             ->setSampleRate(sampleRate)
-            ->setChannelCount(channelCount)
-            ->setFramesPerDataCallback(RecordingStreamConstants::mLivePlaybackFramesPerCallback);
+            ->setChannelCount(channelCount);
     return builder;
 }
 

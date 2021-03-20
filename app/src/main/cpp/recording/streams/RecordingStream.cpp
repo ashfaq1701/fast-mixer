@@ -31,14 +31,14 @@ oboe::AudioStreamBuilder *
 RecordingStream::setupRecordingStreamParameters(oboe::AudioStreamBuilder *builder) {
     builder->setAudioApi(RecordingStreamConstants::mAudioApi)
             ->setFormat(RecordingStreamConstants::mFormat)
-            ->setSharingMode(oboe::SharingMode::Shared)
+            ->setSharingMode(oboe::SharingMode::Exclusive)
             ->setPerformanceMode(oboe::PerformanceMode::LowLatency)
+            ->setInputPreset(RecordingStreamConstants::mRecordingPreset)
             ->setDataCallback(this)
             ->setErrorCallback(this)
             ->setDeviceId(RecordingStreamConstants::mRecordingDeviceId)
             ->setDirection(oboe::Direction::Input)
-            ->setChannelCount(RecordingStreamConstants::mInputChannelCount)
-            ->setFramesPerDataCallback(RecordingStreamConstants::mRecordingFramesPerCallback);
+            ->setChannelCount(RecordingStreamConstants::mInputChannelCount);
 
     return builder;
 }

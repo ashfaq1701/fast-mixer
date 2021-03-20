@@ -21,9 +21,7 @@ public:
 
     static int32_t mRecordingDeviceId;
     static oboe::AudioFormat mPlaybackFormat;
-
-    static int32_t mRecordingFramesPerCallback;
-    static int32_t mLivePlaybackFramesPerCallback;
+    static oboe::InputPreset mRecordingPreset;
 };
 
 
