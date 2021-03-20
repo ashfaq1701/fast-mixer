@@ -75,12 +75,6 @@ void MixingIO::setStopPlaybackCallback(function<void()> stopPlaybackCallback) {
     mPlayer->setPlaybackCallback(stopPlaybackCallback);
 }
 
-void MixingIO::runStopPlaybackCallback() {
-    if (mStopPlaybackCallback) {
-        mStopPlaybackCallback();
-    }
-}
-
 int MixingIO::getTotalSampleFrames() {
     if (mPlayer) {
         return mPlayer->getTotalSampleFrames();

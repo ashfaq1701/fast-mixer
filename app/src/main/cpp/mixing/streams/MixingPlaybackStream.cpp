@@ -53,13 +53,9 @@ MixingPlaybackStream::setupMixingPlaybackStreamParameters(oboe::AudioStreamBuild
 oboe::DataCallbackResult
 MixingPlaybackStream::onAudioReady(oboe::AudioStream *audioStream, void *audioData,
                              int32_t numFrames) {
-    if (audioStream && audioData && audioStream->getState() == oboe::StreamState::Started) {
+    if (audioStream) {
         return processPlaybackFrame(audioStream, static_cast<float_t *>(audioData), numFrames,
                                     audioStream->getChannelCount());
-    }
-
-    if (mMixingIO) {
-        mMixingIO->runStopPlaybackCallback();
     }
 
     return oboe::DataCallbackResult::Stop;
@@ -68,7 +64,9 @@ MixingPlaybackStream::onAudioReady(oboe::AudioStream *audioStream, void *audioDa
 oboe::DataCallbackResult
 MixingPlaybackStream::processPlaybackFrame(oboe::AudioStream *audioStream, float *audioData,
                                      int32_t numFrames, int32_t channelCount) {
-    fillArrayWithZeros(audioData, numFrames);
-    mMixingIO->read_playback(audioData, numFrames);
+    if (audioData) {
+        fillArrayWithZeros(audioData, numFrames);
+        mMixingIO->read_playback(audioData, numFrames);
+    }
     return oboe::DataCallbackResult::Continue;
 }
