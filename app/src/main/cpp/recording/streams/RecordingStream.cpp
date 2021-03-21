@@ -32,7 +32,8 @@ RecordingStream::setupRecordingStreamParameters(oboe::AudioStreamBuilder *builde
     builder->setAudioApi(RecordingStreamConstants::mAudioApi)
             ->setFormat(RecordingStreamConstants::mFormat)
             ->setSharingMode(oboe::SharingMode::Exclusive)
-            ->setPerformanceMode(oboe::PerformanceMode::LowLatency)
+            //Commenting out because on Samsung Note 20 with performance mode low latency, recording doesn't work
+            //->setPerformanceMode(oboe::PerformanceMode::LowLatency)
             ->setInputPreset(RecordingStreamConstants::mRecordingPreset)
             ->setDataCallback(this)
             ->setDeviceId(RecordingStreamConstants::mRecordingDeviceId)
@@ -55,7 +56,7 @@ RecordingStream::onAudioReady(oboe::AudioStream *audioStream, void *audioData, i
 oboe::DataCallbackResult
 RecordingStream::processRecordingFrames(oboe::AudioStream *audioStream, int16_t *audioData,
                                           int32_t numFrames) {
-    if (audioData && audioStream->getState() == oboe::StreamState::Started) {
+    if (audioData) {
         int32_t framesWritten = mRecordingIO->write(audioData, numFrames);
     }
     return oboe::DataCallbackResult::Continue;

@@ -68,7 +68,7 @@ LivePlaybackStream::onAudioReady(oboe::AudioStream *audioStream, void *audioData
 oboe::DataCallbackResult
 LivePlaybackStream::processLivePlaybackFrame(oboe::AudioStream *audioStream, int16_t *audioData,
                                                int32_t numFrames) {
-    if (audioData && audioStream->getState() == oboe::StreamState::Started) {
+    if (audioData) {
         fillArrayWithZeros(audioData, numFrames);
         int64_t framesWritten = mRecordingIO->read_live_playback(audioData, numFrames);
     }

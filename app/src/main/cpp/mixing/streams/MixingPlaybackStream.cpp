@@ -64,7 +64,7 @@ MixingPlaybackStream::onAudioReady(oboe::AudioStream *audioStream, void *audioDa
 oboe::DataCallbackResult
 MixingPlaybackStream::processPlaybackFrame(oboe::AudioStream *audioStream, float *audioData,
                                      int32_t numFrames, int32_t channelCount) {
-    if (audioData && audioStream->getState() == oboe::StreamState::Started) {
+    if (audioData) {
         fillArrayWithZeros(audioData, numFrames);
         mMixingIO->read_playback(audioData, numFrames);
     }
