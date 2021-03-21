@@ -18,7 +18,7 @@
 #define FAST_MIXER_AUDIOSOURCE_H
 
 #include <cstdint>
-#include "../Constants.h"
+#include "../structs.h"
 
 class DataSource {
 public:

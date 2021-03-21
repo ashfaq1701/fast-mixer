@@ -5,7 +5,7 @@
 #include <cassert>
 #include "MixingPlaybackStream.h"
 
-MixingPlaybackStream::MixingPlaybackStream(MixingIO* mixingIO): MixingBaseStream(mixingIO) {}
+MixingPlaybackStream::MixingPlaybackStream(shared_ptr<MixingIO> mixingIO): MixingBaseStream(mixingIO) {}
 
 oboe::Result MixingPlaybackStream::openStream() {
     LOGD(TAG, "openMixingPlaybackStream(): ");
@@ -43,7 +43,6 @@ MixingPlaybackStream::setupMixingPlaybackStreamParameters(oboe::AudioStreamBuild
             ->setSharingMode(oboe::SharingMode::Exclusive)
             ->setPerformanceMode(oboe::PerformanceMode::LowLatency)
             ->setDataCallback(audioStreamCallback)
-            ->setErrorCallback(reinterpret_cast<AudioStreamErrorCallback *>(audioStreamCallback))
             ->setDeviceId(deviceId)
             ->setDirection(oboe::Direction::Output)
             ->setSampleRate(sampleRate)
@@ -54,21 +53,20 @@ MixingPlaybackStream::setupMixingPlaybackStreamParameters(oboe::AudioStreamBuild
 oboe::DataCallbackResult
 MixingPlaybackStream::onAudioReady(oboe::AudioStream *audioStream, void *audioData,
                              int32_t numFrames) {
-    if (audioStream && audioStream->getState() != oboe::StreamState::Closed) {
+    if (audioStream) {
         return processPlaybackFrame(audioStream, static_cast<float_t *>(audioData), numFrames,
                                     audioStream->getChannelCount());
     }
+
     return oboe::DataCallbackResult::Stop;
 }
 
 oboe::DataCallbackResult
 MixingPlaybackStream::processPlaybackFrame(oboe::AudioStream *audioStream, float *audioData,
                                      int32_t numFrames, int32_t channelCount) {
-    fillArrayWithZeros(audioData, numFrames);
-    mMixingIO->read_playback(audioData, numFrames);
+    if (audioData) {
+        fillArrayWithZeros(audioData, numFrames);
+        mMixingIO->read_playback(audioData, numFrames);
+    }
     return oboe::DataCallbackResult::Continue;
-}
-
-void MixingPlaybackStream::onErrorAfterClose(oboe::AudioStream *audioStream, oboe::Result result) {
-    mStream.reset();
 }

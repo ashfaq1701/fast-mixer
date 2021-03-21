@@ -94,7 +94,7 @@ class MixingScreenViewModel @Inject constructor(@ApplicationContext val context:
     val groupPlaySeekbarProgress: LiveData<Int>
         get() = _groupPlaySeekbarProgress
 
-    private val _groupPlaySeekbarMaxValue = MutableLiveData<Int>(0)
+    private val _groupPlaySeekbarMaxValue = MutableLiveData(0)
     val groupPlaySeekbarMaxValue: LiveData<Int>
         get() = _groupPlaySeekbarMaxValue
 
@@ -116,7 +116,21 @@ class MixingScreenViewModel @Inject constructor(@ApplicationContext val context:
 
     val writeButtonEnabled = BooleanCombinedLiveData(
         true,
-        isLoadedFilesEmpty, actionOpenWriteDialog
+        isLoadedFilesEmpty, actionOpenWriteDialog, _isLoading
+    ) { acc, curr ->
+        acc && !curr
+    }
+
+    val readButtonEnabled = BooleanCombinedLiveData(
+        true,
+        _isLoading
+    ) { acc, curr ->
+        acc && !curr
+    }
+
+    val recordButtonEnabled = BooleanCombinedLiveData(
+        true,
+        _isLoading
     ) { acc, curr ->
         acc && !curr
     }
@@ -127,6 +141,8 @@ class MixingScreenViewModel @Inject constructor(@ApplicationContext val context:
         _audioFilesLiveData.value = audioFileStore.audioFiles
 
         fileWaveViewStore.run {
+            recreateCoroutineScopeIfCancelled()
+
             setAudioFilesLiveData(audioFilesLiveData)
             setIsPlayingLiveData(isPlaying)
             setIsGroupPlayingLiveData(isGroupPlaying)
@@ -564,7 +580,8 @@ class MixingScreenViewModel @Inject constructor(@ApplicationContext val context:
         mixingRepository.pausePlayback()
         stopGroupPlayTimer()
         mixingRepository.clearSources()
-        mixingRepository.deleteMixingEngine()
         fileWaveViewStore.cleanup()
+        audioFileStore.clearSources()
+        mixingRepository.deleteMixingEngine()
     }
 }

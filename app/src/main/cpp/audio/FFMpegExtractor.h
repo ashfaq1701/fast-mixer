@@ -11,7 +11,6 @@ extern "C" {
 #include <libavutil/opt.h>
 }
 #include <string>
-#include "../Constants.h"
 #include "../structs.h"
 #include "../logging_macros.h"
 #include "vector"

@@ -11,8 +11,8 @@
 
 class RecordingBaseStream : public BaseStream {
 public:
-    RecordingBaseStream(RecordingIO* recordingIO);
-    RecordingIO* mRecordingIO;
+    RecordingBaseStream(shared_ptr<RecordingIO> recordingIO);
+    shared_ptr<RecordingIO> mRecordingIO;
 };
 
 

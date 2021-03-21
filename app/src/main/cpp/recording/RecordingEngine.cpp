@@ -17,8 +17,8 @@ RecordingEngine::RecordingEngine(
     assert(RecordingStreamConstants::mInputChannelCount == RecordingStreamConstants::mOutputChannelCount);
     auto recordingFilePath = mRecordingFileDir + "/recording.wav";
 
-    mRecordingIO.setRecordingFilePath(recordingFilePath);
-    mRecordingIO.setStopPlaybackCallback([&] () {
+    mRecordingIO->setRecordingFilePath(recordingFilePath);
+    mRecordingIO->setStopPlaybackCallback([&] () {
         setStopPlayback();
     });
     mRecordingScreenViewModelPassed = recordingScreenViewModelPassed;
@@ -40,7 +40,7 @@ void RecordingEngine::setupAudioSource(int fd) {
         }
 
         mDataSource = shared_ptr<FileDataSource>{
-                move(mRecordingIO.setup_audio_source(fd)),
+                move(mRecordingIO->setup_audio_source(fd)),
                 [](FileDataSource *source) {
                     delete source;
                 }
@@ -53,19 +53,19 @@ void RecordingEngine::setupAudioSource(int fd) {
 void RecordingEngine::startLivePlayback() {
     lock_guard<mutex> lock(livePlaybackStreamMtx);
     LOGD(TAG, "startLivePlayback(): ");
-    mRecordingIO.sync_live_playback();
-    livePlaybackStream.startStream();
+    mRecordingIO->sync_live_playback();
+    livePlaybackStream->startStream();
 }
 
 void RecordingEngine::stopLivePlayback() {
     lock_guard<mutex> lock(livePlaybackStreamMtx);
     LOGD(TAG, "stopLivePlayback(): %d");
 
-    if (livePlaybackStream.mStream) {
-        if (livePlaybackStream.mStream->getState() != oboe::StreamState::Closed) {
-            livePlaybackStream.stopStream();
+    if (livePlaybackStream->mStream) {
+        if (livePlaybackStream->mStream->getState() != oboe::StreamState::Closed) {
+            livePlaybackStream->stopStream();
         } else {
-            livePlaybackStream.resetStream();
+            livePlaybackStream->resetStream();
         }
     }
 }
@@ -88,35 +88,35 @@ void RecordingEngine::startPlayingWithMixingTracksWithoutSetup() {
     lock_guard<mutex> lock(playbackStreamMtx);
     LOGD(TAG, "startPlayingWithMixingTracksWithoutSetup(): ");
 
-    if (!playbackStream.mStream) {
-        if (playbackStream.openStream() != oboe::Result::OK) {
+    if (!playbackStream->mStream) {
+        if (playbackStream->openStream() != oboe::Result::OK) {
             return;
         }
     }
 
-    mRecordingIO.setPlaybackPlaying(true);
-    playbackStream.startStream();
+    mRecordingIO->setPlaybackPlaying(true);
+    playbackStream->startStream();
 }
 
 bool RecordingEngine::startPlaybackCallable() {
-    if (!playbackStream.mStream) {
-        if (playbackStream.openStream() != oboe::Result::OK) {
+    if (!playbackStream->mStream) {
+        if (playbackStream->openStream() != oboe::Result::OK) {
             return false;
         }
     }
 
     if (mDataSource) {
-        mRecordingIO.clearPlayerSources();
-        mRecordingIO.add_source_to_player(mDataSource);
-        return playbackStream.startStream() == oboe::Result::OK;
+        mRecordingIO->clearPlayerSources();
+        mRecordingIO->add_source_to_player(mDataSource);
+        return playbackStream->startStream() == oboe::Result::OK;
     }
 
     return false;
 }
 
 bool RecordingEngine::startPlaybackWithMixingTracksCallable() {
-    if (!playbackStream.mStream) {
-        if (playbackStream.openStream() != oboe::Result::OK) {
+    if (!playbackStream->mStream) {
+        if (playbackStream->openStream() != oboe::Result::OK) {
             return false;
         }
     }
@@ -126,20 +126,20 @@ bool RecordingEngine::startPlaybackWithMixingTracksCallable() {
         sourceMap.insert(pair<string, shared_ptr<DataSource>>(it->first, it->second));
     }
 
-    mRecordingIO.clearPlayerSources();
+    mRecordingIO->clearPlayerSources();
 
     if (mDataSource) {
-        mRecordingIO.addSourceMapWithRecordedSource(sourceMap, mDataSource);
+        mRecordingIO->addSourceMapWithRecordedSource(sourceMap, mDataSource);
     } else {
-        mRecordingIO.addSourceMap(sourceMap);
+        mRecordingIO->addSourceMap(sourceMap);
     }
 
     if (sourceMap.size() == 0 && mDataSource == nullptr) {
         return false;
     }
 
-    mRecordingIO.setPlaybackPlaying(true);
-    return playbackStream.startStream() == oboe::Result::OK;
+    mRecordingIO->setPlaybackPlaying(true);
+    return playbackStream->startStream() == oboe::Result::OK;
 }
 
 bool RecordingEngine::startMixingTracksPlayback() {
@@ -152,8 +152,8 @@ bool RecordingEngine::startMixingTracksPlayback() {
 bool RecordingEngine::startMixingTracksPlaybackCallable() {
     if (mSourceMapStore->sourceMap.size() == 0) return false;
 
-    if (!playbackStream.mStream) {
-        if (playbackStream.openStream() != oboe::Result::OK) {
+    if (!playbackStream->mStream) {
+        if (playbackStream->openStream() != oboe::Result::OK) {
             return false;
         }
     }
@@ -163,28 +163,28 @@ bool RecordingEngine::startMixingTracksPlaybackCallable() {
         sourceMap.insert(pair<string, shared_ptr<DataSource>>(it->first, it->second));
     }
 
-    bool checkResult = mRecordingIO.checkPlayerSources(sourceMap);
+    bool checkResult = mRecordingIO->checkPlayerSources(sourceMap);
     if (!checkResult) {
-        mRecordingIO.clearPlayerSources();
-        mRecordingIO.addSourceMap(sourceMap);
+        mRecordingIO->clearPlayerSources();
+        mRecordingIO->addSourceMap(sourceMap);
     }
 
-    bakPlayHead = mRecordingIO.getCurrentPlaybackProgress();
+    bakPlayHead = mRecordingIO->getCurrentPlaybackProgress();
 
     bool shouldPlay = true;
     if (mDataSource) {
-        if (mDataSource->getSampleSize() < mRecordingIO.getPlayerMaxTotalSourceFrames()) {
-            mRecordingIO.setPlayHead(mDataSource->getSampleSize());
+        if (mDataSource->getSampleSize() < mRecordingIO->getPlayerMaxTotalSourceFrames()) {
+            mRecordingIO->setPlayHead(mDataSource->getSampleSize());
         } else {
             shouldPlay = false;
         }
     } else {
-        mRecordingIO.setPlayHead(0);
+        mRecordingIO->setPlayHead(0);
     }
 
     if (shouldPlay) {
-        mRecordingIO.setPlaybackPlaying(true);
-        return playbackStream.startStream() == oboe::Result::OK;
+        mRecordingIO->setPlaybackPlaying(true);
+        return playbackStream->startStream() == oboe::Result::OK;
     }
 
     return false;
@@ -193,15 +193,15 @@ bool RecordingEngine::startMixingTracksPlaybackCallable() {
 void RecordingEngine::stopMixingTracksPlayback() {
     lock_guard<mutex> lock(playbackStreamMtx);
     LOGD(TAG, "stopMixingTracksPlayback()");
-    mRecordingIO.setPlaybackPlaying(false);
+    mRecordingIO->setPlaybackPlaying(false);
     closePlaybackStream();
-    mRecordingIO.setPlayHead(bakPlayHead);
+    mRecordingIO->setPlayHead(bakPlayHead);
 }
 
 void RecordingEngine::stopAndResetPlayback() {
     lock_guard<mutex> lock(playbackStreamMtx);
     LOGD(TAG, "stopAndResetPlayback()");
-    mRecordingIO.setPlaybackPlaying(false);
+    mRecordingIO->setPlaybackPlaying(false);
     closePlaybackStream();
 }
 
@@ -213,16 +213,16 @@ void RecordingEngine::stopPlayback() {
 }
 
 void RecordingEngine::stopPlaybackCallable() {
-    mRecordingIO.setPlaybackPlaying(false);
+    mRecordingIO->setPlaybackPlaying(false);
     closePlaybackStream();
 }
 
 void RecordingEngine::closePlaybackStream() {
-    if (playbackStream.mStream) {
-        if (playbackStream.mStream->getState() != oboe::StreamState::Closed) {
-            playbackStream.stopStream();
+    if (playbackStream->mStream) {
+        if (playbackStream->mStream->getState() != oboe::StreamState::Closed) {
+            playbackStream->stopStream();
         } else {
-            playbackStream.resetStream();
+            playbackStream->resetStream();
         }
     }
 }
@@ -230,8 +230,8 @@ void RecordingEngine::closePlaybackStream() {
 void RecordingEngine::pausePlayback() {
     lock_guard<mutex> lock(playbackStreamMtx);
     LOGD(TAG, "pausePlayback(): ");
-    mRecordingIO.setPlaybackPlaying(false);
-    playbackStream.stopStream();
+    mRecordingIO->setPlaybackPlaying(false);
+    playbackStream->stopStream();
 }
 
 void RecordingEngine::startRecording() {
@@ -239,21 +239,21 @@ void RecordingEngine::startRecording() {
     LOGD(TAG, "startRecording(): ");
     isDirty = true;
 
-    mRecordingIO.reserveRecordingBuffer();
-    recordingStream.startStream();
+    mRecordingIO->reserveRecordingBuffer();
+    recordingStream->startStream();
 }
 
 void RecordingEngine::stopRecording() {
     lock_guard<mutex> lock(recordingStreamMtx);
     LOGD(TAG, "stopRecording(): %d");
 
-    if (recordingStream.mStream) {
-        if (recordingStream.mStream->getState() != oboe::StreamState::Closed) {
-            recordingStream.stopStream();
+    if (recordingStream->mStream) {
+        if (recordingStream->mStream->getState() != oboe::StreamState::Closed) {
+            recordingStream->stopStream();
             flushWriteBuffer();
-            mRecordingIO.clearRecordingBuffer();
+            mRecordingIO->clearRecordingBuffer();
         } else {
-            recordingStream.resetStream();
+            recordingStream->resetStream();
         }
     }
 }
@@ -271,19 +271,19 @@ void RecordingEngine::restartPlaybackWithMixingTracks() {
 }
 
 void RecordingEngine::flushWriteBuffer() {
-    mRecordingIO.flush_buffer();
+    mRecordingIO->flush_buffer();
 }
 
 int RecordingEngine::getCurrentMax() {
-    return mRecordingIO.getCurrentMax();
+    return mRecordingIO->getCurrentMax();
 }
 
 void RecordingEngine::resetCurrentMax() {
-    mRecordingIO.resetCurrentMax();
+    mRecordingIO->resetCurrentMax();
 }
 
 void RecordingEngine::addSourcesToPlayer(string* strArr, int count) {
-    mRecordingIO.clearPlayerSources();
+    mRecordingIO->clearPlayerSources();
 
     map<string, shared_ptr<DataSource>> playMap;
 
@@ -298,7 +298,7 @@ void RecordingEngine::addSourcesToPlayer(string* strArr, int count) {
         strArr[i].erase();
     }
 
-    mRecordingIO.addSourceMap(playMap);
+    mRecordingIO->addSourceMap(playMap);
 }
 
 void RecordingEngine::setStopPlayback() {
@@ -311,26 +311,26 @@ void RecordingEngine::setStopPlayback() {
 }
 
 int RecordingEngine::getTotalSampleFrames() {
-    return mRecordingIO.getTotalSampleFrames();
+    return mRecordingIO->getTotalSampleFrames();
 }
 
 int RecordingEngine::getCurrentPlaybackProgress() {
-    return mRecordingIO.getCurrentPlaybackProgress();
+    return mRecordingIO->getCurrentPlaybackProgress();
 }
 
 void RecordingEngine::setPlayHead(int position) {
     lock_guard<mutex> lock(playbackStreamMtx);
-    mRecordingIO.setPlayHead(position);
+    mRecordingIO->setPlayHead(position);
 }
 
 int RecordingEngine::getDurationInSeconds() {
-    return mRecordingIO.getDurationInSeconds();
+    return mRecordingIO->getDurationInSeconds();
 }
 
 void RecordingEngine::resetAudioEngine() {
-    mRecordingIO.clearPlayerSources();
+    mRecordingIO->clearPlayerSources();
     mDataSource = shared_ptr<FileDataSource> { nullptr};
-    return mRecordingIO.resetProperties();
+    return mRecordingIO->resetProperties();
 }
 
 

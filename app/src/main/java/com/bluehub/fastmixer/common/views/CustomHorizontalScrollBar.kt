@@ -6,7 +6,6 @@ import android.view.*
 import android.widget.HorizontalScrollView
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.bluehub.fastmixer.databinding.CustomScrollBarBinding
-import timber.log.Timber
 import kotlin.math.ceil
 
 class CustomHorizontalScrollBar(context: Context, attributeSet: AttributeSet?)

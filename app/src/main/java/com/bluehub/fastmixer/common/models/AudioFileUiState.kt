@@ -3,8 +3,6 @@ package com.bluehub.fastmixer.common.models
 import com.bluehub.fastmixer.common.config.Config
 import com.bluehub.fastmixer.common.utils.Optional
 import io.reactivex.rxjava3.subjects.BehaviorSubject
-import timber.log.Timber
-import java.io.Serializable
 import java.util.*
 
 

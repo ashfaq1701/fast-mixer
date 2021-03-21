@@ -15,7 +15,6 @@ import com.bluehub.fastmixer.screens.mixing.AudioFileStore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.*
-import timber.log.Timber
 import java.io.File
 import java.util.*
 import javax.inject.Inject
@@ -62,7 +61,6 @@ class RecordingScreenViewModel @Inject constructor (@ApplicationContext val cont
 
     val recordingFilePath: String
         get() {
-            Timber.d("Recording file path: $recordingFileDirectory/recording.wav")
             return "$recordingFileDirectory/recording.wav"
         }
 
@@ -134,28 +132,28 @@ class RecordingScreenViewModel @Inject constructor (@ApplicationContext val cont
 
     val isRecordButtonEnabled = BooleanCombinedLiveData(
         true,
-        _eventIsPlaying, _eventIsPlayingWithMixingTracks
+        _eventIsPlaying, _eventIsPlayingWithMixingTracks, _isLoading
     ) { acc, curr ->
         acc && !curr
     }
 
     val isPlayButtonEnabled = BooleanCombinedLiveData(
         true,
-        _eventIsRecording, _eventIsPlayingWithMixingTracks
+        _eventIsRecording, _eventIsPlayingWithMixingTracks, _isLoading
     ) { acc, curr ->
         acc && !curr
     }
 
     val isPlayWithMixingTracksButtonEnabled = BooleanCombinedLiveData(
         true,
-        _eventIsRecording, _eventIsPlaying
+        _eventIsRecording, _eventIsPlaying, _isLoading
     ) { acc, curr ->
         acc && !curr
     }
 
     val isResetButtonEnabled = BooleanCombinedLiveData(
         true,
-        _eventIsRecording, _eventIsPlaying, _eventIsPlayingWithMixingTracks
+        _eventIsRecording, _eventIsPlaying, _eventIsPlayingWithMixingTracks, _isLoading
     ) { acc, curr ->
         acc && !curr
     }
@@ -165,6 +163,13 @@ class RecordingScreenViewModel @Inject constructor (@ApplicationContext val cont
         _eventIsPlaying, _eventIsPlayingWithMixingTracks
     ) { acc, curr ->
         acc || curr
+    }
+
+    val isGoBackButtonEnabled = BooleanCombinedLiveData(
+        true,
+        _isLoading
+    ) { acc, curr ->
+        acc && !curr
     }
 
     val headphoneConnectedCallback: () -> Unit = {
@@ -427,6 +432,8 @@ class RecordingScreenViewModel @Inject constructor (@ApplicationContext val cont
     }
 
     fun setGoBack() {
+
+        if (_isLoading.value == true) return
 
         viewModelScope.launch {
             withContext(Dispatchers.IO) {

@@ -21,7 +21,6 @@ import com.visualizer.amplitude.AudioRecordView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.recording_screen.*
 import kotlinx.android.synthetic.main.view_loading.*
-import timber.log.Timber
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -171,6 +170,10 @@ class RecordingScreen : BaseFragment<RecordingScreenViewModel>() {
 
         viewModel.isResetButtonEnabled.observe(viewLifecycleOwner, {
             reset.isEnabled = it
+        })
+
+        viewModel.isGoBackButtonEnabled.observe(viewLifecycleOwner, {
+            goBack.isEnabled = it
         })
     }
 

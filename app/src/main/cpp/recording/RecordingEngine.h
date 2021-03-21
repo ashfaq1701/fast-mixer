@@ -88,13 +88,21 @@ private:
     mutex playbackStreamMtx;
 
     shared_ptr<SourceMapStore> mSourceMapStore;
-    RecordingIO mRecordingIO;
+    shared_ptr<RecordingIO> mRecordingIO {
+        new RecordingIO()
+    };
 
     shared_ptr<FileDataSource> mDataSource {nullptr};
 
-    RecordingStream recordingStream = RecordingStream(&mRecordingIO);
-    LivePlaybackStream livePlaybackStream = LivePlaybackStream(&mRecordingIO);
-    PlaybackStream playbackStream = PlaybackStream(&mRecordingIO);
+    unique_ptr<RecordingStream> recordingStream {
+        new RecordingStream(mRecordingIO)
+    };
+    unique_ptr<LivePlaybackStream> livePlaybackStream{
+        new LivePlaybackStream(mRecordingIO)
+    };
+    unique_ptr<PlaybackStream> playbackStream {
+        new PlaybackStream(mRecordingIO)
+    };
     bool mRecordingScreenViewModelPassed = false;
 
     void stopPlayback();

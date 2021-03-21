@@ -4,6 +4,6 @@
 
 #include "RecordingBaseStream.h"
 
-RecordingBaseStream::RecordingBaseStream(RecordingIO* recordingIO) : BaseStream() {
+RecordingBaseStream::RecordingBaseStream(shared_ptr<RecordingIO> recordingIO) : BaseStream() {
     mRecordingIO = recordingIO;
 }

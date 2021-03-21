@@ -5,7 +5,7 @@
 #include <cassert>
 #include "LivePlaybackStream.h"
 
-LivePlaybackStream::LivePlaybackStream(RecordingIO *recordingIO): RecordingBaseStream(recordingIO) {}
+LivePlaybackStream::LivePlaybackStream(shared_ptr<RecordingIO> recordingIO): RecordingBaseStream(recordingIO) {}
 
 oboe::Result LivePlaybackStream::openStream() {
     LOGD(TAG, "openLivePlaybackStream(): ");
@@ -51,15 +51,14 @@ LivePlaybackStream::setupLivePlaybackStreamParameters(oboe::AudioStreamBuilder *
             ->setDeviceId(deviceId)
             ->setDirection(oboe::Direction::Output)
             ->setSampleRate(sampleRate)
-            ->setChannelCount(channelCount)
-            ->setFramesPerDataCallback(RecordingStreamConstants::mLivePlaybackFramesPerCallback);
+            ->setChannelCount(channelCount);
     return builder;
 }
 
 oboe::DataCallbackResult
 LivePlaybackStream::onAudioReady(oboe::AudioStream *audioStream, void *audioData,
                                    int32_t numFrames) {
-    if (audioStream && audioStream->getState() != oboe::StreamState::Closed) {
+    if (audioStream) {
         return processLivePlaybackFrame(audioStream, static_cast<int16_t *>(audioData),
                                         numFrames * audioStream->getChannelCount());
     }
@@ -69,11 +68,9 @@ LivePlaybackStream::onAudioReady(oboe::AudioStream *audioStream, void *audioData
 oboe::DataCallbackResult
 LivePlaybackStream::processLivePlaybackFrame(oboe::AudioStream *audioStream, int16_t *audioData,
                                                int32_t numFrames) {
-    fillArrayWithZeros(audioData, numFrames);
-    int64_t framesWritten = mRecordingIO->read_live_playback(audioData, numFrames);
+    if (audioData) {
+        fillArrayWithZeros(audioData, numFrames);
+        int64_t framesWritten = mRecordingIO->read_live_playback(audioData, numFrames);
+    }
     return oboe::DataCallbackResult::Continue;
-}
-
-void LivePlaybackStream::onErrorAfterClose(oboe::AudioStream *audioStream, oboe::Result result) {
-    mStream.reset();
 }

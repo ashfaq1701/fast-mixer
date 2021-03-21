@@ -5,13 +5,13 @@ import androidx.lifecycle.Observer
 import com.bluehub.fastmixer.common.models.AudioFileUiState
 import com.bluehub.fastmixer.common.models.AudioViewAction
 import com.bluehub.fastmixer.common.utils.Optional
-import dagger.hilt.android.scopes.ActivityRetainedScoped
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import kotlinx.coroutines.*
 import java.util.*
 import javax.inject.Inject
+import javax.inject.Singleton
 
-@ActivityRetainedScoped
+@Singleton
 class FileWaveViewStore @Inject constructor(val mixingRepository: MixingRepository) {
     companion object {
         const val ZOOM_STEP = 1
@@ -52,7 +52,7 @@ class FileWaveViewStore @Inject constructor(val mixingRepository: MixingReposito
             } else listOf()
         }
 
-    val coroutineScope = CoroutineScope(Job() + Dispatchers.Default)
+    var coroutineScope = CoroutineScope(Job() + Dispatchers.Default)
 
     private val fileListObserver: Observer<MutableList<AudioFileUiState>> = Observer {
         calculateSampleCountEachView()
@@ -94,6 +94,12 @@ class FileWaveViewStore @Inject constructor(val mixingRepository: MixingReposito
     fun setClipboardHasDataLiveData(clipboardHasDataLiveData: LiveData<Boolean>) {
         mClipboardHasDataLiveData = clipboardHasDataLiveData
         mClipboardHasDataLiveData.observeForever(clipboardHasDataObserver)
+    }
+
+    fun recreateCoroutineScopeIfCancelled() {
+        if (!coroutineScope.isActive) {
+            coroutineScope = CoroutineScope(Job() + Dispatchers.Default)
+        }
     }
 
     fun updateMeasuredWidth(width: Int) {

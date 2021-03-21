@@ -5,7 +5,7 @@
 #include <cassert>
 #include "RecordingStream.h"
 
-RecordingStream::RecordingStream(RecordingIO* recordingIO): RecordingBaseStream(recordingIO) {}
+RecordingStream::RecordingStream(shared_ptr<RecordingIO> recordingIO): RecordingBaseStream(recordingIO) {}
 
 oboe::Result RecordingStream::openStream() {
     oboe::AudioStreamBuilder builder;
@@ -31,34 +31,33 @@ oboe::AudioStreamBuilder *
 RecordingStream::setupRecordingStreamParameters(oboe::AudioStreamBuilder *builder) {
     builder->setAudioApi(RecordingStreamConstants::mAudioApi)
             ->setFormat(RecordingStreamConstants::mFormat)
-            ->setSharingMode(oboe::SharingMode::Shared)
-            ->setPerformanceMode(oboe::PerformanceMode::LowLatency)
+            ->setSharingMode(oboe::SharingMode::Exclusive)
+            //Commenting out because on Samsung Note 20 with performance mode low latency, recording doesn't work
+            //->setPerformanceMode(oboe::PerformanceMode::LowLatency)
+            ->setInputPreset(RecordingStreamConstants::mRecordingPreset)
             ->setDataCallback(this)
-            ->setErrorCallback(this)
             ->setDeviceId(RecordingStreamConstants::mRecordingDeviceId)
             ->setDirection(oboe::Direction::Input)
-            ->setChannelCount(RecordingStreamConstants::mInputChannelCount)
-            ->setFramesPerDataCallback(RecordingStreamConstants::mRecordingFramesPerCallback);
+            ->setChannelCount(RecordingStreamConstants::mInputChannelCount);
 
     return builder;
 }
 
 oboe::DataCallbackResult
 RecordingStream::onAudioReady(oboe::AudioStream *audioStream, void *audioData, int32_t numFrames) {
-    if (audioStream && audioStream->getState() != oboe::StreamState::Closed) {
+    if (audioStream) {
         return processRecordingFrames(audioStream, static_cast<int16_t *>(audioData),
                                       numFrames * audioStream->getChannelCount());
     }
+
     return oboe::DataCallbackResult::Stop;
 }
 
 oboe::DataCallbackResult
 RecordingStream::processRecordingFrames(oboe::AudioStream *audioStream, int16_t *audioData,
                                           int32_t numFrames) {
-    int32_t framesWritten = mRecordingIO->write(audioData, numFrames);
+    if (audioData) {
+        int32_t framesWritten = mRecordingIO->write(audioData, numFrames);
+    }
     return oboe::DataCallbackResult::Continue;
-}
-
-void RecordingStream::onErrorAfterClose(oboe::AudioStream *audioStream, oboe::Result result) {
-    mStream.reset();
 }

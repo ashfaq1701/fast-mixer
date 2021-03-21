@@ -5,7 +5,7 @@
 #include <cassert>
 #include "PlaybackStream.h"
 
-PlaybackStream::PlaybackStream(RecordingIO* recordingIO): RecordingBaseStream(recordingIO) {}
+PlaybackStream::PlaybackStream(shared_ptr<RecordingIO> recordingIO): RecordingBaseStream(recordingIO) {}
 
 oboe::Result PlaybackStream::openStream() {
     LOGD(TAG, "openPlaybackStream(): ");
@@ -48,7 +48,6 @@ PlaybackStream::setupPlaybackStreamParameters(oboe::AudioStreamBuilder *builder,
             ->setSharingMode(oboe::SharingMode::Shared)
             ->setPerformanceMode(oboe::PerformanceMode::LowLatency)
             ->setDataCallback(audioStreamCallback)
-            ->setErrorCallback(reinterpret_cast<AudioStreamErrorCallback *>(audioStreamCallback))
             ->setDeviceId(deviceId)
             ->setDirection(oboe::Direction::Output)
             ->setSampleRate(sampleRate)
@@ -59,25 +58,20 @@ PlaybackStream::setupPlaybackStreamParameters(oboe::AudioStreamBuilder *builder,
 oboe::DataCallbackResult
 PlaybackStream::onAudioReady(oboe::AudioStream *audioStream, void *audioData,
                                int32_t numFrames) {
-    if (audioStream && audioStream->getState() != oboe::StreamState::Closed) {
+    if (audioStream) {
         return processPlaybackFrame(audioStream, static_cast<float_t *>(audioData), numFrames,
                                     audioStream->getChannelCount());
     }
+
     return oboe::DataCallbackResult::Stop;
 }
 
 oboe::DataCallbackResult
 PlaybackStream::processPlaybackFrame(oboe::AudioStream *audioStream, float *audioData,
                                        int32_t numFrames, int32_t channelCount) {
-    if (mStream->getState() != oboe::StreamState::Started) {
-        return oboe::DataCallbackResult::Stop;
+    if (audioData) {
+        fillArrayWithZeros(audioData, numFrames);
+        mRecordingIO->read_playback(audioData, numFrames);
     }
-
-    fillArrayWithZeros(audioData, numFrames);
-    mRecordingIO->read_playback(audioData, numFrames);
     return oboe::DataCallbackResult::Continue;
-}
-
-void PlaybackStream::onErrorAfterClose(oboe::AudioStream *audioStream, oboe::Result result) {
-    mStream.reset();
 }

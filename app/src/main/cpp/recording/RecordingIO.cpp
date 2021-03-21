@@ -12,7 +12,6 @@
 #include <mutex>
 #include <condition_variable>
 #include <sys/stat.h>
-#include "../Constants.h"
 #include "RecordingEngine.h"
 
 mutex RecordingIO::flushMtx;

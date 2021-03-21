@@ -22,10 +22,11 @@ SourceMapStore::~SourceMapStore() {
     auto it = sourceMap.begin();
     while (it != sourceMap.end()) {
         it->second.reset();
+        ++it;
     }
     sourceMap.clear();
 }
 
 void SourceMapStore::reset() {
-    mInstance = shared_ptr<SourceMapStore> {nullptr};
+    mInstance.reset();
 }

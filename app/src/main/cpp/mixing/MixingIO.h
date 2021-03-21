@@ -49,6 +49,8 @@ public:
 
 private:
     shared_ptr<Player> mPlayer {nullptr};
+
+    function<void(void)> mStopPlaybackCallback = nullptr;
 };
 
 

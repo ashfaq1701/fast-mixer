@@ -9,9 +9,9 @@
 
 using namespace std;
 
-class PlaybackStream: public RecordingBaseStream, public oboe::AudioStreamDataCallback, public oboe::AudioStreamErrorCallback {
+class PlaybackStream: public RecordingBaseStream, public oboe::AudioStreamDataCallback {
 public:
-    PlaybackStream(RecordingIO* recordingIO);
+    PlaybackStream(shared_ptr<RecordingIO> recordingIO);
 
     oboe::Result openStream();
 
@@ -28,8 +28,6 @@ public:
 
 private:
     const char* TAG = "Playback Stream:: %s";
-
-    void onErrorAfterClose(oboe::AudioStream* audioStream, oboe::Result result);
 };
 
 
