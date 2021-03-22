@@ -4,7 +4,7 @@
 
 [![See app preview](https://i.imgur.com/Ab8pHij.png)](https://youtu.be/v9aF8kAckFM)
 
-This project is an open-source sound recorder and mixer for Android based mobile devices and tablets. This app can,
+This project is an open-source sound recorder and mixer for Android based mobile devices and tablets. Features of this app are,
 
 ### Recording Screen
 * Record audio from device's primary microphone or input device attached to the device.
@@ -44,6 +44,35 @@ This project is an open-source sound recorder and mixer for Android based mobile
 * `Zoom Out` button in the bottom drawer can be pressed to Zoom out all of the sources together, maintaining their display width ratio.
 * `Reset` button in the bottom drawer can be pressed to reset each of the source's Zoom Level to a value of 1, restoring their relative width ratio.
 * Finally `Write to disk` button at the top can be pressed to write the mixed audio to the public media storage. A auto generated file name will be suggested in the beginning, which can be changed to give the output file a preferred name.
+
+
+### Project Structure
+A brief navigation to the project's architecture is given below,
+
+#### Kotlin (UI) part:
+UI portion of the app is built with Kotlin,
+
+* [screens](app/src/main/java/com/bluehub/fastmixer/screens) - This folder contains the screen related classes, such as activities, fragments and view models.
+* [screens/mixing](app/src/main/java/com/bluehub/fastmixer/screens/mixing) - This folder contains the mixing screen fragment, view model, repository and shared stores to share ui states between multiple view widgets.
+* [screens/mixing/FileWaveViewStore](app/src/main/java/com/bluehub/fastmixer/screens/FileWaveViewStore.kt) - As audio sources in this application needs to interact with each other to maintain relative width, this class is used as a centralized source of shared UI states. Instance of this object is dependency injected in all of the wave view instances.
+* [screens/mixing/AudioFileStore](app/src/main/java/com/bluehub/fastmixer/screens/mixing/AudioFileStore.kt) - Audio file UI states need to be preserved across app's navigation and also need to shared with the recording screen. This class acts a centralized source for the current list of loaded files.
+* [screens/mixing/PlayFlagStore](app/src/main/java/com/bluehub/fastmixer/screens/mixing/PlayFlagStore.kt) - Play states and Group Play state of the application needs to be shared among different parts of the code. So this is also implemented as a separate store, so that it can be dependency injected.
+* [screens/mixing/modals](app/src/main/java/com/bluehub/fastmixer/screens/mixing/modals) - Popup models inside of the mixing screen.
+* [screens/recording](app/src/main/java/com/bluehub/fastmixer/screens/recording) - Recording screen related stuffs. Fragment, view model and repository.
+* [common/di/screens](app/src/main/java/com/bluehub/fastmixer/common/di/screens) - This project uses hilt, not dagger, so for DI I didn't need to create a lot of modules, components etc. For creating an instance of RxPermission, I needed to create a module, which is injected into FragmentComponent directly. Hilt is great.
+* [common/fragments](app/src/main/java/com/bluehub/fastmixer/common/fragments) - Base fragment and base dialog fragment with bootstrapping code.
+* [common/repositories](app/src/main/java/com/bluehub/fastmixer/common/repositories) - Just some audio utility classes.
+* [common/utils](app/src/main/java/com/bluehub/fastmixer/common/utils) - Some random utility classes.
+* [common/viewmodel](app/src/main/java/com/bluehub/fastmixer/common/viewmodel) - Base view model with some bootstrapping code.
+* [common/views](app/src/main/java/com/bluehub/fastmixer/common/views) - All the custom views used in the app.
+* [common/views/FileWaveView](app/src/main/java/com/bluehub/fastmixer/common/views/FileWaveView.kt) - File wave view custom view class. This does heavy rendering job and heavily use RxJava observers.
+* [common/views/FileWaveViewWidget](app/src/main/java/com/bluehub/fastmixer/common/views/FileWaveViewWidget.kt) - Wrapper view around file wave view with control buttons and drop down menu. This view also registers and transforms many RxJava observers.
+* [common/views/CustomHorizontalScrollBar](common/views/CustomHorizontalScrollBar.kt) - Custom made horizontal scrollbar. I could not use ScrollView because the scroll gesture I needed for segment resizing. So this scrollbar is created.
+* [broadcastReceivers/AudioDeviceChangeListener](app/src/main/java/com/bluehub/fastmixer/broadcastReceivers/AudioDeviceChangeListener.kt) - Broadcast receiver to listen for changes in connected audio devices. Used to detect headphone or BT Headset connection / disconnection.
+* [audio](app/src/main/java/com/bluehub/fastmixer/audio) - C++ interfaces for this project.
+* [audio/MixingEngine](app/src/main/java/com/bluehub/fastmixer/audio/MixingEngine.kt) - C++ interfaced native functions used in mixing screen.
+* [audio/RecordingEngineProxy](app/src/main/java/com/bluehub/fastmixer/audio/RecordingEngineProxy.kt) - Wrapper class around RecordingEngine to avail dependency injection.
+* [audio/MixingEngineProxy](app/src/main/java/com/bluehub/fastmixer/audio/MixingEngineProxy.kt) - Wrapper class around MixingEngine to avail dependency injection.
 
 This is an ongoing project using [google/oboe](https://github.com/google/oboe) c++ library. This is going to be an easy to use mixer for recorded streams and external audio files. I want to credit [sheraz-nadeem/oboe_recorder_sample](https://github.com/sheraz-nadeem/oboe_recorder_sample). This project helped me to understand the required architecture of such a project.
 
