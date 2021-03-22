@@ -46,7 +46,56 @@ This project is an open-source sound recorder and mixer for Android based mobile
 * Finally `Write to disk` button at the top can be pressed to write the mixed audio to the public media storage. A auto generated file name will be suggested in the beginning, which can be changed to give the output file a preferred name.
 
 
-### Project Structure
+### Interesting code chunks and implementation details
+* The way recording buffer is written into a file is non-blocking and done in a background thread. 
+  * Recorded buffer is taken and added to a bigger buffer with a capacity of 30 seconds audio.
+    [RecordingIO::write()](app/src/main/cpp/recording/RecordingIO.cpp#L95)
+  * Once the bigger buffer is about to become full, flush_buffer function triggers. This function copies those data into a new pre-allocated temporary buffer, and frees up the main buffer. Then it notifies by the mutex that main buffer is ready to accept new audio samples. After that it enqueues a lambda worker to the TaskQueue which is a FIFO queue,
+    [RecordingIO::flush_buffer()](app/src/main/cpp/recording/RecordingIO.cpp#L118)
+  * Inside of the fifo queue the worker creates an LIBSNDFile handle and appends the audio data to the passed file descriptor. This is done in separate FIFO queue, so this is non-blocking.
+    [RecordingIO::flush_to_file()](app/src/main/cpp/recording/RecordingIO.cpp#L85)
+  * But there is a catch, the lock used while flushing buffer, inside of the write function, still locks the callback thread for a very short time. This should not be done, callback thread should not be locked at all. In a later fix, this lock will be removed by adding a new backup buffer.  
+    [RecordingIO::write()](app/src/main/cpp/recording/RecordingIO.cpp#L99)
+
+* Live playback stream reads from the audio write buffer when there is data available. It maintains it's own read pointer which eventually resets to the current write pointer, when recording is paused and replayed.
+  [RecordingIO::read_live_playback()](app/src/main/cpp/recording/RecordingIO.cpp#L145)
+  
+* TaskQueue is a fifo queue that takes write buffer flushing tasks and executes them one after another, in a background thread.
+  [TaskQueue](app/src/main/cpp/taskqueue/TaskQueue.h#L53)
+   
+* The way audio samples of a source are summarized to a specified number of samples (for visualization) is interesting and optimal, this code is worth looking.
+  [FileDataSource::readData](app/src/main/cpp/audio/FileDataSource.cpp#L104)
+
+* While mixing multiple sources we need to normalize the mixed audio to preserve original loudness. For this we need max(A[i] + B[i] + C[i]), where A, B and C are 3 loaded sources. When A, B and C are decoded audios loaded into RAM, this operation can be very time consuming, delaying the total mixing operation. This is done by dividing the work into multiple worker threads and then combining the results. The number of workers are kept dynamic.
+  [SourceStore::updateAddedMax](app/src/main/cpp/audio/SourceStore.cpp#L12)
+  
+* The way player renders specific chunk mixed from multiple sources in real time, in a non-blocking manner, is interesting.
+  [Player::renderAudio](app/src/main/cpp/audio/Player.cpp#L55)
+  
+* The way mixed audio is written into a file, in multiple passes, doing all of the computation in place, is an interesting implementation too.
+  [MixedAudioWriter::writeToFile](app/src/main/cpp/audio/MixedAudioWriter.cpp#L10)
+  
+* Obviously the decoded sources are kept in a single place and in an efficient manner. While sharing them with Writer, Player or any other object, a shared_ptr or a map with shared_ptr's are shared and data copy is avoided at all cost. Also the lifecycle of those objects are carefully monitored, to prevent any unintentional crash.
+  [SourceMapStore::sourceMap](app/src/main/cpp/SourceMapStore.h)
+  
+* To update ui state properly when a audio finishes playing, reverse call from C++ - Kotlin is made. The way it is done is interesting too,
+  [RecordingEngine::setStopPlayback](app/src/main/cpp/recording/RecordingEngine.cpp#L305)
+  [prepare_kotlin_recording_method_ids](app/src/main/cpp/recording/recording-lib.cpp#L17)
+  
+* In Kotlin side while reading from file, we used new Scoped Storage, which doesn't need any permission. From Kotlin to native code a FileDescriptor is passed, which is obtained from the ContentManager URI.
+  [RecordingScreenViewModel::addRecordedFilePath](app/src/main/java/com/bluehub/fastmixer/screens/mixing/MixingScreenViewModel.kt#L188)
+  [FileManager::getReadOnlyFdForPath](app/src/main/java/com/bluehub/fastmixer/common/utils/FileManager.kt#L33)
+  
+* While writing file as media using scoped storage, we first get the file descriptor for the media storage and then pass the file descriptor to C++ for writing,
+  [WriteViewModel::performWrite](app/src/main/java/com/bluehub/fastmixer/screens/mixing/modals/WriteViewModel.kt#L54)
+  [FileManager::getFileDescriptorForMedia](app/src/main/java/com/bluehub/fastmixer/common/utils/FileManager.kt#L45)
+  
+* The whole custom view FileWaveView, pulls audio data into background thread, does the scaling efficiently and then does heavy rendering on the screen in an efficient and non-blocking manner too. This can be seen by navigating through the series of function calls fetchPointsToPlot, processPlotPoints and createAndDrawCanvas.
+  [fetchPointsToPlot](app/src/main/java/com/bluehub/fastmixer/common/views/FileWaveView.kt#L183)
+  
+Other than these too, the whole codebase has many other solutions of interesting and complex problems. While doing this I faced countless issues and tried to solve them in standard manners and following the best practices.
+  
+### Code Walk-through
 A brief navigation to the project's architecture is given below,
 
 #### Kotlin (UI) part:
@@ -74,7 +123,7 @@ UI portion of the app is built with Kotlin,
 * [audio/RecordingEngineProxy](app/src/main/java/com/bluehub/fastmixer/audio/RecordingEngineProxy.kt) - Wrapper class around RecordingEngine to avail dependency injection.
 * [audio/MixingEngineProxy](app/src/main/java/com/bluehub/fastmixer/audio/MixingEngineProxy.kt) - Wrapper class around MixingEngine to avail dependency injection.
 
-### C++ (Engine) part:
+#### C++ (Engine) part:
 Audio and IO part of the app is done using C++,
 
 * [audio](app/src/main/cpp/audio) - Audio, player, decoder and mixed file writer classes.
