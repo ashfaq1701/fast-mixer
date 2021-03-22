@@ -74,6 +74,36 @@ UI portion of the app is built with Kotlin,
 * [audio/RecordingEngineProxy](app/src/main/java/com/bluehub/fastmixer/audio/RecordingEngineProxy.kt) - Wrapper class around RecordingEngine to avail dependency injection.
 * [audio/MixingEngineProxy](app/src/main/java/com/bluehub/fastmixer/audio/MixingEngineProxy.kt) - Wrapper class around MixingEngine to avail dependency injection.
 
+### C++ (Engine) part:
+Audio and IO part of the app is done using C++,
+
+* [audio](app/src/main/cpp/audio) - Audio, player, decoder and mixed file writer classes.
+* [mixing](app/src/main/cpp/mixing) - Functions used in mixing screen of the application.
+* [recording](app/src/main/cpp/recording) - Functions used in recording screen of the application.
+* [streams](app/src/main/cpp/streams) - Base stream classes.
+* [synthesizers](app/src/main/cpp/synthesizers) - Synthesizers created for this project. Now only one is there, later many synthesizers are planned to be added.
+* [taskqueue](app/src/main/cpp/taskqueue) - A single background threaded FIFO queue.
+* [utils](app/src/main/cpp/utils) - Utility functions.
+* [jvm_env](app/src/main/cpp/jvm_env.h) - An encapsulation class to do operations on JVM environment. Used for calling some functions in reverse path (cpp - java).
+* [SourceMapStore](app/src/main/cpp/SourceMapStore.cpp) - A shared singleton class to store the encoded audio files. The singleton instance is shared between recording and mixing engine classes.
+* [structs](app/src/main/cpp/structs.h) - Simple structures needed for this app.
+* [mixing/mixing-lib](app/src/main/cpp/mixing/mixing-lib.cpp) - Entry point for mixing screen related functions.
+* [mixing/MixingEngine](app/src/main/cpp/mixing/MixingEngine.cpp) - Mixing engine class, entrypoint for all mixing related functions.
+* [mixing/MixingIO](app/src/main/cpp/mixing/MixingIO.cpp) - Mixing IO class, to perform all IO operations.
+* [mixing/streams](app/src/main/cpp/mixing/streams) - Mixing stream classes, playback stream for mixing screen.
+* [recording/recording-lib](app/src/main/cpp/recording/recording-lib.cpp) - Entry point for recording screen related functions.
+* [recording/RecordingEngine](app/src/main/cpp/recording/RecordingEngine.cpp) - Recording engine class, entrypoint for all recording related functions.
+* [recording/RecordingIO](app/src/main/cpp/recording/RecordingIO.cpp) - Recording IO class, to perform all IO operations.
+* [recording/streams](app/src/main/cpp/recording/streams) - Recording stream classes, recording stream, live playback stream and playback stream for mixing screen.
+* [audio/FFMpegExtractor](app/src/main/cpp/audio/FFMpegExtractor.cpp) - Decoder based on FFMpeg. Decodes audio files and returns a buffer containing all of the decoded audio samples. Works with the file descriptor passed from Kotlin side. This class contains the function which summarizes the audio file to a specified number of points. Used by the visualizer.
+* [audio/FileDataSource](app/src/main/cpp/audio/FileDataSource.cpp) - Class with necessary states to represent a decoded file source in the memory.
+* [audio/BufferedDataSource](app/src/main/cpp/audio/BufferedDataSource.cpp) - Class with necessary states to represent a buffered source (into clipboard) in the memory.
+* [audio/Player](app/src/main/cpp/audio/Player.cpp) - Player class which reads specific number of samples, added and normalized, from all of the loaded sources into the memory. Also holds states such as current play head pointer.
+* [audio/MixedAudioWriter](app/src/main/cpp/audio/MixedAudioWriter.cpp) - Class which writes the mixed audio from all of the sources loaded into the memory into the specified file. Target file is passed as a file descriptor from Kotlin.
+* [audio/SourceStore](app/src/main/cpp/audio/SourceStore.cpp) - Super class for Player and MixedAudioWriter. Player and MixedAudioWriter shares some common implementation and requires same set of functions. For sharing these implementation without necessarily copying code, we inherited those classes from SourceStore.
+* [CMakeLists.txt](app/src/main/cpp/CMakeLists.txt) - CMakeLists file loads all of the necessary classes and external modules into our project.
+
+
 This is an ongoing project using [google/oboe](https://github.com/google/oboe) c++ library. This is going to be an easy to use mixer for recorded streams and external audio files. I want to credit [sheraz-nadeem/oboe_recorder_sample](https://github.com/sheraz-nadeem/oboe_recorder_sample). This project helped me to understand the required architecture of such a project.
 
 To run this project install NDK and CMake in Android Studio.
