@@ -2,7 +2,7 @@
 
 ### Video Preview
 
-[![See app preview](https://user-images.githubusercontent.com/73867778/111960007-c3cb6300-8b21-11eb-917e-ce8d401548c2.pn)](https://youtu.be/v9aF8kAckFM)
+[![See app preview](https://i.imgur.com/Ab8pHij.png)](https://youtu.be/v9aF8kAckFM)
 
 This is an ongoing project using [google/oboe](https://github.com/google/oboe) c++ library. This is going to be an easy to use mixer for recorded streams and external audio files. I want to credit [sheraz-nadeem/oboe_recorder_sample](https://github.com/sheraz-nadeem/oboe_recorder_sample). This project helped me to understand the required architecture of such a project.
 
