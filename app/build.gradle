@@ -128,7 +128,6 @@ task copyWrapFile {
         def wrapFilePath = file("$rootProject.ext.ndkDir").absolutePath + "/wrap.sh/asan.sh"
         if (!folder.exists()) {
             WrapScriptABIs.each { currentABI ->
-                println("Folder will be created " + currentABI)
                 mkdir "src/main/resources/lib/" + currentABI
 
                 copy {
