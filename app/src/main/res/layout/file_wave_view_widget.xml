@@ -7,7 +7,7 @@
     <data>
         <variable
             name="waveViewEventListeners"
-            type="com.bluehub.fastmixer.common.views.FileWaveViewEventListeners" />
+            type="com.bluehub.mixi.common.views.FileWaveViewEventListeners" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -66,7 +66,7 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <com.bluehub.fastmixer.common.views.LockedHorizontalScrollView
+        <com.bluehub.mixi.common.views.LockedHorizontalScrollView
             android:id="@+id/fileWaveViewScroll"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -74,21 +74,21 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/waveViewSlideLayout">
 
-            <com.bluehub.fastmixer.common.views.FileWaveView
+            <com.bluehub.mixi.common.views.FileWaveView
                 android:id="@+id/fileWaveView"
                 android:layout_width="wrap_content"
                 android:layout_height="@dimen/audio_file_view_height"
                 tools:layout_height="120dp">
 
-                <com.bluehub.fastmixer.common.views.AudioWidgetSlider
+                <com.bluehub.mixi.common.views.AudioWidgetSlider
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
 
-            </com.bluehub.fastmixer.common.views.FileWaveView>
+            </com.bluehub.mixi.common.views.FileWaveView>
 
-        </com.bluehub.fastmixer.common.views.LockedHorizontalScrollView>
+        </com.bluehub.mixi.common.views.LockedHorizontalScrollView>
 
-        <com.bluehub.fastmixer.common.views.CustomHorizontalScrollBar
+        <com.bluehub.mixi.common.views.CustomHorizontalScrollBar
             android:id="@+id/fileWaveViewScrollBar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

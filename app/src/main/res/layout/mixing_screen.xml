@@ -7,8 +7,8 @@
     <data>
         <variable
             name="mixingScreenViewModel"
-            type="com.bluehub.fastmixer.screens.mixing.MixingScreenViewModel" />
-        <import type="com.bluehub.fastmixer.R"/>
+            type="com.bluehub.mixi.screens.mixing.MixingScreenViewModel" />
+        <import type="com.bluehub.mixi.R"/>
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -143,7 +143,7 @@
             app:layout_constraintStart_toEndOf="@id/drawerControl"
             tools:visibility="visible">
 
-            <com.bluehub.fastmixer.common.views.GroupControlButton
+            <com.bluehub.mixi.common.views.GroupControlButton
                 android:id="@+id/pasteAsNew"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -151,7 +151,7 @@
                 app:btnLabel="@{@string/paste_new}"
                 app:clickListener="@{mixingScreenViewModel.pasteAsNew}" />
 
-            <com.bluehub.fastmixer.common.views.GroupControlButton
+            <com.bluehub.mixi.common.views.GroupControlButton
                 android:id="@+id/groupPlayPause"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -159,7 +159,7 @@
                 app:btnLabel="@{@string/play}"
                 app:clickListener="@{mixingScreenViewModel.toggleGroupPlay}" />
 
-            <com.bluehub.fastmixer.common.views.GroupControlButton
+            <com.bluehub.mixi.common.views.GroupControlButton
                 android:id="@+id/groupZoomIn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -167,7 +167,7 @@
                 app:btnLabel="@{@string/zoom_in}"
                 app:clickListener="@{mixingScreenViewModel.groupZoomIn}" />
 
-            <com.bluehub.fastmixer.common.views.GroupControlButton
+            <com.bluehub.mixi.common.views.GroupControlButton
                 android:id="@+id/groupZoomOut"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -175,7 +175,7 @@
                 app:btnLabel="@{@string/zoom_out}"
                 app:clickListener="@{mixingScreenViewModel.groupZoomOut}" />
 
-            <com.bluehub.fastmixer.common.views.GroupControlButton
+            <com.bluehub.mixi.common.views.GroupControlButton
                 android:id="@+id/groupReset"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

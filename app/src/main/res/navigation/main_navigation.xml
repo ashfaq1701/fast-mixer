@@ -10,7 +10,7 @@
     <fragment
         android:id="@+id/mixingScreen"
         android:label="MixingScreen"
-        android:name="com.bluehub.fastmixer.screens.mixing.MixingScreen"
+        android:name="com.bluehub.mixi.screens.mixing.MixingScreen"
         tools:layout="@layout/mixing_screen">
 
         <action
@@ -27,7 +27,7 @@
     <fragment
         android:id="@+id/recordingScreen"
         android:label="RecordingScreen"
-        android:name="com.bluehub.fastmixer.screens.recording.RecordingScreen"
+        android:name="com.bluehub.mixi.screens.recording.RecordingScreen"
         tools:layout="@layout/recording_screen">
 
         <action

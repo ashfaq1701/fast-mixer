@@ -7,7 +7,7 @@
     <data>
         <variable
             name="viewModel"
-            type="com.bluehub.fastmixer.screens.mixing.PlayViewModel" />
+            type="com.bluehub.mixi.screens.mixing.PlayViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Fast Mixer</string>
+    <string name="app_name">Mixi</string>
     <string name="record_label">Record</string>
     <string name="save_to_disk">Save to Disk</string>
     <string name="read_from_disk">Read From Disk</string>
