@@ -101,7 +101,7 @@ Other than these too, the whole codebase has many other solutions of interesting
 * Record audio from device's primary microphone or input device attached to the device.
 * While recording, it shows a visualizer and timer to visualize the record operation.
 * There is a feature called `Live Playback`, which can be enabled only if wired headphones are connected. This will relay what the user is recording to the connected headphone in real time. The checkbox to enable live playback will be enabled if wired headphones are connected to the device.
-* There is a feature called `Mixing Play`. This will play the audios loaded into the app in the mixing screen, while recording. This will make it easy to load a track into the app and then sing with the track. To avoid echo, user should use headphone while using the `Mixing Play feature`.
+* There is a feature called `Mixing Play`. This will play the audios loaded into the app in the mixing screen, while recording. This will make it easy to load a track into the app and then sing with the track. To avoid echo, user should use headphone while using the `Mixing Play` feature.
 * The recorded audio can be played from the recording screen and can be seeked using the seekbar in the recording screen.
 * From recording screen user can play the recorded sound along with the other sounds loaded into the mixing screen. This can be done using `Play Mixed` button.
 * Recording is incremental. User can pause and record again. `Mixing Play` will always align with the current recording position.
@@ -117,7 +117,7 @@ Other than these too, the whole codebase has many other solutions of interesting
 * After zooming in if the waveview width gets bigger than the device width, then a Scrollbar will get visible, using which user can slide the waveview.
 * If after many zoom in actions, the scrollbar becomes over narrow, and can't be dragged, then user can slide the waveview using the arrow buttons placed above of each waveview.
 * Similarly user can Zoom out by pressing the `-` button located at the bottom of each waveview.
-* From this webview user can press play icon to play each individual source. There will be a play marker which will progress along the playback progression.
+* From this waveview user can press play icon to play each individual source. There will be a play marker which will progress along the playback progression.
 * Any position inside of the wave view can be long pressed to reposition the play marker at that position.
 * Inside each of the wave view widget, there is a segment selection icon, which when pressed, will create an initial segment boundary inside of the waveview.
 * Area inside the segment selector can be long pressed to resize the segment selector. Long pressing near the left edge and then dragging to a new position will reposition the left side. Long pressing near the right edge and then dragging to a new position will reposition the right edge.
