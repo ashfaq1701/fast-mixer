@@ -4,6 +4,7 @@ import android.app.Dialog
 import android.os.Bundle
 import android.view.*
 import android.widget.Toast
+import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.viewModels
 import com.bluehub.mixi.R
 import com.bluehub.mixi.common.fragments.BaseDialogFragment

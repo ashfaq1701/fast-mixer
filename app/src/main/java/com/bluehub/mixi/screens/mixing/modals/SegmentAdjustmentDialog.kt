@@ -3,6 +3,7 @@ package com.bluehub.mixi.screens.mixing.modals
 import android.app.Dialog
 import android.os.Bundle
 import android.view.*
+import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.viewModels
 import com.bluehub.mixi.common.fragments.BaseDialogFragment
 import com.bluehub.mixi.common.models.AudioFileUiState
