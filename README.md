@@ -1,4 +1,4 @@
-# Fast Mixer
+# Mixi
 
 ### Video Preview
 
