@@ -49,6 +49,10 @@ class MixingScreenViewModel @Inject constructor(@ApplicationContext val context:
     val audioFilesLiveData: LiveData<MutableList<AudioFileUiState>>
         get() = _audioFilesLiveData
 
+    private val _audioFilesIsEmpty = Transformations.map(audioFilesLiveData) {
+        it == null || it.size == 0
+    }
+
     private val _eventDrawerOpen = MutableLiveData<Boolean>()
     val eventDrawerOpen: LiveData<Boolean>
         get() = _eventDrawerOpen
@@ -123,14 +127,21 @@ class MixingScreenViewModel @Inject constructor(@ApplicationContext val context:
 
     val readButtonEnabled = BooleanCombinedLiveData(
         true,
-        _isLoading
+        _isLoading, isGroupPlaying
     ) { acc, curr ->
         acc && !curr
     }
 
     val recordButtonEnabled = BooleanCombinedLiveData(
         true,
-        _isLoading
+        _isLoading, isPlaying, isGroupPlaying
+    ) { acc, curr ->
+        acc && !curr
+    }
+
+    val groupPlayEnabled = BooleanCombinedLiveData(
+        true,
+        isPlaying, _audioFilesIsEmpty
     ) { acc, curr ->
         acc && !curr
     }
@@ -246,10 +257,6 @@ class MixingScreenViewModel @Inject constructor(@ApplicationContext val context:
 
     fun deleteFile(filePath: String) {
         viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                mixingRepository.deleteFile(filePath)
-            }
-
             audioFileStore.run {
                 val idxToRemove = audioFiles.foldIndexed(listOf<Int>(), { idx, list, file ->
                     if (file.path == filePath) {
@@ -266,7 +273,7 @@ class MixingScreenViewModel @Inject constructor(@ApplicationContext val context:
                     fileManager.removeFile(removeFile.path)
 
                     playFlagStore.apply {
-                        if (isPlaying.value == true) {
+                        if (removeFile.isPlaying.hasValue() && removeFile.isPlaying.value) {
                             pauseAudio()
                         } else if (isGroupPlaying.value == true) {
                             groupPause()
@@ -276,6 +283,10 @@ class MixingScreenViewModel @Inject constructor(@ApplicationContext val context:
                     _audioFilesLiveData.value = audioFiles
                     _itemRemovedIdx.value = it
                 }
+            }
+
+            withContext(Dispatchers.IO) {
+                mixingRepository.deleteFile(filePath)
             }
         }
     }

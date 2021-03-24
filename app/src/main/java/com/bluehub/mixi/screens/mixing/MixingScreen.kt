@@ -147,8 +147,8 @@ class MixingScreen : BaseFragment<MixingScreenViewModel>() {
             }
         })
 
-        viewModel.isPlaying.observe(viewLifecycleOwner, {
-            binding.groupPlayPause.setBtnEnabled(!it)
+        viewModel.groupPlayEnabled.observe(viewLifecycleOwner, {
+            binding.groupPlayPause.setBtnEnabled(it)
         })
 
         viewModel.audioViewAction.observe(viewLifecycleOwner, {
@@ -206,12 +206,20 @@ class MixingScreen : BaseFragment<MixingScreenViewModel>() {
         })
 
         viewModel.groupPlaySeekbarMaxValue.observe(viewLifecycleOwner, {
-            binding.groupPlaySeekbar.valueTo = it.toFloat()
+            binding.apply {
+                if (groupPlaySeekbar.valueFrom != it.toFloat()) {
+                    groupPlaySeekbar.valueTo = it.toFloat()
+                    groupPlayBoundRangeSlider.valueTo = it.toFloat()
+                }
 
-            binding.groupPlayBoundRangeSlider.valueTo = it.toFloat()
+                if (!viewModel.arePlayerBoundsSet) {
+                    val playBoundStart = 0.0f
+                    val playBoundEnd = it.toFloat()
 
-            if (!viewModel.arePlayerBoundsSet) {
-                binding.groupPlayBoundRangeSlider.setValues(0.0f, it.toFloat())
+                    if (playBoundStart != playBoundEnd) {
+                        groupPlayBoundRangeSlider.setValues(playBoundStart, playBoundEnd)
+                    }
+                }
             }
         })
 
