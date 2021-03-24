@@ -10,6 +10,6 @@
         android:layout_height="match_parent"
         android:src="@drawable/img_splash_screen"
         android:scaleType="fitCenter"
-        android:background="@color/splashScreenBackground"/>
+        android:background="@color/colorPrimary"/>
 
 </FrameLayout>
