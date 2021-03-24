@@ -26,4 +26,4 @@ class SplashViewModel @Inject constructor() : BaseViewModel() {
     }
 }
 
-const val SPLASH_SCREEN_DURATION = 2000L
+const val SPLASH_SCREEN_DURATION = 1500L
