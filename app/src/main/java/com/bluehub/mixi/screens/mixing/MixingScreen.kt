@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.*
 import android.os.Bundle
 import android.view.*
+import android.widget.LinearLayout
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -19,6 +20,7 @@ import com.bluehub.mixi.common.models.AudioViewActionType
 import com.bluehub.mixi.databinding.MixingScreenBinding
 import com.bluehub.mixi.screens.mixing.MixingScreenDirections.actionMixingScreenToRecordingScreen
 import com.bluehub.mixi.screens.mixing.modals.*
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.slider.RangeSlider
 import com.google.android.material.slider.Slider
 import dagger.hilt.android.AndroidEntryPoint
@@ -41,7 +43,7 @@ class MixingScreen : BaseFragment<MixingScreenViewModel>() {
 
     private lateinit var resolver: ContentResolver
 
-    private lateinit var transition: Transition
+    private lateinit var bottomSheetBehavior: BottomSheetBehavior<LinearLayout>
 
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,
@@ -69,7 +71,6 @@ class MixingScreen : BaseFragment<MixingScreenViewModel>() {
 
         setupViewModel()
         setupView()
-        setupAnimations()
 
         navArguments.recordedFilePath?.let {
             if (it.isNotEmpty()) viewModel.addRecordedFilePath(it)
@@ -79,9 +80,6 @@ class MixingScreen : BaseFragment<MixingScreenViewModel>() {
     }
 
     private fun setupViewModel() {
-        // Initially close bottom drawer
-        viewModel.closeBottomDrawer()
-
         viewModel.eventDrawerOpen.observe(viewLifecycleOwner, { isOpen ->
             if (isOpen) {
                 showBottomDrawer()
@@ -248,6 +246,11 @@ class MixingScreen : BaseFragment<MixingScreenViewModel>() {
 
     private fun setupView() {
 
+        // Initially close bottom drawer
+        viewModel.closeBottomDrawer()
+
+        bottomSheetBehavior = BottomSheetBehavior.from(binding.drawerContainer)
+
         binding.audioFileListView.adapter = audioFileListAdapter
 
         binding.groupPlaySeekbar.addOnSliderTouchListener(object : Slider.OnSliderTouchListener {
@@ -284,20 +287,12 @@ class MixingScreen : BaseFragment<MixingScreenViewModel>() {
         })
     }
 
-    private fun setupAnimations() {
-        transition = Slide()
-        transition.duration = 400
-        transition.addTarget(R.id.drawerContainer)
-    }
-
     private fun showBottomDrawer() {
-        TransitionManager.beginDelayedTransition(binding.drawerContainer, transition)
-        binding.drawerContainer.visibility = View.VISIBLE
+        bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
     }
 
     private fun hideBottomDrawer() {
-        TransitionManager.beginDelayedTransition(binding.drawerContainer, transition)
-        binding.drawerContainer.visibility = View.GONE
+        bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
     }
 
     private fun openFilePicker() {

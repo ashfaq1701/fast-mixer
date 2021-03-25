@@ -60,5 +60,6 @@
     <string name="paste_new">Paste New</string>
     <string name="mute">Mute</string>
     <string name="wav_extension">.wav</string>
+    <string name="toggle_bottom_drawer">Toggle Bottom Drawer</string>
 
 </resources>

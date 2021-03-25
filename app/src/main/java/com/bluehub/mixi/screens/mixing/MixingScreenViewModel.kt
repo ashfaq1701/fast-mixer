@@ -189,9 +189,7 @@ class MixingScreenViewModel @Inject constructor(@ApplicationContext val context:
     }
 
     fun closeBottomDrawer() {
-        if (_eventDrawerOpen.value == true) {
-            _eventDrawerOpen.value = false
-        }
+        _eventDrawerOpen.value = false
     }
 
     fun addRecordedFilePath(filePath: String) {

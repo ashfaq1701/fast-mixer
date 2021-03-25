@@ -76,4 +76,6 @@
 
     <dimen name="file_extension_margin_right">20dp</dimen>
     <dimen name="file_clear_margin_right">10dp</dimen>
+
+    <dimen name="mixing_screen_bottom_drawer_control_margin">16dp</dimen>
 </resources>
