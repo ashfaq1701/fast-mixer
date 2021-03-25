@@ -79,4 +79,5 @@
 
     <dimen name="mixing_screen_bottom_drawer_peek_height">40dp</dimen>
     <dimen name="mixing_screen_bottom_drawer_handle_margin_top">20dp</dimen>
+    <dimen name="mixing_list_last_item_margin_bottom">40dp</dimen>
 </resources>

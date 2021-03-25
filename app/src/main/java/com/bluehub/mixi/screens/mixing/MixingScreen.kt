@@ -2,6 +2,7 @@ package com.bluehub.mixi.screens.mixing
 
 import android.app.Activity
 import android.content.*
+import android.graphics.Rect
 import android.os.Bundle
 import android.view.*
 import android.widget.LinearLayout
@@ -12,6 +13,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import androidx.recyclerview.widget.RecyclerView
 import androidx.transition.*
 import com.bluehub.mixi.R
 import com.bluehub.mixi.common.fragments.BaseFragment
@@ -241,6 +243,23 @@ class MixingScreen : BaseFragment<MixingScreenViewModel>() {
         bottomSheetBehavior = BottomSheetBehavior.from(binding.drawerContainer)
 
         binding.audioFileListView.adapter = audioFileListAdapter
+
+        binding.audioFileListView.addItemDecoration(object : RecyclerView.ItemDecoration() {
+            override fun getItemOffsets(
+                outRect: Rect,
+                view: View,
+                parent: RecyclerView,
+                state: RecyclerView.State
+            ) {
+                val itemCount = parent.adapter?.itemCount ?: return
+
+                if (parent.getChildAdapterPosition(view) == itemCount - 1) {
+                    outRect.bottom = requireContext().resources
+                        .getDimension(R.dimen.mixing_list_last_item_margin_bottom)
+                        .toInt()
+                }
+            }
+        })
 
         binding.groupPlaySeekbar.addOnSliderTouchListener(object : Slider.OnSliderTouchListener {
             override fun onStartTrackingTouch(slider: Slider) {
