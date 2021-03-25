@@ -125,66 +125,73 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/drawerControl"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|start"
-            android:layout_margin="@dimen/mixing_screen_bottom_drawer_control_margin"
-            android:contentDescription="@string/toggle_bottom_drawer"
-            app:srcCompat="@drawable/drawer_control_button_open"
-            android:onClick="@{() -> mixingScreenViewModel.toggleBottomDrawer()}" />
-
         <LinearLayout
             android:id="@+id/drawerContainer"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/bottom_drawer_height"
+            android:layout_height="wrap_content"
             android:background="@drawable/rect_transparent"
             android:fitsSystemWindows="true"
             android:gravity="center"
-            android:orientation="horizontal"
-            app:behavior_hideable="true"
+            android:orientation="vertical"
+            app:behavior_hideable="false"
+            app:behavior_peekHeight="@dimen/mixing_screen_bottom_drawer_peek_height"
             app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
 
-            <com.bluehub.mixi.common.views.GroupControlButton
-                android:id="@+id/pasteAsNew"
+            <ImageView
+                android:id="@+id/bottomSheetGrapple"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:btnDrawable="@{@drawable/paste_new_button}"
-                app:btnLabel="@{@string/paste_new}"
-                app:clickListener="@{mixingScreenViewModel.pasteAsNew}" />
+                android:layout_marginTop="@dimen/mixing_screen_bottom_drawer_handle_margin_top"
+                android:src="@drawable/bottom_sheet_handle"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-            <com.bluehub.mixi.common.views.GroupControlButton
-                android:id="@+id/groupPlayPause"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:btnDrawable="@{@drawable/group_play_button}"
-                app:btnLabel="@{@string/play}"
-                app:clickListener="@{mixingScreenViewModel.toggleGroupPlay}" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/bottom_drawer_height"
+                android:gravity="center">
 
-            <com.bluehub.mixi.common.views.GroupControlButton
-                android:id="@+id/groupZoomIn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:btnDrawable="@{@drawable/group_zoom_in_button}"
-                app:btnLabel="@{@string/zoom_in}"
-                app:clickListener="@{mixingScreenViewModel.groupZoomIn}" />
+                <com.bluehub.mixi.common.views.GroupControlButton
+                    android:id="@+id/pasteAsNew"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:btnDrawable="@{@drawable/paste_new_button}"
+                    app:btnLabel="@{@string/paste_new}"
+                    app:clickListener="@{mixingScreenViewModel.pasteAsNew}" />
 
-            <com.bluehub.mixi.common.views.GroupControlButton
-                android:id="@+id/groupZoomOut"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:btnDrawable="@{@drawable/group_zoom_out_button}"
-                app:btnLabel="@{@string/zoom_out}"
-                app:clickListener="@{mixingScreenViewModel.groupZoomOut}" />
+                <com.bluehub.mixi.common.views.GroupControlButton
+                    android:id="@+id/groupPlayPause"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:btnDrawable="@{@drawable/group_play_button}"
+                    app:btnLabel="@{@string/play}"
+                    app:clickListener="@{mixingScreenViewModel.toggleGroupPlay}" />
 
-            <com.bluehub.mixi.common.views.GroupControlButton
-                android:id="@+id/groupReset"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:btnDrawable="@{@drawable/group_reset_button}"
-                app:btnLabel="@{@string/reset}"
-                app:clickListener="@{mixingScreenViewModel.groupReset}" />
+                <com.bluehub.mixi.common.views.GroupControlButton
+                    android:id="@+id/groupZoomIn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:btnDrawable="@{@drawable/group_zoom_in_button}"
+                    app:btnLabel="@{@string/zoom_in}"
+                    app:clickListener="@{mixingScreenViewModel.groupZoomIn}" />
+
+                <com.bluehub.mixi.common.views.GroupControlButton
+                    android:id="@+id/groupZoomOut"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:btnDrawable="@{@drawable/group_zoom_out_button}"
+                    app:btnLabel="@{@string/zoom_out}"
+                    app:clickListener="@{mixingScreenViewModel.groupZoomOut}" />
+
+                <com.bluehub.mixi.common.views.GroupControlButton
+                    android:id="@+id/groupReset"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:btnDrawable="@{@drawable/group_reset_button}"
+                    app:btnLabel="@{@string/reset}"
+                    app:clickListener="@{mixingScreenViewModel.groupReset}" />
+            </LinearLayout>
         </LinearLayout>
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>

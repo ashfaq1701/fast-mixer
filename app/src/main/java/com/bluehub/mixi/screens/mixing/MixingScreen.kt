@@ -80,16 +80,6 @@ class MixingScreen : BaseFragment<MixingScreenViewModel>() {
     }
 
     private fun setupViewModel() {
-        viewModel.eventDrawerOpen.observe(viewLifecycleOwner, { isOpen ->
-            if (isOpen) {
-                showBottomDrawer()
-                binding.drawerControl.setImageResource(R.drawable.drawer_control_button_close)
-            } else {
-                hideBottomDrawer()
-                binding.drawerControl.setImageResource(R.drawable.drawer_control_button_open)
-            }
-        })
-
         viewModel.eventRecord.observe(viewLifecycleOwner, { record ->
             if (record) {
                 findNavController().navigate(actionMixingScreenToRecordingScreen())
@@ -247,7 +237,6 @@ class MixingScreen : BaseFragment<MixingScreenViewModel>() {
     private fun setupView() {
 
         // Initially close bottom drawer
-        viewModel.closeBottomDrawer()
 
         bottomSheetBehavior = BottomSheetBehavior.from(binding.drawerContainer)
 
@@ -285,14 +274,6 @@ class MixingScreen : BaseFragment<MixingScreenViewModel>() {
                 }
             }
         })
-    }
-
-    private fun showBottomDrawer() {
-        bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
-    }
-
-    private fun hideBottomDrawer() {
-        bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
     }
 
     private fun openFilePicker() {

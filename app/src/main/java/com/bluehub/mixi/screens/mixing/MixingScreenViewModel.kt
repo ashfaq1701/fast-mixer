@@ -10,6 +10,7 @@ import com.bluehub.mixi.common.viewmodel.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.*
+import timber.log.Timber
 import java.io.File
 import java.util.*
 import javax.inject.Inject
@@ -52,10 +53,6 @@ class MixingScreenViewModel @Inject constructor(@ApplicationContext val context:
     private val _audioFilesIsEmpty = Transformations.map(audioFilesLiveData) {
         it == null || it.size == 0
     }
-
-    private val _eventDrawerOpen = MutableLiveData<Boolean>()
-    val eventDrawerOpen: LiveData<Boolean>
-        get() = _eventDrawerOpen
 
     private val _eventRecord = MutableLiveData<Boolean>()
     val eventRecord: LiveData<Boolean>
@@ -182,14 +179,6 @@ class MixingScreenViewModel @Inject constructor(@ApplicationContext val context:
 
     fun onRecordNavigated() {
         _eventRecord.value = false
-    }
-
-    fun toggleBottomDrawer() {
-        _eventDrawerOpen.value = _eventDrawerOpen.value == null || _eventDrawerOpen.value == false
-    }
-
-    fun closeBottomDrawer() {
-        _eventDrawerOpen.value = false
     }
 
     fun addRecordedFilePath(filePath: String) {
@@ -543,7 +532,9 @@ class MixingScreenViewModel @Inject constructor(@ApplicationContext val context:
     }
 
     private fun applyPlayerBoundToAllSources() {
-        if (!arePlayerBoundsSet) return
+        if (!arePlayerBoundsSet) {
+            return
+        }
 
         audioFileStore.audioFiles.forEach { audioFile ->
             val startPos = _playerBoundStartPosition.value ?: -1
