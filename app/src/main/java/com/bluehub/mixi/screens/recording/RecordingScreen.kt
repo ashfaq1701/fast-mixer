@@ -34,7 +34,9 @@ class RecordingScreen : BaseFragment<RecordingScreenViewModel>() {
 
     override val viewModel: RecordingScreenViewModel by viewModels()
 
-    private lateinit var dataBinding: RecordingScreenBinding
+    private var menu: Menu? = null
+
+    private lateinit var binding: RecordingScreenBinding
 
     private lateinit var recordingSeekbar: SeekBar
 
@@ -48,6 +50,7 @@ class RecordingScreen : BaseFragment<RecordingScreenViewModel>() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
         requireActivity().onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
     }
 
@@ -55,27 +58,47 @@ class RecordingScreen : BaseFragment<RecordingScreenViewModel>() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        dataBinding = DataBindingUtil
+        binding = DataBindingUtil
             .inflate(inflater, R.layout.recording_screen, container, false)
 
-        audioRecordView = dataBinding.recordingVisualizer
+        audioRecordView = binding.recordingVisualizer
 
-        recordingSeekbar = dataBinding.recordingSeekbar
+        recordingSeekbar = binding.recordingSeekbar
 
         RecordingScreenViewModel.setInstance(viewModel)
-        dataBinding.viewModel = viewModel
+        binding.viewModel = viewModel
 
-        dataBinding.lifecycleOwner = viewLifecycleOwner
+        binding.lifecycleOwner = viewLifecycleOwner
 
         setupViewModel()
         setupView()
 
-        return dataBinding.root
+        return binding.root
     }
 
-    fun setupViewModel() {
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.recording_screen_menu, menu)
+        this.menu = menu
+        addMenuItemEnabledListener()
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_reset -> {
+                viewModel.reset()
+                true
+            }
+            R.id.action_go_back -> {
+                viewModel.setGoBack()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    private fun setupViewModel() {
         viewModel.eventIsRecording.observe(viewLifecycleOwner, { isRecording ->
-            dataBinding.mixingPlayEnabled.isEnabled = !isRecording
+            binding.mixingPlayEnabled.isEnabled = !isRecording
             if (isRecording) {
                 viewModel.startDrawingVisualizer()
                 viewModel.startUpdatingTimer()
@@ -87,26 +110,26 @@ class RecordingScreen : BaseFragment<RecordingScreenViewModel>() {
 
         viewModel.eventIsPlaying.observe(viewLifecycleOwner, { isPlaying ->
             if (!isPlaying) {
-                dataBinding.togglePlay.text = getString(R.string.play_label)
+                binding.togglePlay.text = getString(R.string.play_label)
                 viewModel.stopTrackingSeekbarTimer()
             } else {
-                dataBinding.togglePlay.text = getString(R.string.pause_label)
+                binding.togglePlay.text = getString(R.string.pause_label)
                 viewModel.startTrackingSeekbar()
             }
         })
 
         viewModel.eventIsPlayingWithMixingTracks.observe(viewLifecycleOwner, { isPlaying ->
             if (!isPlaying) {
-                dataBinding.togglePlayWithMixingTracks.text = getString(R.string.play_mixed_label)
+                binding.togglePlayWithMixingTracks.text = getString(R.string.play_mixed_label)
                 viewModel.stopTrackingSeekbarTimer()
             } else {
-                dataBinding.togglePlayWithMixingTracks.text = getString(R.string.pause_label)
+                binding.togglePlayWithMixingTracks.text = getString(R.string.pause_label)
                 viewModel.startTrackingSeekbar()
             }
         })
 
         viewModel.livePlaybackEnabled.observe(viewLifecycleOwner, {
-            dataBinding.livePlaybackEnabled.isEnabled = it
+            binding.livePlaybackEnabled.isEnabled = it
         })
 
         viewModel.eventGoBack.observe(viewLifecycleOwner, { goBack ->
@@ -166,13 +189,15 @@ class RecordingScreen : BaseFragment<RecordingScreenViewModel>() {
         viewModel.isPlaySeekbarEnabled.observe(viewLifecycleOwner, {
             recordingSeekbar.isEnabled = it
         })
+    }
 
+    private fun addMenuItemEnabledListener() {
         viewModel.isResetButtonEnabled.observe(viewLifecycleOwner, {
-            reset.isEnabled = it
+            menu?.getItem(0)?.isEnabled = it
         })
 
         viewModel.isGoBackButtonEnabled.observe(viewLifecycleOwner, {
-            goBack.isEnabled = it
+            menu?.getItem(1)?.isEnabled = it
         })
     }
 

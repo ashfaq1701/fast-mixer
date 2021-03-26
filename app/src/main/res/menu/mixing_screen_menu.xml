@@ -4,22 +4,19 @@
 
     <item
         android:id="@+id/action_record"
-        android:orderInCategory="100"
-        android:icon="@drawable/ic_baseline_fiber_manual_record_32"
-        android:title="@string/record_label"
+        android:icon="@drawable/ic_baseline_fiber_manual_record_24"
+        android:title="@string/reset_label"
         app:showAsAction="always" />
 
     <item
         android:id="@+id/action_read"
-        android:orderInCategory="100"
-        android:icon="@drawable/ic_baseline_storage_32"
+        android:icon="@drawable/ic_baseline_storage_24"
         android:title="@string/read_from_storage_label"
         app:showAsAction="always" />
 
     <item
         android:id="@+id/action_write"
-        android:orderInCategory="100"
-        android:icon="@drawable/ic_baseline_save_alt_32"
+        android:icon="@drawable/ic_baseline_save_alt_24"
         android:title="@string/write_to_storage_label"
         app:showAsAction="always" />
 </menu>

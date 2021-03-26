@@ -162,7 +162,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     app:btnDrawable="@{@drawable/group_reset_button}"
-                    app:btnLabel="@{@string/reset}"
+                    app:btnLabel="@{@string/reset_label}"
                     app:clickListener="@{mixingScreenViewModel.groupReset}" />
             </LinearLayout>
         </LinearLayout>

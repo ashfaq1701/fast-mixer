@@ -65,7 +65,7 @@
             android:onClick="@{() -> viewModel.toggleRecording()}"
             android:text="@{viewModel.recordingLabel}"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintBottom_toTopOf="@id/goBack" />
+            app:layout_constraintBottom_toBottomOf="parent" />
 
         <Button
             android:id="@+id/togglePlay"
@@ -76,7 +76,7 @@
             android:text="@string/play_label"
             app:layout_constraintStart_toEndOf="@id/toggleRecord"
             app:layout_constraintEnd_toStartOf="@+id/togglePlayWithMixingTracks"
-            app:layout_constraintBottom_toTopOf="@id/goBack" />
+            app:layout_constraintBottom_toBottomOf="parent" />
 
         <Button
             android:id="@+id/togglePlayWithMixingTracks"
@@ -87,29 +87,7 @@
             android:text="@string/play_mixed_label"
             app:layout_constraintStart_toEndOf="@id/togglePlay"
             app:layout_constraintEnd_toStartOf="@+id/reset"
-            app:layout_constraintBottom_toTopOf="@id/goBack" />
-
-        <Button
-            android:id="@+id/reset"
-            android:layout_width="@dimen/record_button_width"
-            android:layout_height="@dimen/record_button_height"
-            android:textSize="@dimen/button_text_size"
-            android:onClick="@{() -> viewModel.reset()}"
-            android:text="@string/reset"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toTopOf="@id/goBack" />
-
-        <Button
-            android:id="@+id/goBack"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/record_button_height"
-            android:textSize="@dimen/button_text_size"
-            android:onClick="@{() -> viewModel.setGoBack()}"
-            android:text="@string/done"
-            app:layout_constraintEnd_toEndOf="@id/reset"
-            app:layout_constraintStart_toStartOf="@+id/toggleRecord"
-            app:layout_constraintBottom_toBottomOf="parent"
-            android:layout_marginBottom="20dp" />
+            app:layout_constraintBottom_toBottomOf="parent" />
 
         <TextView
             android:id="@+id/recordingTimerText"

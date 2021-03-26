@@ -8,8 +8,8 @@
     <string name="recording_permission_needed">Record audio permission is needed to be able to record audio in this operation</string>
     <string name="read_external_storage_permission_needed">Read external file permission is needed to be able to read from external files</string>
     <string name="write_external_storage_permission_needed">Write external file permission is needed to be able to write into external storage</string>
-    <string name="done">Done</string>
-    <string name="reset">Reset</string>
+    <string name="done_label">Done</string>
+    <string name="reset_label">Reset</string>
     <string name="play_label">Play</string>
     <string name="play_mixed_label">Play Mixed</string>
     <string name="pause_label">Pause</string>
