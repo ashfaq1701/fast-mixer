@@ -47,7 +47,6 @@ class RecordingScreen : BaseFragment<RecordingScreenViewModel>() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-
         super.onCreate(savedInstanceState)
         requireActivity().onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
     }

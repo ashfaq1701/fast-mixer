@@ -20,33 +20,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <Button
-                android:id="@+id/goToRecord"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="40dp"
-                android:onClick="@{() -> mixingScreenViewModel.onRecord()}"
-                android:text="@string/record_label"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <Button
-                android:id="@+id/readFromDisk"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:onClick="@{() -> mixingScreenViewModel.onReadFromDisk()}"
-                android:text="@string/read_from_disk"
-                app:layout_constraintTop_toBottomOf="@id/goToRecord" />
-
-            <Button
-                android:id="@+id/writeToDisk"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:onClick="@{() -> mixingScreenViewModel.onSaveToDisk()}"
-                android:text="@string/save_to_disk"
-                app:layout_constraintTop_toBottomOf="@id/readFromDisk" />
-
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/audioFileListView"
                 android:layout_width="match_parent"
@@ -54,7 +27,7 @@
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/writeToDisk"
+                app:layout_constraintTop_toTopOf="parent"
                 tools:listitem="@layout/list_item_audio_file" />
 
             <FrameLayout

@@ -49,6 +49,11 @@ class WriteViewModel @Inject constructor(
             return
         }
 
+        if (audioFileStore.audioFiles.isEmpty()) {
+            errorLiveData.value = context.getString(R.string.error_write_file_list_empty)
+            return
+        }
+
         val fileNameWithExt = "$fileNameStr.wav"
         val fd = fileManager.getFileDescriptorForMedia(fileNameWithExt)?.fd ?: run {
             errorLiveData.value = context.getString(R.string.error_could_not_use_file_for_write)
@@ -66,7 +71,7 @@ class WriteViewModel @Inject constructor(
             if (writeResult) {
                 _writtenFileName.postValue(fileNameWithExt)
             } else {
-                errorLiveData.value = context.getString(R.string.error_file_write_failed)
+                errorLiveData.postValue(context.getString(R.string.error_file_write_failed))
             }
         }
     }

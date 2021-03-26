@@ -39,6 +39,8 @@ class MixingScreen : BaseFragment<MixingScreenViewModel>() {
 
     private lateinit var binding: MixingScreenBinding
 
+    private var menu: Menu? = null
+
     private lateinit var audioFileListAdapter: AudioFileListAdapter
 
     private val navArguments: MixingScreenArgs by navArgs()
@@ -46,6 +48,11 @@ class MixingScreen : BaseFragment<MixingScreenViewModel>() {
     private lateinit var resolver: ContentResolver
 
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<LinearLayout>
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
+    }
 
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,
@@ -79,6 +86,30 @@ class MixingScreen : BaseFragment<MixingScreenViewModel>() {
         }
 
         return binding.root
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.mixing_screen_menu, menu)
+        this.menu = menu
+        addMenuItemEnabledListener()
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_record -> {
+                viewModel.onRecord()
+                true
+            }
+            R.id.action_read -> {
+                viewModel.onReadFromDisk()
+                true
+            }
+            R.id.action_write -> {
+                viewModel.onSaveToDisk()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 
     private fun setupViewModel() {
@@ -222,18 +253,6 @@ class MixingScreen : BaseFragment<MixingScreenViewModel>() {
                 showWriteFileDialog()
             }
         })
-
-        viewModel.writeButtonEnabled.observe(viewLifecycleOwner, {
-            binding.writeToDisk.isEnabled = it
-        })
-
-        viewModel.readButtonEnabled.observe(viewLifecycleOwner, {
-            binding.readFromDisk.isEnabled = it
-        })
-
-        viewModel.recordButtonEnabled.observe(viewLifecycleOwner, {
-            binding.goToRecord.isEnabled = it
-        })
     }
 
     private fun setupView() {
@@ -292,6 +311,20 @@ class MixingScreen : BaseFragment<MixingScreenViewModel>() {
                     viewModel.setPlayerBoundEnd(sliderBoundValues[1].toInt())
                 }
             }
+        })
+    }
+
+    private fun addMenuItemEnabledListener() {
+        viewModel.writeButtonEnabled.observe(viewLifecycleOwner, {
+            menu?.getItem(2)?.isEnabled = it
+        })
+
+        viewModel.readButtonEnabled.observe(viewLifecycleOwner, {
+            menu?.getItem(1)?.isEnabled = it
+        })
+
+        viewModel.recordButtonEnabled.observe(viewLifecycleOwner, {
+            menu?.getItem(0)?.isEnabled = it
         })
     }
 
