@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <dimen name="record_button_width">100dp</dimen>
-    <dimen name="record_button_height">50dp</dimen>
+    <dimen name="circular_button_dimension">60dp</dimen>
     <dimen name="button_text_size">12sp</dimen>
     <dimen name="recording_timer_text_size">25sp</dimen>
     <dimen name="audio_file_list_margin_top">8dp</dimen>
@@ -81,4 +80,6 @@
     <dimen name="mixing_screen_bottom_drawer_handle_margin_top">20dp</dimen>
     <dimen name="mixing_list_last_item_margin_bottom">40dp</dimen>
     <dimen name="mixi_logo_width">120dp</dimen>
+    <dimen name="recording_screen_button_bar_margin_bottom">20dp</dimen>
+    <dimen name="recording_screen_button_bar_margin_horizontal">30dp</dimen>
 </resources>

@@ -96,13 +96,6 @@ class RecordingScreenViewModel @Inject constructor (@ApplicationContext val cont
     val requestRecordingPermission: LiveData<Boolean>
         get() = _requestRecordingPermission
 
-    val recordingLabel = Transformations.map(_eventIsRecording) {
-        if (it)
-            context.getString(R.string.stop_recording_label)
-        else
-            context.getString(R.string.start_recording_label)
-    }
-
     private val _seekbarProgress = MutableLiveData(0)
     val seekbarProgress: LiveData<Int>
         get() = _seekbarProgress

@@ -8,6 +8,7 @@ import android.view.*
 import android.widget.SeekBar
 import androidx.activity.*
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -100,9 +101,15 @@ class RecordingScreen : BaseFragment<RecordingScreenViewModel>() {
         viewModel.eventIsRecording.observe(viewLifecycleOwner, { isRecording ->
             binding.mixingPlayEnabled.isEnabled = !isRecording
             if (isRecording) {
+                binding.toggleRecord.setImageDrawable(
+                    ContextCompat.getDrawable(requireContext(), R.drawable.ic_baseline_stop_40)
+                )
                 viewModel.startDrawingVisualizer()
                 viewModel.startUpdatingTimer()
             } else {
+                binding.toggleRecord.setImageDrawable(
+                    ContextCompat.getDrawable(requireContext(), R.drawable.ic_baseline_fiber_manual_record_40)
+                )
                 viewModel.stopDrawingVisualizer()
                 viewModel.stopTrackingRecordingTimer()
             }
@@ -110,20 +117,28 @@ class RecordingScreen : BaseFragment<RecordingScreenViewModel>() {
 
         viewModel.eventIsPlaying.observe(viewLifecycleOwner, { isPlaying ->
             if (!isPlaying) {
-                binding.togglePlay.text = getString(R.string.play_label)
+                binding.togglePlay.setImageDrawable(
+                    ContextCompat.getDrawable(requireContext(), R.drawable.ic_baseline_play_arrow_40)
+                )
                 viewModel.stopTrackingSeekbarTimer()
             } else {
-                binding.togglePlay.text = getString(R.string.pause_label)
+                binding.togglePlay.setImageDrawable(
+                    ContextCompat.getDrawable(requireContext(), R.drawable.ic_baseline_pause_40)
+                )
                 viewModel.startTrackingSeekbar()
             }
         })
 
         viewModel.eventIsPlayingWithMixingTracks.observe(viewLifecycleOwner, { isPlaying ->
             if (!isPlaying) {
-                binding.togglePlayWithMixingTracks.text = getString(R.string.play_mixed_label)
+                binding.togglePlayWithMixingTracks.setImageDrawable(
+                    ContextCompat.getDrawable(requireContext(), R.drawable.ic_baseline_playlist_play_40)
+                )
                 viewModel.stopTrackingSeekbarTimer()
             } else {
-                binding.togglePlayWithMixingTracks.text = getString(R.string.pause_label)
+                binding.togglePlayWithMixingTracks.setImageDrawable(
+                    ContextCompat.getDrawable(requireContext(), R.drawable.ic_baseline_pause_40)
+                )
                 viewModel.startTrackingSeekbar()
             }
         })
