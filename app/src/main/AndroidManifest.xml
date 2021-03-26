@@ -14,7 +14,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:extractNativeLibs="${extractNativeLibs}">
-        <activity android:name="com.bluehub.mixi.screens.MainActivity"
+        <activity
+            android:name="com.bluehub.mixi.screens.MainActivity"
             android:configChanges="orientation|screenSize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
