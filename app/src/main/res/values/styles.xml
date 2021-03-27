@@ -7,6 +7,11 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="AppTheme.RecordingScreenControlButton">
+        <item name="android:background">@drawable/circular_button_background</item>
+        <item name="android:layout_gravity">center</item>
+    </style>
+
     <style name="IconButton" parent="AppTheme">
         <item name="android:backgroundTint">@android:color/transparent</item>
     </style>

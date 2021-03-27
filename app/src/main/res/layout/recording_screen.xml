@@ -86,22 +86,20 @@
             android:layout_marginHorizontal="@dimen/recording_screen_button_bar_margin_horizontal">
 
             <ImageButton
+                style="@style/AppTheme.RecordingScreenControlButton"
                 android:id="@+id/toggleRecord"
                 android:layout_width="@dimen/circular_button_dimension"
                 android:layout_height="@dimen/circular_button_dimension"
-                android:layout_gravity="center"
-                android:background="@drawable/circular_button_background"
                 android:src="@drawable/ic_baseline_fiber_manual_record_red_30"
                 android:onClick="@{() -> viewModel.toggleRecording()}"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"/>
 
             <ImageButton
+                style="@style/AppTheme.RecordingScreenControlButton"
                 android:id="@+id/togglePlay"
                 android:layout_width="@dimen/circular_button_dimension"
                 android:layout_height="@dimen/circular_button_dimension"
-                android:layout_gravity="center"
-                android:background="@drawable/circular_button_background"
                 android:src="@drawable/ic_baseline_play_arrow_green_30"
                 android:onClick="@{() -> viewModel.togglePlay()}"
                 app:layout_constraintStart_toStartOf="@id/toggleRecord"
@@ -109,11 +107,10 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <ImageButton
+                style="@style/AppTheme.RecordingScreenControlButton"
                 android:id="@+id/togglePlayWithMixingTracks"
                 android:layout_width="@dimen/circular_button_dimension"
                 android:layout_height="@dimen/circular_button_dimension"
-                android:layout_gravity="center"
-                android:background="@drawable/circular_button_background"
                 android:src="@drawable/ic_baseline_playlist_play_green_30"
                 android:onClick="@{() -> viewModel.togglePlayWithMixingTracks()}"
                 app:layout_constraintEnd_toEndOf="parent"
