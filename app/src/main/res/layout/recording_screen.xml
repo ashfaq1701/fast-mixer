@@ -70,7 +70,7 @@
                 android:layout_height="@dimen/circular_button_dimension"
                 android:layout_gravity="center"
                 android:background="@drawable/circular_button_background"
-                android:src="@drawable/ic_baseline_fiber_manual_record_40"
+                android:src="@drawable/ic_baseline_fiber_manual_record_red_30"
                 android:onClick="@{() -> viewModel.toggleRecording()}"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"/>
@@ -81,7 +81,7 @@
                 android:layout_height="@dimen/circular_button_dimension"
                 android:layout_gravity="center"
                 android:background="@drawable/circular_button_background"
-                android:src="@drawable/ic_baseline_play_arrow_40"
+                android:src="@drawable/ic_baseline_play_arrow_green_30"
                 android:onClick="@{() -> viewModel.togglePlay()}"
                 app:layout_constraintStart_toStartOf="@id/toggleRecord"
                 app:layout_constraintEnd_toEndOf="@id/togglePlayWithMixingTracks"
@@ -93,7 +93,7 @@
                 android:layout_height="@dimen/circular_button_dimension"
                 android:layout_gravity="center"
                 android:background="@drawable/circular_button_background"
-                android:src="@drawable/ic_baseline_playlist_play_40"
+                android:src="@drawable/ic_baseline_playlist_play_green_30"
                 android:onClick="@{() -> viewModel.togglePlayWithMixingTracks()}"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
