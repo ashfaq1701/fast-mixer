@@ -72,6 +72,9 @@ class RecordingScreenViewModel @Inject constructor (@ApplicationContext val cont
     val isLoading: LiveData<Boolean>
         get() = _isLoading
 
+    // For play button state control
+    private val _isRecordedTrackEmpty = MutableLiveData<Boolean>(true)
+
     private val _eventIsRecording = MutableLiveData(false)
     val eventIsRecording: LiveData<Boolean>
         get() = _eventIsRecording
@@ -132,7 +135,7 @@ class RecordingScreenViewModel @Inject constructor (@ApplicationContext val cont
 
     val isPlayButtonEnabled = BooleanCombinedLiveData(
         true,
-        _eventIsRecording, _eventIsPlayingWithMixingTracks, _isLoading
+        _eventIsRecording, _eventIsPlayingWithMixingTracks, _isLoading, _isRecordedTrackEmpty
     ) { acc, curr ->
         acc && !curr
     }
@@ -263,6 +266,11 @@ class RecordingScreenViewModel @Inject constructor (@ApplicationContext val cont
                             setupAudioSource(recordingFilePath)
                             startMixingTracksPlaying()
                         }
+                    }
+
+                    // For play button state control
+                    if (_isRecordedTrackEmpty.value == true) {
+                        _isRecordedTrackEmpty.postValue(false)
                     }
 
                     repository.startRecording()
@@ -416,7 +424,10 @@ class RecordingScreenViewModel @Inject constructor (@ApplicationContext val cont
                     repository.stopLivePlayback()
                 }
             }
+
+            _isRecordedTrackEmpty.value = true
             repository.resetRecordingEngine()
+
             _seekbarProgress.value = 0
             _seekbarMaxValue.value = 0
             _audioVisualizerMaxAmplitude.value = 0
