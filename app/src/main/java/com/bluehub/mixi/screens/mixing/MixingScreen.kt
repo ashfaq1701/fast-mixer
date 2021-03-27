@@ -149,7 +149,7 @@ class MixingScreen : BaseFragment<MixingScreenViewModel>() {
 
             if (it) {
                 binding.groupPlayPause.setBtnDrawable(
-                    ContextCompat.getDrawable(requireContext(), R.drawable.group_pause_button)
+                    ContextCompat.getDrawable(requireContext(), R.drawable.ic_baseline_pause_30)
                 )
                 binding.groupPlayPause.setBtnLabel(
                     requireContext().getString(R.string.pause)
@@ -158,7 +158,7 @@ class MixingScreen : BaseFragment<MixingScreenViewModel>() {
                 viewModel.startGroupPlayTimer()
             } else {
                 binding.groupPlayPause.setBtnDrawable(
-                    ContextCompat.getDrawable(requireContext(), R.drawable.group_play_button)
+                    ContextCompat.getDrawable(requireContext(), R.drawable.ic_baseline_play_arrow_30)
                 )
                 binding.groupPlayPause.setBtnLabel(
                     requireContext().getString(R.string.play)

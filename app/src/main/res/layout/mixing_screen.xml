@@ -129,7 +129,7 @@
                     android:id="@+id/pasteAsNew"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    app:btnDrawable="@{@drawable/paste_new_button}"
+                    app:btnDrawable="@{@drawable/ic_baseline_content_paste_30}"
                     app:btnLabel="@{@string/paste_new}"
                     app:clickListener="@{mixingScreenViewModel.pasteAsNew}" />
 
@@ -137,7 +137,7 @@
                     android:id="@+id/groupPlayPause"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    app:btnDrawable="@{@drawable/group_play_button}"
+                    app:btnDrawable="@{@drawable/ic_baseline_play_arrow_30}"
                     app:btnLabel="@{@string/play}"
                     app:clickListener="@{mixingScreenViewModel.toggleGroupPlay}" />
 
@@ -145,7 +145,7 @@
                     android:id="@+id/groupZoomIn"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    app:btnDrawable="@{@drawable/group_zoom_in_button}"
+                    app:btnDrawable="@{@drawable/ic_baseline_zoom_in_30}"
                     app:btnLabel="@{@string/zoom_in}"
                     app:clickListener="@{mixingScreenViewModel.groupZoomIn}" />
 
@@ -153,7 +153,7 @@
                     android:id="@+id/groupZoomOut"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    app:btnDrawable="@{@drawable/group_zoom_out_button}"
+                    app:btnDrawable="@{@drawable/ic_baseline_zoom_out_30}"
                     app:btnLabel="@{@string/zoom_out}"
                     app:clickListener="@{mixingScreenViewModel.groupZoomOut}" />
 
@@ -161,7 +161,7 @@
                     android:id="@+id/groupReset"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    app:btnDrawable="@{@drawable/group_reset_button}"
+                    app:btnDrawable="@{@drawable/ic_baseline_replay_30}"
                     app:btnLabel="@{@string/reset_label}"
                     app:clickListener="@{mixingScreenViewModel.groupReset}" />
             </LinearLayout>

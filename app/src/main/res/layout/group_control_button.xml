@@ -15,7 +15,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:src="@drawable/zoom_out_button" />
+            tools:src="@drawable/ic_baseline_zoom_out_30" />
         <TextView
             android:id="@+id/imgTxt"
             android:layout_width="wrap_content"

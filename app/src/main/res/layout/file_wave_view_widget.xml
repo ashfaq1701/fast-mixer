@@ -48,7 +48,7 @@
                 style="@style/IconButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/arrow_left_button"
+                android:src="@drawable/ic_baseline_keyboard_arrow_left_16"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toEndOf="@id/playHeadValue" />
@@ -58,7 +58,7 @@
                 style="@style/IconButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/arrow_right_button"
+                android:src="@drawable/ic_baseline_keyboard_arrow_right_16"
                 android:layout_marginStart="@dimen/wave_slide_button_horizontal_margin"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
@@ -110,7 +110,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:onClick="@{() -> waveViewEventListeners.toggleDropUpMenu.invoke()}"
-            android:src="@drawable/audio_widget_menu_button"
+            android:src="@drawable/ic_baseline_more_vert_20"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/waveViewControlDivider" />
@@ -121,7 +121,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:onClick="@{() -> waveViewEventListeners.waveViewDelete.invoke()}"
-            android:src="@drawable/delete_button"
+            android:src="@drawable/ic_baseline_delete_20"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/dropdownMenuTrigger"
             app:layout_constraintTop_toBottomOf="@id/waveViewControlDivider" />
@@ -132,7 +132,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:onClick="@{() -> waveViewEventListeners.waveViewZoomOut.invoke()}"
-            android:src="@drawable/zoom_out_button"
+            android:src="@drawable/ic_baseline_zoom_out_20"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/waveDelete"
             app:layout_constraintTop_toBottomOf="@id/waveViewControlDivider" />
@@ -143,7 +143,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:onClick="@{() -> waveViewEventListeners.waveViewZoomIn.invoke()}"
-            android:src="@drawable/zoom_in_button"
+            android:src="@drawable/ic_baseline_zoom_in_20"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/waveZoomOut"
             app:layout_constraintTop_toBottomOf="@id/waveViewControlDivider" />
@@ -154,7 +154,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:onClick="@{() -> waveViewEventListeners.waveViewTogglePlay.invoke()}"
-            android:src="@drawable/play_button"
+            android:src="@drawable/ic_baseline_play_arrow_20"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/waveZoomIn"
             app:layout_constraintTop_toBottomOf="@id/waveViewControlDivider" />
@@ -165,7 +165,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:onClick="@{() -> waveViewEventListeners.toggleSegmentSelector.invoke()}"
-            android:src="@drawable/segment_select_button"
+            android:src="@drawable/ic_baseline_crop_20"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/wavePlayPause"
             app:layout_constraintTop_toBottomOf="@id/waveViewControlDivider" />

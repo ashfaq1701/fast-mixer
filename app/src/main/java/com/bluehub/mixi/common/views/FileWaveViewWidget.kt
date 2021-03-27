@@ -163,12 +163,12 @@ class FileWaveViewWidget(context: Context, attributeSet: AttributeSet?)
                 .subscribe {
                     if (it) {
                         binding.wavePlayPause.setImageDrawable(
-                            ContextCompat.getDrawable(context, R.drawable.pause_button)
+                            ContextCompat.getDrawable(context, R.drawable.ic_baseline_pause_20)
                         )
 
                     } else {
                         binding.wavePlayPause.setImageDrawable(
-                            ContextCompat.getDrawable(context, R.drawable.play_button)
+                            ContextCompat.getDrawable(context, R.drawable.ic_baseline_play_arrow_20)
                         )
                     }
                 }
