@@ -18,7 +18,7 @@
         <com.visualizer.amplitude.AudioRecordView
             android:id="@+id/recordingVisualizer"
             android:layout_width="wrap_content"
-            android:layout_height="@dimen/recording_visualizer_height"
+            android:layout_height="0dp"
             app:chunkAlignTo="bottom"
             app:chunkRoundedCorners="true"
             app:chunkSoftTransition="true"
@@ -28,7 +28,15 @@
             app:chunkMaxHeight="@dimen/recording_visualizer_chunk_max_width"
             app:chunkMinHeight="@dimen/recording_visualizer_chunk_min_width"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/recordingVisualizerGuideline"/>
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/recordingVisualizerGuideline"
+            android:layout_width="1dp"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.30"/>
 
         <SeekBar
             android:id="@+id/recordingSeekbar"
@@ -57,7 +65,20 @@
             app:layout_constraintStart_toEndOf="@id/livePlaybackEnabled"
             app:layout_constraintTop_toBottomOf="@id/recordingSeekbar" />
 
+        <TextView
+            android:id="@+id/recordingTimerText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@{viewModel.recordingTimerText}"
+            android:layout_marginTop="@dimen/recording_timer_margin_top"
+            app:layout_constraintTop_toBottomOf="@id/livePlaybackEnabled"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:textSize="@dimen/recording_timer_text_size"
+            tools:text="@string/recording_time" />
+
         <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/recordingButtonsContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -99,19 +120,6 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <TextView
-            android:id="@+id/recordingTimerText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@{viewModel.recordingTimerText}"
-            tools:text="@string/recording_time"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:gravity="center"
-            android:textSize="@dimen/recording_timer_text_size" />
 
         <include layout="@layout/view_loading" />
 
