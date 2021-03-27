@@ -27,7 +27,7 @@
 
             <TextView
                 android:id="@+id/playHeadLabel"
-                android:layout_width="70dp"
+                android:layout_width="@dimen/play_head_label_width"
                 android:layout_height="wrap_content"
                 android:text="@string/play_head_label"
                 app:layout_constraintStart_toStartOf="parent"
@@ -36,7 +36,7 @@
 
             <TextView
                 android:id="@+id/playHeadValue"
-                android:layout_width="80dp"
+                android:layout_width="@dimen/play_head_value_width"
                 android:layout_height="wrap_content"
                 app:layout_constraintStart_toEndOf="@id/playHeadLabel"
                 app:layout_constraintTop_toTopOf="parent"
@@ -45,19 +45,20 @@
 
             <ImageButton
                 android:id="@+id/waveViewSlideLeft"
-                style="@style/IconButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                style="@style/AppTheme.IconButton"
+                android:layout_width="@dimen/wave_view_icon_width"
+                android:layout_height="@dimen/wave_view_icon_height"
                 android:src="@drawable/ic_baseline_keyboard_arrow_left_16"
+                android:layout_marginStart="@dimen/wave_slide_button_horizontal_margin"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toEndOf="@id/playHeadValue" />
 
             <ImageButton
                 android:id="@+id/waveViewSlideRight"
-                style="@style/IconButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                style="@style/AppTheme.IconButton"
+                android:layout_width="@dimen/wave_view_icon_width"
+                android:layout_height="@dimen/wave_view_icon_height"
                 android:src="@drawable/ic_baseline_keyboard_arrow_right_16"
                 android:layout_marginStart="@dimen/wave_slide_button_horizontal_margin"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -106,9 +107,9 @@
 
         <ImageButton
             android:id="@+id/dropdownMenuTrigger"
-            style="@style/IconButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            style="@style/AppTheme.IconButton"
+            android:layout_width="@dimen/wave_view_icon_width"
+            android:layout_height="@dimen/wave_view_icon_height"
             android:onClick="@{() -> waveViewEventListeners.toggleDropUpMenu.invoke()}"
             android:src="@drawable/ic_baseline_more_vert_20"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -117,9 +118,9 @@
 
         <ImageButton
             android:id="@+id/waveDelete"
-            style="@style/IconButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            style="@style/AppTheme.IconButton"
+            android:layout_width="@dimen/wave_view_icon_width"
+            android:layout_height="@dimen/wave_view_icon_height"
             android:onClick="@{() -> waveViewEventListeners.waveViewDelete.invoke()}"
             android:src="@drawable/ic_baseline_delete_20"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -128,9 +129,9 @@
 
         <ImageButton
             android:id="@+id/waveZoomOut"
-            style="@style/IconButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            style="@style/AppTheme.IconButton"
+            android:layout_width="@dimen/wave_view_icon_width"
+            android:layout_height="@dimen/wave_view_icon_height"
             android:onClick="@{() -> waveViewEventListeners.waveViewZoomOut.invoke()}"
             android:src="@drawable/ic_baseline_zoom_out_20"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -139,9 +140,9 @@
 
         <ImageButton
             android:id="@+id/waveZoomIn"
-            style="@style/IconButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            style="@style/AppTheme.IconButton"
+            android:layout_width="@dimen/wave_view_icon_width"
+            android:layout_height="@dimen/wave_view_icon_height"
             android:onClick="@{() -> waveViewEventListeners.waveViewZoomIn.invoke()}"
             android:src="@drawable/ic_baseline_zoom_in_20"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -150,9 +151,9 @@
 
         <ImageButton
             android:id="@+id/wavePlayPause"
-            style="@style/IconButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            style="@style/AppTheme.IconButton"
+            android:layout_width="@dimen/wave_view_icon_width"
+            android:layout_height="@dimen/wave_view_icon_height"
             android:onClick="@{() -> waveViewEventListeners.waveViewTogglePlay.invoke()}"
             android:src="@drawable/ic_baseline_play_arrow_20"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -161,9 +162,9 @@
 
         <ImageButton
             android:id="@+id/toggleSegmentSelector"
-            style="@style/IconButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            style="@style/AppTheme.IconButton"
+            android:layout_width="@dimen/wave_view_icon_width"
+            android:layout_height="@dimen/wave_view_icon_height"
             android:onClick="@{() -> waveViewEventListeners.toggleSegmentSelector.invoke()}"
             android:src="@drawable/ic_baseline_crop_20"
             app:layout_constraintBottom_toBottomOf="parent"

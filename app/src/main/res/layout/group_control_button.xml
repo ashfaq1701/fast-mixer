@@ -9,9 +9,9 @@
         android:layout_height="wrap_content">
         <ImageButton
             android:id="@+id/imgButton"
-            style="@style/IconButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            style="@style/AppTheme.IconButton"
+            android:layout_width="@dimen/group_control_button_icon_width"
+            android:layout_height="@dimen/group_control_button_icon_height"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"

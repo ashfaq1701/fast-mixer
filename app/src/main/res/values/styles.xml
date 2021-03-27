@@ -12,8 +12,9 @@
         <item name="android:layout_gravity">center</item>
     </style>
 
-    <style name="IconButton" parent="AppTheme">
+    <style name="AppTheme.IconButton" parent="AppTheme">
         <item name="android:backgroundTint">@android:color/transparent</item>
+        <item name="android:background">?android:attr/selectableItemBackgroundBorderless</item>
     </style>
 
     <style name="ProgressBar">
