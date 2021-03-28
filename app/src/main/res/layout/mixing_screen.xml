@@ -75,13 +75,16 @@
                         android:orientation="horizontal">
 
                         <Button
+                            style="@style/AppTheme.Button.Transparent.Accent"
                             android:id="@+id/applySegment"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:onClick="@{() -> mixingScreenViewModel.applyCommonSegmentBounds()}"
+                            android:layout_marginEnd="@dimen/inter_button_margin"
                             android:text="@string/common_apply" />
 
                         <Button
+                            style="@style/AppTheme.Button.Transparent.Accent"
                             android:id="@+id/closeGroupPlayOverlay"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"

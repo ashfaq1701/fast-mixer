@@ -44,7 +44,7 @@
 
     <dimen name="dialog_min_width">500dp</dimen>
     <dimen name="dialog_min_height">370dp</dimen>
-    <dimen name="dialog_button_margin">15dp</dimen>
+    <dimen name="inter_button_margin">15dp</dimen>
     <dimen name="dialog_vertical_padding">15dp</dimen>
 
     <dimen name="play_fragment_height">170dp</dimen>
