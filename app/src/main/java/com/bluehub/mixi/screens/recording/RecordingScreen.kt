@@ -217,6 +217,8 @@ class RecordingScreen : BaseFragment<RecordingScreenViewModel>() {
     }
 
     private fun setupVisualizerObserver() {
+        viewModel.audioVisualizerMaxAmplitude.removeObservers(viewLifecycleOwner)
+
         viewModel.audioVisualizerMaxAmplitude.observe(viewLifecycleOwner, {
             if (viewModel.audioVisualizerRunning.value == true) {
                 audioRecordView.update(it)
