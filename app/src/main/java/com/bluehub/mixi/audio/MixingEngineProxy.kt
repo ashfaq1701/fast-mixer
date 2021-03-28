@@ -5,7 +5,7 @@ import javax.inject.Inject
 class MixingEngineProxy @Inject constructor() {
     fun create() = MixingEngine.create()
 
-    fun addFile(filePath: String, fd: Int) = MixingEngine.addFile(filePath, fd)
+    fun addFile(filePath: String, fd: Int): Boolean = MixingEngine.addFile(filePath, fd)
 
     fun readSamples(filePath: String, countPoints: Int) = MixingEngine.readSamples(filePath, countPoints)
 

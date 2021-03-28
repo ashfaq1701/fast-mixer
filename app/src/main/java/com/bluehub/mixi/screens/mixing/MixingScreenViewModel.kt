@@ -62,6 +62,10 @@ class MixingScreenViewModel @Inject constructor(@ApplicationContext val context:
     val eventRead: LiveData<Boolean>
         get() = _eventRead
 
+    private val _eventShowUnsupportedFileToast = MutableLiveData<Boolean>()
+    val eventShowUnsupportedFileToast: LiveData<Boolean>
+        get() = _eventShowUnsupportedFileToast
+
     private val _itemRemovedIdx = MutableLiveData<Int>()
     val itemRemovedIdx: LiveData<Int>
         get() = _itemRemovedIdx
@@ -193,12 +197,15 @@ class MixingScreenViewModel @Inject constructor(@ApplicationContext val context:
                     _isLoading.value = true
 
                     withContext(Dispatchers.IO) {
-                        mixingRepository.addFile(filePath, fd.fd)
-                        val totalSamples = getTotalSamples(filePath)
-                        audioFiles.add(AudioFileUiState.create(filePath, totalSamples))
+                        if (mixingRepository.addFile(filePath, fd.fd)) {
+                            val totalSamples = getTotalSamples(filePath)
+                            audioFiles.add(AudioFileUiState.create(filePath, totalSamples))
 
-                        _audioFilesLiveData.postValue(audioFiles)
-                        _itemAddedIdx.postValue(audioFiles.size - 1)
+                            _audioFilesLiveData.postValue(audioFiles)
+                            _itemAddedIdx.postValue(audioFiles.size - 1)
+                        } else {
+                            _eventShowUnsupportedFileToast.postValue(true)
+                        }
                     }
 
                     _isLoading.value = false
@@ -221,14 +228,16 @@ class MixingScreenViewModel @Inject constructor(@ApplicationContext val context:
             _isLoading.postValue(true)
 
             newFilePath?.let { newPath ->
-                mixingRepository.addFile(newPath, parcelFd.fd)
+                if (mixingRepository.addFile(newPath, parcelFd.fd)) {
+                    val totalSamples = getTotalSamples(newPath)
 
-                val totalSamples = getTotalSamples(newPath)
-
-                audioFileStore.run {
-                    audioFiles.add(AudioFileUiState.create(newPath, totalSamples))
-                    _audioFilesLiveData.postValue(audioFiles)
-                    _itemAddedIdx.postValue(audioFiles.size - 1)
+                    audioFileStore.run {
+                        audioFiles.add(AudioFileUiState.create(newPath, totalSamples))
+                        _audioFilesLiveData.postValue(audioFiles)
+                        _itemAddedIdx.postValue(audioFiles.size - 1)
+                    }
+                } else {
+                    _eventShowUnsupportedFileToast.postValue(true)
                 }
             }
 
@@ -518,6 +527,10 @@ class MixingScreenViewModel @Inject constructor(@ApplicationContext val context:
     fun resetPlayerBoundEnd() {
         _playerBoundEndPosition.value = null
         mixingRepository.resetPlayerBoundEnd()
+    }
+
+    fun resetEventShowUnsupportedFileToast() {
+        _eventShowUnsupportedFileToast.value = false
     }
 
     fun closeGroupPlayingOverlay() {

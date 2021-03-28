@@ -6,6 +6,7 @@ import android.graphics.Rect
 import android.os.Bundle
 import android.view.*
 import android.widget.LinearLayout
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -253,6 +254,13 @@ class MixingScreen : BaseFragment<MixingScreenViewModel>() {
                 showWriteFileDialog()
             }
         })
+
+        viewModel.eventShowUnsupportedFileToast.observe(viewLifecycleOwner, {
+            if (it) {
+                showUnsupportedFileTypeToast()
+                viewModel.resetEventShowUnsupportedFileToast()
+            }
+        })
     }
 
     private fun setupView() {
@@ -380,6 +388,11 @@ class MixingScreen : BaseFragment<MixingScreenViewModel>() {
                 fragmentManager.unregisterFragmentLifecycleCallbacks(this)
             }
         }, false)
+    }
+
+    private fun showUnsupportedFileTypeToast() {
+        val infoTxt = requireContext().getString(R.string.error_unsupported_file_type)
+        Toast.makeText(requireContext(), infoTxt, Toast.LENGTH_LONG).show()
     }
 }
 

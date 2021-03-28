@@ -19,15 +19,22 @@ MixingEngine::~MixingEngine() {
     SourceMapStore::reset();
 }
 
-void MixingEngine::addFile(string filePath, int fd) {
+bool MixingEngine::addFile(string filePath, int fd) {
     auto it = mSourceMapStore->sourceMap.find(filePath);
     if (it != mSourceMapStore->sourceMap.end()) {
         filePath.erase();
-        return;
+        return false;
     }
     shared_ptr<FileDataSource> source = mMixingIO->readFile(filePath, fd);
+
+    if (!source) {
+        return false;
+    }
+
     mSourceMapStore->sourceMap.insert(pair<string, shared_ptr<FileDataSource>>(filePath, move(source)));
     filePath.erase();
+
+    return true;
 }
 
 shared_ptr<buffer_data> MixingEngine::readSamples(string filePath, size_t countPoints) {

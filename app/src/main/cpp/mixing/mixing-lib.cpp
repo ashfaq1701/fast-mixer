@@ -62,14 +62,14 @@ extern "C" {
         mixingEngine.reset();
     }
 
-    JNIEXPORT void JNICALL
+    JNIEXPORT jboolean JNICALL
     Java_com_bluehub_mixi_audio_MixingEngine_addFile(JNIEnv *env, jclass, jstring fileId, jint fd) {
         if (!mixingEngine) {
             LOGE("addFile: mixingEngine is null, you must call create() method before calling this method");
-            return;
+            return false;
         }
         auto filePathStr = java_str_to_c_str(env, fileId);
-        mixingEngine->addFile(move(filePathStr), fd);
+        return mixingEngine->addFile(move(filePathStr), fd);
     }
 
     JNIEXPORT jobjectArray JNICALL

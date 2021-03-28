@@ -8,7 +8,7 @@ class MixingEngine {
 
         @JvmStatic external fun create(): Boolean
 
-        @JvmStatic external fun addFile(filePath: String, fd: Int)
+        @JvmStatic external fun addFile(filePath: String, fd: Int): Boolean
 
         @JvmStatic external fun readSamples(filePath: String, countPoints: Int): Array<Float>
 
