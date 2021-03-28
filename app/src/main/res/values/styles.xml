@@ -32,4 +32,8 @@
         <item name="android:windowMinWidthMinor">100%</item>
     </style>
 
+    <style name="AppTheme.PrimaryTextStyle">
+        <item name="android:textColor">?attr/colorControlNormal</item>
+    </style>
+
 </resources>

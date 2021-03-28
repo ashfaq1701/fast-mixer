@@ -22,7 +22,7 @@
             app:chunkAlignTo="bottom"
             app:chunkRoundedCorners="true"
             app:chunkSoftTransition="true"
-            app:chunkColor="@color/visualizer"
+            app:chunkColor="@color/colorVisualizer"
             app:chunkSpace="@dimen/recording_visualizer_chunk_space"
             app:chunkWidth="@dimen/recording_visualizer_chunk_width"
             app:chunkMaxHeight="@dimen/recording_visualizer_chunk_max_width"

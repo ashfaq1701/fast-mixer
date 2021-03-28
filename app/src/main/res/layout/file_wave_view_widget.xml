@@ -30,12 +30,14 @@
                 app:layout_constraintTop_toTopOf="parent">
 
                 <TextView
+                    style="@style/AppTheme.PrimaryTextStyle"
                     android:id="@+id/playHeadLabel"
                     android:layout_width="@dimen/play_head_label_width"
                     android:layout_height="wrap_content"
                     android:text="@string/play_head_label" />
 
                 <TextView
+                    style="@style/AppTheme.PrimaryTextStyle"
                     android:id="@+id/playHeadValue"
                     android:layout_width="@dimen/play_head_value_width"
                     android:layout_height="wrap_content"

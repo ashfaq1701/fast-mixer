@@ -66,7 +66,7 @@ class FileWaveView @JvmOverloads constructor(
         textAlign = Paint.Align.CENTER
         textSize = 15.0f
         typeface = Typeface.create("", Typeface.BOLD)
-        color = ContextCompat.getColor(context, R.color.colorAccent)
+        color = ContextCompat.getColor(context, R.color.colorVisualizer)
     }
 
     private val clearPaint = Paint().apply {
