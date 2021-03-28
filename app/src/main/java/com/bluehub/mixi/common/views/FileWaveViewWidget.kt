@@ -278,12 +278,12 @@ class FileWaveViewWidget(context: Context, attributeSet: AttributeSet?)
 
                 waveViewSlideLeft.setOnTouchListener { _, event ->
                     setupLeftSliderTouchEvent(event)
-                    true
+                    false
                 }
 
                 waveViewSlideRight.setOnTouchListener { _, event ->
                     setupRightSliderTouchEvent(event)
-                    true
+                    false
                 }
             }
 
