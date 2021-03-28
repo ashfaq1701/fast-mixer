@@ -10,168 +10,151 @@
             type="com.bluehub.mixi.common.views.FileWaveViewEventListeners" />
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/containerLayout"
+    <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/audio_file_margin"
-        android:background="@drawable/audio_widget_border">
+        android:layout_marginHorizontal="@dimen/audio_file_card_view_margin_horizontal"
+        android:layout_marginVertical="@dimen/audio_file_card_view_margin_vertical">
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/waveViewSlideLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            android:padding="@dimen/file_wave_view_content_padding">
 
-            <TextView
-                android:id="@+id/playHeadLabel"
-                android:layout_width="@dimen/play_head_label_width"
+            <LinearLayout
+                android:id="@+id/topBar"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/play_head_label"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"/>
+                android:gravity="center_vertical"
+                app:layout_constraintTop_toTopOf="parent">
 
-            <TextView
-                android:id="@+id/playHeadValue"
-                android:layout_width="@dimen/play_head_value_width"
+                <TextView
+                    android:id="@+id/playHeadLabel"
+                    android:layout_width="@dimen/play_head_label_width"
+                    android:layout_height="wrap_content"
+                    android:text="@string/play_head_label" />
+
+                <TextView
+                    android:id="@+id/playHeadValue"
+                    android:layout_width="@dimen/play_head_value_width"
+                    android:layout_height="wrap_content"
+                    tools:text="2000000000" />
+
+                <ImageButton
+                    style="@style/AppTheme.IconButton"
+                    android:id="@+id/waveViewSlideLeft"
+                    android:layout_width="@dimen/wave_view_icon_width"
+                    android:layout_height="@dimen/wave_view_icon_height"
+                    android:layout_marginStart="@dimen/wave_slide_button_horizontal_margin"
+                    android:src="@drawable/ic_baseline_keyboard_arrow_left_16"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/playHeadValue"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <ImageButton
+                    style="@style/AppTheme.IconButton"
+                    android:id="@+id/waveViewSlideRight"
+                    android:layout_width="@dimen/wave_view_icon_width"
+                    android:layout_height="@dimen/wave_view_icon_height"
+                    android:layout_marginStart="@dimen/wave_slide_button_horizontal_margin"
+                    android:src="@drawable/ic_baseline_keyboard_arrow_right_16"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/waveViewSlideLeft"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/contentBar"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:layout_constraintStart_toEndOf="@id/playHeadLabel"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
-                tools:text="2000000000" />
+                android:orientation="vertical"
+                app:layout_constraintTop_toBottomOf="@id/topBar">
 
-            <ImageButton
-                android:id="@+id/waveViewSlideLeft"
-                style="@style/AppTheme.IconButton"
-                android:layout_width="@dimen/wave_view_icon_width"
-                android:layout_height="@dimen/wave_view_icon_height"
-                android:src="@drawable/ic_baseline_keyboard_arrow_left_16"
-                android:layout_marginStart="@dimen/wave_slide_button_horizontal_margin"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toEndOf="@id/playHeadValue" />
+                <com.bluehub.mixi.common.views.LockedHorizontalScrollView
+                    android:id="@+id/fileWaveViewScroll"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fillViewport="true">
 
-            <ImageButton
-                android:id="@+id/waveViewSlideRight"
-                style="@style/AppTheme.IconButton"
-                android:layout_width="@dimen/wave_view_icon_width"
-                android:layout_height="@dimen/wave_view_icon_height"
-                android:src="@drawable/ic_baseline_keyboard_arrow_right_16"
-                android:layout_marginStart="@dimen/wave_slide_button_horizontal_margin"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toEndOf="@id/waveViewSlideLeft" />
+                    <com.bluehub.mixi.common.views.FileWaveView
+                        android:id="@+id/fileWaveView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="@dimen/audio_file_view_height">
 
+                        <com.bluehub.mixi.common.views.AudioWidgetSlider
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+
+                    </com.bluehub.mixi.common.views.FileWaveView>
+
+                </com.bluehub.mixi.common.views.LockedHorizontalScrollView>
+
+                <com.bluehub.mixi.common.views.CustomHorizontalScrollBar
+                    android:id="@+id/fileWaveViewScrollBar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/bottomBar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/contentBar"
+                android:gravity="end">
+
+                <ImageButton
+                    style="@style/AppTheme.IconButton"
+                    android:id="@+id/toggleSegmentSelector"
+                    android:layout_width="@dimen/wave_view_icon_width"
+                    android:layout_height="@dimen/wave_view_icon_height"
+                    android:onClick="@{() -> waveViewEventListeners.toggleSegmentSelector.invoke()}"
+                    android:src="@drawable/ic_baseline_crop_20" />
+
+                <ImageButton
+                    style="@style/AppTheme.IconButton"
+                    android:id="@+id/wavePlayPause"
+                    android:layout_width="@dimen/wave_view_icon_width"
+                    android:layout_height="@dimen/wave_view_icon_height"
+                    android:onClick="@{() -> waveViewEventListeners.waveViewTogglePlay.invoke()}"
+                    android:src="@drawable/ic_baseline_play_arrow_20" />
+
+                <ImageButton
+                    style="@style/AppTheme.IconButton"
+                    android:id="@+id/waveZoomIn"
+                    android:layout_width="@dimen/wave_view_icon_width"
+                    android:layout_height="@dimen/wave_view_icon_height"
+                    android:onClick="@{() -> waveViewEventListeners.waveViewZoomIn.invoke()}"
+                    android:src="@drawable/ic_baseline_zoom_in_20" />
+
+                <ImageButton
+                    style="@style/AppTheme.IconButton"
+                    android:id="@+id/waveZoomOut"
+                    android:layout_width="@dimen/wave_view_icon_width"
+                    android:layout_height="@dimen/wave_view_icon_height"
+                    android:onClick="@{() -> waveViewEventListeners.waveViewZoomOut.invoke()}"
+                    android:src="@drawable/ic_baseline_zoom_out_20" />
+
+                <ImageButton
+                    style="@style/AppTheme.IconButton"
+                    android:id="@+id/waveDelete"
+                    android:layout_width="@dimen/wave_view_icon_width"
+                    android:layout_height="@dimen/wave_view_icon_height"
+                    android:onClick="@{() -> waveViewEventListeners.waveViewDelete.invoke()}"
+                    android:src="@drawable/ic_baseline_delete_20" />
+
+                <ImageButton
+                    style="@style/AppTheme.IconButton"
+                    android:id="@+id/dropdownMenuTrigger"
+                    android:layout_width="@dimen/wave_view_icon_width"
+                    android:layout_height="@dimen/wave_view_icon_height"
+                    android:onClick="@{() -> waveViewEventListeners.toggleDropUpMenu.invoke()}"
+                    android:src="@drawable/ic_baseline_more_vert_20" />
+
+            </LinearLayout>
+
+            <include layout="@layout/view_loading" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <com.bluehub.mixi.common.views.LockedHorizontalScrollView
-            android:id="@+id/fileWaveViewScroll"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:fillViewport="true"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/waveViewSlideLayout">
-
-            <com.bluehub.mixi.common.views.FileWaveView
-                android:id="@+id/fileWaveView"
-                android:layout_width="wrap_content"
-                android:layout_height="@dimen/audio_file_view_height"
-                tools:layout_height="120dp">
-
-                <com.bluehub.mixi.common.views.AudioWidgetSlider
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
-
-            </com.bluehub.mixi.common.views.FileWaveView>
-
-        </com.bluehub.mixi.common.views.LockedHorizontalScrollView>
-
-        <com.bluehub.mixi.common.views.CustomHorizontalScrollBar
-            android:id="@+id/fileWaveViewScrollBar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/fileWaveViewScroll" />
-
-        <View
-            android:id="@+id/waveViewControlDivider"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/horizontal_line_height"
-            android:layout_marginVertical="@dimen/divider_margin"
-            android:background="@color/borderColor"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/fileWaveViewScrollBar" />
-
-        <ImageButton
-            android:id="@+id/dropdownMenuTrigger"
-            style="@style/AppTheme.IconButton"
-            android:layout_width="@dimen/wave_view_icon_width"
-            android:layout_height="@dimen/wave_view_icon_height"
-            android:onClick="@{() -> waveViewEventListeners.toggleDropUpMenu.invoke()}"
-            android:src="@drawable/ic_baseline_more_vert_20"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/waveViewControlDivider" />
-
-        <ImageButton
-            android:id="@+id/waveDelete"
-            style="@style/AppTheme.IconButton"
-            android:layout_width="@dimen/wave_view_icon_width"
-            android:layout_height="@dimen/wave_view_icon_height"
-            android:onClick="@{() -> waveViewEventListeners.waveViewDelete.invoke()}"
-            android:src="@drawable/ic_baseline_delete_20"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/dropdownMenuTrigger"
-            app:layout_constraintTop_toBottomOf="@id/waveViewControlDivider" />
-
-        <ImageButton
-            android:id="@+id/waveZoomOut"
-            style="@style/AppTheme.IconButton"
-            android:layout_width="@dimen/wave_view_icon_width"
-            android:layout_height="@dimen/wave_view_icon_height"
-            android:onClick="@{() -> waveViewEventListeners.waveViewZoomOut.invoke()}"
-            android:src="@drawable/ic_baseline_zoom_out_20"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/waveDelete"
-            app:layout_constraintTop_toBottomOf="@id/waveViewControlDivider" />
-
-        <ImageButton
-            android:id="@+id/waveZoomIn"
-            style="@style/AppTheme.IconButton"
-            android:layout_width="@dimen/wave_view_icon_width"
-            android:layout_height="@dimen/wave_view_icon_height"
-            android:onClick="@{() -> waveViewEventListeners.waveViewZoomIn.invoke()}"
-            android:src="@drawable/ic_baseline_zoom_in_20"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/waveZoomOut"
-            app:layout_constraintTop_toBottomOf="@id/waveViewControlDivider" />
-
-        <ImageButton
-            android:id="@+id/wavePlayPause"
-            style="@style/AppTheme.IconButton"
-            android:layout_width="@dimen/wave_view_icon_width"
-            android:layout_height="@dimen/wave_view_icon_height"
-            android:onClick="@{() -> waveViewEventListeners.waveViewTogglePlay.invoke()}"
-            android:src="@drawable/ic_baseline_play_arrow_20"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/waveZoomIn"
-            app:layout_constraintTop_toBottomOf="@id/waveViewControlDivider" />
-
-        <ImageButton
-            android:id="@+id/toggleSegmentSelector"
-            style="@style/AppTheme.IconButton"
-            android:layout_width="@dimen/wave_view_icon_width"
-            android:layout_height="@dimen/wave_view_icon_height"
-            android:onClick="@{() -> waveViewEventListeners.toggleSegmentSelector.invoke()}"
-            android:src="@drawable/ic_baseline_crop_20"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/wavePlayPause"
-            app:layout_constraintTop_toBottomOf="@id/waveViewControlDivider" />
-
-        <include layout="@layout/view_loading" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.card.MaterialCardView>
 </layout>
