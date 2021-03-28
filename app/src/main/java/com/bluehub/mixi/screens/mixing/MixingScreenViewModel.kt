@@ -238,7 +238,12 @@ class MixingScreenViewModel @Inject constructor(@ApplicationContext val context:
 
     fun readSamples(filePath: String) = fun(countPoints: Int): Deferred<Array<Float>> =
         viewModelScope.async(Dispatchers.Default) {
-            mixingRepository.readSamples(filePath, countPoints)
+            audioFileStore.findAudioFileByPath(filePath)?.let { audioFile ->
+                audioFile.isLoading.onNext(true)
+                val samples = mixingRepository.readSamples(filePath, countPoints)
+                audioFile.isLoading.onNext(false)
+                samples
+            } ?: arrayOf()
         }
 
 

@@ -249,6 +249,10 @@ class FileWaveViewWidget(context: Context, attributeSet: AttributeSet?)
                     } else {
                         pbLoading.visibility = View.GONE
                     }
+
+                    if (::binding.isInitialized) {
+                        binding.waveDelete.isEnabled = !it
+                    }
                 }
         }
     }
