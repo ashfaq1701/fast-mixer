@@ -252,7 +252,7 @@ class RecordingScreen : BaseFragment<RecordingScreenViewModel>() {
     }
 
     private fun calculateVisualizerChunkMaxHeight() {
-        audioRecordView.chunkMaxHeight = (audioRecordView.height * 0.90).toFloat()
+        audioRecordView.chunkMaxHeight = (audioRecordView.height * 0.9).toFloat()
     }
 
     private fun handleRecordingPermission(permission: Permission) {
