@@ -46,8 +46,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_gravity="center"
-                    android:background="@drawable/rect_transparent"
-                    android:backgroundTint="@color/colorGrayTransparent"
+                    android:background="@drawable/overlay_frame_transparent"
                     android:gravity="center"
                     android:orientation="vertical">
 
