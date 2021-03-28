@@ -9,7 +9,7 @@
     <color name="borderColor">#CCCCCC</color>
     <color name="transparentBackground">#80000000</color>
     <color name="colorGrayTransparent">#A68F8F8F</color>
-    <color name="colorGlassTransparent">#CCEAE7FA</color>
+    <color name="colorTransparentArea">#CCF2F1FB</color>
     <color name="colorWhiteTransparent">#99FFFFFF</color>
     <color name="colorAudioWaveViewSlider">#f4207c</color>
     <color name="colorGainControlSeekbar">#E0E0E0</color>
