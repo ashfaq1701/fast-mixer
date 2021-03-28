@@ -3,7 +3,7 @@
 
     <dimen name="circular_button_dimension">50dp</dimen>
     <dimen name="button_text_size">12sp</dimen>
-    <dimen name="recording_timer_text_size">25sp</dimen>
+    <dimen name="recording_timer_text_size">30sp</dimen>
     <dimen name="audio_file_list_margin_top">8dp</dimen>
     <dimen name="audio_file_card_view_margin_horizontal">5dp</dimen>
     <dimen name="audio_file_card_view_margin_vertical">5dp</dimen>

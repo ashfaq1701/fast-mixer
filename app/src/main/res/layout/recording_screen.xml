@@ -74,6 +74,7 @@
             app:layout_constraintTop_toBottomOf="@id/livePlaybackEnabled"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            android:textColor="@color/colorAccent"
             android:textSize="@dimen/recording_timer_text_size"
             tools:text="@string/recording_time" />
 
