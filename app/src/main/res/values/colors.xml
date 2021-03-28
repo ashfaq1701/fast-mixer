@@ -12,7 +12,6 @@
     <color name="colorTransparentArea">#CCF2F1FB</color>
     <color name="colorWhiteTransparent">#99FFFFFF</color>
     <color name="colorAudioWaveViewSlider">#f4207c</color>
-    <color name="colorGainControlSeekbar">#E0E0E0</color>
 
     <color name="colorBtnNormal">?attr/colorControlNormal</color>
 </resources>

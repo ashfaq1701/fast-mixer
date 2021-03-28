@@ -36,8 +36,8 @@
                 android:layout_height="wrap_content"
                 android:minHeight="@dimen/gain_seekbar_fixed_height"
                 android:maxHeight="@dimen/gain_seekbar_fixed_height"
-                app:isb_track_background_color="@color/colorGainControlSeekbar"
-                app:isb_track_progress_color="@color/colorGainControlSeekbar" />
+                app:isb_track_background_color="@color/colorAccent"
+                app:isb_track_progress_color="@color/colorAccent" />
         </com.warkiz.widget.IndicatorStayLayout>
 
         <Button
