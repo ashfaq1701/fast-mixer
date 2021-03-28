@@ -9,7 +9,7 @@
         android:layout_height="wrap_content">
         <ImageButton
             android:id="@+id/imgButton"
-            style="@style/AppTheme.IconButton"
+            style="@style/AppTheme.Button.Icon"
             android:layout_width="@dimen/group_control_button_icon_width"
             android:layout_height="@dimen/group_control_button_icon_height"
             app:layout_constraintStart_toStartOf="parent"

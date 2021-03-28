@@ -44,7 +44,7 @@
                     tools:text="2000000000" />
 
                 <ImageButton
-                    style="@style/AppTheme.IconButton"
+                    style="@style/AppTheme.Button.Icon"
                     android:id="@+id/waveViewSlideLeft"
                     android:layout_width="@dimen/wave_view_icon_width"
                     android:layout_height="@dimen/wave_view_icon_height"
@@ -55,7 +55,7 @@
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <ImageButton
-                    style="@style/AppTheme.IconButton"
+                    style="@style/AppTheme.Button.Icon"
                     android:id="@+id/waveViewSlideRight"
                     android:layout_width="@dimen/wave_view_icon_width"
                     android:layout_height="@dimen/wave_view_icon_height"
@@ -107,7 +107,7 @@
                 android:gravity="end">
 
                 <ImageButton
-                    style="@style/AppTheme.IconButton"
+                    style="@style/AppTheme.Button.Icon"
                     android:id="@+id/toggleSegmentSelector"
                     android:layout_width="@dimen/wave_view_icon_width"
                     android:layout_height="@dimen/wave_view_icon_height"
@@ -115,7 +115,7 @@
                     android:src="@drawable/ic_baseline_crop_20" />
 
                 <ImageButton
-                    style="@style/AppTheme.IconButton"
+                    style="@style/AppTheme.Button.Icon"
                     android:id="@+id/wavePlayPause"
                     android:layout_width="@dimen/wave_view_icon_width"
                     android:layout_height="@dimen/wave_view_icon_height"
@@ -123,7 +123,7 @@
                     android:src="@drawable/ic_baseline_play_arrow_20" />
 
                 <ImageButton
-                    style="@style/AppTheme.IconButton"
+                    style="@style/AppTheme.Button.Icon"
                     android:id="@+id/waveZoomIn"
                     android:layout_width="@dimen/wave_view_icon_width"
                     android:layout_height="@dimen/wave_view_icon_height"
@@ -131,7 +131,7 @@
                     android:src="@drawable/ic_baseline_zoom_in_20" />
 
                 <ImageButton
-                    style="@style/AppTheme.IconButton"
+                    style="@style/AppTheme.Button.Icon"
                     android:id="@+id/waveZoomOut"
                     android:layout_width="@dimen/wave_view_icon_width"
                     android:layout_height="@dimen/wave_view_icon_height"
@@ -139,7 +139,7 @@
                     android:src="@drawable/ic_baseline_zoom_out_20" />
 
                 <ImageButton
-                    style="@style/AppTheme.IconButton"
+                    style="@style/AppTheme.Button.Icon"
                     android:id="@+id/waveDelete"
                     android:layout_width="@dimen/wave_view_icon_width"
                     android:layout_height="@dimen/wave_view_icon_height"
@@ -147,7 +147,7 @@
                     android:src="@drawable/ic_baseline_delete_20" />
 
                 <ImageButton
-                    style="@style/AppTheme.IconButton"
+                    style="@style/AppTheme.Button.Icon"
                     android:id="@+id/dropdownMenuTrigger"
                     android:layout_width="@dimen/wave_view_icon_width"
                     android:layout_height="@dimen/wave_view_icon_height"

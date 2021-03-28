@@ -12,7 +12,9 @@
         <item name="android:layout_gravity">center</item>
     </style>
 
-    <style name="AppTheme.IconButton" parent="AppTheme">
+    <style name="AppTheme.Button" />
+
+    <style name="AppTheme.Button.Icon" parent="AppTheme">
         <item name="android:backgroundTint">@android:color/transparent</item>
         <item name="android:background">?android:attr/selectableItemBackgroundBorderless</item>
     </style>
@@ -34,6 +36,14 @@
 
     <style name="AppTheme.PrimaryTextStyle">
         <item name="android:textColor">?attr/colorControlNormal</item>
+    </style>
+
+    <style name="AppTheme.Button.Transparent">
+
+    </style>
+
+    <style name="AppTheme.Button.Transparent.Accent">
+
     </style>
 
 </resources>

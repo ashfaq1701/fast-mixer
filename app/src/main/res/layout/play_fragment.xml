@@ -24,8 +24,9 @@
             android:layout_marginVertical="@dimen/play_screen_seekbar_margin" />
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:gravity="center"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/playSeekbar">
@@ -34,6 +35,7 @@
                 android:id="@+id/playSingle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/dialog_button_margin"
                 android:text="@string/play"
                 android:onClick="@{() -> viewModel.togglePlay()}"/>
 
