@@ -45,24 +45,33 @@
             app:layout_constraintStart_toStartOf="@+id/recordingVisualizer"
             android:layout_marginVertical="@dimen/play_seekbar_margin" />
 
-        <CheckBox
-            android:id="@+id/livePlaybackEnabled"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:id="@+id/recordingCheckboxContainer"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:checked="@={viewModel.livePlaybackActive}"
-            android:text="@string/live_playback_enabled"
             app:layout_constraintTop_toBottomOf="@id/recordingSeekbar"
-            app:layout_constraintStart_toStartOf="@id/recordingSeekbar" />
+            android:gravity="center">
 
-        <CheckBox
-            android:id="@+id/mixingPlayEnabled"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/recording_screen_checkbox_margin_start"
-            android:checked="@={viewModel.mixingPlayActive}"
-            android:text="@string/mixing_play_enabled"
-            app:layout_constraintStart_toEndOf="@id/livePlaybackEnabled"
-            app:layout_constraintTop_toBottomOf="@id/recordingSeekbar" />
+            <CheckBox
+                android:id="@+id/livePlaybackEnabled"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="@={viewModel.livePlaybackActive}"
+                android:text="@string/live_playback"
+                app:layout_constraintTop_toBottomOf="@id/recordingSeekbar"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <CheckBox
+                android:id="@+id/mixingPlayEnabled"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/recording_screen_checkbox_margin_horizontal"
+                android:checked="@={viewModel.mixingPlayActive}"
+                android:text="@string/mixing_play"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/recordingSeekbar" />
+
+        </LinearLayout>
 
         <TextView
             android:id="@+id/recordingTimerText"
@@ -70,7 +79,7 @@
             android:layout_height="wrap_content"
             android:text="@{viewModel.recordingTimerText}"
             android:layout_marginTop="@dimen/recording_timer_margin_top"
-            app:layout_constraintTop_toBottomOf="@id/livePlaybackEnabled"
+            app:layout_constraintTop_toBottomOf="@id/recordingCheckboxContainer"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             android:textColor="@color/colorAccent"

@@ -25,7 +25,7 @@
     <dimen name="audio_segment_selector_height">120dp</dimen>
     <dimen name="audio_segment_selector_width">60dp</dimen>
 
-    <dimen name="recording_screen_checkbox_margin_start">20dp</dimen>
+    <dimen name="recording_screen_checkbox_margin_horizontal">10dp</dimen>
 
     <dimen name="card_view_elevation">10dp</dimen>
 
