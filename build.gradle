@@ -24,6 +24,7 @@ buildscript {
         rxpermissions_version = "0.12"
         audio_record_view_version = "1.0.4"
         indicator_seekbar_version = "2.1.2"
+        firebase_bom_version = "26.8.0"
     }
     repositories {
         google()
@@ -34,6 +35,7 @@ buildscript {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath "android.arch.navigation:navigation-safe-args-gradle-plugin:1.0.0"
         classpath "com.google.dagger:hilt-android-gradle-plugin:$hilt_version"
+        classpath 'com.google.gms:google-services:4.3.5'
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
