@@ -39,7 +39,7 @@
 
     <string name="error_segment_bounds_required">Segment start and duration has to be set</string>
     <string name="error_segment_duration_should_be_less_than_duration">Segment duration should be less than file duration</string>
-    <string name="clear_bounds">Clear Bounds</string>
+    <string name="clear_bounds">Clear</string>
     <string name="menu_item_shift">Shift</string>
 
     <string name="error_shift_duration_required">Shift duration has to be set</string>
