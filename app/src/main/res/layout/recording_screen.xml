@@ -25,7 +25,6 @@
             app:chunkColor="@color/colorVisualizer"
             app:chunkSpace="@dimen/recording_visualizer_chunk_space"
             app:chunkWidth="@dimen/recording_visualizer_chunk_width"
-            app:chunkMaxHeight="@dimen/recording_visualizer_chunk_max_width"
             app:chunkMinHeight="@dimen/recording_visualizer_chunk_min_width"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"

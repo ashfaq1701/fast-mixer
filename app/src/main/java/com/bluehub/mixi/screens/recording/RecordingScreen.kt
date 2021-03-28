@@ -225,6 +225,8 @@ class RecordingScreen : BaseFragment<RecordingScreenViewModel>() {
     }
 
     private fun setupView() {
+        calculateVisualizerChunkMaxHeight()
+
         recordingSeekbar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
                 if (fromUser) {
@@ -247,6 +249,10 @@ class RecordingScreen : BaseFragment<RecordingScreenViewModel>() {
                 }
             }
         })
+    }
+
+    private fun calculateVisualizerChunkMaxHeight() {
+        audioRecordView.chunkMaxHeight = (audioRecordView.height * 0.95).toFloat()
     }
 
     private fun handleRecordingPermission(permission: Permission) {
@@ -289,6 +295,7 @@ class RecordingScreen : BaseFragment<RecordingScreenViewModel>() {
 
         viewModel.audioVisualizerMaxAmplitude.removeObservers(viewLifecycleOwner)
 
+        calculateVisualizerChunkMaxHeight()
         audioRecordView.recreate()
 
         setupVisualizerObserver()

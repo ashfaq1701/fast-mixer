@@ -14,7 +14,6 @@
     <dimen name="recording_visualizer_height">200dp</dimen>
     <dimen name="recording_visualizer_chunk_space">1dp</dimen>
     <dimen name="recording_visualizer_chunk_width">2dp</dimen>
-    <dimen name="recording_visualizer_chunk_max_width">160dp</dimen>
     <dimen name="recording_visualizer_chunk_min_width">0dp</dimen>
     <dimen name="recording_timer_margin_top">40dp</dimen>
 
