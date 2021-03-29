@@ -5,6 +5,9 @@ import android.os.Build
 import android.os.Bundle
 import android.view.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.WindowInsetsCompat.Type.systemBars
+import androidx.core.view.WindowInsetsControllerCompat
+import androidx.core.view.WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.bluehub.mixi.R
@@ -29,30 +32,21 @@ class SplashScreen : BaseFragment<SplashViewModel>() {
     override fun onAttach(context: Context) {
         super.onAttach(context)
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            requireActivity().window.insetsController?.hide(
-                WindowInsets.Type.statusBars() or WindowInsets.Type.navigationBars()
-            )
-        } else {
-            requireActivity().window.setFlags(
-                WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                WindowManager.LayoutParams.FLAG_FULLSCREEN
-            )
-        }
+        val window = requireActivity().window
+
+        val insetsControllerCompat = WindowInsetsControllerCompat(window, window.decorView)
+        insetsControllerCompat.systemBarsBehavior = BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        insetsControllerCompat.hide(systemBars())
     }
 
     override fun onDetach() {
         super.onDetach()
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            requireActivity().window.insetsController?.show(
-                WindowInsets.Type.statusBars() or WindowInsets.Type.navigationBars()
-            )
-        } else {
-            requireActivity().window.clearFlags(
-                WindowManager.LayoutParams.FLAG_FULLSCREEN
-            )
-        }
+        val window = requireActivity().window
+
+        val insetsControllerCompat = WindowInsetsControllerCompat(window, window.decorView)
+        insetsControllerCompat.systemBarsBehavior = BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        insetsControllerCompat.show(systemBars())
     }
 
     override fun onResume() {
