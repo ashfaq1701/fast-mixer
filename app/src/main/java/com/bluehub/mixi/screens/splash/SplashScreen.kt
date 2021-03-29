@@ -31,22 +31,12 @@ class SplashScreen : BaseFragment<SplashViewModel>() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-
-        val window = requireActivity().window
-
-        val insetsControllerCompat = WindowInsetsControllerCompat(window, window.decorView)
-        insetsControllerCompat.systemBarsBehavior = BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-        insetsControllerCompat.hide(systemBars())
+        hideSystemBars()
     }
 
     override fun onDetach() {
         super.onDetach()
-
-        val window = requireActivity().window
-
-        val insetsControllerCompat = WindowInsetsControllerCompat(window, window.decorView)
-        insetsControllerCompat.systemBarsBehavior = BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-        insetsControllerCompat.show(systemBars())
+        showSystemBars()
     }
 
     override fun onResume() {

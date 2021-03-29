@@ -3,6 +3,8 @@ package com.bluehub.mixi.common.fragments
 import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
 import io.reactivex.rxjava3.disposables.CompositeDisposable
@@ -24,5 +26,23 @@ abstract class BaseFragment<T: ViewModel> : Fragment() {
         val uri = Uri.fromParts("package", requireContext().packageName, null)
         intent.data = uri
         requireContext().startActivity(intent)
+    }
+
+    fun hideSystemBars() {
+        val window = requireActivity().window
+
+        val insetsControllerCompat = WindowInsetsControllerCompat(window, window.decorView)
+        insetsControllerCompat.systemBarsBehavior =
+            WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        insetsControllerCompat.hide(WindowInsetsCompat.Type.systemBars())
+    }
+
+    fun showSystemBars() {
+        val window = requireActivity().window
+
+        val insetsControllerCompat = WindowInsetsControllerCompat(window, window.decorView)
+        insetsControllerCompat.systemBarsBehavior =
+            WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        insetsControllerCompat.show(WindowInsetsCompat.Type.systemBars())
     }
 }
