@@ -9,7 +9,6 @@
         android:id="@+id/pbLoading"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/bg_loading_frame"
         android:elevation="@dimen/card_view_elevation"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
