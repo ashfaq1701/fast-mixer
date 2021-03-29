@@ -63,7 +63,7 @@
     <string name="mute">Mute</string>
     <string name="wav_extension">.wav</string>
     <string name="toggle_bottom_drawer">Toggle Bottom Drawer</string>
-    <string name="gain_db">Gain (dB):</string>
+    <string name="gain_db">Apply Gain (dB):</string>
     <string name="test_gain">Test Gain:</string>
     <string name="require_headphone">Require\'s headphone</string>
 
