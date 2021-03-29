@@ -1,6 +1,7 @@
 package com.bluehub.mixi.screens.splash
 
 import android.content.Context
+import android.os.Build
 import android.os.Bundle
 import android.view.*
 import androidx.appcompat.app.AppCompatActivity
@@ -27,16 +28,31 @@ class SplashScreen : BaseFragment<SplashViewModel>() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        requireActivity().window.insetsController?.hide(
-            WindowInsets.Type.statusBars() or WindowInsets.Type.navigationBars()
-        )
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            requireActivity().window.insetsController?.hide(
+                WindowInsets.Type.statusBars() or WindowInsets.Type.navigationBars()
+            )
+        } else {
+            requireActivity().window.setFlags(
+                WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN
+            )
+        }
     }
 
     override fun onDetach() {
         super.onDetach()
-        requireActivity().window.insetsController?.show(
-            WindowInsets.Type.statusBars() or WindowInsets.Type.navigationBars()
-        )
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            requireActivity().window.insetsController?.show(
+                WindowInsets.Type.statusBars() or WindowInsets.Type.navigationBars()
+            )
+        } else {
+            requireActivity().window.clearFlags(
+                WindowManager.LayoutParams.FLAG_FULLSCREEN
+            )
+        }
     }
 
     override fun onResume() {
