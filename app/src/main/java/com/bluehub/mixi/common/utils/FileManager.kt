@@ -3,8 +3,7 @@ package com.bluehub.mixi.common.utils
 import android.content.*
 import android.database.Cursor
 import android.net.Uri
-import android.os.Build
-import android.os.ParcelFileDescriptor
+import android.os.*
 import android.provider.MediaStore
 import android.provider.OpenableColumns
 import android.webkit.MimeTypeMap
@@ -57,6 +56,11 @@ class FileManager @Inject constructor(
         val newAudioDetails = ContentValues().apply {
             put(MediaStore.Audio.Media.DISPLAY_NAME, fileName)
             put(MediaStore.Audio.Media.MIME_TYPE, MimeTypeMap.getSingleton().getMimeTypeFromExtension("wav"))
+
+            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.Q) {
+                val directory = context.getExternalFilesDir(Environment.DIRECTORY_MUSIC)
+                put(MediaStore.Audio.Media.DATA, "$directory/$fileName")
+            }
         }
 
         return resolver
