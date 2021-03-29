@@ -1,18 +1,14 @@
 package com.bluehub.mixi.screens.splash
 
 import android.content.Context
-import android.os.Build
 import android.os.Bundle
 import android.view.*
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.WindowInsetsCompat.Type.systemBars
-import androidx.core.view.WindowInsetsControllerCompat
-import androidx.core.view.WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.bluehub.mixi.R
 import com.bluehub.mixi.common.fragments.BaseFragment
-import com.bluehub.mixi.screens.splash.SplashScreenDirections.*
+import com.bluehub.mixi.screens.splash.SplashScreenDirections.actionSplashScreenToMixingScreen
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
