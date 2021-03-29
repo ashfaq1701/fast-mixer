@@ -6,6 +6,11 @@ import com.tbruyelle.rxpermissions3.RxPermissions
 import dagger.*
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.FragmentComponent
+import dagger.hilt.android.scopes.FragmentScoped
+import javax.inject.Qualifier
+
+@Qualifier
+annotation class RecordingScreenRxPermission
 
 @Module
 @InstallIn(FragmentComponent::class)
@@ -16,6 +21,7 @@ object RecordingScreenModule {
         return fragment as RecordingScreen
     }
 
+    @RecordingScreenRxPermission
     @Provides
     fun rxPermission(fragment: RecordingScreen): RxPermissions = RxPermissions(fragment)
 }

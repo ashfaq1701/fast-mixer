@@ -30,6 +30,8 @@
     <string name="common_save">Save</string>
     <string name="permission_require_title">Permission required</string>
     <string name="permission_recording_require_message">Recording permission is required</string>
+    <string name="permission_read_require_message">Read permission is required</string>
+    <string name="permission_write_require_message">Write permission is required</string>
     <string name="common_cancel">Cancel</string>
     <string name="open_settings">Open settings</string>
     <string name="play_head_label">Play Head:</string>

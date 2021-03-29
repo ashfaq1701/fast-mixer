@@ -4,6 +4,8 @@
 
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:name="com.bluehub.mixi.MixerApplication"
@@ -17,7 +19,8 @@
         android:extractNativeLibs="${extractNativeLibs}">
         <activity
             android:name="com.bluehub.mixi.screens.MainActivity"
-            android:configChanges="orientation|screenSize">
+            android:configChanges="orientation|screenSize"
+            android:requestLegacyExternalStorage="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

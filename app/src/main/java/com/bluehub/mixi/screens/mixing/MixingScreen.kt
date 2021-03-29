@@ -1,5 +1,6 @@
 package com.bluehub.mixi.screens.mixing
 
+import android.Manifest
 import android.app.Activity
 import android.content.*
 import android.graphics.Rect
@@ -7,6 +8,7 @@ import android.os.Bundle
 import android.view.*
 import android.widget.LinearLayout
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -17,6 +19,7 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.RecyclerView
 import androidx.transition.*
 import com.bluehub.mixi.R
+import com.bluehub.mixi.common.di.screens.MixingScreenRxPermission
 import com.bluehub.mixi.common.fragments.BaseFragment
 import com.bluehub.mixi.common.models.AudioFileUiState
 import com.bluehub.mixi.common.models.AudioViewActionType
@@ -26,15 +29,21 @@ import com.bluehub.mixi.screens.mixing.modals.*
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.slider.RangeSlider
 import com.google.android.material.slider.Slider
+import com.tbruyelle.rxpermissions3.Permission
+import com.tbruyelle.rxpermissions3.RxPermissions
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.view_loading.*
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MixingScreen : BaseFragment<MixingScreenViewModel>() {
     companion object {
         fun newInstance() = MixingScreen()
     }
+
+    @MixingScreenRxPermission
+    @Inject lateinit var rxPermission: RxPermissions
 
     override val viewModel: MixingScreenViewModel by hiltNavGraphViewModels(R.id.nav_graph)
 
@@ -261,6 +270,28 @@ class MixingScreen : BaseFragment<MixingScreenViewModel>() {
                 viewModel.resetEventShowUnsupportedFileToast()
             }
         })
+
+        viewModel.requestReadPermission.observe(viewLifecycleOwner, {
+            if (it) {
+                rxPermission
+                    .requestEach(Manifest.permission.READ_EXTERNAL_STORAGE)
+                    .subscribe(::handleReadPermission)
+                    .addToDisposables()
+
+                viewModel.resetRequestReadPermission()
+            }
+        })
+
+        viewModel.requestWritePermission.observe(viewLifecycleOwner, {
+            if (it) {
+                rxPermission
+                    .requestEach(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    .subscribe(::handleWritePermission)
+                    .addToDisposables()
+
+                viewModel.resetRequestWritePermission()
+            }
+        })
     }
 
     private fun setupView() {
@@ -320,6 +351,40 @@ class MixingScreen : BaseFragment<MixingScreenViewModel>() {
                 }
             }
         })
+    }
+
+    private fun handleReadPermission(permission: Permission) {
+        when {
+            permission.granted -> {
+                viewModel.setReadPermissionGranted()
+                viewModel.addReadFile()
+            }
+            permission.shouldShowRequestPermissionRationale -> {
+                // Deny
+                showPermissionRequiredDialog(false, permission.name)
+            }
+            else -> {
+                // Deny and never ask again
+                showPermissionRequiredDialog(true, permission.name)
+            }
+        }
+    }
+
+    private fun handleWritePermission(permission: Permission) {
+        when {
+            permission.granted -> {
+                viewModel.setWritePermissionGranted()
+                viewModel.onSaveToDisk()
+            }
+            permission.shouldShowRequestPermissionRationale -> {
+                // Deny
+                showPermissionRequiredDialog(false, permission.name)
+            }
+            else -> {
+                // Deny and never ask again
+                showPermissionRequiredDialog(true, permission.name)
+            }
+        }
     }
 
     private fun addMenuItemEnabledListener() {
@@ -393,6 +458,30 @@ class MixingScreen : BaseFragment<MixingScreenViewModel>() {
     private fun showUnsupportedFileTypeToast() {
         val infoTxt = requireContext().getString(R.string.error_unsupported_file_type)
         Toast.makeText(requireContext(), infoTxt, Toast.LENGTH_LONG).show()
+    }
+
+    private fun showPermissionRequiredDialog(showSettingsLink: Boolean, permissionName: String) {
+        val message = when (permissionName) {
+            Manifest.permission.READ_EXTERNAL_STORAGE -> R.string.permission_read_require_message
+            Manifest.permission.WRITE_EXTERNAL_STORAGE -> R.string.permission_write_require_message
+            else -> return
+        }
+
+        val alertBuilder = AlertDialog.Builder(requireContext())
+            .setTitle(R.string.permission_require_title)
+            .setMessage(message)
+            .setNegativeButton(R.string.common_close) { dialogInterface: DialogInterface, _: Int ->
+                dialogInterface.cancel()
+            }
+
+        if (showSettingsLink) {
+            alertBuilder.setPositiveButton(R.string.open_settings) { _, _ ->
+                openAppSettingsPage()
+            }
+        }
+
+        alertBuilder.setCancelable(false)
+            .show()
     }
 }
 

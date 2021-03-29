@@ -13,6 +13,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.bluehub.mixi.R
+import com.bluehub.mixi.common.di.screens.RecordingScreenRxPermission
 import com.bluehub.mixi.common.fragments.BaseFragment
 import com.bluehub.mixi.databinding.RecordingScreenBinding
 import com.bluehub.mixi.screens.recording.RecordingScreenDirections.actionRecordingScreenToMixingScreen
@@ -31,6 +32,7 @@ class RecordingScreen : BaseFragment<RecordingScreenViewModel>() {
         fun newInstance() = RecordingScreen()
     }
 
+    @RecordingScreenRxPermission
     @Inject lateinit var rxPermission: RxPermissions
 
     override val viewModel: RecordingScreenViewModel by viewModels()

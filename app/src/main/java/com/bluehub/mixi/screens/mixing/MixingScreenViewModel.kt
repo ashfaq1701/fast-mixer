@@ -2,6 +2,7 @@ package com.bluehub.mixi.screens.mixing
 
 import android.content.Context
 import android.net.Uri
+import android.os.Build
 import androidx.lifecycle.*
 import com.bluehub.mixi.common.models.AudioFileUiState
 import com.bluehub.mixi.common.models.AudioViewAction
@@ -147,6 +148,20 @@ class MixingScreenViewModel @Inject constructor(@ApplicationContext val context:
         acc && !curr
     }
 
+    private val _requestReadPermission = MutableLiveData(false)
+    val requestReadPermission: LiveData<Boolean>
+        get() = _requestReadPermission
+
+    private val _readPermissionGranted = MutableLiveData(false)
+
+    private val _requestWritePermission = MutableLiveData(false)
+    val requestWritePermission: LiveData<Boolean>
+        get() = _requestWritePermission
+
+    private val _writePermissionGranted = MutableLiveData(false)
+
+    private var _readFileUri: Uri? = null
+
     init {
         mixingRepository.createMixingEngine()
 
@@ -175,8 +190,32 @@ class MixingScreenViewModel @Inject constructor(@ApplicationContext val context:
         _eventRead.value = false
     }
 
+    fun setReadPermissionGranted() {
+        _readPermissionGranted.value = true
+    }
+
+    fun setWritePermissionGranted() {
+        _writePermissionGranted.value = true
+    }
+
+    fun resetRequestReadPermission() {
+        _requestReadPermission.value = false
+    }
+
+    fun resetRequestWritePermission() {
+        _requestWritePermission.value = false
+    }
+
     fun onSaveToDisk() {
         if (_actionOpenWriteDialog.value == false) {
+
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+                if (_writePermissionGranted.value == null || _writePermissionGranted.value == false) {
+                    _requestWritePermission.value = true
+                    return
+                }
+            }
+
             _actionOpenWriteDialog.value = true
         }
     }
@@ -214,7 +253,21 @@ class MixingScreenViewModel @Inject constructor(@ApplicationContext val context:
         }
     }
 
-    fun addReadFile(fileUri: Uri) {
+    fun addReadFile(uri: Uri? = null) {
+
+        uri?.let {
+            _readFileUri = uri
+        }
+
+        val fileUri = _readFileUri ?: return
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+            if (_readPermissionGranted.value == null || _readPermissionGranted.value == false) {
+                _requestReadPermission.value = true
+                return
+            }
+        }
+
         val parcelFd = context.contentResolver.openFileDescriptor(fileUri, "r") ?: return
 
         val newFilePath = fileManager.getFileNameFromUri(context.contentResolver, fileUri)?.let {
