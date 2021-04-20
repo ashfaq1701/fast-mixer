@@ -10,7 +10,7 @@ This project is an open-source sound recorder and mixer for Android based mobile
 
 * This project is done using the latest android architecture components, MVVM, LiveData, Navigation, Data Binding, Coroutines etc.
 * Used Hilt for dependency injection.
-* Used RxJava and reactive programming patten to act against various view events.
+* Used RxJava and reactive programming pattern to act against various view events.
 * Designed some complex custom views doing heavy rendering jobs. Used RxJava observers heavily inside those views to react promptly against UI actions.
 * Performed all heavy computation and IO tasks in background threads (IO Dispatcher and Default Dispatcher).
 * NDK heavy project. Most of the operational parts of the project are done as native codes. The solution is scalable and will allow many layers of further improvements without major structural refactor.
