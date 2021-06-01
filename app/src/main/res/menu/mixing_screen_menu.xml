@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/action_record"
+        android:icon="@drawable/ic_baseline_fiber_manual_record_24"
+        android:title="@string/reset_label"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_read"
+        android:icon="@drawable/ic_baseline_storage_24"
+        android:title="@string/read_from_storage_label"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_write"
+        android:icon="@drawable/ic_baseline_save_alt_24"
+        android:title="@string/write_to_storage_label"
+        app:showAsAction="always" />
+</menu>

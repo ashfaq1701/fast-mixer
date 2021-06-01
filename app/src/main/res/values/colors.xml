@@ -1,18 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#6200EE</color>
-    <color name="colorPrimaryDark">#3700B3</color>
-    <color name="colorAccent">#03DAC5</color>
-    <color name="visualizer">#3F51B5</color>
+    <color name="colorPrimary">#020a5b</color>
+    <color name="colorAccent">#3f3189</color>
+    <color name="colorPrimaryDark">#000032</color>
+    <color name="primaryTextColor">#ffffff</color>
+
+    <color name="colorVisualizer">#4C01AE</color>
     <color name="borderColor">#CCCCCC</color>
     <color name="transparentBackground">#80000000</color>
-    <color name="colorGrayTransparent">#BBBDBDBD</color>
-    <color name="colorGlassTransparent">#CCE8FFFF</color>
+    <color name="colorGrayTransparent">#A68F8F8F</color>
+    <color name="colorTransparentArea">#CCF2F1FB</color>
     <color name="colorWhiteTransparent">#99FFFFFF</color>
-    <color name="colorAudioWaveViewSlider">#5D2BAE</color>
-    <color name="colorAudioWaveViewSliderPressed">#8950E6</color>
-    <color name="colorGainControlSeekbar">#E0E0E0</color>
+    <color name="colorAudioWaveViewSlider">#f4207c</color>
 
     <color name="colorBtnNormal">?attr/colorControlNormal</color>
-    <color name="colorBtnPressed">#434543</color>
 </resources>

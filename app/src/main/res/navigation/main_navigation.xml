@@ -5,12 +5,25 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/mixingScreen">
+    app:startDestination="@id/splashScreen">
+
+    <fragment
+        android:id="@+id/splashScreen"
+        android:label="SplashScreen"
+        android:name="com.bluehub.mixi.screens.splash.SplashScreen"
+        tools:layout="@layout/splash_screen">
+
+        <action
+            android:id="@+id/action_splashScreen_to_mixingScreen"
+            app:destination="@id/mixingScreen"
+            app:popUpTo="@id/splashScreen"
+            app:popUpToInclusive="true" />
+    </fragment>
 
     <fragment
         android:id="@+id/mixingScreen"
         android:label="MixingScreen"
-        android:name="com.bluehub.fastmixer.screens.mixing.MixingScreen"
+        android:name="com.bluehub.mixi.screens.mixing.MixingScreen"
         tools:layout="@layout/mixing_screen">
 
         <action
@@ -27,7 +40,7 @@
     <fragment
         android:id="@+id/recordingScreen"
         android:label="RecordingScreen"
-        android:name="com.bluehub.fastmixer.screens.recording.RecordingScreen"
+        android:name="com.bluehub.mixi.screens.recording.RecordingScreen"
         tools:layout="@layout/recording_screen">
 
         <action

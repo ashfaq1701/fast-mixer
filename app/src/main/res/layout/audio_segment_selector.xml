@@ -5,7 +5,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="@dimen/audio_segment_selector_height"
-        android:background="@color/colorGlassTransparent">
+        android:background="@color/colorTransparentArea">
 
         <View
             android:id="@+id/leftEdge"

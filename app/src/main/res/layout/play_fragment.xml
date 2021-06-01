@@ -7,7 +7,7 @@
     <data>
         <variable
             name="viewModel"
-            type="com.bluehub.fastmixer.screens.mixing.PlayViewModel" />
+            type="com.bluehub.mixi.screens.mixing.PlayViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -24,20 +24,24 @@
             android:layout_marginVertical="@dimen/play_screen_seekbar_margin" />
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:gravity="center"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/playSeekbar">
 
             <Button
+                style="@style/AppTheme.Button.Transparent.Accent"
                 android:id="@+id/playSingle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/inter_button_margin"
                 android:text="@string/play"
                 android:onClick="@{() -> viewModel.togglePlay()}"/>
 
             <Button
+                style="@style/AppTheme.Button.Transparent.Accent"
                 android:id="@+id/playAll"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

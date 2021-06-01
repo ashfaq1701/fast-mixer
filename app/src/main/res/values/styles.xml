@@ -1,14 +1,22 @@
 <resources>
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.MaterialComponents.Light.DarkActionBar">
+    <style name="AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
-    <style name="IconButton" parent="AppTheme">
+    <style name="AppTheme.RecordingScreenControlButton">
+        <item name="android:background">@drawable/circular_button_background</item>
+        <item name="android:layout_gravity">center</item>
+    </style>
+
+    <style name="AppTheme.Button" />
+
+    <style name="AppTheme.Button.Icon" parent="AppTheme">
         <item name="android:backgroundTint">@android:color/transparent</item>
+        <item name="android:background">?android:attr/selectableItemBackgroundBorderless</item>
     </style>
 
     <style name="ProgressBar">
@@ -24,6 +32,19 @@
     <style name="DialogWindow" parent="Theme.AppCompat.Light.Dialog.Alert">
         <item name="android:windowMinWidthMajor">100%</item>
         <item name="android:windowMinWidthMinor">100%</item>
+    </style>
+
+    <style name="AppTheme.PrimaryTextStyle">
+        <item name="android:textColor">?attr/colorControlNormal</item>
+    </style>
+
+    <style name="AppTheme.Button.Transparent"/>
+
+    <style name="AppTheme.Button.Transparent.Accent">
+        <item name="android:maxHeight">40dp</item>
+        <item name="android:minHeight">40dp</item>
+        <item name="android:background">@drawable/transparent_button_background</item>
+        <item name="android:textColor">@color/colorAccent</item>
     </style>
 
 </resources>

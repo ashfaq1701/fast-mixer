@@ -1,2 +1,2 @@
 include ':app'
-rootProject.name = "Fast Mixer"
+rootProject.name = "Mixi"

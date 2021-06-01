@@ -84,6 +84,8 @@ FileDataSource* FileDataSource::newFromCompressedFile(
 
     double duration = ffmpegExtractor->getDuration(dup(fd));
 
+    if (duration < 0) return nullptr;
+
     int64_t initialSize = (int64_t) ceil(duration) * targetProperties.channelCount * targetProperties.sampleRate;
 
     auto outputBuffer = make_unique<float[]>(initialSize);

@@ -7,7 +7,7 @@
     <data>
         <variable
             name="viewModel"
-            type="com.bluehub.fastmixer.screens.recording.RecordingScreenViewModel" />
+            type="com.bluehub.mixi.screens.recording.RecordingScreenViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -18,17 +18,24 @@
         <com.visualizer.amplitude.AudioRecordView
             android:id="@+id/recordingVisualizer"
             android:layout_width="wrap_content"
-            android:layout_height="@dimen/recording_visualizer_height"
+            android:layout_height="0dp"
             app:chunkAlignTo="bottom"
             app:chunkRoundedCorners="true"
             app:chunkSoftTransition="true"
-            app:chunkColor="@color/visualizer"
+            app:chunkColor="@color/colorVisualizer"
             app:chunkSpace="@dimen/recording_visualizer_chunk_space"
             app:chunkWidth="@dimen/recording_visualizer_chunk_width"
-            app:chunkMaxHeight="@dimen/recording_visualizer_chunk_max_width"
             app:chunkMinHeight="@dimen/recording_visualizer_chunk_min_width"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/recordingVisualizerGuideline"/>
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/recordingVisualizerGuideline"
+            android:layout_width="1dp"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.30"/>
 
         <SeekBar
             android:id="@+id/recordingSeekbar"
@@ -38,91 +45,87 @@
             app:layout_constraintStart_toStartOf="@+id/recordingVisualizer"
             android:layout_marginVertical="@dimen/play_seekbar_margin" />
 
-        <CheckBox
-            android:id="@+id/livePlaybackEnabled"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:checked="@={viewModel.livePlaybackActive}"
-            android:text="@string/live_playback_enabled"
-            app:layout_constraintTop_toBottomOf="@id/recordingSeekbar"
-            app:layout_constraintStart_toStartOf="@id/recordingSeekbar" />
-
-        <CheckBox
-            android:id="@+id/mixingPlayEnabled"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/recording_screen_checkbox_margin_start"
-            android:checked="@={viewModel.mixingPlayActive}"
-            android:text="@string/mixing_play_enabled"
-            app:layout_constraintStart_toEndOf="@id/livePlaybackEnabled"
-            app:layout_constraintTop_toBottomOf="@id/recordingSeekbar" />
-
-        <Button
-            android:id="@+id/toggleRecord"
-            android:layout_width="@dimen/record_button_width"
-            android:layout_height="@dimen/record_button_height"
-            android:textSize="@dimen/button_text_size"
-            android:onClick="@{() -> viewModel.toggleRecording()}"
-            android:text="@{viewModel.recordingLabel}"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintBottom_toTopOf="@id/goBack" />
-
-        <Button
-            android:id="@+id/togglePlay"
-            android:layout_width="@dimen/record_button_width"
-            android:layout_height="@dimen/record_button_height"
-            android:textSize="@dimen/button_text_size"
-            android:onClick="@{() -> viewModel.togglePlay()}"
-            android:text="@string/play_label"
-            app:layout_constraintStart_toEndOf="@id/toggleRecord"
-            app:layout_constraintEnd_toStartOf="@+id/togglePlayWithMixingTracks"
-            app:layout_constraintBottom_toTopOf="@id/goBack" />
-
-        <Button
-            android:id="@+id/togglePlayWithMixingTracks"
-            android:layout_width="@dimen/record_button_width"
-            android:layout_height="@dimen/record_button_height"
-            android:textSize="@dimen/button_text_size"
-            android:onClick="@{() -> viewModel.togglePlayWithMixingTracks()}"
-            android:text="@string/play_mixed_label"
-            app:layout_constraintStart_toEndOf="@id/togglePlay"
-            app:layout_constraintEnd_toStartOf="@+id/reset"
-            app:layout_constraintBottom_toTopOf="@id/goBack" />
-
-        <Button
-            android:id="@+id/reset"
-            android:layout_width="@dimen/record_button_width"
-            android:layout_height="@dimen/record_button_height"
-            android:textSize="@dimen/button_text_size"
-            android:onClick="@{() -> viewModel.reset()}"
-            android:text="@string/reset"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toTopOf="@id/goBack" />
-
-        <Button
-            android:id="@+id/goBack"
+        <LinearLayout
+            android:id="@+id/recordingCheckboxContainer"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/record_button_height"
-            android:textSize="@dimen/button_text_size"
-            android:onClick="@{() -> viewModel.setGoBack()}"
-            android:text="@string/done"
-            app:layout_constraintEnd_toEndOf="@id/reset"
-            app:layout_constraintStart_toStartOf="@+id/toggleRecord"
-            app:layout_constraintBottom_toBottomOf="parent"
-            android:layout_marginBottom="20dp" />
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/recordingSeekbar"
+            android:gravity="center">
+
+            <CheckBox
+                android:id="@+id/livePlaybackEnabled"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="@={viewModel.livePlaybackActive}"
+                android:text="@string/live_playback"
+                app:layout_constraintTop_toBottomOf="@id/recordingSeekbar"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <CheckBox
+                android:id="@+id/mixingPlayEnabled"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/recording_screen_checkbox_margin_horizontal"
+                android:checked="@={viewModel.mixingPlayActive}"
+                android:text="@string/mixing_play"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/recordingSeekbar" />
+
+        </LinearLayout>
 
         <TextView
             android:id="@+id/recordingTimerText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@{viewModel.recordingTimerText}"
-            tools:text="@string/recording_time"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginTop="@dimen/recording_timer_margin_top"
+            app:layout_constraintTop_toBottomOf="@id/recordingCheckboxContainer"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            android:gravity="center"
-            android:textSize="@dimen/recording_timer_text_size" />
+            android:textColor="@color/colorAccent"
+            android:textSize="@dimen/recording_timer_text_size"
+            tools:text="@string/recording_time" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/recordingButtonsContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginBottom="@dimen/recording_screen_button_bar_margin_bottom"
+            android:layout_marginHorizontal="@dimen/recording_screen_button_bar_margin_horizontal">
+
+            <ImageButton
+                style="@style/AppTheme.RecordingScreenControlButton"
+                android:id="@+id/toggleRecord"
+                android:layout_width="@dimen/circular_button_dimension"
+                android:layout_height="@dimen/circular_button_dimension"
+                android:src="@drawable/ic_baseline_fiber_manual_record_red_30"
+                android:onClick="@{() -> viewModel.toggleRecording()}"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"/>
+
+            <ImageButton
+                style="@style/AppTheme.RecordingScreenControlButton"
+                android:id="@+id/togglePlay"
+                android:layout_width="@dimen/circular_button_dimension"
+                android:layout_height="@dimen/circular_button_dimension"
+                android:src="@drawable/ic_baseline_play_arrow_green_30"
+                android:onClick="@{() -> viewModel.togglePlay()}"
+                app:layout_constraintStart_toStartOf="@id/toggleRecord"
+                app:layout_constraintEnd_toEndOf="@id/togglePlayWithMixingTracks"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageButton
+                style="@style/AppTheme.RecordingScreenControlButton"
+                android:id="@+id/togglePlayWithMixingTracks"
+                android:layout_width="@dimen/circular_button_dimension"
+                android:layout_height="@dimen/circular_button_dimension"
+                android:src="@drawable/ic_baseline_playlist_play_green_30"
+                android:onClick="@{() -> viewModel.togglePlayWithMixingTracks()}"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <include layout="@layout/view_loading" />
 

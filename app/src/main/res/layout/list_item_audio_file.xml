@@ -6,8 +6,8 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginVertical="@dimen/audio_file_margin">
-        <com.bluehub.fastmixer.common.views.FileWaveViewWidget
+        android:layout_marginVertical="@dimen/audio_file_card_view_margin_vertical">
+        <com.bluehub.mixi.common.views.FileWaveViewWidget
             android:id="@+id/fileWaveViewWidget"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

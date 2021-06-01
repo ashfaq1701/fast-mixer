@@ -7,183 +7,168 @@
     <data>
         <variable
             name="mixingScreenViewModel"
-            type="com.bluehub.fastmixer.screens.mixing.MixingScreenViewModel" />
-        <import type="com.bluehub.fastmixer.R"/>
+            type="com.bluehub.mixi.screens.mixing.MixingScreenViewModel" />
+        <import type="com.bluehub.mixi.R"/>
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:context=".screens.mixing.MixingScreen">
+        android:layout_height="match_parent">
 
-        <Button
-            android:id="@+id/goToRecord"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/constraintLayout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="40dp"
-            android:text="@string/record_label"
-            android:onClick="@{() -> mixingScreenViewModel.onRecord()}"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:layout_height="match_parent"
+            android:background="@drawable/mixing_screen_background">
 
-        <Button
-            android:id="@+id/readFromDisk"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:text="@string/read_from_disk"
-            android:onClick="@{() -> mixingScreenViewModel.onReadFromDisk()}"
-            app:layout_constraintTop_toBottomOf="@id/goToRecord" />
-
-        <Button
-            android:id="@+id/writeToDisk"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:text="@string/save_to_disk"
-            android:onClick="@{() -> mixingScreenViewModel.onSaveToDisk()}"
-            app:layout_constraintTop_toBottomOf="@id/readFromDisk" />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/audioFileListView"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            app:layout_constraintTop_toBottomOf="@id/writeToDisk"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            tools:listitem="@layout/list_item_audio_file"/>
-
-        <FrameLayout
-            android:id="@+id/groupPlayOverlay"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            app:layout_constraintBottom_toTopOf="@id/drawerContainer"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:clickable="true"
-            android:focusable="true"
-            android:visibility="gone"
-            tools:visibility="visible">
-
-            <LinearLayout
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/audioFileListView"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:layout_gravity="center"
-                android:gravity="center"
-                android:background="@drawable/rect_transparent"
-                android:backgroundTint="@color/colorGrayTransparent">
+                android:layout_height="0dp"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:listitem="@layout/list_item_audio_file" />
 
-                <com.google.android.material.slider.Slider
-                    android:id="@+id/groupPlaySeekbar"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:valueFrom="0.0"
-                    android:valueTo="100.0"
-                    android:value="0.0"
-                    android:layout_marginTop="@dimen/mixing_screen_seekbar_margin_top"
-                    android:layout_marginBottom="@dimen/mixing_screen_seekbar_margin_bottom" />
-
-                <com.google.android.material.slider.RangeSlider
-                    android:id="@+id/groupPlayBoundRangeSlider"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:valueFrom="0.0"
-                    android:valueTo="100.0"
-                    app:values="@array/initial_range_slider_values" />
+            <FrameLayout
+                android:id="@+id/groupPlayOverlay"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:visibility="visible">
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center">
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:background="@drawable/overlay_frame_transparent"
+                    android:gravity="center"
+                    android:orientation="vertical">
 
-                    <Button
-                        android:id="@+id/applySegment"
-                        android:layout_width="wrap_content"
+                    <com.google.android.material.slider.Slider
+                        android:id="@+id/groupPlaySeekbar"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/common_apply"
-                        android:onClick="@{() -> mixingScreenViewModel.applyCommonSegmentBounds()}" />
+                        android:layout_marginTop="@dimen/mixing_screen_seekbar_margin_top"
+                        android:layout_marginBottom="@dimen/mixing_screen_seekbar_margin_bottom"
+                        android:value="0.0"
+                        android:valueFrom="0.0"
+                        android:valueTo="100.0" />
 
-                    <Button
-                        android:id="@+id/closeGroupPlayOverlay"
-                        android:layout_width="wrap_content"
+                    <com.google.android.material.slider.RangeSlider
+                        android:id="@+id/groupPlayBoundRangeSlider"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/common_close"
-                        android:onClick="@{() -> mixingScreenViewModel.closeGroupPlayingOverlay()}"/>
+                        android:valueFrom="0.0"
+                        android:valueTo="100.0"
+                        app:values="@array/initial_range_slider_values" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:orientation="horizontal">
+
+                        <Button
+                            style="@style/AppTheme.Button.Transparent.Accent"
+                            android:id="@+id/applySegment"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:onClick="@{() -> mixingScreenViewModel.applyCommonSegmentBounds()}"
+                            android:layout_marginEnd="@dimen/inter_button_margin"
+                            android:text="@string/common_apply" />
+
+                        <Button
+                            style="@style/AppTheme.Button.Transparent.Accent"
+                            android:id="@+id/closeGroupPlayOverlay"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:onClick="@{() -> mixingScreenViewModel.closeGroupPlayingOverlay()}"
+                            android:text="@string/common_close" />
+                    </LinearLayout>
+
                 </LinearLayout>
 
-            </LinearLayout>
+            </FrameLayout>
 
-        </FrameLayout>
+            <include layout="@layout/view_loading" />
 
-        <ImageButton
-            android:id="@+id/drawerControl"
-            style="@style/IconButton"
-            android:layout_width="wrap_content"
-            android:layout_height="@dimen/bottom_drawer_height"
-            android:src="@drawable/drawer_control_button_open"
-            android:layout_marginStart="@dimen/bottom_drawer_margin_start"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            android:onClick="@{() -> mixingScreenViewModel.toggleBottomDrawer()}" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <LinearLayout
             android:id="@+id/drawerContainer"
-            android:layout_width="0dp"
-            android:layout_height="@dimen/bottom_drawer_height"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:background="@drawable/rect_transparent"
-            android:visibility="gone"
-            android:clickable="true"
-            android:focusable="true"
+            android:fitsSystemWindows="true"
             android:gravity="center"
-            android:orientation="horizontal"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/drawerControl"
-            tools:visibility="visible">
+            android:orientation="vertical"
+            app:behavior_hideable="false"
+            app:behavior_peekHeight="@dimen/mixing_screen_bottom_drawer_peek_height"
+            app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
 
-            <com.bluehub.fastmixer.common.views.GroupControlButton
-                android:id="@+id/pasteAsNew"
+            <ImageView
+                android:id="@+id/bottomSheetGrapple"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:btnDrawable="@{@drawable/paste_new_button}"
-                app:btnLabel="@{@string/paste_new}"
-                app:clickListener="@{mixingScreenViewModel.pasteAsNew}" />
+                android:layout_marginTop="@dimen/mixing_screen_bottom_drawer_handle_margin_top"
+                android:src="@drawable/bottom_sheet_handle"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-            <com.bluehub.fastmixer.common.views.GroupControlButton
-                android:id="@+id/groupPlayPause"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:btnDrawable="@{@drawable/group_play_button}"
-                app:btnLabel="@{@string/play}"
-                app:clickListener="@{mixingScreenViewModel.toggleGroupPlay}" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/bottom_drawer_height"
+                android:gravity="center">
 
-            <com.bluehub.fastmixer.common.views.GroupControlButton
-                android:id="@+id/groupZoomIn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:btnDrawable="@{@drawable/group_zoom_in_button}"
-                app:btnLabel="@{@string/zoom_in}"
-                app:clickListener="@{mixingScreenViewModel.groupZoomIn}" />
+                <com.bluehub.mixi.common.views.GroupControlButton
+                    android:id="@+id/pasteAsNew"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:btnDrawable="@{@drawable/ic_baseline_content_paste_30}"
+                    app:btnLabel="@{@string/paste_new}"
+                    app:clickListener="@{mixingScreenViewModel.pasteAsNew}" />
 
-            <com.bluehub.fastmixer.common.views.GroupControlButton
-                android:id="@+id/groupZoomOut"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:btnDrawable="@{@drawable/group_zoom_out_button}"
-                app:btnLabel="@{@string/zoom_out}"
-                app:clickListener="@{mixingScreenViewModel.groupZoomOut}" />
+                <com.bluehub.mixi.common.views.GroupControlButton
+                    android:id="@+id/groupPlayPause"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:btnDrawable="@{@drawable/ic_baseline_play_arrow_30}"
+                    app:btnLabel="@{@string/play}"
+                    app:clickListener="@{mixingScreenViewModel.toggleGroupPlay}" />
 
-            <com.bluehub.fastmixer.common.views.GroupControlButton
-                android:id="@+id/groupReset"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:btnDrawable="@{@drawable/group_reset_button}"
-                app:btnLabel="@{@string/reset}"
-                app:clickListener="@{mixingScreenViewModel.groupReset}" />
+                <com.bluehub.mixi.common.views.GroupControlButton
+                    android:id="@+id/groupZoomIn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:btnDrawable="@{@drawable/ic_baseline_zoom_in_30}"
+                    app:btnLabel="@{@string/zoom_in}"
+                    app:clickListener="@{mixingScreenViewModel.groupZoomIn}" />
+
+                <com.bluehub.mixi.common.views.GroupControlButton
+                    android:id="@+id/groupZoomOut"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:btnDrawable="@{@drawable/ic_baseline_zoom_out_30}"
+                    app:btnLabel="@{@string/zoom_out}"
+                    app:clickListener="@{mixingScreenViewModel.groupZoomOut}" />
+
+                <com.bluehub.mixi.common.views.GroupControlButton
+                    android:id="@+id/groupReset"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:btnDrawable="@{@drawable/ic_baseline_replay_30}"
+                    app:btnLabel="@{@string/reset_label}"
+                    app:clickListener="@{mixingScreenViewModel.groupReset}" />
+            </LinearLayout>
         </LinearLayout>
 
-        <include layout="@layout/view_loading" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>

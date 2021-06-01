@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'com.google.gms.google-services'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
@@ -13,7 +14,7 @@ android {
     buildToolsVersion "30.0.2"
 
     defaultConfig {
-        applicationId "com.bluehub.fastmixer"
+        applicationId "com.bluehub.mixi"
         minSdkVersion 23
         targetSdkVersion 30
         versionCode 1
@@ -96,6 +97,8 @@ dependencies {
             "androidx.hilt:hilt-navigation-fragment:$hilt_navigation_version",
             "io.reactivex.rxjava3:rxandroid:$rxjava_version",
             "io.reactivex.rxjava3:rxkotlin:$rxjava_version",
+            platform("com.google.firebase:firebase-bom:$firebase_bom_version"),
+            "com.google.firebase:firebase-analytics-ktx",
             "com.github.Armen101:AudioRecordView:$audio_record_view_version",
             "com.github.warkiz.widget:indicatorseekbar:$indicator_seekbar_version",
             "com.github.tbruyelle:rxpermissions:$rxpermissions_version"

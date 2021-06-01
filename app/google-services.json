@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "605691904946",
+    "project_id": "mixi-ed478",
+    "storage_bucket": "mixi-ed478.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:605691904946:android:55db3bd08571ad1a63daab",
+        "android_client_info": {
+          "package_name": "com.bluehub.mixi"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "605691904946-9m7r3b2vdksu65lttmc4u57sp7a6njon.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDZIPVVShLMnoFdKlfvPtjph2gykHaTHNM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "605691904946-9m7r3b2vdksu65lttmc4u57sp7a6njon.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

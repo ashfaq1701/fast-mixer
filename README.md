@@ -1,4 +1,4 @@
-# Fast Mixer
+# Mixi
 
 ### Video Preview
 
@@ -82,15 +82,15 @@ Then copy ```local.example.properties``` content in ```local.properties``` and t
   [prepare_kotlin_recording_method_ids](app/src/main/cpp/recording/recording-lib.cpp#L17)
   
 * In Kotlin side while reading from file, we used new Scoped Storage, which doesn't need any permission. From Kotlin to native code a FileDescriptor is passed, which is obtained from the ContentManager URI.  
-  [RecordingScreenViewModel::addRecordedFilePath](app/src/main/java/com/bluehub/fastmixer/screens/mixing/MixingScreenViewModel.kt#L188)  
-  [FileManager::getReadOnlyFdForPath](app/src/main/java/com/bluehub/fastmixer/common/utils/FileManager.kt#L33)
+  [RecordingScreenViewModel::addRecordedFilePath](app/src/main/java/com/bluehub/mixi/screens/mixing/MixingScreenViewModel.kt#L188)  
+  [FileManager::getReadOnlyFdForPath](app/src/main/java/com/bluehub/mixi/common/utils/FileManager.kt#L33)
   
 * While writing file as media using scoped storage, we first get the file descriptor for the media storage and then pass the file descriptor to C++ for writing,  
-  [WriteViewModel::performWrite](app/src/main/java/com/bluehub/fastmixer/screens/mixing/modals/WriteViewModel.kt#L54)  
-  [FileManager::getFileDescriptorForMedia](app/src/main/java/com/bluehub/fastmixer/common/utils/FileManager.kt#L45)
+  [WriteViewModel::performWrite](app/src/main/java/com/bluehub/mixi/screens/mixing/modals/WriteViewModel.kt#L54)  
+  [FileManager::getFileDescriptorForMedia](app/src/main/java/com/bluehub/mixi/common/utils/FileManager.kt#L45)
   
 * The whole custom view FileWaveView, pulls audio data into background thread, does the scaling efficiently and then does heavy rendering on the screen in an efficient and non-blocking manner too. This can be seen by navigating through the series of function calls fetchPointsToPlot, processPlotPoints and createAndDrawCanvas.  
-  [fetchPointsToPlot](app/src/main/java/com/bluehub/fastmixer/common/views/FileWaveView.kt#L183)  
+  [fetchPointsToPlot](app/src/main/java/com/bluehub/mixi/common/views/FileWaveView.kt#L183)  
   
 Other than these too, the whole codebase has many other solutions of interesting and complex problems. While doing this I faced countless issues and tried to solve them in standard manners and following the best practices.
   
@@ -143,27 +143,27 @@ A brief navigation to the project's architecture is given below,
 #### Kotlin (UI) part:
 UI portion of the app is built with Kotlin,
 
-* [screens](app/src/main/java/com/bluehub/fastmixer/screens) - This folder contains the screen related classes, such as activities, fragments and view models.
-* [screens/mixing](app/src/main/java/com/bluehub/fastmixer/screens/mixing) - This folder contains the mixing screen fragment, view model, repository and shared stores to share ui states between multiple view widgets.
-* [screens/mixing/FileWaveViewStore](app/src/main/java/com/bluehub/fastmixer/screens/FileWaveViewStore.kt) - As audio sources in this application needs to interact with each other to maintain relative width, this class is used as a centralized source of shared UI states. Instance of this object is dependency injected in all of the wave view instances.
-* [screens/mixing/AudioFileStore](app/src/main/java/com/bluehub/fastmixer/screens/mixing/AudioFileStore.kt) - Audio file UI states need to be preserved across app's navigation and also need to shared with the recording screen. This class acts a centralized source for the current list of loaded files.
-* [screens/mixing/PlayFlagStore](app/src/main/java/com/bluehub/fastmixer/screens/mixing/PlayFlagStore.kt) - Play states and Group Play state of the application needs to be shared among different parts of the code. So this is also implemented as a separate store, so that it can be dependency injected.
-* [screens/mixing/modals](app/src/main/java/com/bluehub/fastmixer/screens/mixing/modals) - Popup models inside of the mixing screen.
-* [screens/recording](app/src/main/java/com/bluehub/fastmixer/screens/recording) - Recording screen related stuffs. Fragment, view model and repository.
-* [common/di/screens](app/src/main/java/com/bluehub/fastmixer/common/di/screens) - This project uses hilt, not dagger, so for DI I didn't need to create a lot of modules, components etc. For creating an instance of RxPermission, I needed to create a module, which is injected into FragmentComponent directly. Hilt is great.
-* [common/fragments](app/src/main/java/com/bluehub/fastmixer/common/fragments) - Base fragment and base dialog fragment with bootstrapping code.
-* [common/repositories](app/src/main/java/com/bluehub/fastmixer/common/repositories) - Just some audio utility classes.
-* [common/utils](app/src/main/java/com/bluehub/fastmixer/common/utils) - Some random utility classes.
-* [common/viewmodel](app/src/main/java/com/bluehub/fastmixer/common/viewmodel) - Base view model with some bootstrapping code.
-* [common/views](app/src/main/java/com/bluehub/fastmixer/common/views) - All the custom views used in the app.
-* [common/views/FileWaveView](app/src/main/java/com/bluehub/fastmixer/common/views/FileWaveView.kt) - File wave view custom view class. This does heavy rendering job and heavily use RxJava observers.
-* [common/views/FileWaveViewWidget](app/src/main/java/com/bluehub/fastmixer/common/views/FileWaveViewWidget.kt) - Wrapper view around file wave view with control buttons and drop down menu. This view also registers and transforms many RxJava observers.
+* [screens](app/src/main/java/com/bluehub/mixi/screens) - This folder contains the screen related classes, such as activities, fragments and view models.
+* [screens/mixing](app/src/main/java/com/bluehub/mixi/screens/mixing) - This folder contains the mixing screen fragment, view model, repository and shared stores to share ui states between multiple view widgets.
+* [screens/mixing/FileWaveViewStore](app/src/main/java/com/bluehub/mixi/screens/FileWaveViewStore.kt) - As audio sources in this application needs to interact with each other to maintain relative width, this class is used as a centralized source of shared UI states. Instance of this object is dependency injected in all of the wave view instances.
+* [screens/mixing/AudioFileStore](app/src/main/java/com/bluehub/mixi/screens/mixing/AudioFileStore.kt) - Audio file UI states need to be preserved across app's navigation and also need to shared with the recording screen. This class acts a centralized source for the current list of loaded files.
+* [screens/mixing/PlayFlagStore](app/src/main/java/com/bluehub/mixi/screens/mixing/PlayFlagStore.kt) - Play states and Group Play state of the application needs to be shared among different parts of the code. So this is also implemented as a separate store, so that it can be dependency injected.
+* [screens/mixing/modals](app/src/main/java/com/bluehub/mixi/screens/mixing/modals) - Popup models inside of the mixing screen.
+* [screens/recording](app/src/main/java/com/bluehub/mixi/screens/recording) - Recording screen related stuffs. Fragment, view model and repository.
+* [common/di/screens](app/src/main/java/com/bluehub/mixi/common/di/screens) - This project uses hilt, not dagger, so for DI I didn't need to create a lot of modules, components etc. For creating an instance of RxPermission, I needed to create a module, which is injected into FragmentComponent directly. Hilt is great.
+* [common/fragments](app/src/main/java/com/bluehub/mixi/common/fragments) - Base fragment and base dialog fragment with bootstrapping code.
+* [common/repositories](app/src/main/java/com/bluehub/mixi/common/repositories) - Just some audio utility classes.
+* [common/utils](app/src/main/java/com/bluehub/mixi/common/utils) - Some random utility classes.
+* [common/viewmodel](app/src/main/java/com/bluehub/mixi/common/viewmodel) - Base view model with some bootstrapping code.
+* [common/views](app/src/main/java/com/bluehub/mixi/common/views) - All the custom views used in the app.
+* [common/views/FileWaveView](app/src/main/java/com/bluehub/mixi/common/views/FileWaveView.kt) - File wave view custom view class. This does heavy rendering job and heavily use RxJava observers.
+* [common/views/FileWaveViewWidget](app/src/main/java/com/bluehub/mixi/common/views/FileWaveViewWidget.kt) - Wrapper view around file wave view with control buttons and drop down menu. This view also registers and transforms many RxJava observers.
 * [common/views/CustomHorizontalScrollBar](common/views/CustomHorizontalScrollBar.kt) - Custom made horizontal scrollbar. I could not use ScrollView because the scroll gesture I needed for segment resizing. So this scrollbar is created.
-* [broadcastReceivers/AudioDeviceChangeListener](app/src/main/java/com/bluehub/fastmixer/broadcastReceivers/AudioDeviceChangeListener.kt) - Broadcast receiver to listen for changes in connected audio devices. Used to detect headphone or BT Headset connection / disconnection.
-* [audio](app/src/main/java/com/bluehub/fastmixer/audio) - C++ interfaces for this project.
-* [audio/MixingEngine](app/src/main/java/com/bluehub/fastmixer/audio/MixingEngine.kt) - C++ interfaced native functions used in mixing screen.
-* [audio/RecordingEngineProxy](app/src/main/java/com/bluehub/fastmixer/audio/RecordingEngineProxy.kt) - Wrapper class around RecordingEngine to avail dependency injection.
-* [audio/MixingEngineProxy](app/src/main/java/com/bluehub/fastmixer/audio/MixingEngineProxy.kt) - Wrapper class around MixingEngine to avail dependency injection.
+* [broadcastReceivers/AudioDeviceChangeListener](app/src/main/java/com/bluehub/mixi/broadcastReceivers/AudioDeviceChangeListener.kt) - Broadcast receiver to listen for changes in connected audio devices. Used to detect headphone or BT Headset connection / disconnection.
+* [audio](app/src/main/java/com/bluehub/mixi/audio) - C++ interfaces for this project.
+* [audio/MixingEngine](app/src/main/java/com/bluehub/mixi/audio/MixingEngine.kt) - C++ interfaced native functions used in mixing screen.
+* [audio/RecordingEngineProxy](app/src/main/java/com/bluehub/mixi/audio/RecordingEngineProxy.kt) - Wrapper class around RecordingEngine to avail dependency injection.
+* [audio/MixingEngineProxy](app/src/main/java/com/bluehub/mixi/audio/MixingEngineProxy.kt) - Wrapper class around MixingEngine to avail dependency injection.
 
 #### C++ (Engine) part:
 Audio and IO part of the app is done using C++,

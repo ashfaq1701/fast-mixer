@@ -133,9 +133,13 @@ double FFMpegExtractor::getDuration(int fd) {
         ioContext.reset(tmp);
     }
 
-    std::unique_ptr<AVFormatContext, decltype(&avformat_free_context)> formatContext {
+    std::unique_ptr<AVFormatContext, void(*)(AVFormatContext *)> formatContext {
             nullptr,
-            &avformat_free_context
+            [](AVFormatContext *f) {
+                if (f->iformat) {
+                    avformat_free_context(f);
+                }
+            }
     };
     {
         AVFormatContext *tmp;

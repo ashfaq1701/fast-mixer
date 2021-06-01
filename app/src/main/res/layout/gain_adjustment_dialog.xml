@@ -11,13 +11,23 @@
         android:minHeight="@dimen/dialog_min_height"
         tools:context=".screens.mixing.modals.GainAdjustmentDialog">
 
-        <com.warkiz.widget.IndicatorStayLayout
-            android:id="@+id/gainValuePickerLayout"
+        <TextView
+            android:id="@+id/gainValueLabel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginStart="@dimen/gain_label_margin_start"
             android:layout_marginTop="@dimen/gain_picker_seekbar_margin_top"
+            android:textSize="@dimen/control_label_size"
+            android:text="@string/gain_db"/>
+
+        <com.warkiz.widget.IndicatorStayLayout
+            android:id="@+id/gainValuePickerLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/gainValueLabel"
+            app:layout_constraintStart_toStartOf="parent"
             android:paddingBottom="@dimen/gain_picker_seekbar_padding_bottom">
 
             <com.warkiz.widget.IndicatorSeekBar
@@ -26,11 +36,12 @@
                 android:layout_height="wrap_content"
                 android:minHeight="@dimen/gain_seekbar_fixed_height"
                 android:maxHeight="@dimen/gain_seekbar_fixed_height"
-                app:isb_track_background_color="@color/colorGainControlSeekbar"
-                app:isb_track_progress_color="@color/colorGainControlSeekbar" />
+                app:isb_track_background_color="@color/colorAccent"
+                app:isb_track_progress_color="@color/colorAccent" />
         </com.warkiz.widget.IndicatorStayLayout>
 
         <Button
+            style="@style/AppTheme.Button.Transparent.Accent"
             android:id="@+id/applyGain"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -40,32 +51,43 @@
             android:layout_marginBottom="@dimen/apply_gain_buttom_margin_bottom"
             android:text="@string/common_apply"/>
 
+        <TextView
+            android:id="@+id/testGainLabel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/applyGain"
+            android:text="@string/test_gain"
+            android:layout_marginTop="@dimen/test_gain_margin_top"
+            android:layout_marginStart="@dimen/gain_label_margin_start"
+            android:textSize="@dimen/control_label_size" />
+
         <FrameLayout
             android:id="@+id/fragmentContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/applyGain"/>
+            app:layout_constraintTop_toBottomOf="@id/testGainLabel"/>
 
         <Button
+            style="@style/AppTheme.Button.Transparent.Accent"
             android:id="@+id/saveGainApplication"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/common_save"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/cancelGainApplication"
-            android:layout_marginBottom="@dimen/dialog_button_margin"
-            android:layout_marginEnd="@dimen/dialog_button_margin" />
+            android:layout_marginBottom="@dimen/inter_button_margin"
+            android:layout_marginEnd="@dimen/inter_button_margin" />
 
         <Button
+            style="@style/AppTheme.Button.Transparent.Accent"
             android:id="@+id/cancelGainApplication"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/common_close"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginBottom="@dimen/dialog_button_margin"
-            android:layout_marginEnd="@dimen/dialog_button_margin"/>
+            android:layout_marginBottom="@dimen/inter_button_margin"
+            android:layout_marginEnd="@dimen/inter_button_margin"/>
 
         <include layout="@layout/view_loading" />
 
