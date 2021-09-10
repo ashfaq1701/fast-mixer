@@ -2,7 +2,7 @@
 
 ### Video Preview
 
-[![See app preview](https://i.imgur.com/Ab8pHij.png)](https://youtu.be/v9aF8kAckFM)
+[![See app preview](https://i.imgur.com/ViyF4EO.png)](https://youtu.be/DAzPD5WPygM)
 
 This project is an open-source sound recorder and mixer for Android based mobile devices and tablets.
 
